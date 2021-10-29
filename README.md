@@ -1,8 +1,18 @@
 # XPower Token (XPOW)
 
-The XPower token &mdash; with XPOW as its symbol &mdash; is a proof-of-work token, that can only be minted by providing a proof-of-work nonce. It's fixed cap with a maximum supply of about 878.779 billion &times; 10^64 XPOW tokens; to be exact:
+The XPower token family &mdash; with XPOW as its symbol prefix &mdash; are proof-of-work tokens, that can only be minted by providing a correct nonce (with a recent block-hash). The XPOW-CPU, XPOW-GPU and XPOW-ASIC tokens are part of the same family with a maximum supply of 817.356B × 10^64 XPOW-CPU, 878.779 billion &times; 10^64 XPOW-GPU and 1'024.398T × 10^64 XPOW-ASIC tokens. To be exact:
 
-> 8787792486760604116967440826552207292435668479088792806564000920878366851072 XPOW
+The maximum supply of XPOW-CPU tokens is
+
+> 8173559240281143206369716588848558201407293035221686873373476518205632680466;
+
+the maximum supply of XPOW-GPU tokens is
+
+> 8787792486760604116967440826552207292435668479088792806564000920878366851072;
+
+and the maximum supply of XPOW-ASIC tokens is
+
+> 10243981394713817163879045579987358347893978955888388649865763135200064687833090.
 
 ## Installation
 
@@ -101,10 +111,10 @@ XPOW tokens can be mined and minted at [xpowermine.com](https://www.xpowermine.c
 
 > https://github.com/karun-i-sfarda/xpower-hh/archive/refs/heads/main.zip
 
-### Installation
+### Installation & Build
 
 ```shell
-npm install
+npm install && npm run build
 ```
 
 ### Environment Variables
@@ -139,28 +149,28 @@ In `hardhat.config.js` add a private key to the `accounts` list, which has been 
 ### Mining and Minting:
 
 ```shell
-npx hardhat mine --network mainnet --mint true
+npx hardhat mine --network mainnet --mint true [--token cpu|gpu|asic]
 ```
 
 ```
-[MINT] nonce = 0xac7f3e5c61295a59078b24c6a355c148d48d11061f9325f87e6bbea8a5ac3144 => 1 XPOW
-[MINT] nonce = 0x35d7b597ea30494c8ae23e0e097ad917fa4e4d030468cbcd74cd52fe18f2244b => 3 XPOW
-[MINT] nonce = 0xcc24af8987b8bdbd96bf75ab0fef61fa2b846166b62004ed09c7ec60631fbcbf => 1 XPOW
-[MINT] nonce = 0xb4664c014e633fd86df7e36e186ef18228b630c01322146cf6ec551b0880188e => 1 XPOW
+[MINT] nonce = 0xeebd6e3f8e8e4f37d051d1de0b985cc1d7e7bb1bdf47b709236ae585329f3093 => 2 XPOW.CPU
+[MINT] nonce = 0x3ad5505c118cd1994c379b961dd19a0001b7c38792109303a560ce07da91b24b => 1 XPOW.CPU
+[MINT] nonce = 0xfe2db5d91a9949c1213f70f7942bc9bb02097ce8e27e27b6d8db54de56a4c288 => 1 XPOW.CPU
+[MINT] nonce = 0x01fb1cec82deb1229c96268e9679c7fa08e88de2cdf14b9d5a7b07d42aecf617 => 1 XPOW.CPU
 ...
 ```
 
-..where you should observe the `[MINT]` prefix if mining and minting of the `nonce` has been successful, and where you should see the `amount` of XPOW tokens that have been minted on the right hand side. To ignore lower valued amounts, you can use the `threshold` option:
+..where you should observe the `[MINT]` prefix if mining and minting of the `nonce` has been successful, and where you should see the `amount` of XPOW tokens that have been minted on the right hand side. With the `token` option you can choose, which token you want to mine and mint for: possible values are `cpu`, `gpu` and `asic`. Further, to ignore lower valued amounts, you can use the `threshold` option:
 
 ```shell
-npx hardhat mine --network mainnet --mint true --threshold 3
+npx hardhat mine --network mainnet --mint true --threshold 3 [--token cpu|gpu|asic]
 ```
 
 ```
-[MINT] nonce = 0x8eef3e19c3ea635bb1bc0bad2fcf5a45b3d82074e83ad8665179da4d6390bbef => 3 XPOW
-[MINT] nonce = 0x9402f538e12a5372352a5b89c8b9a2cc3c411c3a44de820fde434869d57e5202 => 7 XPOW
-[MINT] nonce = 0xef1734a92b6d17fb86d2b3f474bb6f38ae83297ea32e273face1caf61dee02ba => 3 XPOW
-[MINT] nonce = 0xebc31a9e485efd6b258fe4fc05635c095592b4ebf8f0ca59de0849f8eb99b03c => 3 XPOW
+[MINT] nonce = 0x6f83302e4144d648d129cd0f6baa6bf66bd967f5eb2a94c27ca724648e79fff5 => 1 XPOW.CPU
+[MINT] nonce = 0xb83f064fa8b16532023fcc4ae83c3f3c678440bb8f0e5516ac8239412cec5c81 => 1 XPOW.CPU
+[MINT] nonce = 0xe0c678c7644eb974b8b0d8d75be677ed4c8047443d7aa364a6a3738b4d3b2343 => 2 XPOW.CPU
+[MINT] nonce = 0x93061dedf91e79d5cb5b7cef0f597e5a3a2ecbcb14a480b4e17c2f4b9ab39242 => 1 XPOW.CPU
 ...
 ```
 
@@ -169,7 +179,7 @@ npx hardhat mine --network mainnet --mint true --threshold 3
 ### XPOW and AVAX Balances
 
 ```shell
-npx hardhat balances-xpow --network mainnet
+npx hardhat balances-xpow --network mainnet [--token cpu|gpu|asic]
 ```
 
 ..which lists all present accounts with XPOW balances.

@@ -1,3 +1,4 @@
+/* globals hre */
 const { defaultAbiCoder: abi } = require("ethers/lib/utils");
 const { keccak256 } = require("ethers/lib/utils");
 const { BigNumber } = require("ethers");
@@ -24,9 +25,9 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
 });
 
 /**
- * List balances of accounts for AVAX
+ * List balances of accounts for AVAX coins
  */
-task("balances-avax", "Prints the list of balances for AVAX").setAction(
+task("balances-avax", "Prints the list of balances for AVAX coins").setAction(
   async (args, hre) => {
     const accounts = await hre.ethers.getSigners();
     assert(accounts.length > 0, "missing accounts");
@@ -40,71 +41,120 @@ task("balances-avax", "Prints the list of balances for AVAX").setAction(
 /**
  * List balances of accounts for XPOW tokens
  */
-task("balances-xpow", "Prints the list of balances for XPOW").setAction(
-  async (args, hre) => {
+task("balances-xpow", "Prints the list of balances for XPOW tokens")
+  .addParam("token", "xpow-cpu, xpow-gpu or xpow-asic", "xpow-cpu")
+  .setAction(async (args, hre) => {
+    const token = normalize(args.token || "xpow-cpu");
+    assert(typeof token === "string", "token is not a string");
     const accounts = await hre.ethers.getSigners();
     assert(accounts.length > 0, "missing accounts");
-    const address = process.env.XPOWER_ADDRESS;
-    assert(address, "missing contract address");
-    const xpower = await hre.ethers.getContractAt("XPower", address);
+    const xpower = await contract(token);
     assert(xpower, "missing contract");
     for (const { address } of accounts) {
       const balance = await xpower.balanceOf(address);
-      console.log(`${address} => ${balance.toString()} XPOW`);
+      console.log(`${address} => ${balance.toString()} ${token}`);
     }
-  }
-);
+  });
 
 /**
  * Mine (and mint) for XPOW tokens
  */
 task("mine", "Mines for XPOW tokens")
+  .addParam("cache", "cache block-hash", "false")
   .addParam("mint", "auto-mint if possible", "false")
   .addParam("threshold", "threshold of ignorance", "1")
+  .addParam("token", "xpow-cpu, xpow-gpu or xpow-asic", "xpow-cpu")
   .setAction(async (args, hre) => {
+    // process task arguments
+    const cache = JSON.parse(args.cache || "false");
+    assert(typeof cache === "boolean", "cache is not a boolean");
+    const mint = JSON.parse(args.mint || "false");
+    assert(typeof mint === "boolean", "mint is not a boolean");
     const threshold = JSON.parse(args.threshold || "1");
     assert(typeof threshold === "number", "threshold is not a number");
     assert(threshold > 0, "threshold is not larger than zero");
-    const contract_address = process.env.XPOWER_ADDRESS;
-    assert(contract_address, "missing XPOWER_ADDRESS");
+    const token = normalize(args.token || "xpow-cpu");
+    assert(typeof token === "string", "token is not a string");
+    // process environment vars
     const miner_address = process.env.MINER_ADDRESS;
     assert(miner_address, "missing MINER_ADDRESS");
-    const xpower = await hre.ethers.getContractAt("XPower", contract_address);
+    // get signer for miner and connect to contract
+    const xpower = await contract(token);
     assert(xpower, "missing contract");
-    const mint = JSON.parse(args.mint || "false");
-    assert(typeof mint === "boolean", "mint is not a boolean");
     const signers = await hre.ethers.getSigners();
     assert(signers.length > 0, "missing signers");
     const miner = signers.filter((s) => s.address === miner_address)[0];
     assert(miner, "missing signer for miner-address");
     const connect = xpower.connect(miner);
     assert(connect, "missing connection");
+    // get and cache most recent block-hash (if flag is set)
+    let { hash: block_hash } = await hre.ethers.provider.getBlock();
+    assert(block_hash, "missing block-hash");
+    if (cache) {
+      const init = await xpower.init();
+      assert(init, "failed to cache block-hash");
+      ({ block_hash } = await new Promise((resolve) => {
+        xpower.once("Init", (cached_hash, timestamp) => {
+          resolve({ block_hash: cached_hash, timestamp });
+        });
+      }));
+    }
     while (true) {
       const nonce = BigNumber.from(crypto.randomBytes(32));
-      const amount = mine(nonce, miner_address);
+      const amount = mine(token, nonce, miner_address, block_hash);
       if (!amount.isZero() && amount.gte(threshold)) {
         const xnonce = nonce.toHexString();
         if (mint) {
           try {
-            const minted = await xpower.mint(nonce);
+            const minted = await xpower.mint(nonce, block_hash);
             assert(minted, "failed to mint token(s)");
-            console.log(`[MINT] nonce = ${xnonce} => ${amount} XPOW`);
+            console.log(`[MINT] nonce = ${xnonce} => ${amount} ${token}`);
           } catch (ex) {
-            console.log(`[FAIL] nonce = ${xnonce} => ${amount} XPOW`);
+            console.log(`[FAIL] nonce = ${xnonce} => ${amount} ${token}`);
             console.error(ex);
             break;
           }
         } else {
-          console.log(`[WORK] nonce = ${xnonce} => ${amount} XPOW`);
+          console.log(`[WORK] nonce = ${xnonce} => ${amount} ${token}`);
         }
       }
     }
   });
 
-function mine(nonce, address) {
+function normalize(token) {
+  switch (token.toUpperCase()) {
+    case "OLD":
+    case "XPOW.OLD":
+    case "XPOW-OLD":
+    case "XPOW_OLD":
+      return "XPOW.OLD";
+    case "CPU":
+    case "XPOW.CPU":
+    case "XPOW-CPU":
+    case "XPOW_CPU":
+      return "XPOW.CPU";
+    case "GPU":
+    case "XPOW.GPU":
+    case "XPOW-GPU":
+    case "XPOW_GPU":
+      return "XPOW.GPU";
+    case "ASIC":
+    case "XPOW.ASIC":
+    case "XPOW-ASIC":
+    case "XPOW_ASIC":
+      return "XPOW.ASIC";
+    default:
+      return "XPOW.CPU";
+  }
+}
+
+function mine(token, nonce, address, block_hash) {
   const interval = BigNumber.from(Math.floor(new Date().getTime() / 3_600_000));
   const hash = keccak256(
-    abi.encode(["uint256", "address", "uint256"], [nonce, address, interval])
+    abi.encode(
+      ["string", "uint256", "address", "uint256", "bytes32"],
+      [token, nonce, address, interval, block_hash]
+    )
   );
   const zeros = (hash) => {
     const match = hash.match(/^0x(?<zeros>0+)/);
@@ -114,9 +164,60 @@ function mine(nonce, address) {
     return 0;
   };
   const amount = (hash) => {
-    return BigNumber.from(2 ** zeros(hash) - 1);
+    switch (token) {
+      case "XPOW.OLD":
+        return BigNumber.from(2 ** zeros(hash) - 1);
+      case "XPOW.CPU":
+        return BigNumber.from(zeros(hash));
+      case "XPOW.GPU":
+        return BigNumber.from(2 ** zeros(hash) - 1);
+      case "XPOW.ASIC":
+        return BigNumber.from(16 ** zeros(hash) - 1);
+      default:
+        return BigNumber.from(zeros(hash));
+    }
   };
   return amount(hash);
+}
+
+async function contract(token) {
+  switch (token) {
+    case "XPOW.OLD": {
+      const address =
+        process.env.XPOWER_ADDRESS_OLD ??
+        "0x74A68215AEdf59f317a23E87C13B848a292F27A4";
+      assert(address, "missing XPOWER_ADDRESS_OLD");
+      return await hre.ethers.getContractAt("XPowerGpu", address);
+    }
+    case "XPOW.CPU": {
+      const address =
+        process.env.XPOWER_ADDRESS_CPU ??
+        "0xf48C4a0394dD9F27117a43dBb6400872399AB7E7";
+      assert(address, "missing XPOWER_ADDRESS_CPU");
+      return await hre.ethers.getContractAt("XPowerCpu", address);
+    }
+    case "XPOW.GPU": {
+      const address =
+        process.env.XPOWER_ADDRESS_GPU ??
+        "0xc63e3B6D0a2d382A74B13D19426b65C0aa5F3648";
+      assert(address, "missing XPOWER_ADDRESS_GPU");
+      return await hre.ethers.getContractAt("XPowerGpu", address);
+    }
+    case "XPOW.ASIC": {
+      const address =
+        process.env.XPOWER_ADDRESS_ASC ??
+        "0xE71a2c51b8e0c35ee1F45ADDDb27fda1862Ad880";
+      assert(address, "missing XPOWER_ADDRESS_ASC");
+      return await hre.ethers.getContractAt("XPowerAsic", address);
+    }
+    default: {
+      const address =
+        process.env.XPOWER_ADDRESS_CPU ??
+        "0xf48C4a0394dD9F27117a43dBb6400872399AB7E7";
+      assert(address, "missing XPOWER_ADDRESS_CPU");
+      return await hre.ethers.getContractAt("XPowerCpu", address);
+    }
+  }
 }
 
 /**
@@ -163,12 +264,14 @@ module.exports = {
     },
     /* avalanche */ fuji: {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
+      gas: 2100000,
       gasPrice: 225000000000,
       chainId: 43113,
       accounts: [],
     },
     /* avalanche */ mainnet: {
       url: "https://api.avax.network/ext/bc/C/rpc",
+      gas: 2100000,
       gasPrice: 225000000000,
       chainId: 43114,
       accounts: [],

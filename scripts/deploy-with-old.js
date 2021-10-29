@@ -18,16 +18,25 @@ const assert = require("assert");
  * > await hre.run('compile');
  */
 async function main() {
-  const old_address = process.env.XPOWER_ADDRESS_OLD;
-  assert(old_address, "missing XPOWER_ADDRESS_OLD");
+  const nil_address = process.env.XPOWER_ADDRESS_NIL;
+  assert(nil_address, "missing XPOWER_ADDRESS_NIL");
   const owner_address = process.env.OWNER_ADDRESS;
   assert(owner_address, "missing OWNER_ADDRESS");
   const deadline = 1_814_400; // in seconds, i.e. 3 weeks
   //
+  // deploy XPOW-OLD: sealed => *not* migratable from nil address
+  //
+  const factory_old = await hre.ethers.getContractFactory("XPowerGpu");
+  const xpower_old = await factory_old.deploy(nil_address, deadline);
+  await xpower_old.deployed();
+  await xpower_old.seal();
+  console.log("[DEPLOY] XPower OLD contract to:", xpower_old.address);
+  await xpower_old.transferOwnership(owner_address);
+  //
   // deploy XPOW-CPU: sealed => *not* migratable from old address
   //
   const factory_cpu = await hre.ethers.getContractFactory("XPowerCpu");
-  const xpower_cpu = await factory_cpu.deploy(old_address, deadline);
+  const xpower_cpu = await factory_cpu.deploy(xpower_old.address, deadline);
   await xpower_cpu.deployed();
   await xpower_cpu.seal();
   console.log("[DEPLOY] XPower CPU contract to:", xpower_cpu.address);
@@ -36,7 +45,7 @@ async function main() {
   // deploy XPOW-GPU: *not* sealed => migratable from old address
   //
   const factory_gpu = await hre.ethers.getContractFactory("XPowerGpu");
-  const xpower_gpu = await factory_gpu.deploy(old_address, deadline);
+  const xpower_gpu = await factory_gpu.deploy(xpower_old.address, deadline);
   await xpower_gpu.deployed();
   console.log("[DEPLOY] XPower GPU contract to:", xpower_gpu.address);
   await xpower_gpu.transferOwnership(owner_address);
@@ -44,7 +53,7 @@ async function main() {
   // deploy XPOW-ASIC: sealed => *not* migratable from old address
   //
   const factory_asc = await hre.ethers.getContractFactory("XPowerAsic");
-  const xpower_asc = await factory_asc.deploy(old_address, deadline);
+  const xpower_asc = await factory_asc.deploy(xpower_old.address, deadline);
   await xpower_asc.deployed();
   await xpower_asc.seal();
   console.log("[DEPLOY] XPower ASC contract to:", xpower_asc.address);
