@@ -1,0 +1,60 @@
+{
+  "author": {
+    "email": "karun-i-sfarda@protonmail.com",
+    "name": "Kârūn The Dark",
+    "url": "https://github.com/karun-i-sfarda"
+  },
+  "description": "XPower token",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-etherscan": "^2.1.6",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.3.2",
+    "chai": "^4.3.4",
+    "dotenv": "^10.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.4.7",
+    "hardhat": "^2.6.4",
+    "hardhat-gas-reporter": "^1.0.4",
+    "prettier": "^2.4.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.18",
+    "solhint": "^3.3.6",
+    "solidity-coverage": "^0.7.17"
+  },
+  "engines": {
+    "node": ">=11.14.0"
+  },
+  "license": "GPL-3.0",
+  "name": "xpower",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hsk81/xpower"
+  },
+  "scripts": {
+    "build": "npx hardhat compile",
+    "clean": "npx hardhat clean",
+    "coverage": "npx hardhat coverage",
+    "deploy": "npx hardhat run 'scripts/deploy.js'",
+    "eslint": "npx eslint '**/*.js'",
+    "eslint-fix": "npx eslint '**/*.js' --fix",
+    "lint": "npm run eslint && npm run prettier && npm run solhint",
+    "lint-fix": "npm run eslint-fix && npm run prettier-fix && npm run solhint-fix",
+    "node": "npx hardhat node",
+    "prebuild": "npm run lint",
+    "prettier": "npx prettier '**/*.{json,sol,md}' --check --print-width 120",
+    "prettier-fix": "npx prettier '**/*.{json,sol,md}' --write --print-width 120",
+    "solhint": "npx solhint 'contracts/**/*.sol'",
+    "solhint-fix": "npx solhint 'contracts/**/*.sol' --fix",
+    "test": "npx hardhat test",
+    "test-gas": "REPORT_GAS=true npx hardhat test"
+  },
+  "version": "0.0.0"
+}
