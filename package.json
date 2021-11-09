@@ -56,5 +56,5 @@
     "test": "npx hardhat test",
     "test-gas": "REPORT_GAS=true npx hardhat test"
   },
-  "version": "0.0.0"
+  "version": "1.0.0"
 }
