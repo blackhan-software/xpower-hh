@@ -96,13 +96,21 @@ npx hardhat node
 ### Deploy smart contract(s)
 
 ```shell
-npx hardhat run 'scripts/deploy.js' [--no-compile] [--network $NETWORK]
+npx hardhat run 'scripts/deploy[-with-old].js' [--no-compile] [--network $NETWORK]
+```
+
+```shell
+npx hardhat run 'scripts/deploy-nfts.js' [--no-compile] [--network $NETWORK]
 ```
 
 ### ..or deploy smart contract(s) via
 
 ```shell
-node scripts/deploy.js [--no-compile] [--network $NETWORK]
+node scripts/deploy[-with-old].js [--no-compile] [--network $NETWORK]
+```
+
+```shell
+node scripts/deploy-nfts.js [--no-compile] [--network $NETWORK]
 ```
 
 ## Mining & Minting
@@ -149,7 +157,7 @@ In `hardhat.config.js` add a private key to the `accounts` list, which has been 
 ### Mining and Minting:
 
 ```shell
-npx hardhat mine --network mainnet --mint true [--token cpu|gpu|asic]
+npx hardhat mine --network mainnet --mint true [--cache false|true] [--token cpu|gpu|asic]
 ```
 
 ```
@@ -163,7 +171,7 @@ npx hardhat mine --network mainnet --mint true [--token cpu|gpu|asic]
 ..where you should observe the `[MINT]` prefix if mining and minting of the `nonce` has been successful, and where you should see the `amount` of XPOW tokens that have been minted on the right hand side. With the `token` option you can choose, which token you want to mine and mint for: possible values are `cpu`, `gpu` and `asic`. Further, to ignore lower valued amounts, you can use the `threshold` option:
 
 ```shell
-npx hardhat mine --network mainnet --mint true --threshold 3 [--token cpu|gpu|asic]
+npx hardhat mine --network mainnet --mint true --threshold 3 [--cache false|true] [--token cpu|gpu|asic]
 ```
 
 ```
@@ -192,4 +200,4 @@ npx hardhat balances-avax --network mainnet
 
 ## Copyright
 
-© 2021 [Kârūn The Lydian](https://github.com/karun-i-sfarda)
+ © 2021 [XPowerMine.com](https://www.xpowermine.com)

@@ -32,7 +32,10 @@ async function supplyOf(contract, delta = 0, log = console.log) {
     if (typeof log === "function") {
       log("H[", i, "] =", nonce_hash);
       if (!owners.isZero()) {
-        const relative_inv = amount.add(amount_extra).mul(PRECISION).div(amount_extra);
+        const relative_inv = amount
+          .add(amount_extra)
+          .mul(PRECISION)
+          .div(amount_extra);
         const relative_pct = (100 * PRECISION) / relative_inv.toNumber();
         log(
           `#[${i}] = ${amount.toString()} & ${amount_extra.toString()} =>`,

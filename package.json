@@ -1,30 +1,31 @@
 {
   "author": {
-    "email": "karun-i-sfarda@protonmail.com",
-    "name": "Kârūn The Dark",
-    "url": "https://github.com/karun-i-sfarda"
+    "email": "development@xpowermine.com",
+    "name": "Kârūn The Rich",
+    "url": "https://github.com/xpowermine"
   },
   "description": "XPower token",
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@nomiclabs/hardhat-etherscan": "^2.1.7",
+    "@nomiclabs/hardhat-ethers": "^2.0.3",
+    "@nomiclabs/hardhat-etherscan": "^2.1.8",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@openzeppelin/contracts": "^4.3.2",
+    "@openzeppelin/contracts": "^4.4.1",
     "chai": "^4.3.4",
     "dotenv": "^10.0.0",
-    "eslint": "^8.2.0",
+    "eslint": "^8.5.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-promise": "^5.1.1",
+    "eslint-plugin-promise": "^6.0.0",
     "ethereum-waffle": "^3.4.0",
-    "ethers": "^5.5.1",
-    "hardhat": "^2.6.8",
-    "hardhat-gas-reporter": "^1.0.4",
-    "prettier": "^2.4.1",
-    "prettier-plugin-solidity": "^1.0.0-beta.18",
+    "ethers": "^5.5.2",
+    "hardhat": "^2.8.0",
+    "hardhat-gas-reporter": "^1.0.6",
+    "moment": "^2.29.1",
+    "prettier": "^2.5.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.19",
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.17"
   },
@@ -36,7 +37,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/hsk81/xpower"
+    "url": "https://github.com/xpowermine/xpower-hh"
   },
   "scripts": {
     "build": "hardhat compile",
@@ -44,6 +45,8 @@
     "coverage": "hardhat coverage",
     "deploy": "hardhat run 'scripts/deploy.js'",
     "deploy-with-old": "hardhat run 'scripts/deploy-with-old.js'",
+    "deploy-nfts": "hardhat run 'scripts/deploy-nfts.js'",
+    "deploy-nfts-with-old": "hardhat run 'scripts/deploy-nfts-with-old.js'",
     "eslint": "eslint '**/*.js'",
     "eslint-fix": "eslint '**/*.js' --fix",
     "lint": "npm run eslint && npm run prettier && npm run solhint",

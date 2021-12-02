@@ -20,36 +20,40 @@ const assert = require("assert");
 async function main() {
   const old_address = process.env.XPOWER_ADDRESS_OLD;
   assert(old_address, "missing XPOWER_ADDRESS_OLD");
-  const owner_address = process.env.OWNER_ADDRESS;
-  assert(owner_address, "missing OWNER_ADDRESS");
+  const own_address = process.env.OWNER_ADDRESS;
+  assert(own_address, "missing OWNER_ADDRESS");
   const deadline = 1_814_400; // in seconds, i.e. 3 weeks
   //
-  // deploy XPOW-CPU: sealed => *not* migratable from old address
+  // deploy XPowerCpu: sealed => *not* migratable from old address
   //
-  const factory_cpu = await hre.ethers.getContractFactory("XPowerCpu");
-  const xpower_cpu = await factory_cpu.deploy(old_address, deadline);
-  await xpower_cpu.deployed();
-  await xpower_cpu.seal();
-  console.log("[DEPLOY] XPower CPU contract to:", xpower_cpu.address);
-  await xpower_cpu.transferOwnership(owner_address);
+  const cpu_factory = await hre.ethers.getContractFactory("XPowerCpu");
+  const cpu = await cpu_factory.deploy(old_address, deadline);
+  await cpu.deployed();
+  await cpu.seal();
+  console.log("[DEPLOY] XPower CPU contract to:", cpu.address);
+  await cpu.transferOwnership(own_address);
   //
-  // deploy XPOW-GPU: *not* sealed => migratable from old address
+  // deploy XPowerGpu: *not* sealed => migratable from old address
   //
-  const factory_gpu = await hre.ethers.getContractFactory("XPowerGpu");
-  const xpower_gpu = await factory_gpu.deploy(old_address, deadline);
-  await xpower_gpu.deployed();
-  console.log("[DEPLOY] XPower GPU contract to:", xpower_gpu.address);
-  await xpower_gpu.transferOwnership(owner_address);
+  const gpu_factory = await hre.ethers.getContractFactory("XPowerGpu");
+  const gpu = await gpu_factory.deploy(old_address, deadline);
+  await gpu.deployed();
+  await gpu.seal();
+  console.log("[DEPLOY] XPower GPU contract to:", gpu.address);
+  await gpu.transferOwnership(own_address);
   //
-  // deploy XPOW-ASIC: sealed => *not* migratable from old address
+  // deploy XPowerAsic: sealed => *not* migratable from old address
   //
-  const factory_asc = await hre.ethers.getContractFactory("XPowerAsic");
-  const xpower_asc = await factory_asc.deploy(old_address, deadline);
-  await xpower_asc.deployed();
-  await xpower_asc.seal();
-  console.log("[DEPLOY] XPower ASC contract to:", xpower_asc.address);
-  await xpower_asc.transferOwnership(owner_address);
-  console.log("[DEPLOY] and w/the ownership at:", owner_address);
+  const asc_factory = await hre.ethers.getContractFactory("XPowerAsic");
+  const asc = await asc_factory.deploy(old_address, deadline);
+  await asc.deployed();
+  await asc.seal();
+  console.log("[DEPLOY] XPower ASC contract to:", asc.address);
+  await asc.transferOwnership(own_address);
+  //
+  // show ownership address:
+  //
+  console.log("[DEPLOY] and w/the ownership at:", own_address);
 }
 
 /**

@@ -90,20 +90,36 @@ class HashTable {
 
   /** @returns nbh-cache[amount] => [nonce, block_hash] */
   get_nonce(amount) {
-    return this._A2NBH[amount].split(":");
+    if (this._A2NBH === undefined) {
+      this._A2NBH = {};
+    }
+    const nbh = this._A2NBH[amount];
+    if (typeof nbh !== "string") {
+      throw new Error(`no nonce for amount=${amount}`);
+    }
+    return nbh.split(":");
   }
 
   /** hash-cache[amount] = hash */
   set_hash(amount, hash) {
-    if (this._N2H === undefined) {
-      this._N2H = {};
+    if (this._NBH2H === undefined) {
+      this._NBH2H = {};
     }
-    this._N2H[this._A2NBH[amount]] = hash;
+    const nbh = this.get_nonce(amount);
+    this._NBH2H[nbh.join(":")] = hash;
   }
 
   /** @returns hash-cache[amount] => hash */
   get_hash(amount) {
-    return this._N2H[this._A2NBH[amount]];
+    if (this._NBH2H === undefined) {
+      this._NBH2H = {};
+    }
+    const nbh = this.get_nonce(amount);
+    const h = this._NBH2H[nbh.join(":")];
+    if (typeof h !== "string") {
+      throw new Error(`no hash for amount=${amount}`);
+    }
+    return h;
   }
 }
 

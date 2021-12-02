@@ -245,7 +245,7 @@ module.exports = {
       initialBaseFeePerGas: 0, // workaround
     },
     /* avalanche */ local: {
-      url: "http://localhost:9650/ext/bc/C/rpc",
+      url: "http://127.0.0.1:9650/ext/bc/C/rpc",
       gas: 2100000,
       gasPrice: 225000000000,
       chainId: 43112,
@@ -267,14 +267,20 @@ module.exports = {
       gas: 2100000,
       gasPrice: 225000000000,
       chainId: 43113,
-      accounts: [],
+      accounts: [
+        process.env.XPOWER_OWNERS_PK ??
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+      ],
     },
     /* avalanche */ mainnet: {
       url: "https://api.avax.network/ext/bc/C/rpc",
       gas: 2100000,
       gasPrice: 225000000000,
       chainId: 43114,
-      accounts: [],
+      accounts: [
+        process.env.XPOWER_OWNERS_PK ??
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+      ],
     },
   },
   gasReporter: {

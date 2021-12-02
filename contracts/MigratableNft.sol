@@ -1,5 +1,9 @@
 // solhint-disable not-rely-on-time
+<<<<<<< HEAD
 // SPDX-License-Identifier: GPL-3.0
+=======
+// SPDX-License-Identifier: MIT
+>>>>>>> 54e16f3 (XPower NFTs: 2021)
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
