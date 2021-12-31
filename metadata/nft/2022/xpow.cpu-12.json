@@ -1,0 +1,11 @@
+{
+  "description": "Stakeable XPOW.CPU TERA NFT",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmSMgiatWGHS1HjPQuEXr86iVrgdYtK9UAFDGwgAGbqZvN",
+  "name": "XPOW.CPU TERA",
+  "properties": {
+    "issue": "2022",
+    "label": "TERA",
+    "level": "5",
+    "token": "XPOW.CPU"
+  }
+}

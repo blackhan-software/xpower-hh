@@ -1,0 +1,11 @@
+[Unit]
+Description=XPower ASIC miner timer
+
+[Timer]
+OnBootSec=120
+OnCalendar=hourly
+Persistent=true
+Unit=asic-start@%i.service
+
+[Install]
+WantedBy=timers.target

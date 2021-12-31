@@ -1,0 +1,11 @@
+{
+  "description": "Stakeable XPOW.GPU KILO NFT",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmcfJpVtNWXX3V4VUxDdbnzagYyBmntogNDomAqpStvmQf",
+  "name": "XPOW.GPU KILO",
+  "properties": {
+    "issue": "2021",
+    "label": "KILO",
+    "level": "2",
+    "token": "XPOW.GPU"
+  }
+}

@@ -18,16 +18,25 @@ const assert = require("assert");
  * > await hre.run('compile');
  */
 async function main() {
-  const old_address = process.env.XPOWER_ADDRESS_OLD;
-  assert(old_address, "missing XPOWER_ADDRESS_OLD");
+  const nil_address = process.env.XPOWER_ADDRESS_NIL;
+  assert(nil_address, "missing XPOWER_ADDRESS_NIL");
   const own_address = process.env.OWNER_ADDRESS;
   assert(own_address, "missing OWNER_ADDRESS");
   const deadline = 1_814_400; // in seconds, i.e. 3 weeks
   //
+  // deploy XPower[Old]: sealed => *not* migratable from nil address
+  //
+  const old_factory = await hre.ethers.getContractFactory("XPowerGpu");
+  const old = await old_factory.deploy(nil_address, deadline);
+  await old.deployed();
+  await old.seal();
+  console.log("[DEPLOY] XPower OLD contract to:", old.address);
+  await old.transferOwnership(own_address);
+  //
   // deploy XPowerCpu: sealed => *not* migratable from old address
   //
   const cpu_factory = await hre.ethers.getContractFactory("XPowerCpu");
-  const cpu = await cpu_factory.deploy(old_address, deadline);
+  const cpu = await cpu_factory.deploy(old.address, deadline);
   await cpu.deployed();
   await cpu.seal();
   console.log("[DEPLOY] XPower CPU contract to:", cpu.address);
@@ -36,7 +45,7 @@ async function main() {
   // deploy XPowerGpu: *not* sealed => migratable from old address
   //
   const gpu_factory = await hre.ethers.getContractFactory("XPowerGpu");
-  const gpu = await gpu_factory.deploy(old_address, deadline);
+  const gpu = await gpu_factory.deploy(old.address, deadline);
   await gpu.deployed();
   await gpu.seal();
   console.log("[DEPLOY] XPower GPU contract to:", gpu.address);
@@ -45,7 +54,7 @@ async function main() {
   // deploy XPowerAsic: sealed => *not* migratable from old address
   //
   const asc_factory = await hre.ethers.getContractFactory("XPowerAsic");
-  const asc = await asc_factory.deploy(old_address, deadline);
+  const asc = await asc_factory.deploy(old.address, deadline);
   await asc.deployed();
   await asc.seal();
   console.log("[DEPLOY] XPower ASC contract to:", asc.address);
@@ -60,9 +69,12 @@ async function main() {
  * We recommend this pattern, to be able to use async plus await everywhere and
  * properly handle errors.
  */
-main()
-  .then(() => process.exit(0))
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  });
+if (require.main === module) {
+  main()
+    .then(() => process.exit(0))
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+}
+exports.main = main;

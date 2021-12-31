@@ -13,6 +13,9 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 12,
   },
+  globals: {
+    hre: true,
+  },
   overrides: [
     {
       files: ["hardhat.config.js"],
@@ -23,7 +26,7 @@ module.exports = {
       rules: { "no-process-exit": "off" },
     },
     {
-      files: ["hardhat.config.js", "scripts/**", "test/**"],
+      files: ["hardhat.config.js", "scripts/**", "source/**", "test/**"],
       rules: { "node/no-unpublished-require": "off" },
     },
   ],

@@ -1,0 +1,6 @@
+[Unit]
+Description=XPower ASIC miner (re)starter
+
+[Service]
+ExecStart=/usr/bin/systemctl restart --user asic-miner@%i.service
+Type=oneshot

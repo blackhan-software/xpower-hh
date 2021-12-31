@@ -1,0 +1,6 @@
+[Unit]
+Description=XPower CPU miner (re)starter
+
+[Service]
+ExecStart=/usr/bin/systemctl restart --user cpu-miner@%i.service
+Type=oneshot

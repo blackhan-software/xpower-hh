@@ -1,0 +1,11 @@
+[Unit]
+Description=XPower GPU miner timer
+
+[Timer]
+OnBootSec=120
+OnCalendar=hourly
+Persistent=true
+Unit=gpu-start@%i.service
+
+[Install]
+WantedBy=timers.target

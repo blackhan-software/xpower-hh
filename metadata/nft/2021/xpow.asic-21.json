@@ -1,0 +1,11 @@
+{
+  "description": "Stakeable XPOW.ASIC ZETTA NFT",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmUF52ohobpApMV8HKajQEqprLwzYRSGqYNG7zwAmnYJmz",
+  "name": "XPOW.ASIC ZETTA",
+  "properties": {
+    "issue": "2021",
+    "label": "ZETTA",
+    "level": "8",
+    "token": "XPOW.ASIC"
+  }
+}

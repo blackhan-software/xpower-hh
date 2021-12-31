@@ -1,0 +1,11 @@
+{
+  "description": "Stakeable XPOW.ASIC KILO NFT",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmdHP7QgLdkNe8XDaLQu8Cb7HtpMUdAaJu473HfFq9xUnq",
+  "name": "XPOW.ASIC KILO",
+  "properties": {
+    "issue": "2021",
+    "label": "KILO",
+    "level": "2",
+    "token": "XPOW.ASIC"
+  }
+}
