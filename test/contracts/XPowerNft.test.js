@@ -87,15 +87,15 @@ describe("XPowerNft", async function () {
     it("should increase XPOW allowance by amount=3", async function () {
       await increaseAllowanceBy(3);
     });
-    it("should mint NFTs for kind=UNIT & amount=3", async function () {
+    it("should mint NFTs for level=UNIT & amount=3", async function () {
       await mintXPow(3);
       await increaseAllowanceBy(3);
       await mintXPowNft(UNIT, 3);
     });
-    it("should *not* mint NFTs (non-ternary kind)", async function () {
+    it("should *not* mint NFTs (non-ternary level)", async function () {
       expect(
         await mintXPowNft(2, 3).catch((ex) => {
-          const m = ex.message.match(/non-ternary kind/);
+          const m = ex.message.match(/non-ternary level/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
@@ -137,15 +137,15 @@ describe("XPowerNft", async function () {
     it("should increase XPOW allowance by amount=1", async function () {
       await increaseAllowanceBy(3);
     });
-    it("should mint-batch NFTs for kind=UNIT & amount=1", async function () {
+    it("should mint-batch NFTs for level=UNIT & amount=1", async function () {
       await mintXPow(3);
       await increaseAllowanceBy(3);
       await mintBatchXPowNft(UNIT, 3);
     });
-    it("should *not* mint-batch NFTs (non-ternary kind[0])", async function () {
+    it("should *not* mint-batch NFTs (non-ternary level[0])", async function () {
       expect(
         await mintBatchXPowNft(2, 3).catch((ex) => {
-          const m = ex.message.match(/non-ternary kind/);
+          const m = ex.message.match(/non-ternary level/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
@@ -224,7 +224,7 @@ async function mintXPow(amount) {
 async function mintXPowNft(unit, amount) {
   const year = (await xpower_nft.year()).toNumber();
   expect(year).to.be.greaterThan(0);
-  await xpower_nft.mint(unit, amount);
+  await xpower_nft.mint(addresses[0], unit, amount);
   const nft_id = (await xpower_nft.idBy(year, unit)).toNumber();
   expect(nft_id).to.be.greaterThan(0);
   const nft_balance = await xpower_nft.balanceOf(addresses[0], nft_id);
@@ -239,7 +239,7 @@ async function mintXPowNft(unit, amount) {
 async function mintBatchXPowNft(unit, amount) {
   const year = (await xpower_nft.year()).toNumber();
   expect(year).to.be.greaterThan(0);
-  await xpower_nft.mintBatch([unit], [amount]);
+  await xpower_nft.mintBatch(addresses[0], [unit], [amount]);
   const nft_ids = await xpower_nft.idsBy(year, [unit]);
   expect(nft_ids.length).to.be.greaterThan(0);
   const nft_id = nft_ids[0].toNumber();

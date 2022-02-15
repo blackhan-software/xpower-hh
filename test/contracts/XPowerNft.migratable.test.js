@@ -72,14 +72,14 @@ describe("XPowerNft", async function () {
     it("should set XPOW NFT approval for all", async function () {
       await setNftApprovalForAll(xpower_nft_v2.address);
     });
-    it("should migrate NFTs for kind=UNIT & amount=1", async function () {
+    it("should migrate NFTs for level=UNIT & amount=1", async function () {
       await mintXPow(1);
       await increaseAllowanceBy(1);
       await mintXPowNft(UNIT, 1);
       await setNftApprovalForAll(xpower_nft_v2.address);
       await migrateXPowNft(UNIT, 1);
     });
-    it("should *not* migrate NFTs for kind=UNIT & amount=1 (caller is not owner nor approved)", async function () {
+    it("should *not* migrate NFTs for level=UNIT & amount=1 (caller is not owner nor approved)", async function () {
       await mintXPow(1);
       await increaseAllowanceBy(1);
       await mintXPowNft(UNIT, 1);
@@ -90,7 +90,7 @@ describe("XPowerNft", async function () {
         })
       ).to.eq(undefined);
     });
-    it("should *not* migrate NFTs for kind=UNIT & amount=1 (reverted with panic code 0x11)", async function () {
+    it("should *not* migrate NFTs for level=UNIT & amount=1 (reverted with panic code 0x11)", async function () {
       await mintXPow(1);
       await increaseAllowanceBy(1);
       await setNftApprovalForAll(xpower_nft_v2.address);
@@ -101,7 +101,7 @@ describe("XPowerNft", async function () {
         })
       ).to.eq(undefined);
     });
-    it("should *not* migrate NFTs for kind=UNIT & amount=1 (migration sealed)", async function () {
+    it("should *not* migrate NFTs for level=UNIT & amount=1 (migration sealed)", async function () {
       await mintXPow(1);
       await increaseAllowanceBy(1);
       await mintXPowNft(UNIT, 1);
@@ -118,14 +118,14 @@ describe("XPowerNft", async function () {
     it("should set XPOW NFT approval for all", async function () {
       await setNftApprovalForAll(xpower_nft_v2.address);
     });
-    it("should migrate-batch NFTs for kind=UNIT & amount=1", async function () {
+    it("should migrate-batch NFTs for level=UNIT & amount=1", async function () {
       await mintXPow(1);
       await increaseAllowanceBy(1);
       await mintBatchXPowNft(UNIT, 1);
       await setNftApprovalForAll(xpower_nft_v2.address);
       await migrateBatchXPowNft(UNIT, 1);
     });
-    it("should *not* migrate-batch NFTs for kind=UNIT & amount=1 (caller is not owner nor approved)", async function () {
+    it("should *not* migrate-batch NFTs for level=UNIT & amount=1 (caller is not owner nor approved)", async function () {
       await mintXPow(1);
       await increaseAllowanceBy(1);
       await mintXPowNft(UNIT, 1);
@@ -136,7 +136,7 @@ describe("XPowerNft", async function () {
         })
       ).to.eq(undefined);
     });
-    it("should *not* migrate-batch NFTs for kind=UNIT & amount=1 (reverted with panic code 0x11)", async function () {
+    it("should *not* migrate-batch NFTs for level=UNIT & amount=1 (reverted with panic code 0x11)", async function () {
       await mintXPow(1);
       await increaseAllowanceBy(1);
       await setNftApprovalForAll(xpower_nft_v2.address);
@@ -147,7 +147,7 @@ describe("XPowerNft", async function () {
         })
       ).to.eq(undefined);
     });
-    it("should *not* migrate-batch NFTs for kind=UNIT & amount=1 (migration sealed)", async function () {
+    it("should *not* migrate-batch NFTs for level=UNIT & amount=1 (migration sealed)", async function () {
       await mintXPow(1);
       await increaseAllowanceBy(1);
       await mintBatchXPowNft(UNIT, 1);
@@ -179,7 +179,7 @@ async function mintXPow(amount) {
 async function mintXPowNft(unit, amount) {
   const year = (await xpower_nft_v1.year()).toNumber();
   expect(year).to.be.greaterThan(0);
-  await xpower_nft_v1.mint(unit, amount);
+  await xpower_nft_v1.mint(addresses[0], unit, amount);
   const nft_id = (await xpower_nft_v1.idBy(year, unit)).toNumber();
   expect(nft_id).to.be.greaterThan(0);
   const nft_balance = await xpower_nft_v1.balanceOf(addresses[0], nft_id);
@@ -194,7 +194,7 @@ async function mintXPowNft(unit, amount) {
 async function mintBatchXPowNft(unit, amount) {
   const year = (await xpower_nft_v1.year()).toNumber();
   expect(year).to.be.greaterThan(0);
-  await xpower_nft_v1.mintBatch([unit], [amount]);
+  await xpower_nft_v1.mintBatch(addresses[0], [unit], [amount]);
   const nft_ids = await xpower_nft_v1.idsBy(year, [unit]);
   expect(nft_ids.length).to.be.greaterThan(0);
   const nft_id = nft_ids[0].toNumber();

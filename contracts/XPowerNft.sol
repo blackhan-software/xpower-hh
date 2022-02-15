@@ -26,7 +26,7 @@ abstract contract URIMalleable is ERC1155, Ownable {
  * where each NFT can only be minted by burning the corresponding amount.
  */
 contract XPowerNft is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, MigratableNft {
-    /** NFT kinds: UNIT, ..., YOTTA *or* higher! */
+    /** NFT levels: UNIT, ..., YOTTA *or* higher! */
     uint256 public constant UNIT = 0;
     uint256 public constant KILO = 3;
     uint256 public constant MEGA = 6;
@@ -53,26 +53,34 @@ contract XPowerNft is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, Mig
         _xpower = ERC20Burnable(xpower);
     }
 
-    /** create `amount` tokens of token type `kind` */
-    function mint(uint256 kind, uint256 amount) public {
-        require(kind % 3 == 0, "non-ternary kind");
-        uint256 xpow = amount * (10**kind);
+    /** mint particular amount of tokens for given level and address */
+    function mint(
+        address to,
+        uint256 level,
+        uint256 amount
+    ) public {
+        require(level % 3 == 0, "non-ternary level");
+        uint256 xpow = amount * (10**level);
         require(xpow > 0, "non-positive amount");
-        _xpower.burnFrom(msg.sender, xpow);
-        _mint(msg.sender, idBy(year(), kind), amount, "");
+        _xpower.burnFrom(to, xpow);
+        _mint(to, idBy(year(), level), amount, "");
     }
 
-    /** create `amounts` tokens of token types `kinds` */
-    function mintBatch(uint256[] memory kinds, uint256[] memory amounts) public {
+    /** mint particular amounts of tokens for given level and address */
+    function mintBatch(
+        address to,
+        uint256[] memory levels,
+        uint256[] memory amounts
+    ) public {
         uint256 xpow = 0;
-        for (uint256 i = 0; i < kinds.length; i++) {
-            require(kinds[i] % 3 == 0, "non-ternary kind");
-            uint256 delta = amounts[i] * (10**kinds[i]);
+        for (uint256 i = 0; i < levels.length; i++) {
+            require(levels[i] % 3 == 0, "non-ternary level");
+            uint256 delta = amounts[i] * (10**levels[i]);
             require(delta > 0, "non-positive amount");
             xpow += delta;
         }
-        _xpower.burnFrom(msg.sender, xpow);
-        _mintBatch(msg.sender, idsBy(year(), kinds), amounts, "");
+        _xpower.burnFrom(to, xpow);
+        _mintBatch(to, idsBy(year(), levels), amounts, "");
     }
 
     /** @return current number of years since anno domini */
@@ -82,22 +90,22 @@ contract XPowerNft is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, Mig
         return y + 1970;
     }
 
-    /** @return id composed of (year, kind) */
-    function idBy(uint256 _year, uint256 kind) public pure returns (uint256) {
-        require(kind < 100, "invalid kind");
-        return _year * 100 + kind;
+    /** @return ID composed of (year, level) */
+    function idBy(uint256 _year, uint256 level) public pure returns (uint256) {
+        require(level < 100, "invalid level");
+        return _year * 100 + level;
     }
 
-    /** @return ids composed of [(year, kind) for kind in kinds] */
-    function idsBy(uint256 _year, uint256[] memory kinds) public pure returns (uint256[] memory) {
-        uint256[] memory ids = new uint256[](kinds.length);
-        for (uint256 i = 0; i < kinds.length; i++) {
-            ids[i] = idBy(_year, kinds[i]);
+    /** @return IDs composed of [(year, level) for level in levels] */
+    function idsBy(uint256 _year, uint256[] memory levels) public pure returns (uint256[] memory) {
+        uint256[] memory ids = new uint256[](levels.length);
+        for (uint256 i = 0; i < levels.length; i++) {
+            ids[i] = idBy(_year, levels[i]);
         }
         return ids;
     }
 
-    /** destroy `amount` tokens of token type `id` from `from` */
+    /** burn particular amount of certain token(s) from given address */
     function _burn(
         address from,
         uint256 id,
@@ -106,16 +114,16 @@ contract XPowerNft is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, Mig
         super._burn(from, id, amount);
     }
 
-    /** destroy `amounts` tokens of token types `kinds` from `from` */
+    /** burn particular amounts of certain token(s) from given address */
     function _burnBatch(
         address from,
-        uint256[] memory kinds,
+        uint256[] memory ids,
         uint256[] memory amounts
     ) internal override(ERC1155) {
-        super._burnBatch(from, kinds, amounts);
+        super._burnBatch(from, ids, amounts);
     }
 
-    /** create `amount` tokens of token type `id`, and assigns them to `to` */
+    /** mint particular amount of certain token(s) for given address */
     function _mint(
         address to,
         uint256 id,
@@ -125,14 +133,14 @@ contract XPowerNft is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, Mig
         super._mint(to, id, amount, data);
     }
 
-    /** create `amounts` tokens of token types `kinds`, and assigns them to `to` */
+    /** mint particular amounts of certain token(s) for given address */
     function _mintBatch(
         address to,
-        uint256[] memory kinds,
+        uint256[] memory levels,
         uint256[] memory amounts,
         bytes memory data
     ) internal override(ERC1155) {
-        super._mintBatch(to, kinds, amounts, data);
+        super._mintBatch(to, levels, amounts, data);
     }
 
     /** called before any token transfer; includes (batched) minting and burning */

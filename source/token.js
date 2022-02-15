@@ -51,24 +51,19 @@ const zeros = (hash) => {
 };
 const contract = async (symbol) => {
   switch (symbol) {
-    case "XPOW.OLD": {
-      const address = process.env.XPOWER_ADDRESS_OLD;
-      assert(address, "missing XPOWER_ADDRESS_OLD");
-      return await hre.ethers.getContractAt("XPowerGpu", address);
-    }
     case "XPOW.CPU": {
-      const address = process.env.XPOWER_ADDRESS_CPU;
-      assert(address, "missing XPOWER_ADDRESS_CPU");
+      const address = process.env.XPOWER_ADDRESS_CPU_V3;
+      assert(address, "missing XPOWER_ADDRESS_CPU_V3");
       return await hre.ethers.getContractAt("XPowerCpu", address);
     }
     case "XPOW.GPU": {
-      const address = process.env.XPOWER_ADDRESS_GPU;
-      assert(address, "missing XPOWER_ADDRESS_GPU");
+      const address = process.env.XPOWER_ADDRESS_GPU_V3;
+      assert(address, "missing XPOWER_ADDRESS_GPU_V3");
       return await hre.ethers.getContractAt("XPowerGpu", address);
     }
     case "XPOW.ASIC": {
-      const address = process.env.XPOWER_ADDRESS_ASC;
-      assert(address, "missing XPOWER_ADDRESS_ASC");
+      const address = process.env.XPOWER_ADDRESS_ASC_V3;
+      assert(address, "missing XPOWER_ADDRESS_ASC_V3");
       return await hre.ethers.getContractAt("XPowerAsic", address);
     }
     default:
@@ -77,11 +72,6 @@ const contract = async (symbol) => {
 };
 const normalized = (symbol) => {
   switch (symbol.toUpperCase()) {
-    case "OLD":
-    case "XPOW.OLD":
-    case "XPOW-OLD":
-    case "XPOW_OLD":
-      return "XPOW.OLD";
     case "CPU":
     case "XPOW.CPU":
     case "XPOW-CPU":
@@ -103,8 +93,6 @@ const normalized = (symbol) => {
 };
 const threshold_of = (symbol) => {
   switch (symbol) {
-    case "XPOW.OLD":
-      return (level) => 2 ** level - 1;
     case "XPOW.CPU":
       return (level) => level;
     case "XPOW.GPU":
