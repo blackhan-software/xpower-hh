@@ -49,7 +49,7 @@ describe("XPowerGpuTest", async function () {
       expect(interval.toNumber()).to.be.greaterThan(0);
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const hash = await xpower.hash(nonce, addresses[0], interval, block_hash);
+      const hash = await xpower.hash(addresses[0], interval, block_hash, nonce);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 0 }));
     });
@@ -58,7 +58,7 @@ describe("XPowerGpuTest", async function () {
       expect(interval.toNumber()).to.be.greaterThan(0);
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const hash = await xpower.hash(nonce, addresses[0], interval, block_hash);
+      const hash = await xpower.hash(addresses[0], interval, block_hash, nonce);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 1 }));
     });
@@ -67,7 +67,7 @@ describe("XPowerGpuTest", async function () {
       expect(interval.toNumber()).to.be.greaterThan(0);
       const [nonce, block_hash] = table.getNonce({ amount: 3 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const hash = await xpower.hash(nonce, addresses[0], interval, block_hash);
+      const hash = await xpower.hash(addresses[0], interval, block_hash, nonce);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 3 }));
     });

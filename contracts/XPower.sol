@@ -14,7 +14,7 @@ import "./Migratable.sol";
  * Base class for the XPOW-CPU, XPOW-GPU & XPOW-ASIC proof-of-work tokens. It
  * verifies that the provided nonce & block-hash result in a positive amount,
  * as specified by the sub-classes. After the verification, the corresponding
- * number of tokens are minted for the sender (plus for the project fund).
+ * amount of tokens are minted for the beneficiary (plus for the treasury).
  */
 contract XPower is ERC20, ERC20Burnable, Ownable, Migratable {
     using EnumerableSet for EnumerableSet.UintSet;
@@ -52,23 +52,27 @@ contract XPower is ERC20, ERC20Burnable, Ownable, Migratable {
         emit Init(blockHash, timestamp);
     }
 
-    /** mint tokens for nonce, sender, interval and block-hash */
-    function mint(uint256 nonce, bytes32 blockHash) public {
+    /** mint tokens for beneficiary, interval, block-hash and nonce */
+    function mint(
+        address to,
+        bytes32 blockHash,
+        uint256 nonce
+    ) public {
         // get current interval (in hours)
         uint256 interval = _interval();
         // check block-hash to be recent
         _requireRecent(blockHash, interval);
-        // calculate nonce-hash of nonce for sender, interval & block-hash
-        bytes32 nonceHash = _hash(nonce, msg.sender, interval, blockHash);
+        // calculate nonce-hash for to, interval, block-hash & nonce
+        bytes32 nonceHash = _hash(to, interval, blockHash, nonce);
         require(!_hashes.contains(uint256(nonceHash)), "duplicate nonce-hash");
         // calculate amount of tokens for nonce-hash
         uint256 amount = _amount(nonceHash);
         require(amount > 0, "empty nonce-hash");
         // ensure unique nonce-hash (to be used once)
         _hashes.add(uint256(nonceHash));
-        // mint tokens for minter (i.e. nonce provider)
-        _mint(msg.sender, amount);
-        // mint tokens for owner (i.e. project fund)
+        // mint tokens for beneficiary (e.g. nonce provider)
+        _mint(to, amount);
+        // mint tokens for owner (i.e. project treasury)
         if (amount / 2 > 0) _mint(owner(), amount / 2);
     }
 
@@ -93,14 +97,14 @@ contract XPower is ERC20, ERC20Burnable, Ownable, Migratable {
         return interval;
     }
 
-    /** @return hash of nonce for sender, interval & block-hash */
+    /** @return hash of beneficiary, interval, block-hash & nonce */
     function _hash(
-        uint256 nonce,
-        address sender,
+        address to,
         uint256 interval,
-        bytes32 blockHash
-    ) internal pure virtual returns (bytes32) {
-        return keccak256(abi.encode("XPOW", nonce, sender, interval, blockHash));
+        bytes32 blockHash,
+        uint256 nonce
+    ) internal view virtual returns (bytes32) {
+        return keccak256(abi.encode(symbol(), to, interval, blockHash, nonce));
     }
 
     /** @return amount for provided nonce-hash */
@@ -109,7 +113,7 @@ contract XPower is ERC20, ERC20Burnable, Ownable, Migratable {
         return 0;
     }
 
-    /** @return leading zeros for nonce-hash */
+    /** @return leading zeros of provided nonce-hash */
     function _zeros(bytes32 nonceHash) internal pure returns (uint8) {
         uint8 counter = 0;
         for (uint8 i = 0; i < 32; i++) {
@@ -151,16 +155,6 @@ contract XPower is ERC20, ERC20Burnable, Ownable, Migratable {
 contract XPowerCpu is XPower {
     constructor(address _base, uint256 _deadlineIn) XPower("XPOW.CPU", _base, _deadlineIn) {}
 
-    /** @return hash of nonce for sender, interval & block-hash */
-    function _hash(
-        uint256 nonce,
-        address sender,
-        uint256 interval,
-        bytes32 blockHash
-    ) internal pure override returns (bytes32) {
-        return keccak256(abi.encode("XPOW.CPU", nonce, sender, interval, blockHash));
-    }
-
     /** @return amount for provided nonce-hash */
     function _amount(bytes32 nonceHash) internal pure override returns (uint256) {
         return _zeros(nonceHash);
@@ -174,16 +168,6 @@ contract XPowerCpu is XPower {
 contract XPowerGpu is XPower {
     constructor(address _base, uint256 _deadlineIn) XPower("XPOW.GPU", _base, _deadlineIn) {}
 
-    /** @return hash of nonce for sender, interval & block-hash */
-    function _hash(
-        uint256 nonce,
-        address sender,
-        uint256 interval,
-        bytes32 blockHash
-    ) internal pure override returns (bytes32) {
-        return keccak256(abi.encode("XPOW.GPU", nonce, sender, interval, blockHash));
-    }
-
     /** @return amount for provided nonce-hash */
     function _amount(bytes32 nonceHash) internal pure override returns (uint256) {
         return 2**_zeros(nonceHash) - 1;
@@ -196,16 +180,6 @@ contract XPowerGpu is XPower {
  */
 contract XPowerAsic is XPower {
     constructor(address _base, uint256 _deadlineIn) XPower("XPOW.ASIC", _base, _deadlineIn) {}
-
-    /** @return hash of nonce for sender, interval & block-hash */
-    function _hash(
-        uint256 nonce,
-        address sender,
-        uint256 interval,
-        bytes32 blockHash
-    ) internal pure override returns (bytes32) {
-        return keccak256(abi.encode("XPOW.ASIC", nonce, sender, interval, blockHash));
-    }
 
     /** @return amount for provided nonce-hash */
     function _amount(bytes32 nonceHash) internal pure override returns (uint256) {

@@ -13,12 +13,12 @@ contract XPowerCpuTest is XPowerCpu {
     }
 
     function hash(
-        uint256 _nonce,
-        address _sender,
+        address _to,
         uint256 _interval,
-        bytes32 _blockHash
-    ) public pure returns (bytes32) {
-        return _hash(_nonce, _sender, _interval, _blockHash);
+        bytes32 _blockHash,
+        uint256 _nonce
+    ) public view returns (bytes32) {
+        return _hash(_to, _interval, _blockHash, _nonce);
     }
 
     function amount(bytes32 _nonceHash) public pure returns (uint256) {
@@ -39,12 +39,12 @@ contract XPowerGpuTest is XPowerGpu {
     }
 
     function hash(
-        uint256 _nonce,
-        address _sender,
+        address _to,
         uint256 _interval,
-        bytes32 _blockHash
-    ) public pure returns (bytes32) {
-        return _hash(_nonce, _sender, _interval, _blockHash);
+        bytes32 _blockHash,
+        uint256 _nonce
+    ) public view returns (bytes32) {
+        return _hash(_to, _interval, _blockHash, _nonce);
     }
 
     function amount(bytes32 _nonceHash) public pure returns (uint256) {
@@ -65,12 +65,12 @@ contract XPowerAsicTest is XPowerAsic {
     }
 
     function hash(
-        uint256 _nonce,
-        address _sender,
+        address _to,
         uint256 _interval,
-        bytes32 _blockHash
-    ) public pure returns (bytes32) {
-        return _hash(_nonce, _sender, _interval, _blockHash);
+        bytes32 _blockHash,
+        uint256 _nonce
+    ) public view returns (bytes32) {
+        return _hash(_to, _interval, _blockHash, _nonce);
     }
 
     function amount(bytes32 _nonceHash) public pure returns (uint256) {

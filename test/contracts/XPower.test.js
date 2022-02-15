@@ -47,9 +47,13 @@ describe("XPower", async function () {
     it("should *not* mint for amount=0", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower.mint(nonce, block_hash).catch((ex) => {
-        expect(ex.message.match(/empty nonce-hash/)).to.be.not.null;
-      });
+      const tx = await xpower
+        .mint(addresses[0], block_hash, nonce)
+        .catch((ex) => {
+          const m = ex.message.match(/empty nonce-hash/);
+          if (m === null) console.debug(ex);
+          expect().to.be.not.null;
+        });
       expect(tx).to.eq(undefined);
       expect(await xpower.balanceOf(addresses[0])).to.eq(0);
       expect(await xpower.balanceOf(addresses[1])).to.eq(0);
@@ -57,7 +61,7 @@ describe("XPower", async function () {
     it("should mint for amount=1", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower.mint(nonce, block_hash);
+      const tx = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower.balanceOf(addresses[0])).to.eq(1);
       expect(await xpower.balanceOf(addresses[1])).to.eq(0);
@@ -65,13 +69,17 @@ describe("XPower", async function () {
     it("should mint for amount=1 once", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx_1st = await xpower.mint(nonce, block_hash);
+      const tx_1st = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx_1st).to.be.an("object");
       expect(await xpower.balanceOf(addresses[0])).to.eq(1);
       expect(await xpower.balanceOf(addresses[1])).to.eq(0);
-      const tx_2nd = await xpower.mint(nonce, block_hash).catch((ex) => {
-        expect(ex.message.match(/duplicate nonce-hash/)).to.be.not.null;
-      });
+      const tx_2nd = await xpower
+        .mint(addresses[0], block_hash, nonce)
+        .catch((ex) => {
+          const m = ex.message.match(/duplicate nonce-hash/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        });
       expect(tx_2nd).to.eq(undefined);
       expect(await xpower.balanceOf(addresses[0])).to.eq(1);
       expect(await xpower.balanceOf(addresses[1])).to.eq(0);
@@ -82,9 +90,13 @@ describe("XPower", async function () {
       const block_hash =
         "0x0000000000000000000000000000000000000000000000000000000000000000";
       expect(block_hash).to.exist;
-      const tx = await xpower.mint(nonce, block_hash).catch((ex) => {
-        expect(ex.message.match(/invalid block-hash/)).to.be.not.null;
-      });
+      const tx = await xpower
+        .mint(addresses[0], block_hash, nonce)
+        .catch((ex) => {
+          const m = ex.message.match(/invalid block-hash/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        });
       expect(tx).to.eq(undefined);
     });
     it("should *not* mint for amount=1 & expired block-hash", async function () {
@@ -93,15 +105,19 @@ describe("XPower", async function () {
       const block_hash =
         "0x0000000000000000000000000000000000000000000000000000000000000001";
       expect(block_hash).to.exist;
-      const tx = await xpower.mint(nonce, block_hash).catch((ex) => {
-        expect(ex.message.match(/expired block-hash/)).to.be.not.null;
-      });
+      const tx = await xpower
+        .mint(addresses[0], block_hash, nonce)
+        .catch((ex) => {
+          const m = ex.message.match(/expired block-hash/);
+          if (m == null) console.debug(ex);
+          expect(m).to.be.not.null;
+        });
       expect(tx).to.eq(undefined);
     });
     it("should mint for amount=3", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 3 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower.mint(nonce, block_hash);
+      const tx = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower.balanceOf(addresses[0])).to.eq(3);
       expect(await xpower.balanceOf(addresses[1])).to.eq(1);
@@ -109,13 +125,17 @@ describe("XPower", async function () {
     it("should mint for amount=3 once", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 3 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx_1 = await xpower.mint(nonce, block_hash);
+      const tx_1 = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx_1).to.be.an("object");
       expect(await xpower.balanceOf(addresses[0])).to.eq(3);
       expect(await xpower.balanceOf(addresses[1])).to.eq(1);
-      const tx_2nd = await xpower.mint(nonce, block_hash).catch((ex) => {
-        expect(ex.message.match(/duplicate nonce-hash/)).to.be.not.null;
-      });
+      const tx_2nd = await xpower
+        .mint(addresses[0], block_hash, nonce)
+        .catch((ex) => {
+          const m = ex.message.match(/duplicate nonce-hash/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        });
       expect(tx_2nd).to.eq(undefined);
       expect(await xpower.balanceOf(addresses[0])).to.eq(3);
       expect(await xpower.balanceOf(addresses[1])).to.eq(1);
@@ -126,9 +146,13 @@ describe("XPower", async function () {
       const block_hash =
         "0x0000000000000000000000000000000000000000000000000000000000000000";
       expect(block_hash).to.exist;
-      const tx = await xpower.mint(nonce, block_hash).catch((ex) => {
-        expect(ex.message.match(/invalid block-hash/)).to.be.not.null;
-      });
+      const tx = await xpower
+        .mint(addresses[0], block_hash, nonce)
+        .catch((ex) => {
+          const m = ex.message.match(/invalid block-hash/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        });
       expect(tx).to.eq(undefined);
     });
     it("should *not* mint for amount=3 & expired block-hash", async function () {
@@ -137,9 +161,13 @@ describe("XPower", async function () {
       const block_hash =
         "0x0000000000000000000000000000000000000000000000000000000000000001";
       expect(block_hash).to.exist;
-      const tx = await xpower.mint(nonce, block_hash).catch((ex) => {
-        expect(ex.message.match(/expired block-hash/)).to.be.not.null;
-      });
+      const tx = await xpower
+        .mint(addresses[0], block_hash, nonce)
+        .catch((ex) => {
+          const m = ex.message.match(/expired block-hash/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        });
       expect(tx).to.eq(undefined);
     });
   });
@@ -147,14 +175,20 @@ describe("XPower", async function () {
     it("should *not* mint for amount=0 & *not* burn 1 token", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx_mint = await xpower.mint(nonce, block_hash).catch((ex) => {
-        expect(ex.message.match(/empty nonce-hash/)).to.be.not.null;
-      });
+      const tx_mint = await xpower
+        .mint(addresses[0], block_hash, nonce)
+        .catch((ex) => {
+          const m = ex.message.match(/empty nonce-hash/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        });
       expect(tx_mint).to.eq(undefined);
       expect(await xpower.balanceOf(addresses[0])).to.eq(0);
       expect(await xpower.balanceOf(addresses[1])).to.eq(0);
       const tx_burn = await xpower.burn(1).catch((ex) => {
-        expect(ex.message.match(/burn amount exceeds balance/)).to.be.not.null;
+        const m = ex.message.match(/burn amount exceeds balance/);
+        if (m === null) console.debug(ex);
+        expect(m).to.be.not.null;
       });
       expect(tx_burn).to.eq(undefined);
       expect(await xpower.balanceOf(addresses[0])).to.eq(0);
@@ -163,14 +197,20 @@ describe("XPower", async function () {
     it("should *not* mint for amount=0 & *not* burn 2 tokens", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx_mint = await xpower.mint(nonce, block_hash).catch((ex) => {
-        expect(ex.message.match(/empty nonce-hash/)).to.be.not.null;
-      });
+      const tx_mint = await xpower
+        .mint(addresses[0], block_hash, nonce)
+        .catch((ex) => {
+          const m = ex.message.match(/empty nonce-hash/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        });
       expect(tx_mint).to.eq(undefined);
       expect(await xpower.balanceOf(addresses[0])).to.eq(0);
       expect(await xpower.balanceOf(addresses[1])).to.eq(0);
       const tx_burn = await xpower.burn(2).catch((ex) => {
-        expect(ex.message.match(/burn amount exceeds balance/)).to.be.not.null;
+        const m = ex.message.match(/burn amount exceeds balance/);
+        if (m === null) console.debug(ex);
+        expect(m).to.be.not.null;
       });
       expect(tx_burn).to.eq(undefined);
       expect(await xpower.balanceOf(addresses[0])).to.eq(0);
@@ -179,7 +219,7 @@ describe("XPower", async function () {
     it("should mint for amount=1 & burn 1 token", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower.mint(nonce, block_hash);
+      const tx = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower.balanceOf(addresses[0])).to.eq(1);
       expect(await xpower.balanceOf(addresses[1])).to.eq(0);
@@ -190,7 +230,7 @@ describe("XPower", async function () {
     it("should mint for amount=3 & burn 2 tokens", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 3 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower.mint(nonce, block_hash);
+      const tx = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower.balanceOf(addresses[0])).to.eq(3);
       expect(await xpower.balanceOf(addresses[1])).to.eq(1);

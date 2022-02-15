@@ -35,7 +35,7 @@ async function do_mint(
     const tid = setTimeout(() => {
       reject(new Error("[MINT] transaction timeout"));
     }, timeout_ms);
-    const minting = xpower.mint("0x" + nonce.toString(16), block_hash);
+    const minting = xpower.mint(address, block_hash, "0x" + nonce.toString(16));
     xpower.on("Transfer", async function listener(from, to, amount, ev) {
       try {
         const minted = await minting;

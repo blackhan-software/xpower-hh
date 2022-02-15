@@ -171,7 +171,7 @@ async function increaseAllowanceBy(amount) {
 async function mintXPow(amount) {
   const [nonce, block_hash] = table.getNonce({ amount });
   expect(nonce).to.greaterThanOrEqual(0);
-  const tx = await xpower.mint(nonce, block_hash);
+  const tx = await xpower.mint(addresses[0], block_hash, nonce);
   expect(tx).to.be.an("object");
   expect(await xpower.balanceOf(addresses[0])).to.eq(amount);
   expect(await xpower.balanceOf(addresses[1])).to.eq(Math.floor(amount / 2));

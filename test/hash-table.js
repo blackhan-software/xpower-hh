@@ -52,7 +52,7 @@ class HashTable {
       for (let n = start; n < start + length; n++) {
         const i = await this._contract.interval();
         const { hash: bh } = await ethers.provider.getBlock(0);
-        const h = await this._contract.hash(n, this._address, i, bh);
+        const h = await this._contract.hash(this._address, i, bh, n);
         const a = (await this._contract.amount(h)).toNumber();
         await fs.writeFile(path, `${JSON.stringify([n, bh, h, a])}\n`, {
           encoding: "utf8",

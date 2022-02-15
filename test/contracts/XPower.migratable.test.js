@@ -52,7 +52,7 @@ describe("Migration", async function () {
     it("should mint for amount=1", async function () {
       const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower_v1.mint(nonce, block_hash);
+      const tx = await xpower_v1.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower_v1.balanceOf(addresses[0])).to.eq(1);
     });
@@ -61,7 +61,7 @@ describe("Migration", async function () {
     it("should mint for amount=1", async function () {
       const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower_v2.mint(nonce, block_hash);
+      const tx = await xpower_v2.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower_v2.balanceOf(addresses[0])).to.eq(1);
       expect(await xpower_v2.balanceOf(addresses[1])).to.eq(0);
@@ -69,7 +69,7 @@ describe("Migration", async function () {
     it("should approve allowance v1[0] => v2", async function () {
       const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower_v1.mint(nonce, block_hash);
+      const tx = await xpower_v1.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower_v1.balanceOf(addresses[0])).to.eq(1);
       // increase allowance for spender (i.e. XPower.v2)
@@ -90,7 +90,9 @@ describe("Migration", async function () {
         expect(minter.address).to.match(/^0x/);
         const [nonce, block_hash] = table_2.getNonce({ amount: 3 });
         expect(nonce).to.greaterThanOrEqual(0);
-        const tx = await xpower_v1.connect(minter).mint(nonce, block_hash);
+        const tx = await xpower_v1
+          .connect(minter)
+          .mint(minter.address, block_hash, nonce);
         expect(tx).to.be.an("object");
         expect(await xpower_v1.balanceOf(minter.address)).to.eq(3);
         // increase allowance for spender (i.e. XPower.v2)
@@ -128,7 +130,9 @@ describe("Migration", async function () {
         expect(minter.address).to.match(/^0x/);
         const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
         expect(nonce).to.greaterThanOrEqual(0);
-        const tx = await xpower_v1.connect(minter).mint(nonce, block_hash);
+        const tx = await xpower_v1
+          .connect(minter)
+          .mint(minter.address, block_hash, nonce);
         expect(tx).to.be.an("object");
         expect(await xpower_v1.balanceOf(minter.address)).to.eq(2);
         // increase allowance for spender (i.e. XPower.v2)
@@ -161,7 +165,9 @@ describe("Migration", async function () {
     });
     it("should *not* migrate v1[0] => v2 (insufficient allowance: v1[0] = 0 balance)", async function () {
       const tx = await xpower_v2.migrate(1).catch((ex) => {
-        expect(ex.message.match(/insufficient allowance/)).to.be.not.null;
+        const m = ex.message.match(/insufficient allowance/);
+        if (m === null) console.debug(ex);
+        expect(m).to.be.not.null;
       });
       expect(tx).to.eq(undefined);
       const v2_migrated = await xpower_v2.migrated();
@@ -170,11 +176,13 @@ describe("Migration", async function () {
     it("should *not* migrate v1[0] => v2 (insufficient allowance)", async function () {
       const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower_v1.mint(nonce, block_hash);
+      const tx = await xpower_v1.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower_v1.balanceOf(addresses[0])).to.eq(1);
       const v2_migrate = await xpower_v2.migrate(1).catch((ex) => {
-        expect(ex.message.match(/insufficient allowance/)).to.be.not.null;
+        const m = ex.message.match(/insufficient allowance/);
+        if (m === null) console.debug(ex);
+        expect(m).to.be.not.null;
       });
       expect(v2_migrate).to.eq(undefined);
       const v2_migrated = await xpower_v2.migrated();
@@ -183,7 +191,7 @@ describe("Migration", async function () {
     it("should *not* migrate v1[0] => v2 (insufficient balance)", async function () {
       const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower_v1.mint(nonce, block_hash);
+      const tx = await xpower_v1.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower_v1.balanceOf(addresses[0])).to.eq(1);
       // increase allowance for spender (i.e. XPower.v2)
@@ -196,39 +204,23 @@ describe("Migration", async function () {
       expect(v2_allowance.toNumber()).to.eq(0);
       // migrate amount from v1[owner] to v2[owner]
       const v2_migrate = await xpower_v2.migrate(5).catch((ex) => {
-        expect(ex.message.match(/insufficient balance/)).to.be.not.null;
+        const m = ex.message.match(/insufficient balance/);
+        if (m === null) console.debug(ex);
+        expect(m).to.be.not.null;
       });
       expect(v2_migrate).to.eq(undefined);
       // ensure migrated amount = 0
       const v2_migrated = await xpower_v2.migrated();
       expect(v2_migrated).to.eq(0);
     });
-    it("should *not* migrate v1[0] => v2 (fund's share > 33.33%)", async function () {
-      const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
-      expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower_v1.mint(nonce, block_hash);
-      expect(tx).to.be.an("object");
-      expect(await xpower_v1.balanceOf(addresses[0])).to.eq(1);
-      // increase allowance for spender (i.e. XPower.v2)
-      const [owner, spender] = [addresses[0], xpower_v2.address];
-      const v1_increase = await xpower_v1.increaseAllowance(spender, 1);
-      expect(v1_increase).to.be.an("object");
-      const v1_allowance = await xpower_v1.allowance(owner, spender);
-      expect(v1_allowance.toNumber()).to.eq(1);
-      const v2_allowance = await xpower_v2.allowance(owner, spender);
-      expect(v2_allowance.toNumber()).to.eq(0);
-      // migrate amount from v1[owner] to v2[owner]
-      const v2_migrate = await xpower_v2.migrate(1).catch((ex) => {
-        expect(ex.message.match(/fund's share > 33.33%/)).to.be.not.null;
-      });
-      expect(v2_migrate).to.eq(undefined);
-    });
     it("should migrate v1[2] => v2", async function () {
       const minter = accounts[2];
       expect(minter.address).to.match(/^0x/);
       const [nonce, block_hash] = table_2.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower_v1.connect(minter).mint(nonce, block_hash);
+      const tx = await xpower_v1
+        .connect(minter)
+        .mint(minter.address, block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower_v1.balanceOf(minter.address)).to.eq(1);
       // increase allowance for spender (i.e. XPower.v2)
@@ -258,39 +250,14 @@ describe("Migration", async function () {
       const v2_balance_spender = await xpower_v2.balanceOf(spender);
       expect(v2_balance_spender.toNumber()).to.eq(0);
     });
-    it("should *not* migrate v1[2] => v2 (non-positive amount)", async function () {
-      const minter = accounts[2];
-      expect(minter.address).to.match(/^0x/);
-      const [nonce, block_hash] = table_2.getNonce({ amount: 1 });
-      expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower_v1.connect(minter).mint(nonce, block_hash);
-      expect(tx).to.be.an("object");
-      expect(await xpower_v1.balanceOf(minter.address)).to.eq(1);
-      // increase allowance for spender (i.e. XPower.v2)
-      const [owner, spender] = [minter.address, xpower_v2.address];
-      const v1_increase = await xpower_v1
-        .connect(minter)
-        .increaseAllowance(spender, 1);
-      expect(v1_increase).to.be.an("object");
-      const v1_allowance = await xpower_v1.allowance(owner, spender);
-      expect(v1_allowance.toNumber()).to.eq(1);
-      const v2_allowance = await xpower_v2.allowance(owner, spender);
-      expect(v2_allowance.toNumber()).to.eq(0);
-      // try to migrate amount from v1[owner] to v2[owner]
-      const v2_migrate = await xpower_v2
-        .connect(minter)
-        .migrate(0)
-        .catch((ex) => {
-          expect(ex.message.match(/non-positive amount/)).to.be.not.null;
-        });
-      expect(v2_migrate).to.eq(undefined);
-    });
     it("should *not* migrate v1[2] => v2 (migration sealed)", async function () {
       const minter = accounts[2];
       expect(minter.address).to.match(/^0x/);
       const [nonce, block_hash] = table_2.getNonce({ amount: 1 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower_v1.connect(minter).mint(nonce, block_hash);
+      const tx = await xpower_v1
+        .connect(minter)
+        .mint(minter.address, block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower_v1.balanceOf(minter.address)).to.eq(1);
       // deploy xpower.v2 contract (w/o transferring ownership):
@@ -317,7 +284,9 @@ describe("Migration", async function () {
         .connect(minter)
         .migrate(1)
         .catch((ex) => {
-          expect(ex.message.match(/migration sealed/)).to.be.not.null;
+          const m = ex.message.match(/migration sealed/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         });
       expect(v2_migrate).to.eq(undefined);
       // ensure migrated amount = 0
@@ -329,7 +298,9 @@ describe("Migration", async function () {
       expect(minter.address).to.match(/^0x/);
       const [nonce, block_hash] = table_2.getNonce({ amount: 3 });
       expect(nonce).to.greaterThanOrEqual(0);
-      const tx = await xpower_v1.connect(minter).mint(nonce, block_hash);
+      const tx = await xpower_v1
+        .connect(minter)
+        .mint(minter.address, block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower_v1.balanceOf(minter.address)).to.eq(3);
       expect(await xpower_v1.balanceOf(addresses[0])).to.eq(1);
@@ -364,7 +335,9 @@ describe("Migration", async function () {
         .connect(minter)
         .migrate(1)
         .catch((ex) => {
-          expect(ex.message.match(/deadline passed/)).to.be.not.null;
+          const m = ex.message.match(/deadline passed/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         });
       expect(v2_migrate_3).to.eq(undefined);
       // ensure migrated amount = 2 (and not 3)
@@ -393,7 +366,9 @@ describe("Migration", async function () {
         const v2_seal = await xpower_v2.connect(minter).seal();
         expect(v2_seal).to.be.an(undefined);
       } catch (ex) {
-        expect(ex.message.match(/caller is not the owner/)).to.be.not.null;
+        const m = ex.message.match(/caller is not the owner/);
+        if (m === null) console.debug(ex);
+        expect(m).to.be.not.null;
       }
     });
   });

@@ -154,13 +154,13 @@ async function loop(
   { cache, refresh, block_hash, timestamp, mint, level }
 ) {
   let at_interval = interval();
-  let nonce = BigNumber.from(crypto.randomBytes(32)).toBigInt();
+  let nonce = large_random();
   const { start, now } = { start: nonce, now: performance.now() };
   const mine = await miner(level);
   const token = new Token(symbol);
   const threshold = token.threshold(level);
   while (true) {
-    const hashed = mine(symbol, address, nonce, at_interval, block_hash);
+    const hashed = mine(symbol, address, at_interval, block_hash, nonce);
     const amount = token.amount_of(hashed);
     if (amount >= threshold) {
       const hms = Number(nonce - start) / (performance.now() - now);
@@ -192,6 +192,13 @@ async function loop(
     }
     nonce++;
   }
+}
+function large_random() {
+  const bytes = crypto.randomBytes(32);
+  if (bytes[0] > 15) {
+    return BigNumber.from(bytes).toBigInt();
+  }
+  return large_random();
 }
 exports.start = start;
 exports.workers = workers;

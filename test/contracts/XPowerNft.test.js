@@ -95,14 +95,18 @@ describe("XPowerNft", async function () {
     it("should *not* mint NFTs (non-ternary kind)", async function () {
       expect(
         await mintXPowNft(2, 3).catch((ex) => {
-          expect(ex.message.match(/non-ternary kind/)).to.be.not.null;
+          const m = ex.message.match(/non-ternary kind/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
     it("should *not* mint NFTs (non-positive amount)", async function () {
       expect(
         await mintXPowNft(UNIT, 0).catch((ex) => {
-          expect(ex.message.match(/non-positive amount/)).to.be.not.null;
+          const m = ex.message.match(/non-positive amount/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
@@ -110,16 +114,18 @@ describe("XPowerNft", async function () {
       await increaseAllowanceBy(3);
       expect(
         await mintXPowNft(UNIT, 3).catch((ex) => {
-          expect(ex.message.match(/burn amount exceeds balance/)).to.be.not
-            .null;
+          const m = ex.message.match(/burn amount exceeds balance/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
-    it("should *not* mint NFTs (burn amount exceeds allowance)", async function () {
+    it("should *not* mint NFTs (insufficient allowance)", async function () {
       expect(
         await mintXPowNft(UNIT, 3).catch((ex) => {
-          expect(ex.message.match(/burn amount exceeds allowance/)).to.be.not
-            .null;
+          const m = ex.message.match(/insufficient allowance/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
@@ -139,14 +145,18 @@ describe("XPowerNft", async function () {
     it("should *not* mint-batch NFTs (non-ternary kind[0])", async function () {
       expect(
         await mintBatchXPowNft(2, 3).catch((ex) => {
-          expect(ex.message.match(/non-ternary kind/)).to.be.not.null;
+          const m = ex.message.match(/non-ternary kind/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
     it("should *not* mint-batch NFTs (non-positive amount[0])", async function () {
       expect(
         await mintBatchXPowNft(UNIT, 0).catch((ex) => {
-          expect(ex.message.match(/non-positive amount/)).to.be.not.null;
+          const m = ex.message.match(/non-positive amount/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
@@ -154,16 +164,18 @@ describe("XPowerNft", async function () {
       await increaseAllowanceBy(3);
       expect(
         await mintBatchXPowNft(UNIT, 3).catch((ex) => {
-          expect(ex.message.match(/burn amount exceeds balance/)).to.be.not
-            .null;
+          const m = ex.message.match(/burn amount exceeds balance/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
-    it("should *not* mint-batch NFTs (burn amount exceeds allowance)", async function () {
+    it("should *not* mint-batch NFTs (insufficient allowance)", async function () {
       expect(
         await mintBatchXPowNft(UNIT, 3).catch((ex) => {
-          expect(ex.message.match(/burn amount exceeds allowance/)).to.be.not
-            .null;
+          const m = ex.message.match(/insufficient allowance/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
@@ -186,7 +198,9 @@ describe("XPowerNft", async function () {
       await xpower_nft.transferOwnership(addresses[1]);
       expect(
         await xpower_nft.setURI(NFT_GPU_WWW).catch((ex) => {
-          expect(ex.message.match(/caller is not the owner/)).to.be.not.null;
+          const m = ex.message.match(/caller is not the owner/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
@@ -202,7 +216,7 @@ async function increaseAllowanceBy(amount) {
 async function mintXPow(amount) {
   const [nonce, block_hash] = table.getNonce({ amount });
   expect(nonce).to.greaterThanOrEqual(0);
-  const tx = await xpower.mint(nonce, block_hash);
+  const tx = await xpower.mint(addresses[0], block_hash, nonce);
   expect(tx).to.be.an("object");
   expect(await xpower.balanceOf(addresses[0])).to.eq(amount);
   expect(await xpower.balanceOf(addresses[1])).to.eq(Math.floor(amount / 2));

@@ -4,12 +4,14 @@ class Token {
   static async contract(symbol, address) {
     const instance = await contract(symbol);
     assert(instance, "missing contract instance");
-    const signers = await hre.ethers.getSigners();
-    assert(signers.length > 0, "missing signers");
-    const signer = signers.filter((s) => s.address === address)[0];
-    assert(signer, "missing signer for miner-address");
-    const connect = instance.connect(signer);
-    assert(connect, "missing connection");
+    if (typeof address === "string") {
+      const signers = await hre.ethers.getSigners();
+      assert(signers.length > 0, "missing signers");
+      const signer = signers.filter((s) => s.address === address)[0];
+      assert(signer, "missing signer for address");
+      const connect = instance.connect(signer);
+      assert(connect, "missing connection");
+    }
     return instance;
   }
 

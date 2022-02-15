@@ -3,7 +3,7 @@ const { InitializeKeccak } = require("keccak-wasm");
 const { keccak256 } = require("keccak-wasm");
 const { block } = require("./block");
 
-// cache: (interval: number) => abi.encode(token, nonce, ...)
+// cache: (interval: number) => abi.encode(token, ...)
 const abi_encoded = {};
 // cache: (level: number) => arrayify(nonce)
 const array_cache = {};
@@ -13,26 +13,26 @@ const nonce_cache = {};
 const miner = async (level) => {
   await InitializeKeccak();
   const abi_encode = abi_encoder(level);
-  return (token, address, nonce, interval, block_hash) => {
-    const data = abi_encode(token, address, nonce, interval, block_hash);
+  return (token, address, interval, block_hash, nonce) => {
+    const data = abi_encode(token, address, interval, block_hash, nonce);
     return "0x" + keccak256(data);
   };
 };
 const abi_encoder = (level) => {
   const lazy_arrayify = arrayifier(level);
-  return (token, address, nonce, interval, block_hash) => {
+  return (token, address, interval, block_hash, nonce) => {
     let value = abi_encoded[interval];
     if (value === undefined) {
       const template = abi.encode(
-        ["string", "uint256", "address", "uint256", "bytes32"],
-        [token, 0, address, interval, block_hash]
+        ["string", "address", "uint256", "bytes32", "uint256"],
+        [token, address, interval, block_hash, 0]
       );
       abi_encoded[interval] = value = arrayify(template.slice(2));
       array_cache[level] = arrayify(nonce.toString(16));
       nonce_cache[level] = nonce;
     }
     const array = lazy_arrayify(nonce, nonce.toString(16));
-    value.set(array, 32);
+    value.set(array, 128);
     return value;
   };
 };

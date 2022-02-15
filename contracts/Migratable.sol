@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
@@ -33,7 +32,6 @@ abstract contract Migratable is ERC20, ERC20Burnable, Ownable {
 
     /** import amount from old contract */
     function migrate(uint256 amount) public virtual {
-        require(amount > 0, "non-positive amount");
         require(_migratable, "migration sealed");
         uint256 myAllowance = _token.allowance(msg.sender, address(this));
         require(amount <= myAllowance, "insufficient allowance");
@@ -48,15 +46,12 @@ abstract contract Migratable is ERC20, ERC20Burnable, Ownable {
         incrementCounters(amount);
     }
 
-    /** ensure 2 * fund's is less than (or eq) to other's */
+    /** track migration counters */
     function incrementCounters(uint256 amount) internal {
         if (msg.sender == owner()) {
             _migratedOwner += amount;
         } else {
             _migratedOther += amount;
-        }
-        if (2 * _migratedOwner > _migratedOther) {
-            revert("fund's share > 33.33%");
         }
         _migratedTotal += amount;
     }
