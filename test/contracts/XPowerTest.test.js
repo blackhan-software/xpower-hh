@@ -11,7 +11,7 @@ const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
 const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
-const DEADLINE = 1_814_400; // [seconds] i.e. 3 weeks
+const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("XPowerGpuTest", async function () {
   before(async function () {

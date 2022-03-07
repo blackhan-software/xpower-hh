@@ -21,6 +21,8 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
     EnumerableSet.UintSet private _hashes;
     /** map from block-hashes to timestamps */
     mapping(bytes32 => uint256) internal _timestamps;
+    /** deployment timestamp of contract */
+    uint256 private immutable _timestamp;
 
     constructor(
         string memory symbol,
@@ -31,7 +33,9 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
         ERC20("XPower", symbol)
         // Migratable: old contract, rel. deadline [seconds]
         Migratable(base, deadlineIn)
-    {}
+    {
+        _timestamp = block.timestamp;
+    }
 
     /** @return number of decimal places of the token */
     function decimals() public pure override returns (uint8) {
@@ -75,6 +79,11 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
         if (amount / 2 > 0) _mint(owner(), amount / 2);
     }
 
+    /** @return difficulty offset for current timestamp */
+    function difficulty() public view returns (uint256) {
+        return (100 * (block.timestamp - _timestamp)) / (4 * 365_25 days);
+    }
+
     /** check whether block-hash has recently been cached or is recent */
     function _requireRecent(bytes32 blockHash, uint256 interval) internal view {
         require(blockHash > 0, "invalid block-hash");
@@ -107,7 +116,7 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
     }
 
     /** @return amount for provided nonce-hash */
-    function _amount(bytes32 nonceHash) internal pure virtual returns (uint256) {
+    function _amount(bytes32 nonceHash) internal view virtual returns (uint256) {
         require(nonceHash >= 0, "invalid nonce-hash");
         return 0;
     }
@@ -155,8 +164,8 @@ contract XPowerCpu is XPower {
     constructor(address _base, uint256 _deadlineIn) XPower("XPOW.CPU", _base, _deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
-    function _amount(bytes32 nonceHash) internal pure override returns (uint256) {
-        return _zeros(nonceHash);
+    function _amount(bytes32 nonceHash) internal view override returns (uint256) {
+        return _zeros(nonceHash) - difficulty();
     }
 }
 
@@ -168,8 +177,8 @@ contract XPowerGpu is XPower {
     constructor(address _base, uint256 _deadlineIn) XPower("XPOW.GPU", _base, _deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
-    function _amount(bytes32 nonceHash) internal pure override returns (uint256) {
-        return 2**_zeros(nonceHash) - 1;
+    function _amount(bytes32 nonceHash) internal view override returns (uint256) {
+        return 2**(_zeros(nonceHash) - difficulty()) - 1;
     }
 }
 
@@ -181,7 +190,7 @@ contract XPowerAsic is XPower {
     constructor(address _base, uint256 _deadlineIn) XPower("XPOW.ASIC", _base, _deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
-    function _amount(bytes32 nonceHash) internal pure override returns (uint256) {
-        return 16**_zeros(nonceHash) - 1;
+    function _amount(bytes32 nonceHash) internal view override returns (uint256) {
+        return 16**(_zeros(nonceHash) - difficulty()) - 1;
     }
 }

@@ -21,7 +21,7 @@ contract XPowerCpuTest is XPowerCpu {
         return _hash(_to, _interval, _blockHash, _nonce);
     }
 
-    function amount(bytes32 _nonceHash) public pure returns (uint256) {
+    function amount(bytes32 _nonceHash) public view returns (uint256) {
         return _amount(_nonceHash);
     }
 
@@ -47,7 +47,7 @@ contract XPowerGpuTest is XPowerGpu {
         return _hash(_to, _interval, _blockHash, _nonce);
     }
 
-    function amount(bytes32 _nonceHash) public pure returns (uint256) {
+    function amount(bytes32 _nonceHash) public view returns (uint256) {
         return _amount(_nonceHash);
     }
 
@@ -73,7 +73,7 @@ contract XPowerAsicTest is XPowerAsic {
         return _hash(_to, _interval, _blockHash, _nonce);
     }
 
-    function amount(bytes32 _nonceHash) public pure returns (uint256) {
+    function amount(bytes32 _nonceHash) public view returns (uint256) {
         return _amount(_nonceHash);
     }
 
