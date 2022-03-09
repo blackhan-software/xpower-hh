@@ -36,12 +36,12 @@ task("balances-avax", "Prints the list of balances for AVAX coins").setAction(
 );
 
 /**
- * List balances of accounts for XPOW tokens
+ * List balances of accounts for XPower tokens
  */
-task("balances-xpow", "Prints the list of balances for XPOW tokens")
-  .addParam("token", "xpow-cpu, xpow-gpu or xpow-asic", "xpow-cpu")
+task("balances-xpow", "Prints the list of balances for XPower tokens")
+  .addParam("token", "para, aqch or qrsh", "para")
   .setAction(async (args, hre) => {
-    const symbol = Token.symbol(args.token || "xpow-cpu");
+    const symbol = Token.symbol(args.token || "para");
     assert(typeof symbol === "string", "token is not a string");
     const accounts = await hre.ethers.getSigners();
     assert(accounts.length > 0, "missing accounts");
@@ -54,14 +54,14 @@ task("balances-xpow", "Prints the list of balances for XPOW tokens")
   });
 
 /**
- * Mine (and mint) for XPOW tokens
+ * Mine (and mint) for XPower tokens
  */
-task("mine", "Mines for XPOW tokens")
+task("mine", "Mines for XPower tokens")
   .addParam("cache", "cache block-hash", "true")
   .addParam("refresh", "refresh block-hash", "false")
   .addParam("mint", "auto-mint if possible", "true")
   .addParam("level", "minimum minting threshold level", "5")
-  .addParam("token", "xpow-cpu, xpow-gpu or xpow-asic", "xpow-cpu")
+  .addParam("token", "para, aqch or qrsh", "para")
   .addParam("workers", "number of mining processes", `${workers()}`)
   .setAction(async (args, hre) => {
     const cache = JSON.parse(args.cache || "true");
@@ -73,7 +73,7 @@ task("mine", "Mines for XPOW tokens")
     const level = JSON.parse(args.level || "1");
     assert(typeof level === "number", "level is not a number");
     assert(level > 0, "level is not larger than zero");
-    const symbol = Token.symbol(args.token || "xpow-cpu");
+    const symbol = Token.symbol(args.token || "para");
     assert(typeof symbol === "string", "token is not a string");
     const n_workers = JSON.parse(args.workers || `${workers()}`);
     assert(typeof n_workers === "number", "workers is not a number");

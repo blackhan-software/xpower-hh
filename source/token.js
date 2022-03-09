@@ -30,13 +30,11 @@ class Token {
 }
 const amount_of = (symbol) => {
   switch (symbol) {
-    case "XPOW.OLD":
-      return (hash) => 2 ** zeros(hash) - 1;
-    case "XPOW.CPU":
+    case "PARA":
       return (hash) => zeros(hash);
-    case "XPOW.GPU":
+    case "AQCH":
       return (hash) => 2 ** zeros(hash) - 1;
-    case "XPOW.ASIC":
+    case "QRSH":
       return (hash) => 16 ** zeros(hash) - 1;
     default:
       throw new Error(`unknown ${symbol}`);
@@ -51,20 +49,20 @@ const zeros = (hash) => {
 };
 const contract = async (symbol) => {
   switch (symbol) {
-    case "XPOW.CPU": {
-      const address = process.env.XPOWER_ADDRESS_CPU_V3;
-      assert(address, "missing XPOWER_ADDRESS_CPU_V3");
-      return await hre.ethers.getContractAt("XPowerCpu", address);
+    case "PARA": {
+      const address = process.env.XPOWER_ADDRESS_PARA_V3;
+      assert(address, "missing XPOWER_ADDRESS_PARA_V3");
+      return await hre.ethers.getContractAt("XPowerPara", address);
     }
-    case "XPOW.GPU": {
-      const address = process.env.XPOWER_ADDRESS_GPU_V3;
-      assert(address, "missing XPOWER_ADDRESS_GPU_V3");
-      return await hre.ethers.getContractAt("XPowerGpu", address);
+    case "AQCH": {
+      const address = process.env.XPOWER_ADDRESS_AQCH_V3;
+      assert(address, "missing XPOWER_ADDRESS_AQCH_V3");
+      return await hre.ethers.getContractAt("XPowerAqch", address);
     }
-    case "XPOW.ASIC": {
-      const address = process.env.XPOWER_ADDRESS_ASC_V3;
-      assert(address, "missing XPOWER_ADDRESS_ASC_V3");
-      return await hre.ethers.getContractAt("XPowerAsic", address);
+    case "QRSH": {
+      const address = process.env.XPOWER_ADDRESS_QRSH_V3;
+      assert(address, "missing XPOWER_ADDRESS_QRSH_V3");
+      return await hre.ethers.getContractAt("XPowerQrsh", address);
     }
     default:
       throw new Error(`unknown ${symbol}`);
@@ -72,32 +70,23 @@ const contract = async (symbol) => {
 };
 const normalized = (symbol) => {
   switch (symbol.toUpperCase()) {
-    case "CPU":
-    case "XPOW.CPU":
-    case "XPOW-CPU":
-    case "XPOW_CPU":
-      return "XPOW.CPU";
-    case "GPU":
-    case "XPOW.GPU":
-    case "XPOW-GPU":
-    case "XPOW_GPU":
-      return "XPOW.GPU";
-    case "ASIC":
-    case "XPOW.ASIC":
-    case "XPOW-ASIC":
-    case "XPOW_ASIC":
-      return "XPOW.ASIC";
+    case "PARA":
+      return "PARA";
+    case "AQCH":
+      return "AQCH";
+    case "QRSH":
+      return "QRSH";
     default:
       throw new Error(`unknown ${symbol}`);
   }
 };
 const threshold_of = (symbol) => {
   switch (symbol) {
-    case "XPOW.CPU":
+    case "PARA":
       return (level) => level;
-    case "XPOW.GPU":
+    case "AQCH":
       return (level) => 2 ** level - 1;
-    case "XPOW.ASIC":
+    case "QRSH":
       return (level) => 16 ** level - 1;
     default:
       throw new Error(`unknown ${symbol}`);

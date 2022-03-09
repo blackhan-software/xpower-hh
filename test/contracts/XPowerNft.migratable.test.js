@@ -11,8 +11,8 @@ let xpower, xpower_nft_v1, xpower_nft_v2; // instances
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
-const NFT_GPU_URL = "https://xpowermine.com/nfts/gpu/{id}.json";
+const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
+const NFT_AQCH_URL = "https://xpowermine.com/nfts/aqch/{id}.json";
 const DEADLINE = 0; // [seconds]
 
 let UNIT;
@@ -28,32 +28,32 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerGpuTest");
-    const contract = await factory.deploy(NULL_ADDRESS, DEADLINE);
+    const factory = await ethers.getContractFactory("XPowerAqchTest");
+    const contract = await factory.deploy(NONE_ADDRESS, DEADLINE);
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerGpuNftTest");
+    XPowerNft = await ethers.getContractFactory("XPowerAqchNftTest");
     expect(XPowerNft).to.exist;
-    XPower = await ethers.getContractFactory("XPowerGpu");
+    XPower = await ethers.getContractFactory("XPowerAqch");
     expect(XPower).to.exist;
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy(NULL_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.transferOwnership(addresses[1]);
   });
   beforeEach(async function () {
     xpower_nft_v1 = await XPowerNft.deploy(
-      NFT_GPU_URL,
+      NFT_AQCH_URL,
       xpower.address,
-      NULL_ADDRESS
+      NONE_ADDRESS
     );
     expect(xpower_nft_v1).to.exist;
     await xpower_nft_v1.deployed();
     xpower_nft_v2 = await XPowerNft.deploy(
-      NFT_GPU_URL,
+      NFT_AQCH_URL,
       xpower.address,
       xpower_nft_v1.address
     );
@@ -69,7 +69,7 @@ describe("XPowerNft", async function () {
     await xpower.connect(signer_1).transferOwnership(owner.address);
   });
   describe("migrate", async function () {
-    it("should set XPOW NFT approval for all", async function () {
+    it("should set XPower NFT approval for all", async function () {
       await setNftApprovalForAll(xpower_nft_v2.address);
     });
     it("should migrate NFTs for level=UNIT & amount=1", async function () {
@@ -115,7 +115,7 @@ describe("XPowerNft", async function () {
     });
   });
   describe("migrate-batch", async function () {
-    it("should set XPOW NFT approval for all", async function () {
+    it("should set XPower NFT approval for all", async function () {
       await setNftApprovalForAll(xpower_nft_v2.address);
     });
     it("should migrate-batch NFTs for level=UNIT & amount=1", async function () {
@@ -189,7 +189,7 @@ async function mintXPowNft(unit, amount) {
   const nft_exists = await xpower_nft_v1.exists(nft_id);
   expect(nft_exists).to.eq(true);
   const nft_url = await xpower_nft_v1.uri(nft_id);
-  expect(nft_url).to.eq(NFT_GPU_URL);
+  expect(nft_url).to.eq(NFT_AQCH_URL);
 }
 async function mintBatchXPowNft(unit, amount) {
   const year = (await xpower_nft_v1.year()).toNumber();
@@ -206,7 +206,7 @@ async function mintBatchXPowNft(unit, amount) {
   const nft_exists = await xpower_nft_v1.exists(nft_id);
   expect(nft_exists).to.eq(true);
   const nft_url = await xpower_nft_v1.uri(nft_id);
-  expect(nft_url).to.eq(NFT_GPU_URL);
+  expect(nft_url).to.eq(NFT_AQCH_URL);
 }
 async function setNftApprovalForAll(operator) {
   const set_approval = await xpower_nft_v1.setApprovalForAll(operator, true);

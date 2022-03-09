@@ -10,10 +10,10 @@ let xpower; // instance
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
-describe("XPowerGpuTest", async function () {
+describe("XPowerAqchTest", async function () {
   before(async function () {
     await network.provider.send("hardhat_reset");
   });
@@ -24,15 +24,15 @@ describe("XPowerGpuTest", async function () {
     expect(addresses.length).to.be.greaterThan(0);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerGpuTest");
-    const contract = await factory.deploy(NULL_ADDRESS, DEADLINE);
+    const factory = await ethers.getContractFactory("XPowerAqchTest");
+    const contract = await factory.deploy(NONE_ADDRESS, DEADLINE);
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerGpuTest");
+    XPower = await ethers.getContractFactory("XPowerAqchTest");
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy(NULL_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     await xpower.deployed();
     const init = await xpower.init();
     expect(init).to.be.an("object");

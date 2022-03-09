@@ -11,7 +11,7 @@ contract XPowerNftTest is XPowerNft {
     ) XPowerNft(uri, xpower, base) {}
 }
 
-contract XPowerCpuNftTest is XPowerNftTest {
+contract XPowerParaNftTest is XPowerNftTest {
     constructor(
         string memory uri,
         address xpower,
@@ -19,7 +19,7 @@ contract XPowerCpuNftTest is XPowerNftTest {
     ) XPowerNftTest(uri, xpower, base) {}
 }
 
-contract XPowerGpuNftTest is XPowerNftTest {
+contract XPowerAqchNftTest is XPowerNftTest {
     constructor(
         string memory uri,
         address xpower,
@@ -27,7 +27,7 @@ contract XPowerGpuNftTest is XPowerNftTest {
     ) XPowerNftTest(uri, xpower, base) {}
 }
 
-contract XPowerAsicNftTest is XPowerNftTest {
+contract XPowerQrshNftTest is XPowerNftTest {
     constructor(
         string memory uri,
         address xpower,

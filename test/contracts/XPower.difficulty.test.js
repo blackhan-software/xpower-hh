@@ -10,7 +10,7 @@ let xpower; // instance
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("XPower", async function () {
@@ -24,15 +24,15 @@ describe("XPower", async function () {
     expect(addresses.length).to.be.greaterThan(0);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerGpuTest");
-    const contract = await factory.deploy(NULL_ADDRESS, DEADLINE);
+    const factory = await ethers.getContractFactory("XPowerAqchTest");
+    const contract = await factory.deploy(NONE_ADDRESS, DEADLINE);
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerGpuTest");
+    XPower = await ethers.getContractFactory("XPowerAqchTest");
   });
   before(async function () {
-    xpower = await XPower.deploy(NULL_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     await xpower.deployed();
     const init = await xpower.init();
     expect(init).to.be.an("object");
@@ -66,6 +66,18 @@ describe("XPower", async function () {
       expect(hash).to.be.a("string").and.to.match(/^0x00/);
       const amount = await xpower.amount(hash);
       expect(amount).to.equal(0);
+    });
+    it("should return difficulty=3", async function () {
+      await network.provider.send("hardhat_mine", ["0x7861f80"]); // 4 years
+      expect(await xpower.difficulty()).to.equal(3);
+    });
+    it("should *not* return amount=0 (at difficulty=3)", async function () {
+      const hash = table.getHash({ amount: 0 }); // w.r.t. difficulty=0
+      expect(hash).to.be.a("string").and.to.match(/^0x/);
+      const amount = await xpower.amount(hash).catch((ex) => {
+        expect(ex.message.match(/underflowed or overflowed/)).to.be.not.null;
+      });
+      expect(amount).to.equal(undefined);
     });
   });
 });

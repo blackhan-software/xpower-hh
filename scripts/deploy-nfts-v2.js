@@ -9,6 +9,7 @@
  */
 const hre = require("hardhat");
 const assert = require("assert");
+const { wait } = require("./wait");
 
 /**
  * Hardhat *always* runs the compile task when running scripts with its command
@@ -18,64 +19,61 @@ const assert = require("assert");
  * > await hre.run('compile');
  */
 async function main() {
-  const nil = process.env.XPOWER_ADDRESS_NIL;
-  assert(nil, "missing XPOWER_ADDRESS_NIL");
+  const none = process.env.XPOWER_ADDRESS_NONE;
+  assert(none, "missing XPOWER_ADDRESS_NONE");
   const owner = process.env.OWNER_ADDRESS;
   assert(owner, "missing OWNER_ADDRESS");
   // addresses XPower[Old]
-  const cpu_xpower = process.env.XPOWER_ADDRESS_CPU_V2;
-  assert(cpu_xpower, "missing XPOWER_ADDRESS_CPU_V2");
-  const gpu_xpower = process.env.XPOWER_ADDRESS_GPU_V2;
-  assert(gpu_xpower, "missing XPOWER_ADDRESS_GPU_V2");
-  const asc_xpower = process.env.XPOWER_ADDRESS_ASC_V2;
-  assert(asc_xpower, "missing XPOWER_ADDRESS_ASC_V2");
+  const para_xpower = process.env.XPOWER_ADDRESS_PARA_V2;
+  assert(para_xpower, "missing XPOWER_ADDRESS_PARA_V2");
+  const aqch_xpower = process.env.XPOWER_ADDRESS_AQCH_V2;
+  assert(aqch_xpower, "missing XPOWER_ADDRESS_AQCH_V2");
+  const qrsh_xpower = process.env.XPOWER_ADDRESS_QRSH_V2;
+  assert(qrsh_xpower, "missing XPOWER_ADDRESS_QRSH_V2");
   // addresses XPowerNft[Uri]
-  const cpu_uri = process.env.XPOWER_NFT_URI_CPU;
-  assert(cpu_uri, "missing XPOWER_NFT_URI_CPU");
-  const gpu_uri = process.env.XPOWER_NFT_URI_GPU;
-  assert(gpu_uri, "missing XPOWER_NFT_URI_GPU");
-  const asc_uri = process.env.XPOWER_NFT_URI_ASC;
-  assert(asc_uri, "missing XPOWER_NFT_URI_ASC");
+  const para_uri = process.env.XPOWER_NFT_URI_PARA;
+  assert(para_uri, "missing XPOWER_NFT_URI_PARA");
+  const aqch_uri = process.env.XPOWER_NFT_URI_AQCH;
+  assert(aqch_uri, "missing XPOWER_NFT_URI_AQCH");
+  const qrsh_uri = process.env.XPOWER_NFT_URI_QRSH;
+  assert(qrsh_uri, "missing XPOWER_NFT_URI_QRSH");
   //
-  // deploy XPowerCpuNft[Old]:
+  // deploy XPowerParaNft[Old]:
   //
-  const cpu = await deploy("XPowerCpuNft", {
-    base: nil,
-    uri: cpu_uri,
-    xpower: cpu_xpower,
+  const para = await deploy("XPowerParaNft", {
+    base: none,
+    uri: para_uri,
+    xpower: para_xpower,
     owner,
   });
-  console.log("[DEPLOY] XPowerCpuNft[Old] contract to:", cpu.address);
+  console.log(`XPOWER_NFT_ADDRESS_PARA_V2=${para.address}`);
   //
-  // deploy XPowerGpuNft[Old]:
+  // deploy XPowerAqchNft[Old]:
   //
-  const gpu = await deploy("XPowerGpuNft", {
-    base: nil,
-    uri: gpu_uri,
-    xpower: gpu_xpower,
+  const aqch = await deploy("XPowerAqchNft", {
+    base: none,
+    uri: aqch_uri,
+    xpower: aqch_xpower,
     owner,
   });
-  console.log("[DEPLOY] XPowerGpuNft[Old] contract to:", gpu.address);
+  console.log(`XPOWER_NFT_ADDRESS_AQCH_V2=${aqch.address}`);
   //
-  // deploy XPowerAscNft[Old]:
+  // deploy XPowerQrshNft[Old]:
   //
-  const asc = await deploy("XPowerAsicNft", {
-    base: nil,
-    uri: asc_uri,
-    xpower: asc_xpower,
+  const qrsh = await deploy("XPowerQrshNft", {
+    base: none,
+    uri: qrsh_uri,
+    xpower: qrsh_xpower,
     owner,
   });
-  console.log("[DEPLOY] XPowerAscNft[Old] contract to:", asc.address);
-  //
-  // show ownership address:
-  //
-  console.log("[DEPLOY] ... and with the ownership at:", owner);
+  console.log(`XPOWER_NFT_ADDRESS_QRSH_V2=${qrsh.address}`);
 }
 async function deploy(name, { base, uri, xpower, owner }) {
   const factory = await hre.ethers.getContractFactory(name);
   const contract = await factory.deploy(uri, xpower, base);
-  await contract.deployed();
-  await contract.transferOwnership(owner);
+  await wait(contract.deployTransaction);
+  const transfer = await contract.transferOwnership(owner);
+  await wait(transfer);
   return contract;
 }
 if (require.main === module) {

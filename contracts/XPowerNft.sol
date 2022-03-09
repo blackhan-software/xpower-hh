@@ -22,7 +22,7 @@ abstract contract URIMalleable is ERC1155, Ownable {
 }
 
 /**
- * NFT base class for the XPOW-CPU, XPOW-GPU & XPOW-ASIC proof-of-work tokens,
+ * NFT base class for the PARA, AQCH & QRSH proof-of-work tokens,
  * where each NFT can only be minted by burning the corresponding amount.
  */
 contract XPowerNft is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, MigratableNft {
@@ -157,10 +157,10 @@ contract XPowerNft is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, Mig
 }
 
 /**
- * NFT class for XPOW.CPU tokens: only the latter are allowed to get burned,
- * to mint the XPOW.CPU NFTs.
+ * NFT class for PARA tokens: only the latter are allowed to get burned,
+ * to mint the PARA NFTs.
  */
-contract XPowerCpuNft is XPowerNft {
+contract XPowerParaNft is XPowerNft {
     constructor(
         string memory uri,
         address xpower,
@@ -169,10 +169,10 @@ contract XPowerCpuNft is XPowerNft {
 }
 
 /**
- * NFT class for XPOW.GPU tokens: only the latter are allowed to get burned,
- * to mint the XPOW.GPU NFTs.
+ * NFT class for AQCH tokens: only the latter are allowed to get burned,
+ * to mint the AQCH NFTs.
  */
-contract XPowerGpuNft is XPowerNft {
+contract XPowerAqchNft is XPowerNft {
     constructor(
         string memory uri,
         address xpower,
@@ -181,10 +181,10 @@ contract XPowerGpuNft is XPowerNft {
 }
 
 /**
- * NFT class for XPOW.ASIC tokens: only the latter are allowed to get burned,
- * to mint the XPOW.ASIC NFTs.
+ * NFT class for QRSH tokens: only the latter are allowed to get burned,
+ * to mint the QRSH NFTs.
  */
-contract XPowerAsicNft is XPowerNft {
+contract XPowerQrshNft is XPowerNft {
     constructor(
         string memory uri,
         address xpower,

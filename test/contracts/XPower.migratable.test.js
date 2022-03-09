@@ -11,7 +11,7 @@ let xpower_v2; // new instance
 const { HashTable } = require("../hash-table");
 let table_0, table_2; // pre-hashed nonces
 
-const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE_v1 = 0; // [seconds], i.e. migrate not possible
 const DEADLINE_v2 = 1_814_400; // [seconds] i.e. 3 weeks
 
@@ -26,17 +26,17 @@ describe("Migration", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerGpuTest");
-    const contract = await factory.deploy(NULL_ADDRESS, DEADLINE_v1);
+    const factory = await ethers.getContractFactory("XPowerAqchTest");
+    const contract = await factory.deploy(NONE_ADDRESS, DEADLINE_v1);
     table_0 = await new HashTable(contract, addresses[0]).init();
     table_2 = await new HashTable(contract, addresses[2]).init();
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerGpuTest");
+    XPower = await ethers.getContractFactory("XPowerAqchTest");
   });
   beforeEach(async function () {
     // deploy xpower.v1 contract:
-    xpower_v1 = await XPower.deploy(NULL_ADDRESS, DEADLINE_v1);
+    xpower_v1 = await XPower.deploy(NONE_ADDRESS, DEADLINE_v1);
     await xpower_v1.deployed();
     expect(xpower_v1.address).to.be.a("string");
     const init_v1 = await xpower_v1.init();

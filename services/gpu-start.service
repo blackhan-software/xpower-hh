@@ -1,6 +1,0 @@
-[Unit]
-Description=XPower GPU miner (re)starter
-
-[Service]
-ExecStart=/usr/bin/systemctl restart --user gpu-miner@%i.service
-Type=oneshot

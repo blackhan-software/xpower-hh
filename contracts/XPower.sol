@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./Migratable.sol";
 
 /**
- * Base class for the XPOW-CPU, XPOW-GPU & XPOW-ASIC proof-of-work tokens. It
+ * The base class for the XPower PARA, AQCH and QRSH proof-of-work tokens. It
  * verifies that the provided nonce & block-hash result in a positive amount,
  * as specified by the sub-classes. After the verification, the corresponding
  * amount of tokens are minted for the beneficiary (plus for the treasury).
@@ -21,7 +21,7 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
     EnumerableSet.UintSet private _hashes;
     /** map from block-hashes to timestamps */
     mapping(bytes32 => uint256) internal _timestamps;
-    /** deployment timestamp of contract */
+    /** anchor for difficulty calculation */
     uint256 private immutable _timestamp;
 
     constructor(
@@ -34,7 +34,7 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
         // Migratable: old contract, rel. deadline [seconds]
         Migratable(base, deadlineIn)
     {
-        _timestamp = block.timestamp;
+        _timestamp = 0x6215621e; // 2022-02-22T22:22:22Z
     }
 
     /** @return number of decimal places of the token */
@@ -157,11 +157,11 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
 }
 
 /**
- * Allow mining & minting for XPOW.CPU proof-of-work tokens, where the rewarded
- * amount equals to *only* |leading-zeros(nonce-hash)|.
+ * Allow mining & minting for PARA proof-of-work tokens, where the rewarded
+ * amount equals to *only* |leading-zeros(nonce-hash) - difficulty|.
  */
-contract XPowerCpu is XPower {
-    constructor(address _base, uint256 _deadlineIn) XPower("XPOW.CPU", _base, _deadlineIn) {}
+contract XPowerPara is XPower {
+    constructor(address _base, uint256 _deadlineIn) XPower("PARA", _base, _deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amount(bytes32 nonceHash) internal view override returns (uint256) {
@@ -170,11 +170,11 @@ contract XPowerCpu is XPower {
 }
 
 /**
- * Allow mining & minting for XPOW.GPU proof-of-work tokens, where the rewarded
- * amount equals to 2 ^ |leading-zeros(nonce-hash)| - 1.
+ * Allow mining & minting for AQCH proof-of-work tokens, where the rewarded
+ * amount equals to 2 ^ |leading-zeros(nonce-hash) - difficulty| - 1.
  */
-contract XPowerGpu is XPower {
-    constructor(address _base, uint256 _deadlineIn) XPower("XPOW.GPU", _base, _deadlineIn) {}
+contract XPowerAqch is XPower {
+    constructor(address _base, uint256 _deadlineIn) XPower("AQCH", _base, _deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amount(bytes32 nonceHash) internal view override returns (uint256) {
@@ -183,11 +183,11 @@ contract XPowerGpu is XPower {
 }
 
 /**
- * Allow mining & minting for XPOW.ASIC proof-of-work tokens, where the rewarded
- * amount equals to 16 ^ |leading-zeros(nonce-hash)| - 1.
+ * Allow mining & minting for QRSH proof-of-work tokens, where the rewarded
+ * amount equals to 16 ^ |leading-zeros(nonce-hash) - difficulty| - 1.
  */
-contract XPowerAsic is XPower {
-    constructor(address _base, uint256 _deadlineIn) XPower("XPOW.ASIC", _base, _deadlineIn) {}
+contract XPowerQrsh is XPower {
+    constructor(address _base, uint256 _deadlineIn) XPower("QRSH", _base, _deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amount(bytes32 nonceHash) internal view override returns (uint256) {

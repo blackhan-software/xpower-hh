@@ -24,6 +24,7 @@ abstract contract MigratableNft is ERC1155, ERC1155Burnable, Ownable {
     /** import NFT from old contract */
     function migrate(uint256 id, uint256 amount) public virtual {
         require(_migratable, "migration sealed");
+        require(amount > 0, "non-positive amount");
         _token.burn(msg.sender, id, amount);
         _mint(msg.sender, id, amount, "");
     }
@@ -31,6 +32,9 @@ abstract contract MigratableNft is ERC1155, ERC1155Burnable, Ownable {
     /** batch import NFTs from old contract */
     function migrateBatch(uint256[] memory ids, uint256[] memory amounts) public virtual {
         require(_migratable, "migration sealed");
+        for (uint256 i = 0; i < amounts.length; i++) {
+            require(amounts[i] > 0, "non-positive amount");
+        }
         _token.burnBatch(msg.sender, ids, amounts);
         _mintBatch(msg.sender, ids, amounts, "");
     }

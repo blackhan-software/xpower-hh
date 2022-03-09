@@ -3,7 +3,7 @@ const { Token } = require("./token");
 async function do_init(
   symbol,
   address,
-  { timeout_ms } = { timeout_ms: 60_000 }
+  { timeout_ms } = { timeout_ms: 900_000 }
 ) {
   const xpower = await Token.contract(symbol, address);
   return new Promise((resolve, reject) => {
@@ -28,7 +28,7 @@ async function do_init(
 async function do_mint(
   symbol,
   address,
-  { nonce, block_hash, timeout_ms = 60_000 }
+  { nonce, block_hash, timeout_ms = 300_000 }
 ) {
   const xpower = await Token.contract(symbol, address);
   return new Promise((resolve, reject) => {

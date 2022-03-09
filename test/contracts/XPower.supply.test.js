@@ -69,13 +69,13 @@ async function supplyOf(contract, delta = 0, log = console.log) {
 let XPower, xpower; // contract & instance
 let supply; // { total, other's, fund's }
 
-const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 1_814_400; // [seconds] i.e. 3 weeks
 
-describe("XPOW-CPU Supply", async () => {
+describe("PARA Supply", async () => {
   before(async () => {
-    XPower = await ethers.getContractFactory("XPowerCpuTest");
-    xpower = await XPower.deploy(NULL_ADDRESS, DEADLINE);
+    XPower = await ethers.getContractFactory("XPowerParaTest");
+    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     await xpower.deployed();
     await xpower.renounceOwnership();
   });
@@ -105,10 +105,10 @@ describe("XPOW-CPU Supply", async () => {
     });
   });
 });
-describe("XPOW-GPU Supply", async () => {
+describe("AQCH Supply", async () => {
   before(async () => {
-    XPower = await ethers.getContractFactory("XPowerGpuTest");
-    xpower = await XPower.deploy(NULL_ADDRESS, DEADLINE);
+    XPower = await ethers.getContractFactory("XPowerAqchTest");
+    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     await xpower.deployed();
     await xpower.renounceOwnership();
   });
@@ -138,10 +138,10 @@ describe("XPOW-GPU Supply", async () => {
     });
   });
 });
-describe("XPOW-ASIC Supply", async () => {
+describe("QRSH Supply", async () => {
   before(async () => {
-    XPower = await ethers.getContractFactory("XPowerAsicTest");
-    xpower = await XPower.deploy(NULL_ADDRESS, DEADLINE);
+    XPower = await ethers.getContractFactory("XPowerQrshTest");
+    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     await xpower.deployed();
     await xpower.renounceOwnership();
   });

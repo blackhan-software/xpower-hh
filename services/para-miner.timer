@@ -1,0 +1,11 @@
+[Unit]
+Description=XPower PARA miner timer
+
+[Timer]
+OnBootSec=120
+OnCalendar=hourly
+Persistent=true
+Unit=para-start@%i.service
+
+[Install]
+WantedBy=timers.target

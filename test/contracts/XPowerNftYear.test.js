@@ -8,8 +8,8 @@ let addresses; // all addresses
 let XPower, XPowerNft; // contracts
 let xpower, xpower_nft; // instances
 
-const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
-const NFT_GPU_URL = "https://xpowermine.com/nfts/gpu/{id}.json";
+const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
+const NFT_AQCH_URL = "https://xpowermine.com/nfts/aqch/{id}.json";
 const DEADLINE = 0; // [seconds]
 
 const moment = require("moment");
@@ -25,22 +25,22 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerGpuNftTest");
+    XPowerNft = await ethers.getContractFactory("XPowerAqchNftTest");
     expect(XPowerNft).to.exist;
-    XPower = await ethers.getContractFactory("XPowerGpu");
+    XPower = await ethers.getContractFactory("XPowerAqch");
     expect(XPower).to.exist;
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy(NULL_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.transferOwnership(addresses[1]);
   });
   beforeEach(async function () {
     xpower_nft = await XPowerNft.deploy(
-      NFT_GPU_URL,
+      NFT_AQCH_URL,
       xpower.address,
-      NULL_ADDRESS
+      NONE_ADDRESS
     );
     expect(xpower_nft).to.exist;
     await xpower_nft.deployed();

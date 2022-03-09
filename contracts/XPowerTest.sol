@@ -4,9 +4,9 @@
 pragma solidity ^0.8.0;
 import "./XPower.sol";
 
-/** Test class for XPowerCpu */
-contract XPowerCpuTest is XPowerCpu {
-    constructor(address _base, uint256 _deadlineIn) XPowerCpu(_base, _deadlineIn) {}
+/** Test class for XPowerPara */
+contract XPowerParaTest is XPowerPara {
+    constructor(address _base, uint256 _deadlineIn) XPowerPara(_base, _deadlineIn) {}
 
     function interval() public view returns (uint256) {
         return _interval();
@@ -30,9 +30,9 @@ contract XPowerCpuTest is XPowerCpu {
     }
 }
 
-/** Test class for XPowerGpu */
-contract XPowerGpuTest is XPowerGpu {
-    constructor(address _base, uint256 _deadlineIn) XPowerGpu(_base, _deadlineIn) {}
+/** Test class for XPowerAqch */
+contract XPowerAqchTest is XPowerAqch {
+    constructor(address _base, uint256 _deadlineIn) XPowerAqch(_base, _deadlineIn) {}
 
     function interval() public view returns (uint256) {
         return _interval();
@@ -56,9 +56,9 @@ contract XPowerGpuTest is XPowerGpu {
     }
 }
 
-/** Test class for XPowerAsic */
-contract XPowerAsicTest is XPowerAsic {
-    constructor(address _base, uint256 _deadlineIn) XPowerAsic(_base, _deadlineIn) {}
+/** Test class for XPowerQrsh */
+contract XPowerQrshTest is XPowerQrsh {
+    constructor(address _base, uint256 _deadlineIn) XPowerQrsh(_base, _deadlineIn) {}
 
     function interval() public view returns (uint256) {
         return _interval();
