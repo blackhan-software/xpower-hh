@@ -50,18 +50,18 @@ const zeros = (hash) => {
 const contract = async (symbol) => {
   switch (symbol) {
     case "PARA": {
-      const address = process.env.XPOWER_ADDRESS_PARA_V3;
-      assert(address, "missing XPOWER_ADDRESS_PARA_V3");
+      const address = process.env.PARA_MOE_V4a;
+      assert(address, "missing PARA_MOE_V4a");
       return await hre.ethers.getContractAt("XPowerPara", address);
     }
     case "AQCH": {
-      const address = process.env.XPOWER_ADDRESS_AQCH_V3;
-      assert(address, "missing XPOWER_ADDRESS_AQCH_V3");
+      const address = process.env.AQCH_MOE_V4a;
+      assert(address, "missing AQCH_MOE_V4a");
       return await hre.ethers.getContractAt("XPowerAqch", address);
     }
     case "QRSH": {
-      const address = process.env.XPOWER_ADDRESS_QRSH_V3;
-      assert(address, "missing XPOWER_ADDRESS_QRSH_V3");
+      const address = process.env.QRSH_MOE_V4a;
+      assert(address, "missing QRSH_MOE_V4a");
       return await hre.ethers.getContractAt("XPowerQrsh", address);
     }
     default:

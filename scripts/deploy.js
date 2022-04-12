@@ -1,29 +1,42 @@
 const assert = require("assert");
 
-const { main: deploy_xpow_v2 } = require("./deploy-xpow-v2");
-const { main: deploy_xpow_v3 } = require("./deploy-xpow-v3");
-const { main: deploy_nfts_v2 } = require("./deploy-nfts-v2");
-const { main: deploy_nfts_v3a } = require("./deploy-nfts-v3a");
-const { main: deploy_nfts_v3b } = require("./deploy-nfts-v3b");
+const { main: deploy_moe_v2a } = require("./deploy-moe-v2a");
+const { main: deploy_moe_v3a } = require("./deploy-moe-v3a");
+const { main: deploy_moe_v4a } = require("./deploy-moe-v4a");
+const { main: deploy_nft_v2a } = require("./deploy-nft-v2a");
+const { main: deploy_nft_v3a } = require("./deploy-nft-v3a");
+const { main: deploy_nft_v3b } = require("./deploy-nft-v3b");
+const { main: deploy_nft_v4a } = require("./deploy-nft-v4a");
+const { main: deploy_ppt_v4a } = require("./deploy-ppt-v4a");
+const { main: deploy_ppt_v4a_treasury } = require("./deploy-ppt-v4a.treasury");
+const { main: deploy_moe_v4a_treasury } = require("./deploy-moe-v4a.treasury");
 
 async function main() {
-  const owner = process.env.OWNER_ADDRESS;
-  assert(owner, "missing OWNER_ADDRESS");
+  const owner = process.env.FUND_ADDRESS;
+  assert(owner, "missing FUND_ADDRESS");
   //
-  // deploy contracts for XPOW:
+  // deploy MoE contracts:
   //
-  await deploy_xpow_v2();
-  await deploy_xpow_v3();
+  await deploy_moe_v2a();
+  await deploy_moe_v3a();
+  await deploy_moe_v4a();
   //
-  // deploy contracts for NFTs:
+  // deploy NFT contracts:
   //
-  await deploy_nfts_v2();
-  await deploy_nfts_v3a();
-  await deploy_nfts_v3b();
+  await deploy_nft_v2a();
+  await deploy_nft_v3a();
+  await deploy_nft_v3b();
+  await deploy_nft_v4a();
+  await deploy_ppt_v4a();
+  //
+  // deploy PPT & MoE treasuries:
+  //
+  await deploy_ppt_v4a_treasury();
+  await deploy_moe_v4a_treasury();
   //
   // show ownership address:
   //
-  console.log(`... and w/the ownership at:${owner}`);
+  console.log(`...w/the ownership at:${owner}`);
 }
 if (require.main === module) {
   main()

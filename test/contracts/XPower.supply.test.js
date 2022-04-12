@@ -9,7 +9,7 @@ async function supplyOf(contract, delta = 0, log = console.log) {
   let owners = ethers.BigNumber.from(0);
   for (let i = 0; i < 65 + delta; i++) {
     const nonce_hash = `0x${"0".repeat(i)}${"f".repeat(64 - i)}`;
-    const amount = await contract.amount(nonce_hash);
+    const amount = await contract.amountOf(nonce_hash);
     expect(amount.gte(0)).to.be.true;
     const weight =
       i < 64 ? HEXA.pow(64 - i).sub(HEXA.pow(63 - i)) : HEXA.pow(64 - i);

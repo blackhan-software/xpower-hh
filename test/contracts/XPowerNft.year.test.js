@@ -25,7 +25,7 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerAqchNftTest");
+    XPowerNft = await ethers.getContractFactory("XPowerAqchNft");
     expect(XPowerNft).to.exist;
     XPower = await ethers.getContractFactory("XPowerAqch");
     expect(XPower).to.exist;
@@ -35,12 +35,14 @@ describe("XPowerNft", async function () {
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.transferOwnership(addresses[1]);
+    await xpower.init();
   });
   beforeEach(async function () {
     xpower_nft = await XPowerNft.deploy(
       NFT_AQCH_URL,
-      xpower.address,
-      NONE_ADDRESS
+      NONE_ADDRESS,
+      DEADLINE,
+      xpower.address
     );
     expect(xpower_nft).to.exist;
     await xpower_nft.deployed();
@@ -49,21 +51,21 @@ describe("XPowerNft", async function () {
     const [owner, signer_1] = await ethers.getSigners();
     await xpower.connect(signer_1).transferOwnership(owner.address);
   });
-  describe("year (by days)", async function () {
+  describe("year", async function () {
     beforeEach(async () => {
-      await network.provider.send("evm_increaseTime", [86400]);
+      await network.provider.send("evm_increaseTime", [31_556_736]);
     });
-    for (const dd of range(0, 365)) {
-      it(`should match current UTC year + ${dd} days`, async () => {
-        await check_day(dd);
+    for (const dy of range(0, 10)) {
+      it(`should match current UTC year + ${dy} years`, async () => {
+        await check_year(dy);
       });
     }
   });
 });
-async function check_day(delta) {
+async function check_year(delta) {
   const nft_year = (await xpower_nft.year()).toNumber();
   expect(nft_year).to.be.greaterThan(0);
-  const utc_date = moment().add(delta, "days");
+  const utc_date = moment().add(delta, "years");
   expect(nft_year).to.eq(utc_date.year());
 }
 function* range(start, end) {

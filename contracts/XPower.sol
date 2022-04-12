@@ -10,12 +10,12 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./Migratable.sol";
 
 /**
- * The base class for the XPower PARA, AQCH and QRSH proof-of-work tokens. It
- * verifies that the provided nonce & block-hash result in a positive amount,
- * as specified by the sub-classes. After the verification, the corresponding
- * amount of tokens are minted for the beneficiary (plus for the treasury).
+ * Abstract base class for the XPower PARA, AQCH and QRSH proof-of-work tokens.
+ * It verifies, that the nonce & the block-hash do result in a positive amount,
+ * (as specified by the sub-classes). After the verification, the corresponding
+ * amount of tokens are minted for the beneficiary (plus the treasury).
  */
-contract XPower is ERC20, ERC20Burnable, Migratable {
+abstract contract XPower is ERC20, ERC20Burnable, Migratable {
     using EnumerableSet for EnumerableSet.UintSet;
     /** set of nonce-hashes already minted for */
     EnumerableSet.UintSet private _hashes;
@@ -23,7 +23,14 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
     mapping(bytes32 => uint256) internal _timestamps;
     /** anchor for difficulty calculation */
     uint256 private immutable _timestamp;
+    /** parametrization of treasure-for */
+    uint256[] private _thetas = [0, 2, 1, 0];
+    /** parametrization of difficulty-for */
+    uint256[] private _deltas = [0, 4, 1, 0];
 
+    /** @param symbol short token symbol */
+    /** @param base address of old contract */
+    /** @param deadlineIn seconds to end-of-migration */
     constructor(
         string memory symbol,
         address base,
@@ -66,22 +73,57 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
         // check block-hash to be recent
         _requireRecent(blockHash, interval);
         // calculate nonce-hash for to, interval, block-hash & nonce
-        bytes32 nonceHash = _hash(to, interval, blockHash, nonce);
+        bytes32 nonceHash = _hashOf(to, interval, blockHash, nonce);
         require(!_hashes.contains(uint256(nonceHash)), "duplicate nonce-hash");
         // calculate amount of tokens for nonce-hash
-        uint256 amount = _amount(nonceHash);
+        uint256 amount = _amountOf(nonceHash);
         require(amount > 0, "empty nonce-hash");
         // ensure unique nonce-hash (to be used once)
         _hashes.add(uint256(nonceHash));
         // mint tokens for beneficiary (e.g. nonce provider)
         _mint(to, amount);
         // mint tokens for owner (i.e. project treasury)
-        if (amount / 2 > 0) _mint(owner(), amount / 2);
+        uint256 treasure = treasureFor(amount);
+        if (treasure > 0) _mint(owner(), treasure);
     }
 
-    /** @return difficulty offset for current timestamp */
-    function difficulty() public view returns (uint256) {
-        return (100 * (block.timestamp - _timestamp)) / (4 * 365_25 days);
+    /** @return treasure for given amount */
+    function treasureFor(uint256 amount) public view returns (uint256) {
+        if (amount > _thetas[3]) {
+            return ((amount - _thetas[3]) * _thetas[2]) / _thetas[1] + _thetas[0];
+        }
+        return _thetas[0];
+    }
+
+    /** @return treasure parameters */
+    function getTheta() public view returns (uint256[] memory) {
+        return _thetas;
+    }
+
+    /** set treasure parameters */
+    function setTheta(uint256[] memory array) public onlyOwner {
+        require(array.length == 4, "invalid array.length");
+        _thetas = array;
+    }
+
+    /** @return difficulty for given timestamp */
+    function difficultyFor(uint256 timestamp) public view returns (uint256) {
+        uint256 dt = timestamp - _timestamp;
+        if (dt > _deltas[3]) {
+            return (100 * (dt - _deltas[3]) * _deltas[2]) / (_deltas[1] * 365_25 days) + _deltas[0];
+        }
+        return _deltas[0];
+    }
+
+    /** @return difficulty parameters */
+    function getDelta() public view returns (uint256[] memory) {
+        return _deltas;
+    }
+
+    /** set difficulty parameters */
+    function setDelta(uint256[] memory array) public onlyOwner {
+        require(array.length == 4, "invalid array.length");
+        _deltas = array;
     }
 
     /** check whether block-hash has recently been cached or is recent */
@@ -106,7 +148,7 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
     }
 
     /** @return hash of beneficiary, interval, block-hash & nonce */
-    function _hash(
+    function _hashOf(
         address to,
         uint256 interval,
         bytes32 blockHash,
@@ -116,13 +158,13 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
     }
 
     /** @return amount for provided nonce-hash */
-    function _amount(bytes32 nonceHash) internal view virtual returns (uint256) {
+    function _amountOf(bytes32 nonceHash) internal view virtual returns (uint256) {
         require(nonceHash >= 0, "invalid nonce-hash");
         return 0;
     }
 
     /** @return leading zeros of provided nonce-hash */
-    function _zeros(bytes32 nonceHash) internal pure returns (uint8) {
+    function _zerosOf(bytes32 nonceHash) internal pure returns (uint8) {
         uint8 counter = 0;
         for (uint8 i = 0; i < 32; i++) {
             bytes1 b = nonceHash[i];
@@ -161,11 +203,18 @@ contract XPower is ERC20, ERC20Burnable, Migratable {
  * amount equals to *only* |leading-zeros(nonce-hash) - difficulty|.
  */
 contract XPowerPara is XPower {
-    constructor(address _base, uint256 _deadlineIn) XPower("PARA", _base, _deadlineIn) {}
+    /** @param base address of old contract */
+    /** @param deadlineIn seconds to end-of-migration */
+    constructor(address base, uint256 deadlineIn) XPower("PARA", base, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
-    function _amount(bytes32 nonceHash) internal view override returns (uint256) {
-        return _zeros(nonceHash) - difficulty();
+    function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
+        uint256 difficulty = difficultyFor(block.timestamp);
+        uint256 zeros = _zerosOf(nonceHash);
+        if (zeros > difficulty) {
+            return zeros - difficulty;
+        }
+        return 0;
     }
 }
 
@@ -174,11 +223,18 @@ contract XPowerPara is XPower {
  * amount equals to 2 ^ |leading-zeros(nonce-hash) - difficulty| - 1.
  */
 contract XPowerAqch is XPower {
-    constructor(address _base, uint256 _deadlineIn) XPower("AQCH", _base, _deadlineIn) {}
+    /** @param base address of old contract */
+    /** @param deadlineIn seconds to end-of-migration */
+    constructor(address base, uint256 deadlineIn) XPower("AQCH", base, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
-    function _amount(bytes32 nonceHash) internal view override returns (uint256) {
-        return 2**(_zeros(nonceHash) - difficulty()) - 1;
+    function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
+        uint256 difficulty = difficultyFor(block.timestamp);
+        uint256 zeros = _zerosOf(nonceHash);
+        if (zeros > difficulty) {
+            return 2**(zeros - difficulty) - 1;
+        }
+        return 0;
     }
 }
 
@@ -187,10 +243,17 @@ contract XPowerAqch is XPower {
  * amount equals to 16 ^ |leading-zeros(nonce-hash) - difficulty| - 1.
  */
 contract XPowerQrsh is XPower {
-    constructor(address _base, uint256 _deadlineIn) XPower("QRSH", _base, _deadlineIn) {}
+    /** @param base address of old contract */
+    /** @param deadlineIn seconds to end-of-migration */
+    constructor(address base, uint256 deadlineIn) XPower("QRSH", base, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
-    function _amount(bytes32 nonceHash) internal view override returns (uint256) {
-        return 16**(_zeros(nonceHash) - difficulty()) - 1;
+    function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
+        uint256 difficulty = difficultyFor(block.timestamp);
+        uint256 zeros = _zerosOf(nonceHash);
+        if (zeros > difficulty) {
+            return 16**(zeros - difficulty) - 1;
+        }
+        return 0;
     }
 }

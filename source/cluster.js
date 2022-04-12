@@ -3,9 +3,10 @@ const crypto = require("crypto");
 
 const { log } = require("./log");
 const { block } = require("./block");
+const { do_init } = require("./minter");
+const { do_mint } = require("./minter");
+const { Miner } = require("./miner");
 const { Token } = require("./token");
-const { do_init, do_mint } = require("./minter");
-const { miner, expired, interval } = require("./miner");
 
 const cluster = require("cluster");
 const process = require("process");
@@ -15,7 +16,7 @@ const { assert } = require("console");
 async function start(
   symbol,
   address,
-  { cache, refresh, mint, level, n_workers = workers() }
+  { cache, json, level, mint, refresh, n_workers = workers() }
 ) {
   if (cluster.isPrimary) {
     console.log("[CLUSTER]", `master = ${worker_id()} state = setup`);
@@ -50,12 +51,13 @@ async function start(
     process.on("message", function on_init({ block_hash, timestamp }) {
       process.off("message", on_init);
       loop(symbol, address, {
-        cache,
-        refresh,
         block_hash,
-        timestamp,
-        mint,
+        cache,
         level,
+        json,
+        mint,
+        refresh,
+        timestamp,
       });
     });
   }
@@ -128,7 +130,7 @@ async function init(
 ) {
   if (cache) {
     if (typeof refresh === "boolean") {
-      if (!refresh || (await expired(timestamp)) === false) {
+      if (!refresh || (await Miner.expired(timestamp)) === false) {
         return { block_hash, timestamp };
       }
     }
@@ -151,30 +153,37 @@ async function init(
 async function loop(
   symbol,
   address,
-  { cache, refresh, block_hash, timestamp, mint, level }
+  { block_hash, cache, level, json, mint, refresh, timestamp }
 ) {
-  let at_interval = interval();
+  let at_interval = Miner.interval();
   let nonce = large_random();
   const { start, now } = { start: nonce, now: performance.now() };
-  const mine = await miner(level);
+  const mine = await new Miner().init(level);
   const token = new Token(symbol);
   const threshold = token.threshold(level);
   while (true) {
-    const hashed = mine(symbol, address, at_interval, block_hash, nonce);
-    const amount = token.amount_of(hashed);
+    const hash = mine(symbol, address, at_interval, block_hash, nonce);
+    const amount = token.amount_of(hash);
     if (amount >= threshold) {
       const hms = Number(nonce - start) / (performance.now() - now);
+      const ctx = {
+        amount,
+        block_hash,
+        hash,
+        nonce,
+        json,
+      };
       if (mint) {
         try {
           await do_mint(symbol, address, { nonce, block_hash });
-          log(`[MINT#${worker_id()}|ACK]`, nonce, amount, symbol, hms);
+          log(`[MINT#${worker_id()}|ACK]`, symbol, hms, ctx);
         } catch (ex) {
           if (ex.message?.match(/replacement fee too low/)) {
-            log(`[MINT#${worker_id()}!FTL]`, nonce, amount, symbol, hms);
+            log(`[MINT#${worker_id()}!FTL]`, symbol, hms, ctx);
           } else if (ex.message?.match(/cannot estimate gas/)) {
-            log(`[MINT#${worker_id()}!CEG]`, nonce, amount, symbol, hms);
+            log(`[MINT#${worker_id()}!CEG]`, symbol, hms, ctx);
           } else if (ex.message?.match(/nonce has already been used/)) {
-            log(`[MINT#${worker_id()}!NAU]`, nonce, amount, symbol, hms);
+            log(`[MINT#${worker_id()}!NAU]`, symbol, hms, ctx);
           } else {
             console.error(ex);
           }
@@ -188,7 +197,7 @@ async function loop(
       } else {
         log(`[WORK#${worker_id()}]`, nonce, amount, symbol, hms);
       }
-      at_interval = interval();
+      at_interval = Miner.interval();
     }
     nonce++;
   }
@@ -202,3 +211,4 @@ function large_random() {
 }
 exports.start = start;
 exports.workers = workers;
+exports.large_random = large_random;

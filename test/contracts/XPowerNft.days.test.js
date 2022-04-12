@@ -25,22 +25,24 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerAqchNftTest");
+    XPowerNft = await ethers.getContractFactory("XPowerAqchNft");
     expect(XPowerNft).to.exist;
     XPower = await ethers.getContractFactory("XPowerAqch");
     expect(XPower).to.exist;
   });
-  beforeEach(async function () {
+  before(async function () {
     xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.transferOwnership(addresses[1]);
+    await xpower.init();
   });
-  beforeEach(async function () {
+  before(async function () {
     xpower_nft = await XPowerNft.deploy(
       NFT_AQCH_URL,
-      xpower.address,
-      NONE_ADDRESS
+      NONE_ADDRESS,
+      DEADLINE,
+      xpower.address
     );
     expect(xpower_nft).to.exist;
     await xpower_nft.deployed();
@@ -49,22 +51,29 @@ describe("XPowerNft", async function () {
     const [owner, signer_1] = await ethers.getSigners();
     await xpower.connect(signer_1).transferOwnership(owner.address);
   });
-  describe("year", async function () {
+  describe("year (by days)", async function () {
     beforeEach(async () => {
-      await network.provider.send("evm_increaseTime", [31_556_736]);
+      await network.provider.send("evm_increaseTime", [86400]);
+      await network.provider.send("evm_mine");
     });
-    for (const dy of range(0, 10)) {
-      it(`should match current UTC year + ${dy} years`, async () => {
-        await check_year(dy);
+    for (const dd of range(0, 365)) {
+      const utc_date = moment().add(dd, "days");
+      const iso_date = utc_date.toISOString();
+      const pad_days = String(dd).padStart(3, "0");
+      it(`should match current UTC year + ${pad_days} days: ${iso_date}`, async () => {
+        await check_day(utc_date);
       });
     }
   });
 });
-async function check_year(delta) {
+async function check_day(utc_date) {
   const nft_year = (await xpower_nft.year()).toNumber();
   expect(nft_year).to.be.greaterThan(0);
-  const utc_date = moment().add(delta, "years");
-  expect(nft_year).to.eq(utc_date.year());
+  if (utc_date.dayOfYear() === 1 || utc_date.dayOfYear() === 365) {
+    expect(nft_year).to.approximately(utc_date.year(), 1);
+  } else {
+    expect(nft_year).to.eq(utc_date.year());
+  }
 }
 function* range(start, end) {
   for (let i = start; i < end; i++) {

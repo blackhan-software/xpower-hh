@@ -31,29 +31,19 @@ abstract contract Migratable is ERC20, ERC20Burnable, Ownable {
     }
 
     /** import amount from old contract */
-    function migrate(uint256 amount) public virtual {
+    function migrate(uint256 amount) public {
         require(_migratable, "migration sealed");
+        uint256 timestamp = block.timestamp;
+        require(_deadlineBy >= timestamp, "deadline passed");
         uint256 myAllowance = _token.allowance(msg.sender, address(this));
         require(amount <= myAllowance, "insufficient allowance");
         uint256 oldBalance = _token.balanceOf(msg.sender);
         require(amount <= oldBalance, "insufficient balance");
-        uint256 timestamp = block.timestamp;
-        require(_deadlineBy >= timestamp, "deadline passed");
         _token.burnFrom(msg.sender, amount);
         uint256 newBalance = _token.balanceOf(msg.sender);
         require(newBalance + amount == oldBalance, "invalid balance");
         _mint(msg.sender, amount);
-        incrementCounters(amount);
-    }
-
-    /** track migration counters */
-    function incrementCounters(uint256 amount) internal {
-        if (msg.sender == owner()) {
-            _migratedOwner += amount;
-        } else {
-            _migratedOther += amount;
-        }
-        _migratedTotal += amount;
+        _incrementCounters(amount);
     }
 
     /** @return number of migrated tokens */
@@ -64,5 +54,15 @@ abstract contract Migratable is ERC20, ERC20Burnable, Ownable {
     /** seal migration (manually) */
     function seal() public onlyOwner {
         _migratable = false;
+    }
+
+    /** track migration counters */
+    function _incrementCounters(uint256 amount) internal {
+        if (msg.sender == owner()) {
+            _migratedOwner += amount;
+        } else {
+            _migratedOther += amount;
+        }
+        _migratedTotal += amount;
     }
 }

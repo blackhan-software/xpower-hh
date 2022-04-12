@@ -1,11 +1,17 @@
-function log(prefix, nonce, amount, symbol, hms) {
-  nonce = ellipse(nonce.toString(16));
+function log(
+  prefix,
+  symbol,
+  hms,
+  { nonce, block_hash, hash, amount, json = false }
+) {
+  nonce = "0x" + nonce.toString(16);
   hms = ("000" + hms.toFixed(3)).slice(-7);
-  console.log(
-    `${prefix} nonce = 0x${nonce} => ${amount} ${symbol} [${hms} H/ms]`
-  );
-}
-function ellipse(string, beg = 14, end = -12) {
-  return `${string.slice(0, beg)}...${string.slice(end)}`;
+  if (json) {
+    console.log(`${JSON.stringify([nonce, block_hash, hash, amount])}`);
+  } else {
+    console.log(
+      `${prefix} nonce=${nonce}, block_hash=${block_hash} => ${amount} ${symbol} [${hms} H/ms]`
+    );
+  }
 }
 exports.log = log;

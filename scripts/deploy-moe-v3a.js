@@ -19,42 +19,42 @@ const { wait } = require("./wait");
  * > await hre.run("compile");
  */
 async function main() {
-  const para_base = process.env.XPOWER_ADDRESS_PARA_V2;
-  assert(para_base, "missing XPOWER_ADDRESS_PARA_V2");
-  const aqch_base = process.env.XPOWER_ADDRESS_AQCH_V2;
-  assert(aqch_base, "missing XPOWER_ADDRESS_AQCH_V2");
-  const qrsh_base = process.env.XPOWER_ADDRESS_QRSH_V2;
-  assert(qrsh_base, "missing XPOWER_ADDRESS_QRSH_V2");
-  const owner = process.env.OWNER_ADDRESS;
-  assert(owner, "missing OWNER_ADDRESS");
-  const deadline = 126_230_400; // in seconds i.e. 4 years
+  const para_base = process.env.PARA_MOE_V2a;
+  assert(para_base, "missing PARA_MOE_V2a");
+  const aqch_base = process.env.AQCH_MOE_V2a;
+  assert(aqch_base, "missing AQCH_MOE_V2a");
+  const qrsh_base = process.env.QRSH_MOE_V2a;
+  assert(qrsh_base, "missing QRSH_MOE_V2a");
+  const owner = process.env.FUND_ADDRESS;
+  assert(owner, "missing FUND_ADDRESS");
+  const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerPara[New]
   //
-  const para = await deploy("XPowerPara", {
+  const para_moe = await deploy("XPowerPara", {
     base: para_base,
     deadline,
     owner,
   });
-  console.log(`XPOWER_ADDRESS_PARA_V3=${para.address}`);
+  console.log(`PARA_MOE_V3a=${para_moe.address}`);
   //
   // deploy XPowerAqch[New]
   //
-  const aqch = await deploy("XPowerAqch", {
+  const aqch_moe = await deploy("XPowerAqch", {
     base: aqch_base,
     deadline,
     owner,
   });
-  console.log(`XPOWER_ADDRESS_AQCH_V3=${aqch.address}`);
+  console.log(`AQCH_MOE_V3a=${aqch_moe.address}`);
   //
   // deploy XPowerQrsh[New]
   //
-  const qrsh = await deploy("XPowerQrsh", {
+  const qrsh_moe = await deploy("XPowerQrsh", {
     base: qrsh_base,
     deadline,
     owner,
   });
-  console.log(`XPOWER_ADDRESS_QRSH_V3=${qrsh.address}`);
+  console.log(`QRSH_MOE_V3a=${qrsh_moe.address}`);
 }
 async function deploy(name, { base, deadline, owner }) {
   const factory = await hre.ethers.getContractFactory(name);

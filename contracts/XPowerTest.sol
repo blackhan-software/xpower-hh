@@ -8,25 +8,29 @@ import "./XPower.sol";
 contract XPowerParaTest is XPowerPara {
     constructor(address _base, uint256 _deadlineIn) XPowerPara(_base, _deadlineIn) {}
 
-    function interval() public view returns (uint256) {
-        return _interval();
+    function amountOf(bytes32 _nonceHash) public view returns (uint256) {
+        return _amountOf(_nonceHash);
     }
 
-    function hash(
+    function cache(bytes32 _blockHash) public {
+        _timestamps[_blockHash] = block.timestamp;
+    }
+
+    function hashOf(
         address _to,
         uint256 _interval,
         bytes32 _blockHash,
         uint256 _nonce
     ) public view returns (bytes32) {
-        return _hash(_to, _interval, _blockHash, _nonce);
+        return _hashOf(_to, _interval, _blockHash, _nonce);
     }
 
-    function amount(bytes32 _nonceHash) public view returns (uint256) {
-        return _amount(_nonceHash);
+    function intervalOf() public view returns (uint256) {
+        return _interval();
     }
 
-    function zeros(bytes32 _nonceHash) public pure returns (uint8) {
-        return _zeros(_nonceHash);
+    function zerosOf(bytes32 _nonceHash) public pure returns (uint8) {
+        return _zerosOf(_nonceHash);
     }
 }
 
@@ -34,25 +38,29 @@ contract XPowerParaTest is XPowerPara {
 contract XPowerAqchTest is XPowerAqch {
     constructor(address _base, uint256 _deadlineIn) XPowerAqch(_base, _deadlineIn) {}
 
-    function interval() public view returns (uint256) {
-        return _interval();
+    function amountOf(bytes32 _nonceHash) public view returns (uint256) {
+        return _amountOf(_nonceHash);
     }
 
-    function hash(
+    function cache(bytes32 _blockHash) public {
+        _timestamps[_blockHash] = block.timestamp;
+    }
+
+    function hashOf(
         address _to,
         uint256 _interval,
         bytes32 _blockHash,
         uint256 _nonce
     ) public view returns (bytes32) {
-        return _hash(_to, _interval, _blockHash, _nonce);
+        return _hashOf(_to, _interval, _blockHash, _nonce);
     }
 
-    function amount(bytes32 _nonceHash) public view returns (uint256) {
-        return _amount(_nonceHash);
+    function interval() public view returns (uint256) {
+        return _interval();
     }
 
-    function zeros(bytes32 _nonceHash) public pure returns (uint8) {
-        return _zeros(_nonceHash);
+    function zerosOf(bytes32 _nonceHash) public pure returns (uint8) {
+        return _zerosOf(_nonceHash);
     }
 }
 
@@ -60,24 +68,28 @@ contract XPowerAqchTest is XPowerAqch {
 contract XPowerQrshTest is XPowerQrsh {
     constructor(address _base, uint256 _deadlineIn) XPowerQrsh(_base, _deadlineIn) {}
 
-    function interval() public view returns (uint256) {
-        return _interval();
+    function amountOf(bytes32 _nonceHash) public view returns (uint256) {
+        return _amountOf(_nonceHash);
     }
 
-    function hash(
+    function cache(bytes32 _blockHash) public {
+        _timestamps[_blockHash] = block.timestamp;
+    }
+
+    function hashOf(
         address _to,
         uint256 _interval,
         bytes32 _blockHash,
         uint256 _nonce
     ) public view returns (bytes32) {
-        return _hash(_to, _interval, _blockHash, _nonce);
+        return _hashOf(_to, _interval, _blockHash, _nonce);
     }
 
-    function amount(bytes32 _nonceHash) public view returns (uint256) {
-        return _amount(_nonceHash);
+    function interval() public view returns (uint256) {
+        return _interval();
     }
 
-    function zeros(bytes32 _nonceHash) public pure returns (uint8) {
-        return _zeros(_nonceHash);
+    function zerosOf(bytes32 _nonceHash) public pure returns (uint8) {
+        return _zerosOf(_nonceHash);
     }
 }

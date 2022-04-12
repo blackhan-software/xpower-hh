@@ -58,33 +58,37 @@ task("balances-xpow", "Prints the list of balances for XPower tokens")
  */
 task("mine", "Mines for XPower tokens")
   .addParam("cache", "cache block-hash", "true")
-  .addParam("refresh", "refresh block-hash", "false")
-  .addParam("mint", "auto-mint if possible", "true")
+  .addParam("json", "json logs", "false")
   .addParam("level", "minimum minting threshold level", "5")
+  .addParam("mint", "auto-mint if possible", "true")
+  .addParam("refresh", "refresh block-hash", "false")
   .addParam("token", "para, aqch or qrsh", "para")
   .addParam("workers", "number of mining processes", `${workers()}`)
   .setAction(async (args, hre) => {
+    const address = process.env.MINT_ADDRESS;
+    assert(address, "missing MINT_ADDRESS");
     const cache = JSON.parse(args.cache || "true");
     assert(typeof cache === "boolean", "cache is not a boolean");
-    const refresh = JSON.parse(args.refresh || "false");
-    assert(typeof refresh === "boolean", "refresh is not a boolean");
-    const mint = JSON.parse(args.mint || "true");
-    assert(typeof mint === "boolean", "mint is not a boolean");
+    const json = JSON.parse(args.json || "false");
+    assert(typeof json === "boolean", "cache is not a boolean");
     const level = JSON.parse(args.level || "1");
     assert(typeof level === "number", "level is not a number");
     assert(level > 0, "level is not larger than zero");
+    const mint = JSON.parse(args.mint || "true");
+    assert(typeof mint === "boolean", "mint is not a boolean");
+    const refresh = JSON.parse(args.refresh || "false");
+    assert(typeof refresh === "boolean", "refresh is not a boolean");
     const symbol = Token.symbol(args.token || "para");
     assert(typeof symbol === "string", "token is not a string");
     const n_workers = JSON.parse(args.workers || `${workers()}`);
     assert(typeof n_workers === "number", "workers is not a number");
     assert(n_workers > 0, "workers is not larger than zero");
-    const address = process.env.MINER_ADDRESS;
-    assert(address, "missing MINER_ADDRESS");
     await start(symbol, address, {
       cache,
-      refresh,
-      mint,
+      json,
       level,
+      mint,
+      refresh,
       n_workers,
     });
   });
@@ -117,7 +121,7 @@ module.exports = {
       url: "http://127.0.0.1:9650/ext/bc/C/rpc",
       chainId: 43112,
       accounts: [
-        process.env.MINER_ADDRESS_PK ||
+        process.env.MINT_ADDRESS_PK ||
           "0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027",
         "0x7b4198529994b0dc604278c99d153cfd069d594753d471171a1d102a10438e07",
         "0x15614556be13730e9e8d6eacc1603143e7b96987429df8726384c2ec4502ef6e",
@@ -134,7 +138,7 @@ module.exports = {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
       chainId: 43113,
       accounts: [
-        process.env.MINER_ADDRESS_PK ||
+        process.env.MINT_ADDRESS_PK ||
           "0x0000000000000000000000000000000000000000000000000000000000000000",
       ],
     },
@@ -142,7 +146,7 @@ module.exports = {
       url: "https://api.avax.network/ext/bc/C/rpc",
       chainId: 43114,
       accounts: [
-        process.env.MINER_ADDRESS_PK ||
+        process.env.MINT_ADDRESS_PK ||
           "0x0000000000000000000000000000000000000000000000000000000000000000",
       ],
     },

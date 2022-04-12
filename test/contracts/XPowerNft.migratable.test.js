@@ -13,7 +13,7 @@ let table; // pre-hashed nonces
 
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const NFT_AQCH_URL = "https://xpowermine.com/nfts/aqch/{id}.json";
-const DEADLINE = 0; // [seconds]
+const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 let UNIT;
 
@@ -33,7 +33,7 @@ describe("XPowerNft", async function () {
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerAqchNftTest");
+    XPowerNft = await ethers.getContractFactory("XPowerAqchNft");
     expect(XPowerNft).to.exist;
     XPower = await ethers.getContractFactory("XPowerAqch");
     expect(XPower).to.exist;
@@ -43,19 +43,22 @@ describe("XPowerNft", async function () {
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.transferOwnership(addresses[1]);
+    await xpower.init();
   });
   beforeEach(async function () {
     xpower_nft_v1 = await XPowerNft.deploy(
       NFT_AQCH_URL,
-      xpower.address,
-      NONE_ADDRESS
+      NONE_ADDRESS,
+      DEADLINE,
+      xpower.address
     );
     expect(xpower_nft_v1).to.exist;
     await xpower_nft_v1.deployed();
     xpower_nft_v2 = await XPowerNft.deploy(
       NFT_AQCH_URL,
-      xpower.address,
-      xpower_nft_v1.address
+      xpower_nft_v1.address,
+      DEADLINE,
+      xpower.address
     );
     expect(xpower_nft_v2).to.exist;
     await xpower_nft_v2.deployed();
@@ -170,7 +173,7 @@ async function increaseAllowanceBy(amount) {
 }
 async function mintXPow(amount) {
   const [nonce, block_hash] = table.getNonce({ amount });
-  expect(nonce).to.greaterThanOrEqual(0);
+  expect(nonce.gte(0)).to.eq(true);
   const tx = await xpower.mint(addresses[0], block_hash, nonce);
   expect(tx).to.be.an("object");
   expect(await xpower.balanceOf(addresses[0])).to.eq(amount);
