@@ -1,6 +1,0 @@
-[Unit]
-Description=XPower PARA miner (re)starter
-
-[Service]
-ExecStart=/usr/bin/systemctl restart --user para-miner@%i.service
-Type=oneshot

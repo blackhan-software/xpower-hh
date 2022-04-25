@@ -1,4 +1,4 @@
-const { task } = require("hardhat/config");
+const { task, types } = require("hardhat/config");
 const assert = require("assert");
 require("dotenv").config();
 
@@ -39,17 +39,25 @@ task("balances-avax", "Prints the list of balances for AVAX coins").setAction(
  * List balances of accounts for XPower tokens
  */
 task("balances-xpow", "Prints the list of balances for XPower tokens")
-  .addParam("token", "para, aqch or qrsh", "para")
+  .addVariadicPositionalParam(
+    "tokens",
+    "thor, loki or odin",
+    ["thor", "loki", "odin"],
+    types.string,
+    true
+  )
   .setAction(async (args, hre) => {
-    const symbol = Token.symbol(args.token || "para");
-    assert(typeof symbol === "string", "token is not a string");
     const accounts = await hre.ethers.getSigners();
     assert(accounts.length > 0, "missing accounts");
-    const xpower = await Token.contract(symbol);
-    assert(xpower, "missing contract");
-    for (const { address } of accounts) {
-      const balance = await xpower.balanceOf(address);
-      console.log(`${address} => ${balance.toString()} ${symbol}`);
+    const symbols = Array.from(
+      new Set(args.tokens.map((token) => Token.symbol(token)))
+    );
+    for (const symbol of symbols) {
+      const xpower = await Token.contract(symbol);
+      for (const { address } of accounts) {
+        const balance = await xpower.balanceOf(address);
+        console.log(`${address} => ${balance.toString()} ${symbol}`);
+      }
     }
   });
 
@@ -57,39 +65,34 @@ task("balances-xpow", "Prints the list of balances for XPower tokens")
  * Mine (and mint) for XPower tokens
  */
 task("mine", "Mines for XPower tokens")
-  .addParam("cache", "cache block-hash", "true")
-  .addParam("json", "json logs", "false")
-  .addParam("level", "minimum minting threshold level", "5")
-  .addParam("mint", "auto-mint if possible", "true")
-  .addParam("refresh", "refresh block-hash", "false")
-  .addParam("token", "para, aqch or qrsh", "para")
-  .addParam("workers", "number of mining processes", `${workers()}`)
+  .addParam("cache", "cache block-hash", true, types.boolean)
+  .addParam("json", "json logs", false, types.boolean)
+  .addParam("level", "minimum minting threshold", 7, types.int)
+  .addParam("mint", "auto-mint if possible", true, types.boolean)
+  .addParam("refresh", "refresh block-hash", false, types.boolean)
+  .addParam("workers", "number of mining processes", workers(), types.int)
+  .addVariadicPositionalParam(
+    "tokens",
+    "thor, loki or odin",
+    ["thor", "loki", "odin"],
+    types.string,
+    true
+  )
   .setAction(async (args, hre) => {
-    const address = process.env.MINT_ADDRESS;
-    assert(address, "missing MINT_ADDRESS");
-    const cache = JSON.parse(args.cache || "true");
-    assert(typeof cache === "boolean", "cache is not a boolean");
-    const json = JSON.parse(args.json || "false");
-    assert(typeof json === "boolean", "cache is not a boolean");
-    const level = JSON.parse(args.level || "1");
-    assert(typeof level === "number", "level is not a number");
-    assert(level > 0, "level is not larger than zero");
-    const mint = JSON.parse(args.mint || "true");
-    assert(typeof mint === "boolean", "mint is not a boolean");
-    const refresh = JSON.parse(args.refresh || "false");
-    assert(typeof refresh === "boolean", "refresh is not a boolean");
-    const symbol = Token.symbol(args.token || "para");
-    assert(typeof symbol === "string", "token is not a string");
-    const n_workers = JSON.parse(args.workers || `${workers()}`);
-    assert(typeof n_workers === "number", "workers is not a number");
-    assert(n_workers > 0, "workers is not larger than zero");
-    await start(symbol, address, {
-      cache,
-      json,
-      level,
-      mint,
-      refresh,
-      n_workers,
+    const accounts = await hre.ethers.getSigners();
+    assert(accounts.length > 0, "missing accounts");
+    const beneficiary = process.env.MINT_ADDRESS;
+    assert(beneficiary, "missing MINT_ADDRESS");
+    assert(args.level > 0, "level is not larger than zero");
+    assert(args.workers > 0, "workers is not larger than zero");
+    const symbols = args.tokens.map((token) => Token.symbol(token));
+    return start(symbols, [accounts[0].address, beneficiary], {
+      cache: args.cache,
+      json: args.json,
+      level: args.level,
+      mint: args.mint,
+      refresh: args.refresh,
+      n_workers: args.workers,
     });
   });
 
@@ -110,13 +113,6 @@ module.exports = {
     },
   },
   networks: {
-    hardhat: {
-      /**
-       * @see https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
-       * @todo remove when that issue is closed!
-       */
-      initialBaseFeePerGas: 0, // workaround
-    },
     /* avalanche */ local: {
       url: "http://127.0.0.1:9650/ext/bc/C/rpc",
       chainId: 43112,
@@ -133,6 +129,7 @@ module.exports = {
         "0x86f78c5416151fe3546dece84fda4b4b1e36089f2dbc48496faf3a950f16157c",
         "0x750839e9dbbd2a0910efe40f50b2f3b2f2f59f5580bb4b83bd8c1201cf9a010a",
       ],
+      gasMultiplier: 1.125, // gasPrice: 100_000_000_000,
     },
     /* avalanche */ fuji: {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
@@ -141,6 +138,7 @@ module.exports = {
         process.env.MINT_ADDRESS_PK ||
           "0x0000000000000000000000000000000000000000000000000000000000000000",
       ],
+      gasMultiplier: 1.125, // gasPrice: 100_000_000_000,
     },
     /* avalanche */ mainnet: {
       url: "https://api.avax.network/ext/bc/C/rpc",
@@ -149,6 +147,7 @@ module.exports = {
         process.env.MINT_ADDRESS_PK ||
           "0x0000000000000000000000000000000000000000000000000000000000000000",
       ],
+      gasMultiplier: 1.125, // gasPrice: 100_000_000_000,
     },
   },
   gasReporter: {

@@ -166,9 +166,9 @@ abstract contract XPowerNftStaked is XPowerNftBase {
 }
 
 /**
- * Staked NFT class for PARA tokens.
+ * Staked NFT class for THOR tokens.
  */
-contract XPowerParaNftStaked is XPowerNftStaked {
+contract XPowerThorNftStaked is XPowerNftStaked {
     /** @param uri meta-data URI */
     /** @param base address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
@@ -180,9 +180,9 @@ contract XPowerParaNftStaked is XPowerNftStaked {
 }
 
 /**
- * Staked NFT class for AQCH tokens.
+ * Staked NFT class for LOKI tokens.
  */
-contract XPowerAqchNftStaked is XPowerNftStaked {
+contract XPowerLokiNftStaked is XPowerNftStaked {
     /** @param uri meta-data URI */
     /** @param base address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
@@ -194,9 +194,9 @@ contract XPowerAqchNftStaked is XPowerNftStaked {
 }
 
 /**
- * Staked NFT class for QRSH tokens.
+ * Staked NFT class for ODIN tokens.
  */
-contract XPowerQrshNftStaked is XPowerNftStaked {
+contract XPowerOdinNftStaked is XPowerNftStaked {
     /** @param uri meta-data URI */
     /** @param base address of old contract */
     /** @param deadlineIn seconds to end-of-migration */

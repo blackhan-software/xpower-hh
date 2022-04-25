@@ -20,54 +20,54 @@ const { wait } = require("./wait");
  */
 async function main() {
   // addresses XPowerNft[New]
-  const para_nft = process.env.PARA_NFT_V4a;
-  assert(para_nft, "missing PARA_NFT_V4a");
-  const aqch_nft = process.env.AQCH_NFT_V4a;
-  assert(aqch_nft, "missing AQCH_NFT_V4a");
-  const qrsh_nft = process.env.QRSH_NFT_V4a;
-  assert(qrsh_nft, "missing QRSH_NFT_V4a");
+  const thor_nft = process.env.THOR_NFT_V4a;
+  assert(thor_nft, "missing THOR_NFT_V4a");
+  const loki_nft = process.env.LOKI_NFT_V4a;
+  assert(loki_nft, "missing LOKI_NFT_V4a");
+  const odin_nft = process.env.ODIN_NFT_V4a;
+  assert(odin_nft, "missing ODIN_NFT_V4a");
   // addresses XPowerNftStaked[New]
-  const para_nft_staked = process.env.PARA_PPT_V4a;
-  assert(para_nft_staked, "missing PARA_PPT_V4a");
-  const aqch_nft_staked = process.env.AQCH_PPT_V4a;
-  assert(aqch_nft_staked, "missing AQCH_PPT_V4a");
-  const qrsh_nft_staked = process.env.QRSH_PPT_V4a;
-  assert(qrsh_nft_staked, "missing QRSH_PPT_V4a");
+  const thor_nft_staked = process.env.THOR_PPT_V4a;
+  assert(thor_nft_staked, "missing THOR_PPT_V4a");
+  const loki_nft_staked = process.env.LOKI_PPT_V4a;
+  assert(loki_nft_staked, "missing LOKI_PPT_V4a");
+  const odin_nft_staked = process.env.ODIN_PPT_V4a;
+  assert(odin_nft_staked, "missing ODIN_PPT_V4a");
   //
-  // deploy PARA NftTreasury[New]:
+  // deploy THOR NftTreasury[New]:
   //
-  const para_treasury = await deploy("NftTreasury", {
-    nft: para_nft,
-    nft_staked: para_nft_staked,
+  const thor_treasury = await deploy("NftTreasury", {
+    nft: thor_nft,
+    nft_staked: thor_nft_staked,
   });
-  console.log(`PARA_PPT_TREASURY_V4a=${para_treasury.address}`);
-  await repossess("XPowerParaNftStaked", {
-    nft_staked: para_nft_staked,
-    nft_treasury: para_treasury.address,
-  });
-  //
-  // deploy AQCH NftTreasury[New]:
-  //
-  const aqch_treasury = await deploy("NftTreasury", {
-    nft: aqch_nft,
-    nft_staked: aqch_nft_staked,
-  });
-  console.log(`AQCH_PPT_TREASURY_V4a=${aqch_treasury.address}`);
-  await repossess("XPowerAqchNftStaked", {
-    nft_staked: aqch_nft_staked,
-    nft_treasury: aqch_treasury.address,
+  console.log(`THOR_PPT_TREASURY_V4a=${thor_treasury.address}`);
+  await repossess("XPowerThorNftStaked", {
+    nft_staked: thor_nft_staked,
+    nft_treasury: thor_treasury.address,
   });
   //
-  // deploy QRSH NftTreasury[New]:
+  // deploy LOKI NftTreasury[New]:
   //
-  const qrsh_treasury = await deploy("NftTreasury", {
-    nft: qrsh_nft,
-    nft_staked: qrsh_nft_staked,
+  const loki_treasury = await deploy("NftTreasury", {
+    nft: loki_nft,
+    nft_staked: loki_nft_staked,
   });
-  console.log(`QRSH_PPT_TREASURY_V4a=${qrsh_treasury.address}`);
-  await repossess("XPowerQrshNftStaked", {
-    nft_staked: qrsh_nft_staked,
-    nft_treasury: qrsh_treasury.address,
+  console.log(`LOKI_PPT_TREASURY_V4a=${loki_treasury.address}`);
+  await repossess("XPowerLokiNftStaked", {
+    nft_staked: loki_nft_staked,
+    nft_treasury: loki_treasury.address,
+  });
+  //
+  // deploy ODIN NftTreasury[New]:
+  //
+  const odin_treasury = await deploy("NftTreasury", {
+    nft: odin_nft,
+    nft_staked: odin_nft_staked,
+  });
+  console.log(`ODIN_PPT_TREASURY_V4a=${odin_treasury.address}`);
+  await repossess("XPowerOdinNftStaked", {
+    nft_staked: odin_nft_staked,
+    nft_treasury: odin_treasury.address,
   });
 }
 async function deploy(name, { nft, nft_staked }) {

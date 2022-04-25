@@ -1,0 +1,6 @@
+[Unit]
+Description=XPower LOKI miner (re)starter
+
+[Service]
+ExecStart=/usr/bin/systemctl restart --user loki-miner@%i.service
+Type=oneshot

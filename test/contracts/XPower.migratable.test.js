@@ -26,13 +26,13 @@ describe("Migration", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerAqchTest");
+    const factory = await ethers.getContractFactory("XPowerLokiTest");
     const contract = await factory.deploy(NONE_ADDRESS, DEADLINE_OLD);
     table_0 = await new HashTable(contract, addresses[0]).init();
     table_2 = await new HashTable(contract, addresses[2]).init();
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerAqchTest");
+    XPower = await ethers.getContractFactory("XPowerLokiTest");
   });
   beforeEach(async function () {
     // deploy old xpower contract:

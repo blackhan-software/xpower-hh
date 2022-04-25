@@ -7,7 +7,9 @@ class Token {
     if (typeof address === "string") {
       const signers = await hre.ethers.getSigners();
       assert(signers.length > 0, "missing signers");
-      const signer = signers.filter((s) => s.address === address)[0];
+      const signer = signers.filter((s) =>
+        s.address.match(new RegExp(address, "i"))
+      )[0];
       assert(signer, "missing signer for address");
       const connect = instance.connect(signer);
       assert(connect, "missing connection");
@@ -30,11 +32,11 @@ class Token {
 }
 const amount_of = (symbol) => {
   switch (symbol) {
-    case "PARA":
+    case "THOR":
       return (hash) => zeros(hash);
-    case "AQCH":
+    case "LOKI":
       return (hash) => 2 ** zeros(hash) - 1;
-    case "QRSH":
+    case "ODIN":
       return (hash) => 16 ** zeros(hash) - 1;
     default:
       throw new Error(`unknown ${symbol}`);
@@ -49,20 +51,20 @@ const zeros = (hash) => {
 };
 const contract = async (symbol) => {
   switch (symbol) {
-    case "PARA": {
-      const address = process.env.PARA_MOE_V4a;
-      assert(address, "missing PARA_MOE_V4a");
-      return await hre.ethers.getContractAt("XPowerPara", address);
+    case "THOR": {
+      const address = process.env.THOR_MOE_V4a;
+      assert(address, "missing THOR_MOE_V4a");
+      return await hre.ethers.getContractAt("XPowerThor", address);
     }
-    case "AQCH": {
-      const address = process.env.AQCH_MOE_V4a;
-      assert(address, "missing AQCH_MOE_V4a");
-      return await hre.ethers.getContractAt("XPowerAqch", address);
+    case "LOKI": {
+      const address = process.env.LOKI_MOE_V4a;
+      assert(address, "missing LOKI_MOE_V4a");
+      return await hre.ethers.getContractAt("XPowerLoki", address);
     }
-    case "QRSH": {
-      const address = process.env.QRSH_MOE_V4a;
-      assert(address, "missing QRSH_MOE_V4a");
-      return await hre.ethers.getContractAt("XPowerQrsh", address);
+    case "ODIN": {
+      const address = process.env.ODIN_MOE_V4a;
+      assert(address, "missing ODIN_MOE_V4a");
+      return await hre.ethers.getContractAt("XPowerOdin", address);
     }
     default:
       throw new Error(`unknown ${symbol}`);
@@ -70,23 +72,23 @@ const contract = async (symbol) => {
 };
 const normalized = (symbol) => {
   switch (symbol.toUpperCase()) {
-    case "PARA":
-      return "PARA";
-    case "AQCH":
-      return "AQCH";
-    case "QRSH":
-      return "QRSH";
+    case "THOR":
+      return "THOR";
+    case "LOKI":
+      return "LOKI";
+    case "ODIN":
+      return "ODIN";
     default:
       throw new Error(`unknown ${symbol}`);
   }
 };
 const threshold_of = (symbol) => {
   switch (symbol) {
-    case "PARA":
+    case "THOR":
       return (level) => level;
-    case "AQCH":
+    case "LOKI":
       return (level) => 2 ** level - 1;
-    case "QRSH":
+    case "ODIN":
       return (level) => 16 ** level - 1;
     default:
       throw new Error(`unknown ${symbol}`);

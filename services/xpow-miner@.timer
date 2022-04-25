@@ -1,0 +1,11 @@
+[Unit]
+Description=XPower miner timer
+
+[Timer]
+OnBootSec=120
+OnCalendar=hourly
+Persistent=true
+Unit=xpow-start@%i.service
+
+[Install]
+WantedBy=timers.target

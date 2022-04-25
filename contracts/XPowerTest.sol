@@ -4,9 +4,9 @@
 pragma solidity ^0.8.0;
 import "./XPower.sol";
 
-/** Test class for XPowerPara */
-contract XPowerParaTest is XPowerPara {
-    constructor(address _base, uint256 _deadlineIn) XPowerPara(_base, _deadlineIn) {}
+/** Test class for XPowerThor */
+contract XPowerThorTest is XPowerThor {
+    constructor(address _base, uint256 _deadlineIn) XPowerThor(_base, _deadlineIn) {}
 
     function amountOf(bytes32 _nonceHash) public view returns (uint256) {
         return _amountOf(_nonceHash);
@@ -34,9 +34,9 @@ contract XPowerParaTest is XPowerPara {
     }
 }
 
-/** Test class for XPowerAqch */
-contract XPowerAqchTest is XPowerAqch {
-    constructor(address _base, uint256 _deadlineIn) XPowerAqch(_base, _deadlineIn) {}
+/** Test class for XPowerLoki */
+contract XPowerLokiTest is XPowerLoki {
+    constructor(address _base, uint256 _deadlineIn) XPowerLoki(_base, _deadlineIn) {}
 
     function amountOf(bytes32 _nonceHash) public view returns (uint256) {
         return _amountOf(_nonceHash);
@@ -64,9 +64,9 @@ contract XPowerAqchTest is XPowerAqch {
     }
 }
 
-/** Test class for XPowerQrsh */
-contract XPowerQrshTest is XPowerQrsh {
-    constructor(address _base, uint256 _deadlineIn) XPowerQrsh(_base, _deadlineIn) {}
+/** Test class for XPowerOdin */
+contract XPowerOdinTest is XPowerOdin {
+    constructor(address _base, uint256 _deadlineIn) XPowerOdin(_base, _deadlineIn) {}
 
     function amountOf(bytes32 _nonceHash) public view returns (uint256) {
         return _amountOf(_nonceHash);

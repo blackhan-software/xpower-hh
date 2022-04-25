@@ -1,6 +1,0 @@
-[Unit]
-Description=XPower AQCH miner (re)starter
-
-[Service]
-ExecStart=/usr/bin/systemctl restart --user aqch-miner@%i.service
-Type=oneshot

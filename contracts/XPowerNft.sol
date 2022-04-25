@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "./XPowerNftBase.sol";
 
 /**
- * Abstract base class for the PARA, AQCH & QRSH proof-of-work NFTs, where each
+ * Abstract base class for the THOR, LOKI & ODIN proof-of-work NFTs, where each
  * can only be minted by burning the corresponding amount of tokens.
  */
 contract XPowerNft is XPowerNftBase {
@@ -57,10 +57,10 @@ contract XPowerNft is XPowerNftBase {
 }
 
 /**
- * NFT class for PARA tokens: Only the latter are allowed to get burned, to
- * mint PARA NFTs.
+ * NFT class for THOR tokens: Only the latter are allowed to get burned, to
+ * mint THOR NFTs.
  */
-contract XPowerParaNft is XPowerNft {
+contract XPowerThorNft is XPowerNft {
     constructor(
         string memory uri,
         address base,
@@ -70,10 +70,10 @@ contract XPowerParaNft is XPowerNft {
 }
 
 /**
- * NFT class for AQCH tokens: Only the latter are allowed to get burned, to
- * mint AQCH NFTs.
+ * NFT class for LOKI tokens: Only the latter are allowed to get burned, to
+ * mint LOKI NFTs.
  */
-contract XPowerAqchNft is XPowerNft {
+contract XPowerLokiNft is XPowerNft {
     constructor(
         string memory uri,
         address base,
@@ -83,10 +83,10 @@ contract XPowerAqchNft is XPowerNft {
 }
 
 /**
- * NFT class for QRSH tokens: Only the latter are allowed to get burned, to
- * mint QRSH NFTs.
+ * NFT class for ODIN tokens: Only the latter are allowed to get burned, to
+ * mint ODIN NFTs.
  */
-contract XPowerQrshNft is XPowerNft {
+contract XPowerOdinNft is XPowerNft {
     constructor(
         string memory uri,
         address base,

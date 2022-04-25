@@ -1,28 +1,28 @@
 # XPower Tokens
 
-The XPower token family are proof-of-work tokens, that can only be minted by providing a correct nonce (with a recent block-hash). The PARA, AQCH and QRSH tokens are part of the same family with a maximum supply of 817.356B × 10^64 PARA, 878.779 billion &times; 10^64 AQCH and 1'024.398T × 10^64 QRSH tokens. To be exact:
+The XPower token family are proof-of-work tokens, that can only be minted by providing a correct nonce (with a recent block-hash). The THOR, LOKI and ODIN tokens are part of the same family with a maximum supply of 817.356B × 10^64 THOR, 878.779 billion &times; 10^64 LOKI and 1'024.398T × 10^64 ODIN tokens. To be exact:
 
-The maximum supply of PARA tokens is
+The maximum supply of THOR tokens is
 
 > 8173559240281143206369716588848558201407293035221686873373476518205632680466;
 
-the maximum supply of AQCH tokens is
+the maximum supply of LOKI tokens is
 
 > 8787792486760604116967440826552207292435668479088792806564000920878366851072;
 
-and the maximum supply of QRSH tokens is
+and the maximum supply of ODIN tokens is
 
 > 10243981394713817163879045579987358347893978955888388649865763135200064687833090.
 
 ## Installation
 
-```shell
+```sh
 npm install
 ```
 
 ## Help
 
-```shell
+```sh
 npx hardhat help
 ```
 
@@ -30,7 +30,7 @@ npx hardhat help
 
 ### List accounts
 
-```shell
+```sh
 npx hardhat accounts
 ```
 
@@ -38,41 +38,41 @@ npx hardhat accounts
 
 ### Clean
 
-```shell
+```sh
 npx hardhat clean [--global]
 ```
 
 ### ESLint
 
-```shell
+```sh
 npx eslint '**/*.js' [--fix|--quiet]
 ```
 
 ### Prettier
 
-```shell
+```sh
 npx prettier '**/*.{json,sol,md}' [--check|--write]
 ```
 
 ### Solhint
 
-```shell
+```sh
 npx solhint 'contracts/**/*.sol' [--fix|--quiet]
 ```
 
 ### Compile
 
-```shell
+```sh
 npx hardhat compile [--force|--quiet]
 ```
 
 ## Testing
 
-```shell
+```sh
 [REPORT_GAS=1] npx hardhat test [--no-compile] [...test-files]
 ```
 
-```shell
+```sh
 npx hardhat coverage [...test-files]
 ```
 
@@ -80,7 +80,7 @@ npx hardhat coverage [...test-files]
 
 ### Start a local node
 
-```shell
+```sh
 npx hardhat node
 ```
 
@@ -95,71 +95,90 @@ npx hardhat node
 
 ### Deploy smart contract(s)
 
-```shell
+```sh
 npx hardhat run 'scripts/deploy.js' [--no-compile] [--network $NETWORK]
 ```
 
 ## Mining & Minting
 
-XPower tokens can be mined and minted at [xpowermine.com](https://www.xpowermine.com/home), but you can also use the **terminal** to do so. First, download the contract's source code from the link, unpack the archive and then follow the instructions below:
+XPower tokens can be mined and minted at [xpowermine.com](https://www.xpowermine.com/home), but you can also use a *terminal* based miner to do so. First, download the source code from this link, unpack the archive and then follow the instructions below:
 
 > https://github.com/xpowermine/xpower-hh/archive/refs/heads/main.zip
 
 ### Installation & Build
 
-```shell
+```sh
 npm install && npm run build
 ```
 
 ### Environment Variables
 
-```shell
+```sh
 cp .env-main .env
 ```
 
-..plus change in `.env` the `MINT_ADDRESS` to _your own_ one; don't forget add the corresponding *private key* too:
+..plus change in `.env` the `MINT_ADDRESS` to _your own_ one; don't forget to set the corresponding `MINT_ADDRESS_PK` _private key_ too. It's also possible to use the private key of a *different* address: That way the account of the beneficiary and the minting fee payer can be &mdash; for security purposes &mdash; separated.
 
-```shell
-MINT_ADDRESS=0x...    # use your own address (for minting purposes)
+```sh
+MINT_ADDRESS=0x...    # beneficiary address (account to *receive* minted tokens)
 ```
 
-```shell
-MINT_ADDRESS_PK=0x... # use the private key of the same address!
+```sh
+MINT_ADDRESS_PK=0x... # minter address' private key (can be a different account)
 ```
 
-> Please, do **NOT** provide an address with a private key that contains massive amounts of AVAX! This account will _only_ be used to auto-pay for some minting fees. Just ensure, that there is enough &mdash; which you can afford to loose &mdash; but not more. Metamask users can for example add a new account, transfer a _small_ amount of AVAX to it, and then export the private key from the account's details section.
+> Please, do **NOT** provide an address with a private key that contains massive amounts of AVAX! This account will _only_ be used to auto-pay for some minting fees. Just ensure that there is enough &mdash; which you can afford to loose &mdash; but not more. Metamask users can for example add a new account, transfer a _small_ amount of AVAX to it, and then export the private key from the account's details section.
 
 ### Mining and Minting:
 
-```shell
-npx hardhat mine --network mainnet
-    [--token para|aqch|qrsh]  # token to mine (default: para)
-    [--level 5]               # threshold level (default: 5)
-    [--mint true|false]       # mint (default: true)
-    [--cache true|false]      # cache block-hash (default: true)
-    [--refresh false|true]    # refresh block-hash (default: false)
-    [--workers N]             # number of workers (default: #CPUs - 1)
+```sh
+Usage: hardhat [GLOBAL OPTIONS] mine [--cache <BOOLEAN>] [--json <BOOLEAN>] [--level <INT>] [--mint <BOOLEAN>] [--refresh <BOOLEAN>] [--workers <INT>] [...tokens]
+
+OPTIONS:
+
+  --cache       cache block-hash (default: true)
+  --json        json logs (default: false)
+  --level       minimum minting threshold (default: 7)
+  --mint        auto-mint if possible (default: true)
+  --refresh     refresh block-hash (default: false)
+  --workers     number of mining processes (default: CPUs - 1)
+
+POSITIONAL ARGUMENTS:
+
+  tokens        thor, loki or odin (default: ["thor","loki","odin"])
+
+mine: Mines for XPower tokens
+```
+
+Start mining and minting on the Avalanche mainnet for the XPower THOR, LOKI and ODIN tokens (and optionally filter for the `info` messages only &mdash; requires the `jq` tool):
+
+```sh
+npx hardhat mine --network mainnet # | jq -rc 'select(.level=="info")|.message'
 ```
 
 ```txt
-[MINT#1] nonce = 0xeebd6e3f8e8e4f37d051d1de0b985cc1d7e7bb1bdf47b709236ae585329f3093 => 2 PARA [100.000 H/ms]
-[MINT#2] nonce = 0x3ad5505c118cd1994c379b961dd19a0001b7c38792109303a560ce07da91b24b => 1 PARA [099.000 H/ms]
-[MINT#3] nonce = 0xfe2db5d91a9949c1213f70f7942bc9bb02097ce8e27e27b6d8db54de56a4c288 => 1 PARA [101.000 H/ms]
-[MINT#1] nonce = 0x01fb1cec82deb1229c96268e9679c7fa08e88de2cdf14b9d5a7b07d42aecf617 => 1 PARA [100.000 H/ms]
+[INIT#0|ACK] block-hash=0xe3f...920, timestamp=1651775580 => THOR
+[INIT#0|ACK] block-hash=0x569...ade, timestamp=1651775584 => LOKI
+[INIT#0|ACK] block-hash=0xb7a...f4d, timestamp=1651775588 => ODIN
+```
+
+```txt
+[MINT#4|ACK] nonce=0x80a...531, block_hash=0xe3f...920 =>       5 THOR [096.468 H/ms]
+[MINT#2|ACK] nonce=0x981...08d, block_hash=0x569...ade =>      31 LOKI [120.812 H/ms]
+[MINT#3|ACK] nonce=0xa69...d6e, block_hash=0xb7a...f4d => 1048575 ODIN [121.778 H/ms]
 ...
 ```
 
-..where you should observe the `[MINT]` prefix if mining and minting of the `nonce` has been successful, and where you should see the `amount` of XPower tokens that have been minted on the right hand side. With the `token` option you can choose, which token you want to mine and mint for: possible values are `para`, `aqch` and `qrsh`. Further, to ignore lower valued amounts, you can use the `level` option:
+..where you should see the `[MINT]` prefix, if minting for the `nonce` value has been successful. Via the positional `tokens` arguments you can also choose which token(s) you want to mine and mint for: `thor`, `loki` or `odin`. Further, to skip minting *lower* valued amounts you can use the `level` option:
 
-```shell
-npx hardhat mine --network mainnet --token para --level 3
+```sh
+npx hardhat mine --network mainnet --level 7 thor # | jq -rc '.message'
 ```
 
 ```txt
-[MINT#1] nonce = 0x6f83302e4144d648d129cd0f6baa6bf66bd967f5eb2a94c27ca724648e79fff5 => 1 PARA [100.000 H/ms]
-[MINT#2] nonce = 0xb83f064fa8b16532023fcc4ae83c3f3c678440bb8f0e5516ac8239412cec5c81 => 1 PARA [099.000 H/ms]
-[MINT#3] nonce = 0xe0c678c7644eb974b8b0d8d75be677ed4c8047443d7aa364a6a3738b4d3b2343 => 2 PARA [101.000 H/ms]
-[MINT#1] nonce = 0x93061dedf91e79d5cb5b7cef0f597e5a3a2ecbcb14a480b4e17c2f4b9ab39242 => 1 PARA [100.000 H/ms]
+[MINT#3|ACK] nonce=0xbb9...9b8, block_hash=0x699...09d => 7 THOR [104.973 H/ms]
+[MINT#1|ACK] nonce=0x557...cfd, block_hash=0x699...09d => 8 THOR [120.621 H/ms]
+[MINT#2|ACK] nonce=0x626...3c4, block_hash=0x699...09d => 7 THOR [119.361 H/ms]
 ...
 ```
 
@@ -167,18 +186,84 @@ npx hardhat mine --network mainnet --token para --level 3
 
 ### XPower and AVAX Balances
 
-```shell
-npx hardhat balances-xpow --network mainnet [--token para|aqch|qrsh]
+```sh
+npx hardhat balances-xpow --network mainnet [thor|loki|odin]
 ```
 
 ..which lists all present accounts with XPower balances.
 
-```shell
+```sh
 npx hardhat balances-avax --network mainnet
 ```
 
 ..which lists all present accounts with nano-AVAX balances.
 
+## Systemd Integration
+
+The examples below are specific to mine (and mint) *all* the XPower THOR, LOKI and ODIN tokens simultaneously (across multiple CPU cores). If you want to mine them individually, then you have to replace the `xpow-` prefix with the `thor-`, `loki-` or `odin-` prefixes respectively.
+
+### Service installation
+
+> By default the service files assume the miner (repository) to be accessible at `/opt/xpower-hh`. If that is not the case, either provide a corresponding symbolic link or (if you cannot access `/opt`) modify the service files accordingly.
+
+Copy the systemd unit files to the user directory:
+
+```sh
+cp --update ./services/* ~/.config/systemd/user/
+```
+
+Enable the timer service (for e.g. `level=7`):
+
+```sh
+systemctl enable --user xpow-miner@7.timer
+```
+
+..to ensure that mining starts upon a reboot (optional).
+
+### Service start
+
+Start the timer service (to auto-[re]start &ndash; every hour &ndash; the miner service):
+
+```sh
+systemctl start --user xpow-miner@7.timer
+```
+
+List the installed timer services:
+
+```sh
+systemctl list-timers --user
+```
+
+Follow the journal of the miner service:
+
+```sh
+journalctl --user -fu xpow-miner@7.service
+```
+
+### Service stop
+
+Stop the timer service:
+
+```sh
+systemctl stop --user xpow-miner@7.timer
+```
+
+Stop the miner service:
+
+```sh
+systemctl stop --user xpow-miner@7.service
+```
+
+### Service removal
+
+Disable the timer service:
+
+```sh
+systemctl disable --user xpow-miner@7.timer
+```
+
+..to ensure that mining does *not* start upon a reboot.
+
 ## Copyright
 
- © 2021 [XPowerMine.com](https://www.xpowermine.com)
+ © 2022 [XPowerMine.com](https://www.xpowermine.com)

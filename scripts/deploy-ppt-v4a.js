@@ -23,39 +23,39 @@ async function main() {
   assert(none, "missing NONE_ADDRESS");
   const deadline = 126_230_400; // 4 years
   // addresses XPowerNft[Uri]
-  const para_uri = process.env.PARA_PPT_URI;
-  assert(para_uri, "missing PARA_PPT_URI");
-  const aqch_uri = process.env.AQCH_PPT_URI;
-  assert(aqch_uri, "missing AQCH_PPT_URI");
-  const qrsh_uri = process.env.QRSH_PPT_URI;
-  assert(qrsh_uri, "missing QRSH_PPT_URI");
+  const thor_uri = process.env.THOR_PPT_URI;
+  assert(thor_uri, "missing THOR_PPT_URI");
+  const loki_uri = process.env.LOKI_PPT_URI;
+  assert(loki_uri, "missing LOKI_PPT_URI");
+  const odin_uri = process.env.ODIN_PPT_URI;
+  assert(odin_uri, "missing ODIN_PPT_URI");
   //
-  // deploy XPowerParaNft[New]:
+  // deploy XPowerThorNft[New]:
   //
-  const para_nft = await deploy("XPowerParaNftStaked", {
-    uri: para_uri,
+  const thor_nft = await deploy("XPowerThorNftStaked", {
+    uri: thor_uri,
     base: none,
     deadline,
   });
-  console.log(`PARA_PPT_V4a=${para_nft.address}`);
+  console.log(`THOR_PPT_V4a=${thor_nft.address}`);
   //
-  // deploy XPowerAqchNft[New]:
+  // deploy XPowerLokiNft[New]:
   //
-  const aqch_nft = await deploy("XPowerAqchNftStaked", {
-    uri: aqch_uri,
+  const loki_nft = await deploy("XPowerLokiNftStaked", {
+    uri: loki_uri,
     base: none,
     deadline,
   });
-  console.log(`AQCH_PPT_V4a=${aqch_nft.address}`);
+  console.log(`LOKI_PPT_V4a=${loki_nft.address}`);
   //
-  // deploy XPowerQrshNft[New]:
+  // deploy XPowerOdinNft[New]:
   //
-  const qrsh_nft = await deploy("XPowerQrshNftStaked", {
-    uri: qrsh_uri,
+  const odin_nft = await deploy("XPowerOdinNftStaked", {
+    uri: odin_uri,
     base: none,
     deadline,
   });
-  console.log(`QRSH_PPT_V4a=${qrsh_nft.address}`);
+  console.log(`ODIN_PPT_V4a=${odin_nft.address}`);
 }
 async function deploy(name, { uri, base, deadline }) {
   const factory = await hre.ethers.getContractFactory(name);

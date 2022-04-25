@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./Migratable.sol";
 
 /**
- * Abstract base class for the XPower PARA, AQCH and QRSH proof-of-work tokens.
+ * Abstract base class for the XPower THOR, LOKI and ODIN proof-of-work tokens.
  * It verifies, that the nonce & the block-hash do result in a positive amount,
  * (as specified by the sub-classes). After the verification, the corresponding
  * amount of tokens are minted for the beneficiary (plus the treasury).
@@ -158,10 +158,7 @@ abstract contract XPower is ERC20, ERC20Burnable, Migratable {
     }
 
     /** @return amount for provided nonce-hash */
-    function _amountOf(bytes32 nonceHash) internal view virtual returns (uint256) {
-        require(nonceHash >= 0, "invalid nonce-hash");
-        return 0;
-    }
+    function _amountOf(bytes32 nonceHash) internal view virtual returns (uint256);
 
     /** @return leading zeros of provided nonce-hash */
     function _zerosOf(bytes32 nonceHash) internal pure returns (uint8) {
@@ -199,13 +196,13 @@ abstract contract XPower is ERC20, ERC20Burnable, Migratable {
 }
 
 /**
- * Allow mining & minting for PARA proof-of-work tokens, where the rewarded
+ * Allow mining & minting for THOR proof-of-work tokens, where the rewarded
  * amount equals to *only* |leading-zeros(nonce-hash) - difficulty|.
  */
-contract XPowerPara is XPower {
+contract XPowerThor is XPower {
     /** @param base address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address base, uint256 deadlineIn) XPower("PARA", base, deadlineIn) {}
+    constructor(address base, uint256 deadlineIn) XPower("THOR", base, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
@@ -219,13 +216,13 @@ contract XPowerPara is XPower {
 }
 
 /**
- * Allow mining & minting for AQCH proof-of-work tokens, where the rewarded
+ * Allow mining & minting for LOKI proof-of-work tokens, where the rewarded
  * amount equals to 2 ^ |leading-zeros(nonce-hash) - difficulty| - 1.
  */
-contract XPowerAqch is XPower {
+contract XPowerLoki is XPower {
     /** @param base address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address base, uint256 deadlineIn) XPower("AQCH", base, deadlineIn) {}
+    constructor(address base, uint256 deadlineIn) XPower("LOKI", base, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
@@ -239,13 +236,13 @@ contract XPowerAqch is XPower {
 }
 
 /**
- * Allow mining & minting for QRSH proof-of-work tokens, where the rewarded
+ * Allow mining & minting for ODIN proof-of-work tokens, where the rewarded
  * amount equals to 16 ^ |leading-zeros(nonce-hash) - difficulty| - 1.
  */
-contract XPowerQrsh is XPower {
+contract XPowerOdin is XPower {
     /** @param base address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address base, uint256 deadlineIn) XPower("QRSH", base, deadlineIn) {}
+    constructor(address base, uint256 deadlineIn) XPower("ODIN", base, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {

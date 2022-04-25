@@ -11,7 +11,7 @@ let xpower, nft, nft_staked, nft_treasury; // instances
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NFT_AQCH_URL = "https://xpowermine.com/nfts/aqch/{id}.json";
+const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
@@ -26,12 +26,12 @@ describe("NftTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerAqchTest");
+    const factory = await ethers.getContractFactory("XPowerLokiTest");
     const contract = await factory.deploy(NONE_ADDRESS, DEADLINE);
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerAqchTest");
+    XPower = await ethers.getContractFactory("XPowerLokiTest");
     expect(XPower).to.exist;
   });
   beforeEach(async function () {
@@ -41,23 +41,23 @@ describe("NftTreasury", async function () {
     await xpower.init();
   });
   before(async function () {
-    Nft = await ethers.getContractFactory("XPowerAqchNft");
+    Nft = await ethers.getContractFactory("XPowerLokiNft");
     expect(Nft).to.exist;
-    NftStaked = await ethers.getContractFactory("XPowerAqchNftStaked");
+    NftStaked = await ethers.getContractFactory("XPowerLokiNftStaked");
     expect(NftStaked).to.exist;
     NftTreasury = await ethers.getContractFactory("NftTreasury");
     expect(NftTreasury).to.exist;
   });
   beforeEach(async function () {
     nft = await Nft.deploy(
-      NFT_AQCH_URL,
+      NFT_LOKI_URL,
       NONE_ADDRESS,
       DEADLINE,
       xpower.address
     );
     expect(nft).to.exist;
     await nft.deployed();
-    nft_staked = await NftStaked.deploy(NFT_AQCH_URL, NONE_ADDRESS, DEADLINE);
+    nft_staked = await NftStaked.deploy(NFT_LOKI_URL, NONE_ADDRESS, DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
     nft_treasury = await NftTreasury.deploy(nft.address, nft_staked.address);

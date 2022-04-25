@@ -22,7 +22,7 @@ describe("XPower", async function () {
     expect(addresses.length).to.be.greaterThan(0);
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerAqchTest");
+    XPower = await ethers.getContractFactory("XPowerLokiTest");
   });
   beforeEach(async function () {
     xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);

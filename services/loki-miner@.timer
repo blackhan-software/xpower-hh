@@ -1,0 +1,11 @@
+[Unit]
+Description=XPower LOKI miner timer
+
+[Timer]
+OnBootSec=120
+OnCalendar=hourly
+Persistent=true
+Unit=loki-start@%i.service
+
+[Install]
+WantedBy=timers.target

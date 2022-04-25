@@ -1,16 +1,23 @@
+const { parseUnits } = require("ethers").utils;
 const { Token } = require("./token");
 
 async function do_init(
   symbol,
-  address,
-  { timeout_ms } = { timeout_ms: 900_000 }
+  [minter],
+  { timeout_ms } = { timeout_ms: 180_000 }
 ) {
-  const xpower = await Token.contract(symbol, address);
+  const { gasMultiplier: gas_multiplier } = hre.network.config;
+  const xpower = await Token.contract(symbol, minter);
+  const [signer] = await hre.ethers.getSigners();
+  const gas_price = await signer.getGasPrice();
   return new Promise((resolve, reject) => {
     const tid = setTimeout(() => {
       reject(new Error("[INIT] block-hash timeout"));
     }, timeout_ms);
-    const caching = xpower.init();
+    const caching = xpower.init({
+      maxFeePerGas: gas_price.mul(gas_multiplier * 1000).div(1000),
+      maxPriorityFeePerGas: parseUnits("2.0", "gwei"), // nAVAX
+    });
     xpower.on("Init", async function listener(block_hash, timestamp, ev) {
       try {
         const cached = await caching;
@@ -27,15 +34,26 @@ async function do_init(
 }
 async function do_mint(
   symbol,
-  address,
-  { nonce, block_hash, timeout_ms = 300_000 }
+  [minter, beneficiary],
+  { nonce, block_hash, timeout_ms = 60_000 }
 ) {
-  const xpower = await Token.contract(symbol, address);
+  const { gasMultiplier: gas_multiplier } = hre.network.config;
+  const xpower = await Token.contract(symbol, minter);
+  const [signer] = await hre.ethers.getSigners();
+  const gas_price = await signer.getGasPrice();
   return new Promise((resolve, reject) => {
     const tid = setTimeout(() => {
       reject(new Error("[MINT] transaction timeout"));
     }, timeout_ms);
-    const minting = xpower.mint(address, block_hash, "0x" + nonce.toString(16));
+    const minting = xpower.mint(
+      beneficiary,
+      block_hash,
+      "0x" + nonce.toString(16),
+      {
+        maxFeePerGas: gas_price.mul(gas_multiplier * 1000).div(1000),
+        maxPriorityFeePerGas: parseUnits("1.5", "gwei"), // nAVAX
+      }
+    );
     xpower.on("Transfer", async function listener(from, to, amount, ev) {
       try {
         const minted = await minting;

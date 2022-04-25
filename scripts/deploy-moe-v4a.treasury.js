@@ -22,46 +22,46 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPower[New]
-  const para_moe = process.env.PARA_MOE_V4a;
-  assert(para_moe, "missing PARA_MOE_V4a");
-  const aqch_moe = process.env.AQCH_MOE_V4a;
-  assert(aqch_moe, "missing AQCH_MOE_V4a");
-  const qrsh_moe = process.env.QRSH_MOE_V4a;
-  assert(qrsh_moe, "missing QRSH_MOE_V4a");
+  const thor_moe = process.env.THOR_MOE_V4a;
+  assert(thor_moe, "missing THOR_MOE_V4a");
+  const loki_moe = process.env.LOKI_MOE_V4a;
+  assert(loki_moe, "missing LOKI_MOE_V4a");
+  const odin_moe = process.env.ODIN_MOE_V4a;
+  assert(odin_moe, "missing ODIN_MOE_V4a");
   // addresses XPowerNftStaked[New]
-  const para_nft_staked = process.env.PARA_PPT_V4a;
-  assert(para_nft_staked, "missing PARA_PPT_V4a");
-  const aqch_nft_staked = process.env.AQCH_PPT_V4a;
-  assert(aqch_nft_staked, "missing AQCH_PPT_V4a");
-  const qrsh_nft_staked = process.env.QRSH_PPT_V4a;
-  assert(qrsh_nft_staked, "missing QRSH_PPT_V4a");
+  const thor_nft_staked = process.env.THOR_PPT_V4a;
+  assert(thor_nft_staked, "missing THOR_PPT_V4a");
+  const loki_nft_staked = process.env.LOKI_PPT_V4a;
+  assert(loki_nft_staked, "missing LOKI_PPT_V4a");
+  const odin_nft_staked = process.env.ODIN_PPT_V4a;
+  assert(odin_nft_staked, "missing ODIN_PPT_V4a");
   //
-  // deploy PARA NftTreasury[New]:
+  // deploy THOR NftTreasury[New]:
   //
-  const para_treasury = await deploy("MoeTreasury", {
-    moe: para_moe,
-    nft_staked: para_nft_staked,
+  const thor_treasury = await deploy("MoeTreasury", {
+    moe: thor_moe,
+    nft_staked: thor_nft_staked,
     owner,
   });
-  console.log(`PARA_MOE_TREASURY_V4a=${para_treasury.address}`);
+  console.log(`THOR_MOE_TREASURY_V4a=${thor_treasury.address}`);
   //
-  // deploy AQCH NftTreasury[New]:
+  // deploy LOKI NftTreasury[New]:
   //
-  const aqch_treasury = await deploy("MoeTreasury", {
-    moe: aqch_moe,
-    nft_staked: aqch_nft_staked,
+  const loki_treasury = await deploy("MoeTreasury", {
+    moe: loki_moe,
+    nft_staked: loki_nft_staked,
     owner,
   });
-  console.log(`AQCH_MOE_TREASURY_V4a=${aqch_treasury.address}`);
+  console.log(`LOKI_MOE_TREASURY_V4a=${loki_treasury.address}`);
   //
-  // deploy QRSH NftTreasury[New]:
+  // deploy ODIN NftTreasury[New]:
   //
-  const qrsh_treasury = await deploy("MoeTreasury", {
-    moe: qrsh_moe,
-    nft_staked: qrsh_nft_staked,
+  const odin_treasury = await deploy("MoeTreasury", {
+    moe: odin_moe,
+    nft_staked: odin_nft_staked,
     owner,
   });
-  console.log(`QRSH_MOE_TREASURY_V4a=${qrsh_treasury.address}`);
+  console.log(`ODIN_MOE_TREASURY_V4a=${odin_treasury.address}`);
 }
 async function deploy(name, { moe, nft_staked, owner }) {
   const factory = await hre.ethers.getContractFactory(name);

@@ -1,0 +1,11 @@
+[Unit]
+Description=XPower ODIN miner timer
+
+[Timer]
+OnBootSec=120
+OnCalendar=hourly
+Persistent=true
+Unit=odin-start@%i.service
+
+[Install]
+WantedBy=timers.target

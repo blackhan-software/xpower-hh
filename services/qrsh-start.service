@@ -1,6 +1,0 @@
-[Unit]
-Description=XPower QRSH miner (re)starter
-
-[Service]
-ExecStart=/usr/bin/systemctl restart --user qrsh-miner@%i.service
-Type=oneshot

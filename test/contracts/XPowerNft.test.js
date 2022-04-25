@@ -12,8 +12,8 @@ const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
-const NFT_AQCH_WWW = "https://www.xpowermine.com/nfts/aqch/{id}.json";
-const NFT_AQCH_URL = "https://xpowermine.com/nfts/aqch/{id}.json";
+const NFT_LOKI_WWW = "https://www.xpowermine.com/nfts/loki/{id}.json";
+const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const DEADLINE = 0; // [seconds]
 
 let UNIT, KILO, MEGA;
@@ -31,14 +31,14 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerAqchTest");
+    const factory = await ethers.getContractFactory("XPowerLokiTest");
     const contract = await factory.deploy(NONE_ADDRESS, DEADLINE);
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerAqchNft");
+    XPowerNft = await ethers.getContractFactory("XPowerLokiNft");
     expect(XPowerNft).to.exist;
-    XPower = await ethers.getContractFactory("XPowerAqch");
+    XPower = await ethers.getContractFactory("XPowerLoki");
     expect(XPower).to.exist;
   });
   beforeEach(async function () {
@@ -50,7 +50,7 @@ describe("XPowerNft", async function () {
   });
   beforeEach(async function () {
     xpower_nft = await XPowerNft.deploy(
-      NFT_AQCH_URL,
+      NFT_LOKI_URL,
       NONE_ADDRESS,
       DEADLINE,
       xpower.address
@@ -188,9 +188,9 @@ describe("XPowerNft", async function () {
       expect(nft_year).to.be.greaterThan(0);
       const nft_id = (await xpower_nft.idBy(nft_year, UNIT)).toNumber();
       expect(nft_id).to.be.greaterThan(0);
-      await xpower_nft.setURI(NFT_AQCH_WWW);
+      await xpower_nft.setURI(NFT_LOKI_WWW);
       const nft_url = await xpower_nft.uri(nft_id);
-      expect(nft_url).to.eq(NFT_AQCH_WWW);
+      expect(nft_url).to.eq(NFT_LOKI_WWW);
     });
     it("should *not* set new URI (caller is not the owner)", async function () {
       const nft_year = (await xpower_nft.year()).toNumber();
@@ -199,7 +199,7 @@ describe("XPowerNft", async function () {
       expect(nft_id).to.be.greaterThan(0);
       await xpower_nft.transferOwnership(addresses[1]);
       expect(
-        await xpower_nft.setURI(NFT_AQCH_WWW).catch((ex) => {
+        await xpower_nft.setURI(NFT_LOKI_WWW).catch((ex) => {
           const m = ex.message.match(/caller is not the owner/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -236,7 +236,7 @@ async function mintXPowNft(unit, amount) {
   const nft_exists = await xpower_nft.exists(nft_id);
   expect(nft_exists).to.eq(true);
   const nft_url = await xpower_nft.uri(nft_id);
-  expect(nft_url).to.eq(NFT_AQCH_URL);
+  expect(nft_url).to.eq(NFT_LOKI_URL);
 }
 async function mintBatchXPowNft(unit, amount) {
   const year = (await xpower_nft.year()).toNumber();
@@ -253,5 +253,5 @@ async function mintBatchXPowNft(unit, amount) {
   const nft_exists = await xpower_nft.exists(nft_id);
   expect(nft_exists).to.eq(true);
   const nft_url = await xpower_nft.uri(nft_id);
-  expect(nft_url).to.eq(NFT_AQCH_URL);
+  expect(nft_url).to.eq(NFT_LOKI_URL);
 }

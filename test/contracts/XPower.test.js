@@ -25,12 +25,12 @@ describe("XPower", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerAqchTest");
+    const factory = await ethers.getContractFactory("XPowerLokiTest");
     const contract = await factory.deploy(NONE_ADDRESS, DEADLINE);
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerAqchTest");
+    XPower = await ethers.getContractFactory("XPowerLokiTest");
   });
   beforeEach(async function () {
     xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);

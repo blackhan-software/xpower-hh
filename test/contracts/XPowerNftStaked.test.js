@@ -10,7 +10,7 @@ let nft_staked; // instance
 
 const DATA =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
-const NFT_AQCH_URL = "https://xpowermine.com/nfts/aqch/{id}.json";
+const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
@@ -25,11 +25,11 @@ describe("XPowerNftStaked", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    NftStaked = await ethers.getContractFactory("XPowerAqchNftStaked");
+    NftStaked = await ethers.getContractFactory("XPowerLokiNftStaked");
     expect(NftStaked).to.exist;
   });
   beforeEach(async function () {
-    nft_staked = await NftStaked.deploy(NFT_AQCH_URL, NONE_ADDRESS, DEADLINE);
+    nft_staked = await NftStaked.deploy(NFT_LOKI_URL, NONE_ADDRESS, DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });

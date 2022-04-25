@@ -23,59 +23,59 @@ async function main() {
   assert(owner, "missing FUND_ADDRESS");
   const deadline = 126_230_400; // 4 years
   // addresses XPower[New]
-  const para_xpower = process.env.PARA_MOE_V3a;
-  assert(para_xpower, "missing PARA_MOE_V3a");
-  const aqch_xpower = process.env.AQCH_MOE_V3a;
-  assert(aqch_xpower, "missing AQCH_MOE_V3a");
-  const qrsh_xpower = process.env.QRSH_MOE_V3a;
-  assert(qrsh_xpower, "missing QRSH_MOE_V3a");
+  const thor_xpower = process.env.THOR_MOE_V3a;
+  assert(thor_xpower, "missing THOR_MOE_V3a");
+  const loki_xpower = process.env.LOKI_MOE_V3a;
+  assert(loki_xpower, "missing LOKI_MOE_V3a");
+  const odin_xpower = process.env.ODIN_MOE_V3a;
+  assert(odin_xpower, "missing ODIN_MOE_V3a");
   // addresses XPowerNft[Uri]
-  const para_uri = process.env.PARA_NFT_URI;
-  assert(para_uri, "missing PARA_NFT_URI");
-  const aqch_uri = process.env.AQCH_NFT_URI;
-  assert(aqch_uri, "missing AQCH_NFT_URI");
-  const qrsh_uri = process.env.QRSH_NFT_URI;
-  assert(qrsh_uri, "missing QRSH_NFT_URI");
+  const thor_uri = process.env.THOR_NFT_URI;
+  assert(thor_uri, "missing THOR_NFT_URI");
+  const loki_uri = process.env.LOKI_NFT_URI;
+  assert(loki_uri, "missing LOKI_NFT_URI");
+  const odin_uri = process.env.ODIN_NFT_URI;
+  assert(odin_uri, "missing ODIN_NFT_URI");
   // addresses XPowerNft[Old]
-  const para_base = process.env.PARA_NFT_V2a;
-  assert(para_base, "missing PARA_NFT_V2a");
-  const aqch_base = process.env.AQCH_NFT_V2a;
-  assert(aqch_base, "missing AQCH_NFT_V2a");
-  const qrsh_base = process.env.QRSH_NFT_V2a;
-  assert(qrsh_base, "missing QRSH_NFT_V2a");
+  const thor_base = process.env.THOR_NFT_V2a;
+  assert(thor_base, "missing THOR_NFT_V2a");
+  const loki_base = process.env.LOKI_NFT_V2a;
+  assert(loki_base, "missing LOKI_NFT_V2a");
+  const odin_base = process.env.ODIN_NFT_V2a;
+  assert(odin_base, "missing ODIN_NFT_V2a");
   //
-  // deploy XPowerParaNft[New]:
+  // deploy XPowerThorNft[New]:
   //
-  const para_nft = await deploy("XPowerParaNft", {
-    uri: para_uri,
-    base: para_base,
+  const thor_nft = await deploy("XPowerThorNft", {
+    uri: thor_uri,
+    base: thor_base,
     deadline,
-    moe: para_xpower,
+    moe: thor_xpower,
     owner,
   });
-  console.log(`PARA_NFT_V3a=${para_nft.address}`);
+  console.log(`THOR_NFT_V3a=${thor_nft.address}`);
   //
-  // deploy XPowerAqchNft[New]:
+  // deploy XPowerLokiNft[New]:
   //
-  const aqch_nft = await deploy("XPowerAqchNft", {
-    uri: aqch_uri,
-    base: aqch_base,
+  const loki_nft = await deploy("XPowerLokiNft", {
+    uri: loki_uri,
+    base: loki_base,
     deadline,
-    moe: aqch_xpower,
+    moe: loki_xpower,
     owner,
   });
-  console.log(`AQCH_NFT_V3a=${aqch_nft.address}`);
+  console.log(`LOKI_NFT_V3a=${loki_nft.address}`);
   //
-  // deploy XPowerQrshNft[New]:
+  // deploy XPowerOdinNft[New]:
   //
-  const qrsh_nft = await deploy("XPowerQrshNft", {
-    uri: qrsh_uri,
-    base: qrsh_base,
+  const odin_nft = await deploy("XPowerOdinNft", {
+    uri: odin_uri,
+    base: odin_base,
     deadline,
-    moe: qrsh_xpower,
+    moe: odin_xpower,
     owner,
   });
-  console.log(`QRSH_NFT_V3a=${qrsh_nft.address}`);
+  console.log(`ODIN_NFT_V3a=${odin_nft.address}`);
 }
 async function deploy(name, { uri, base, deadline, moe, owner }) {
   const factory = await hre.ethers.getContractFactory(name);

@@ -1,0 +1,15 @@
+[Unit]
+Description=XPower THOR miner
+StartLimitIntervalSec=0
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/xpower-hh
+EnvironmentFile=/opt/xpower-hh/.env
+ExecStart=npx hardhat mine --network mainnet --json true --level %i thor
+Restart=on-failure
+RestartSec=60
+Nice=10
+
+[Install]
+WantedBy=default.target

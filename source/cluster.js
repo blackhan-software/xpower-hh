@@ -1,7 +1,8 @@
 const { BigNumber } = require("ethers");
 const crypto = require("crypto");
 
-const { log } = require("./log");
+const { logger, log_init, log_mint, dbg_mint, err_mint } = require("./log");
+
 const { block } = require("./block");
 const { do_init } = require("./minter");
 const { do_mint } = require("./minter");
@@ -14,13 +15,10 @@ const { cpus } = require("os");
 const { assert } = require("console");
 
 async function start(
-  symbol,
-  address,
-  { cache, json, level, mint, refresh, n_workers = workers() }
+  symbols,
+  [minter, beneficiary],
+  { cache, json, level, mint, refresh, n_workers }
 ) {
-  if (cluster.isPrimary) {
-    console.log("[CLUSTER]", `master = ${worker_id()} state = setup`);
-  }
   if (cluster.isPrimary) {
     const { counter } = await fork(n_workers);
     assert(counter === n_workers);
@@ -30,34 +28,40 @@ async function start(
     assert(counter === n_workers);
   }
   if (cluster.isPrimary) {
-    const { block_hash, timestamp } = await init(symbol, address, {
-      cache,
-    });
+    const initialized = {};
+    for (const symbol of symbols) {
+      const { block_hash, timestamp } = await init(symbol, [minter], {
+        cache,
+        json,
+      });
+      initialized[symbol] = { block_hash, timestamp };
+    }
     for (const id in cluster.workers) {
+      const symbol = symbols[(Number(id) - 1) % symbols.length];
+      const { block_hash, timestamp } = initialized[symbol];
       const on_exit = exiter({ worker_id: id });
       cluster.workers[id].on("exit", on_exit);
-      const restart = restarter({ block_hash, timestamp });
+      const restart = restarter({ block_hash, timestamp, symbol });
       cluster.workers[id].on("exit", restart);
-      cluster.workers[id].send({
-        block_hash,
-        timestamp,
-      });
+      cluster.workers[id].send({ block_hash, timestamp, symbol });
     }
   }
   if (cluster.isWorker) {
-    console.log("[CLUSTER]", `worker = ${worker_id()} state = ready`);
-  }
-  if (cluster.isWorker) {
-    process.on("message", function on_init({ block_hash, timestamp }) {
+    process.on("message", function on_init({ block_hash, timestamp, symbol }) {
       process.off("message", on_init);
-      loop(symbol, address, {
+      logger.debug({
+        action: "loop",
+        worker: worker_id(),
+        symbol,
+      });
+      loop(symbol, [minter, beneficiary], {
         block_hash,
         cache,
         level,
-        json,
         mint,
         refresh,
         timestamp,
+        json,
       });
     });
   }
@@ -75,25 +79,22 @@ function worker_id() {
 function exiter({ worker_id }) {
   return (code, signal) => {
     if (signal) {
-      console.log(`[EXIT#${worker_id}] killed by SIGNAL = ${signal}`);
+      logger.debug({ action: "exit", worker: worker_id, signal });
     } else if (code !== 0) {
-      console.log(`[EXIT#${worker_id}] exited with error code = ${code}`);
+      logger.debug({ action: "exit", worker: worker_id, error: code });
     } else {
-      console.log(`[EXIT#${worker_id}] exited successfully`);
+      logger.debug({ action: "exit", worker: worker_id });
     }
   };
 }
-function restarter({ block_hash, timestamp }) {
+function restarter({ block_hash, timestamp, symbol }) {
   return async (code) => {
     if (code !== 0) {
       const { counter: n_forked, workers } = await fork(1);
       assert(n_forked === 1 && workers.length === 1);
       const { counter: n_ready } = await ready(1);
       assert(n_ready === 1);
-      workers[0].send({
-        block_hash,
-        timestamp,
-      });
+      workers[0].send({ block_hash, timestamp, symbol });
     }
   };
 }
@@ -125,8 +126,8 @@ async function busy() {
 }
 async function init(
   symbol,
-  address,
-  { cache, refresh, block_hash, timestamp }
+  [minter],
+  { block_hash, timestamp, cache, refresh, json }
 ) {
   if (cache) {
     if (typeof refresh === "boolean") {
@@ -134,26 +135,34 @@ async function init(
         return { block_hash, timestamp };
       }
     }
-    ({ block_hash, timestamp } = await do_init(symbol, address));
-    console.log(
-      `[INIT#${worker_id()}|ACK]` +
-        ` block-hash = ${block_hash}` +
-        ` timestamp = ${timestamp}`
-    );
+    logger.debug({ action: "init", worker: worker_id(), symbol });
+    ({ block_hash, timestamp } = await do_init(symbol, [minter]));
+    log_init({
+      worker: worker_id(),
+      result: "ACK",
+      block_hash,
+      timestamp,
+      symbol,
+      json,
+    });
   } else {
+    logger.debug({ action: "init", worker: worker_id(), symbol });
     ({ hash: block_hash, timestamp } = await block());
-    console.log(
-      `[INIT#${worker_id()}|BLK]` +
-        ` block-hash = ${block_hash}` +
-        ` timestamp = ${timestamp}`
-    );
+    log_init({
+      worker: worker_id(),
+      result: "blk",
+      block_hash,
+      timestamp,
+      symbol,
+      json,
+    });
   }
   return { block_hash, timestamp };
 }
 async function loop(
   symbol,
-  address,
-  { block_hash, cache, level, json, mint, refresh, timestamp }
+  [minter, beneficiary],
+  { block_hash, timestamp, level, cache, mint, refresh, json }
 ) {
   let at_interval = Miner.interval();
   let nonce = large_random();
@@ -162,40 +171,88 @@ async function loop(
   const token = new Token(symbol);
   const threshold = token.threshold(level);
   while (true) {
-    const hash = mine(symbol, address, at_interval, block_hash, nonce);
+    const hash = mine(symbol, beneficiary, at_interval, block_hash, nonce);
     const amount = token.amount_of(hash);
     if (amount >= threshold) {
       const hms = Number(nonce - start) / (performance.now() - now);
-      const ctx = {
-        amount,
-        block_hash,
-        hash,
-        nonce,
-        json,
-      };
       if (mint) {
         try {
-          await do_mint(symbol, address, { nonce, block_hash });
-          log(`[MINT#${worker_id()}|ACK]`, symbol, hms, ctx);
+          dbg_mint({
+            worker: worker_id(),
+            block_hash,
+            nonce,
+            amount,
+            symbol,
+            hms,
+            json,
+          });
+          await do_mint(symbol, [minter, beneficiary], { nonce, block_hash });
+          log_mint({
+            worker: worker_id(),
+            result: "ACK",
+            block_hash,
+            nonce,
+            amount,
+            symbol,
+            hms,
+            json,
+          });
         } catch (ex) {
           if (ex.message?.match(/replacement fee too low/)) {
-            log(`[MINT#${worker_id()}!FTL]`, symbol, hms, ctx);
+            err_mint({
+              worker: worker_id(),
+              result: "FIL",
+              block_hash,
+              nonce,
+              amount,
+              symbol,
+              hms,
+              json,
+            });
           } else if (ex.message?.match(/cannot estimate gas/)) {
-            log(`[MINT#${worker_id()}!CEG]`, symbol, hms, ctx);
+            err_mint({
+              worker: worker_id(),
+              result: "CEG",
+              block_hash,
+              nonce,
+              amount,
+              symbol,
+              hms,
+              json,
+            });
           } else if (ex.message?.match(/nonce has already been used/)) {
-            log(`[MINT#${worker_id()}!NAU]`, symbol, hms, ctx);
+            err_mint({
+              worker: worker_id(),
+              result: "NAU",
+              block_hash,
+              nonce,
+              amount,
+              symbol,
+              hms,
+              json,
+            });
           } else {
-            console.error(ex);
+            logger.error(ex);
           }
         }
-        ({ block_hash, timestamp } = await init(symbol, address, {
-          cache,
-          refresh,
+        ({ block_hash, timestamp } = await init(symbol, [minter], {
           block_hash,
           timestamp,
+          cache,
+          refresh,
+          json,
         }));
       } else {
-        log(`[WORK#${worker_id()}]`, nonce, amount, symbol, hms);
+        log_mint({
+          worker: worker_id(),
+          result: "NIL",
+          block_hash,
+          nonce,
+          amount,
+          symbol,
+          hms,
+          json,
+        });
       }
       at_interval = Miner.interval();
     }

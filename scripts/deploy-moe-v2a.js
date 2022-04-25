@@ -25,32 +25,32 @@ async function main() {
   assert(owner, "missing FUND_ADDRESS");
   const deadline = 126_230_400; // 4 years
   //
-  // deploy XPowerPara[Old]
+  // deploy XPowerThor[Old]
   //
-  const para_moe = await deploy("XPowerPara", {
+  const thor_moe = await deploy("XPowerThor", {
     base: none,
     deadline,
     owner,
   });
-  console.log(`PARA_MOE_V2a=${para_moe.address}`);
+  console.log(`THOR_MOE_V2a=${thor_moe.address}`);
   //
-  // deploy XPowerAqch[Old]
+  // deploy XPowerLoki[Old]
   //
-  const aqch_moe = await deploy("XPowerAqch", {
+  const loki_moe = await deploy("XPowerLoki", {
     base: none,
     deadline,
     owner,
   });
-  console.log(`AQCH_MOE_V2a=${aqch_moe.address}`);
+  console.log(`LOKI_MOE_V2a=${loki_moe.address}`);
   //
-  // deploy XPowerQrsh[Old]
+  // deploy XPowerOdin[Old]
   //
-  const qrsh_moe = await deploy("XPowerQrsh", {
+  const odin_moe = await deploy("XPowerOdin", {
     base: none,
     deadline,
     owner,
   });
-  console.log(`QRSH_MOE_V2a=${qrsh_moe.address}`);
+  console.log(`ODIN_MOE_V2a=${odin_moe.address}`);
 }
 async function deploy(name, { base, deadline, owner }) {
   const factory = await hre.ethers.getContractFactory(name);

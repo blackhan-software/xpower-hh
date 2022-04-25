@@ -9,7 +9,7 @@ let XPower, XPowerNft; // contracts
 let xpower, xpower_nft; // instances
 
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
-const NFT_AQCH_URL = "https://xpowermine.com/nfts/aqch/{id}.json";
+const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const DEADLINE = 0; // [seconds]
 
 const moment = require("moment");
@@ -25,9 +25,9 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerAqchNft");
+    XPowerNft = await ethers.getContractFactory("XPowerLokiNft");
     expect(XPowerNft).to.exist;
-    XPower = await ethers.getContractFactory("XPowerAqch");
+    XPower = await ethers.getContractFactory("XPowerLoki");
     expect(XPower).to.exist;
   });
   before(async function () {
@@ -39,7 +39,7 @@ describe("XPowerNft", async function () {
   });
   before(async function () {
     xpower_nft = await XPowerNft.deploy(
-      NFT_AQCH_URL,
+      NFT_LOKI_URL,
       NONE_ADDRESS,
       DEADLINE,
       xpower.address

@@ -72,9 +72,9 @@ let supply; // { total, other's, fund's }
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 1_814_400; // [seconds] i.e. 3 weeks
 
-describe("PARA Supply", async () => {
+describe("THOR Supply", async () => {
   before(async () => {
-    XPower = await ethers.getContractFactory("XPowerParaTest");
+    XPower = await ethers.getContractFactory("XPowerThorTest");
     xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     await xpower.deployed();
     await xpower.renounceOwnership();
@@ -105,9 +105,9 @@ describe("PARA Supply", async () => {
     });
   });
 });
-describe("AQCH Supply", async () => {
+describe("LOKI Supply", async () => {
   before(async () => {
-    XPower = await ethers.getContractFactory("XPowerAqchTest");
+    XPower = await ethers.getContractFactory("XPowerLokiTest");
     xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     await xpower.deployed();
     await xpower.renounceOwnership();
@@ -138,9 +138,9 @@ describe("AQCH Supply", async () => {
     });
   });
 });
-describe("QRSH Supply", async () => {
+describe("ODIN Supply", async () => {
   before(async () => {
-    XPower = await ethers.getContractFactory("XPowerQrshTest");
+    XPower = await ethers.getContractFactory("XPowerOdinTest");
     xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     await xpower.deployed();
     await xpower.renounceOwnership();

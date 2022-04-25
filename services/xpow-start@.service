@@ -1,0 +1,6 @@
+[Unit]
+Description=XPower miner (re)starter
+
+[Service]
+ExecStart=/usr/bin/systemctl restart --user xpow-miner@%i.service
+Type=oneshot

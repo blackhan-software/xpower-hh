@@ -1,0 +1,11 @@
+[Unit]
+Description=XPower THOR miner timer
+
+[Timer]
+OnBootSec=120
+OnCalendar=hourly
+Persistent=true
+Unit=thor-start@%i.service
+
+[Install]
+WantedBy=timers.target

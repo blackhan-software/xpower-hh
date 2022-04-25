@@ -11,7 +11,7 @@ let xpower, nft, nft_staked, nft_treasury, moe_treasury, mt; // instances
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NFT_QRSH_URL = "https://xpowermine.com/nfts/qrsh/{id}.json";
+const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const DAYS = 86_400; // [seconds]
@@ -27,13 +27,13 @@ describe("MoeTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerQrshTest");
+    XPower = await ethers.getContractFactory("XPowerOdinTest");
     expect(XPower).to.exist;
   });
   before(async function () {
-    Nft = await ethers.getContractFactory("XPowerQrshNft");
+    Nft = await ethers.getContractFactory("XPowerOdinNft");
     expect(Nft).to.exist;
-    NftStaked = await ethers.getContractFactory("XPowerQrshNftStaked");
+    NftStaked = await ethers.getContractFactory("XPowerOdinNftStaked");
     expect(NftStaked).to.exist;
     NftTreasury = await ethers.getContractFactory("NftTreasury");
     expect(NftTreasury).to.exist;
@@ -56,14 +56,14 @@ describe("MoeTreasury", async function () {
   });
   beforeEach(async function () {
     nft = await Nft.deploy(
-      NFT_QRSH_URL,
+      NFT_ODIN_URL,
       NONE_ADDRESS,
       DEADLINE,
       xpower.address
     );
     expect(nft).to.exist;
     await nft.deployed();
-    nft_staked = await NftStaked.deploy(NFT_QRSH_URL, NONE_ADDRESS, DEADLINE);
+    nft_staked = await NftStaked.deploy(NFT_ODIN_URL, NONE_ADDRESS, DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
     nft_treasury = await NftTreasury.deploy(nft.address, nft_staked.address);
@@ -94,12 +94,12 @@ describe("MoeTreasury", async function () {
     await xpower.transfer(moe_treasury.address, 601_000);
   });
   describe("balance", async function () {
-    it("should return 601'000 [QRSH]", async function () {
+    it("should return 601'000 [ODIN]", async function () {
       expect(await moe_treasury.balance()).to.eq(601_000);
     });
   });
   describe("claimFor", async function () {
-    it("should return 601'000 [QRSH] in 120 months", async function () {
+    it("should return 601'000 [ODIN] in 120 months", async function () {
       const [account, nft_id] = await stakeNft(await mintNft(6, 1), 1);
       expect(
         await mt.claimFor(account, nft_id).catch((ex) => {

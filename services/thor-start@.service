@@ -1,0 +1,6 @@
+[Unit]
+Description=XPower THOR miner (re)starter
+
+[Service]
+ExecStart=/usr/bin/systemctl restart --user thor-miner@%i.service
+Type=oneshot
