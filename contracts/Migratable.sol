@@ -2,7 +2,7 @@
 // solhint-disable not-rely-on-time
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 
@@ -11,7 +11,9 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
  * Further, it is possible to close down the migration window earlier than
  * the specified deadline.
  */
-abstract contract Migratable is ERC20, ERC20Burnable, Ownable {
+abstract contract Migratable is ERC20, ERC20Burnable, AccessControl {
+    bytes32 public constant SEAL_ROLE = keccak256("SEAL_ROLE");
+
     /** old contract to migrate from */
     ERC20Burnable private _token;
     /** timestamp of migration deadline */
@@ -20,12 +22,11 @@ abstract contract Migratable is ERC20, ERC20Burnable, Ownable {
     bool private _migratable = true;
     /** number of migrated tokens */
     uint256 private _migratedTotal = 0;
-    uint256 private _migratedOther = 0;
-    uint256 private _migratedOwner = 0;
 
     /** @param base address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address base, uint256 deadlineIn) {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _deadlineBy = block.timestamp + deadlineIn;
         _token = ERC20Burnable(base);
     }
@@ -43,7 +44,7 @@ abstract contract Migratable is ERC20, ERC20Burnable, Ownable {
         uint256 newBalance = _token.balanceOf(msg.sender);
         require(newBalance + amount == oldBalance, "invalid balance");
         _mint(msg.sender, amount);
-        _incrementCounters(amount);
+        _incrementCounter(amount);
     }
 
     /** @return number of migrated tokens */
@@ -52,17 +53,17 @@ abstract contract Migratable is ERC20, ERC20Burnable, Ownable {
     }
 
     /** seal migration (manually) */
-    function seal() public onlyOwner {
+    function seal() public onlyRole(SEAL_ROLE) {
         _migratable = false;
     }
 
-    /** track migration counters */
-    function _incrementCounters(uint256 amount) internal {
-        if (msg.sender == owner()) {
-            _migratedOwner += amount;
-        } else {
-            _migratedOther += amount;
-        }
+    /** track migration counter */
+    function _incrementCounter(uint256 amount) internal {
         _migratedTotal += amount;
+    }
+
+    /** returns true if this contract implements the interface defined by interfaceId. */
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return AccessControl.supportsInterface(interfaceId);
     }
 }

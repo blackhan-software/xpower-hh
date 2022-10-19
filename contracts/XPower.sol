@@ -3,6 +3,7 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
@@ -15,7 +16,7 @@ import "./Migratable.sol";
  * (as specified by the sub-classes). After the verification, the corresponding
  * amount of tokens are minted for the beneficiary (plus the treasury).
  */
-abstract contract XPower is ERC20, ERC20Burnable, Migratable {
+abstract contract XPower is ERC20, ERC20Burnable, Migratable, Ownable {
     using EnumerableSet for EnumerableSet.UintSet;
     /** set of nonce-hashes already minted for */
     EnumerableSet.UintSet private _hashes;

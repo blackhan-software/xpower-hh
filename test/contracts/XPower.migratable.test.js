@@ -272,6 +272,8 @@ describe("Migration", async function () {
       expect(old_allowance.toNumber()).to.eq(1);
       const new_allowance = await xpower_new.allowance(owner, spender);
       expect(new_allowance.toNumber()).to.eq(0);
+      // grant seal role to default account (i.e. deployer)
+      await xpower_new.grantRole(xpower_new.SEAL_ROLE(), addresses[0]);
       // seal migrate option
       const new_seal = await xpower_new.seal();
       expect(new_seal).to.be.an("object");
@@ -350,19 +352,21 @@ describe("Migration", async function () {
       const new_balance_spender = await xpower_new.balanceOf(spender);
       expect(new_balance_spender.toNumber()).to.eq(0);
     });
-    it("should *not* seal (caller is not the owner)", async function () {
+    it("should *not* seal (account is missing role)", async function () {
       const minter = accounts[2];
       expect(minter.address).to.match(/^0x/);
       // deploy xpower.new contract (w/o transferring ownership):
       xpower_new = await XPower.deploy(xpower_old.address, DEADLINE_NEW);
       await xpower_new.deployed();
       expect(xpower_new.address).to.exists;
+      // grant seal role to default account (but *not* minter)
+      await xpower_new.grantRole(xpower_new.SEAL_ROLE(), addresses[0]);
       // try to seal migrate option
       try {
         const new_seal = await xpower_new.connect(minter).seal();
         expect(new_seal).to.be.an(undefined);
       } catch (ex) {
-        const m = ex.message.match(/caller is not the owner/);
+        const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
       }
