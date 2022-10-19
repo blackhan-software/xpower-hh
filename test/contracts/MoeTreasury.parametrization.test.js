@@ -67,29 +67,31 @@ describe("MoeTreasury", async function () {
       Expect(await moe_treasury.getAlpha()).to.equal([0, 0, 3, 1, 0, 0]);
     });
     it("should set alpha array", async function () {
+      await moe_treasury.grantRole(moe_treasury.ALPHA_ROLE(), addresses[0]);
       await moe_treasury.setAlpha([1, 2, 3, 4, 5, 6]);
       Expect(await moe_treasury.getAlpha()).to.equal([1, 2, 3, 4, 5, 6]);
     });
     it("should *not* set alpha array (invalid array.length)", async function () {
+      await moe_treasury.grantRole(moe_treasury.ALPHA_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAlpha([1, 2, 3]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
-          expect().to.be.not.null;
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
       Expect(await moe_treasury.getAlpha()).to.equal([0, 0, 3, 1, 0, 0]);
     });
-    it("should *not* set alpha array (not owner)", async function () {
+    it("should *not* set alpha array (account is missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await moe_treasury
           .connect(signer_1)
           .setAlpha([1, 2, 3, 4, 5, 6])
           .catch((ex) => {
-            const m = ex.message.match(/caller is not the owner/);
+            const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
-            expect().to.be.not.null;
+            expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
       Expect(await moe_treasury.getAlpha()).to.equal([0, 0, 3, 1, 0, 0]);
@@ -100,29 +102,31 @@ describe("MoeTreasury", async function () {
       Expect(await moe_treasury.getGamma()).to.equal([0, 0, 1, 10, 0, 0]);
     });
     it("should set gamma array", async function () {
+      await moe_treasury.grantRole(moe_treasury.GAMMA_ROLE(), addresses[0]);
       await moe_treasury.setGamma([1, 2, 3, 4, 5, 6]);
       Expect(await moe_treasury.getGamma()).to.equal([1, 2, 3, 4, 5, 6]);
     });
     it("should *not* set gamma array (invalid array.length)", async function () {
+      await moe_treasury.grantRole(moe_treasury.GAMMA_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setGamma([1, 2, 3]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
-          expect().to.be.not.null;
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
       Expect(await moe_treasury.getGamma()).to.equal([0, 0, 1, 10, 0, 0]);
     });
-    it("should *not* set gamma array (not owner)", async function () {
+    it("should *not* set gamma array (account is missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await moe_treasury
           .connect(signer_1)
           .setGamma([1, 2, 3, 4, 5, 6])
           .catch((ex) => {
-            const m = ex.message.match(/caller is not the owner/);
+            const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
-            expect().to.be.not.null;
+            expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
       Expect(await moe_treasury.getGamma()).to.equal([0, 0, 1, 10, 0, 0]);

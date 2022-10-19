@@ -2,7 +2,7 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 import "./XPower.sol";
 import "./XPowerNftStaked.sol";
@@ -10,7 +10,12 @@ import "./XPowerNftStaked.sol";
 /**
  * Treasury to claim (MoE) tokens for staked XPowerNft(s).
  */
-contract MoeTreasury is Ownable {
+contract MoeTreasury is AccessControl {
+    /** role grants right to change APR parametrization */
+    bytes32 public constant ALPHA_ROLE = keccak256("ALPHA_ROLE");
+    /** role grants right to change APR bonus parametrization */
+    bytes32 public constant GAMMA_ROLE = keccak256("GAMMA_ROLE");
+
     /** (burnable) proof-of-work tokens */
     XPower private _moe;
     /** staked proof-of-work NFTs */
@@ -27,6 +32,7 @@ contract MoeTreasury is Ownable {
     /** @param moe address of contract for tokens */
     /** @param nftStaked address of contract for staked NFTs */
     constructor(address moe, address nftStaked) {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _moe = XPower(moe);
         _nftStaked = XPowerNftStaked(nftStaked);
     }
@@ -197,7 +203,7 @@ contract MoeTreasury is Ownable {
     }
 
     /** set apr parameters */
-    function setAlpha(uint256[] memory array) public onlyOwner {
+    function setAlpha(uint256[] memory array) public onlyRole(ALPHA_ROLE) {
         require(array.length == 6, "invalid array.length");
         _alpha = array;
     }
@@ -216,7 +222,7 @@ contract MoeTreasury is Ownable {
     }
 
     /** set apr-bonus parameters */
-    function setGamma(uint256[] memory array) public onlyOwner {
+    function setGamma(uint256[] memory array) public onlyRole(GAMMA_ROLE) {
         require(array.length == 6, "invalid array.length");
         _gamma = array;
     }
