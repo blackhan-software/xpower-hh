@@ -95,7 +95,7 @@ describe("NftTreasury", async function () {
       const tx_stake = await nft_treasury
         .stake(owner, nft_id, 1)
         .catch((ex) => {
-          const m = ex.message.match(/caller is not owner nor approved/);
+          const m = ex.message.match(/caller is not token owner nor approved/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         });
@@ -161,7 +161,7 @@ describe("NftTreasury", async function () {
       const tx_stake = await nft_treasury
         .stakeBatch(owner, [nft_id], [1])
         .catch((ex) => {
-          const m = ex.message.match(/caller is not owner nor approved/);
+          const m = ex.message.match(/caller is not token owner nor approved/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         });

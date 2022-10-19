@@ -325,7 +325,7 @@ describe("XPowerNftStaked", async function () {
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
     });
-    it("should *not* transfer nft-staked (not owner nor approved)", async function () {
+    it("should *not* transfer nft-staked (not token owner nor approved)", async function () {
       const [to, from] = addresses; // REVERSED!
       // mint: (for *to* and not *from*!)
       await nft_staked.mint(from, 202200, 1);
@@ -337,7 +337,7 @@ describe("XPowerNftStaked", async function () {
       const tx_transfer = await nft_staked
         .safeTransferFrom(from, to, 202200, 1, DATA)
         .catch((ex) => {
-          const m = ex.message.match(/caller is not owner nor approved/);
+          const m = ex.message.match(/caller is not token owner nor approved/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         });
@@ -392,7 +392,7 @@ describe("XPowerNftStaked", async function () {
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
     });
-    it("should *not* transfer nft-staked (not owner nor approved)", async function () {
+    it("should *not* transfer nft-staked (not token owner nor approved)", async function () {
       const [to, from] = addresses; // REVERSED!
       // mint: (for *to* and not *from*!)
       await nft_staked.mintBatch(from, [202200], [1]);
@@ -404,7 +404,7 @@ describe("XPowerNftStaked", async function () {
       const tx_transfer = await nft_staked
         .safeBatchTransferFrom(from, to, [202200], [1], DATA)
         .catch((ex) => {
-          const m = ex.message.match(/caller is not owner nor approved/);
+          const m = ex.message.match(/caller is not token owner nor approved/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         });
