@@ -2,5 +2,5 @@
   "name": "EXA ODIN",
   "describe": "EXA ODIN NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/320x427/2022/Odin/7-Odin_EXA.png",
-  "properties": { "issue": "2022", "label": "EXA", "level": "18", "token": "ODIN" }
+  "properties": { "apr": "0%", "apr-bonus": "0‱", "issue": "2022", "label": "EXA", "level": "18", "token": "ODIN" }
 }

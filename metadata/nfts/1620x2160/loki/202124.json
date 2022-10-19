@@ -2,5 +2,5 @@
   "name": "YOTTA LOKI",
   "describe": "YOTTA LOKI NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/1620x2160/2021/Loki/9-Loki_YOTTA.png",
-  "properties": { "issue": "2021", "label": "YOTTA", "level": "24", "token": "LOKI" }
+  "properties": { "apr": "0%", "apr-bonus": "0‱", "issue": "2021", "label": "YOTTA", "level": "24", "token": "LOKI" }
 }
