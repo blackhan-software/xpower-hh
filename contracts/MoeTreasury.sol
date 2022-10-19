@@ -16,9 +16,9 @@ contract MoeTreasury is Ownable {
     /** staked proof-of-work NFTs */
     XPowerNftStaked private _nftStaked;
     /** parametrization of APR */
-    uint256[] private _alphas = [0, 1, 1, 0];
+    uint256[] private _alpha = [0, 0, 3, 1, 0, 0];
     /** parametrization of APR bonus */
-    uint256[] private _gammas = [0, 1, 1, 0];
+    uint256[] private _gamma = [0, 0, 1, 10, 0, 0];
     /** map of rewards claimed: account => nft-id => amount */
     mapping(address => mapping(uint256 => uint256)) private _claimed;
     /** map of rewards claimed total: nft-id => amount */
@@ -188,21 +188,18 @@ contract MoeTreasury is Ownable {
     /** @return apr i.e. annual percentage rate (per nft.level) */
     function aprOf(uint256 nftId) public view returns (uint256) {
         uint256 level = _nftStaked.levelOf(nftId);
-        if (level > _alphas[3]) {
-            return ((level - _alphas[3]) * _alphas[2]) / _alphas[1] + _alphas[0];
-        }
-        return _alphas[0];
+        return ((level + _alpha[5] - _alpha[4]) * _alpha[3]) / _alpha[2] + _alpha[1] - _alpha[0];
     }
 
     /** @return apr parameters */
     function getAlpha() public view returns (uint256[] memory) {
-        return _alphas;
+        return _alpha;
     }
 
     /** set apr parameters */
     function setAlpha(uint256[] memory array) public onlyOwner {
-        require(array.length == 4, "invalid array.length");
-        _alphas = array;
+        require(array.length == 6, "invalid array.length");
+        _alpha = array;
     }
 
     /** @return apr-bonus i.e. annual percentage permille rate (per nft.year) */
@@ -210,21 +207,18 @@ contract MoeTreasury is Ownable {
         uint256 nowYear = _nftStaked.year();
         uint256 nftYear = _nftStaked.yearOf(nftId);
         uint256 ageYear = nowYear > nftYear ? nowYear - nftYear : 0;
-        if (ageYear > _gammas[3]) {
-            return ((ageYear - _gammas[3]) * _gammas[2]) / _gammas[1] + _gammas[0];
-        }
-        return _gammas[0];
+        return ((ageYear + _gamma[5] - _gamma[4]) * _gamma[3]) / _gamma[2] + _gamma[1] - _gamma[0];
     }
 
     /** @return apr-bonus parameters */
     function getGamma() public view returns (uint256[] memory) {
-        return _gammas;
+        return _gamma;
     }
 
     /** set apr-bonus parameters */
     function setGamma(uint256[] memory array) public onlyOwner {
-        require(array.length == 4, "invalid array.length");
-        _gammas = array;
+        require(array.length == 6, "invalid array.length");
+        _gamma = array;
     }
 
     /** @return age seconds for given account and nft-id */

@@ -63,41 +63,41 @@ describe("MoeTreasury", async function () {
     await moe_treasury.deployed();
   });
   describe("apr", async function () {
-    it("should return 00[%] for nft-level=00", async function () {
+    it("should return 0[%] for nft-level=00", async function () {
       expect(await moe_treasury.aprOf(202100)).to.eq(0);
       expect(await moe_treasury.aprOf(202200)).to.eq(0);
     });
-    it("should return 03[%] for nft-level=03", async function () {
-      expect(await moe_treasury.aprOf(202103)).to.eq(3);
-      expect(await moe_treasury.aprOf(202203)).to.eq(3);
+    it("should return 1[%] for nft-level=03", async function () {
+      expect(await moe_treasury.aprOf(202103)).to.eq(1);
+      expect(await moe_treasury.aprOf(202203)).to.eq(1);
     });
-    it("should return 06[%] for nft-level=06", async function () {
-      expect(await moe_treasury.aprOf(202106)).to.eq(6);
-      expect(await moe_treasury.aprOf(202206)).to.eq(6);
+    it("should return 2[%] for nft-level=06", async function () {
+      expect(await moe_treasury.aprOf(202106)).to.eq(2);
+      expect(await moe_treasury.aprOf(202206)).to.eq(2);
     });
-    it("should return 09[%] for nft-level=09", async function () {
-      expect(await moe_treasury.aprOf(202109)).to.eq(9);
-      expect(await moe_treasury.aprOf(202209)).to.eq(9);
+    it("should return 3[%] for nft-level=09", async function () {
+      expect(await moe_treasury.aprOf(202109)).to.eq(3);
+      expect(await moe_treasury.aprOf(202209)).to.eq(3);
     });
-    it("should return 12[%] for nft-level=12", async function () {
-      expect(await moe_treasury.aprOf(202112)).to.eq(12);
-      expect(await moe_treasury.aprOf(202212)).to.eq(12);
+    it("should return 4[%] for nft-level=12", async function () {
+      expect(await moe_treasury.aprOf(202112)).to.eq(4);
+      expect(await moe_treasury.aprOf(202212)).to.eq(4);
     });
-    it("should return 15[%] for nft-level=15", async function () {
-      expect(await moe_treasury.aprOf(202115)).to.eq(15);
-      expect(await moe_treasury.aprOf(202215)).to.eq(15);
+    it("should return 5[%] for nft-level=15", async function () {
+      expect(await moe_treasury.aprOf(202115)).to.eq(5);
+      expect(await moe_treasury.aprOf(202215)).to.eq(5);
     });
-    it("should return 18[%] for nft-level=18", async function () {
-      expect(await moe_treasury.aprOf(202118)).to.eq(18);
-      expect(await moe_treasury.aprOf(202218)).to.eq(18);
+    it("should return 6[%] for nft-level=18", async function () {
+      expect(await moe_treasury.aprOf(202118)).to.eq(6);
+      expect(await moe_treasury.aprOf(202218)).to.eq(6);
     });
-    it("should return 21[%] for nft-level=21", async function () {
-      expect(await moe_treasury.aprOf(202121)).to.eq(21);
-      expect(await moe_treasury.aprOf(202221)).to.eq(21);
+    it("should return 7[%] for nft-level=21", async function () {
+      expect(await moe_treasury.aprOf(202121)).to.eq(7);
+      expect(await moe_treasury.aprOf(202221)).to.eq(7);
     });
-    it("should return 24[%] for nft-level=24", async function () {
-      expect(await moe_treasury.aprOf(202124)).to.eq(24);
-      expect(await moe_treasury.aprOf(202224)).to.eq(24);
+    it("should return 8[%] for nft-level=24", async function () {
+      expect(await moe_treasury.aprOf(202124)).to.eq(8);
+      expect(await moe_treasury.aprOf(202224)).to.eq(8);
     });
   });
   describe("apr-bonus", async function () {
@@ -106,9 +106,9 @@ describe("MoeTreasury", async function () {
     for (let dy = 0; dy < 10; dy++) {
       for (let y = 2021; y < 2031; y++) {
         const now_year = dy + full_year;
-        const rate = positive(now_year - y);
-        const rate_padded = String(rate).padStart(2, "0");
-        it(`should return ${rate_padded}[%] for nft-year=${y} & now-year=${now_year}`, async () => {
+        const rate = positive(now_year - y) * 10;
+        const rate_padded = String(rate).padStart(3, "0");
+        it(`should return ${rate_padded}[pcm] for nft-year=${y} & now-year=${now_year}`, async () => {
           expect(await moe_treasury.aprBonusOf(nft.idBy(y, 0))).to.eq(rate);
           expect(await moe_treasury.aprBonusOf(nft.idBy(y, 3))).to.eq(rate);
           expect(await moe_treasury.aprBonusOf(nft.idBy(y, 6))).to.eq(rate);
