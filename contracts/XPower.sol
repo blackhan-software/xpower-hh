@@ -17,6 +17,11 @@ import "./Migratable.sol";
  * amount of tokens are minted for the beneficiary (plus the treasury).
  */
 abstract contract XPower is ERC20, ERC20Burnable, Migratable, Ownable {
+    /** role grants right to change treasury's share per mint */
+    bytes32 public constant THETA_ROLE = keccak256("THETA_ROLE");
+    /** role grants right to change difficulty parametrization */
+    bytes32 public constant DELTA_ROLE = keccak256("DELTA_ROLE");
+
     using EnumerableSet for EnumerableSet.UintSet;
     /** set of nonce-hashes already minted for */
     EnumerableSet.UintSet private _hashes;
@@ -99,7 +104,7 @@ abstract contract XPower is ERC20, ERC20Burnable, Migratable, Ownable {
     }
 
     /** set treasure parameters */
-    function setTheta(uint256[] memory array) public onlyOwner {
+    function setTheta(uint256[] memory array) public onlyRole(THETA_ROLE) {
         require(array.length == 6, "invalid array.length");
         _theta = array;
     }
@@ -116,7 +121,7 @@ abstract contract XPower is ERC20, ERC20Burnable, Migratable, Ownable {
     }
 
     /** set difficulty parameters */
-    function setDelta(uint256[] memory array) public onlyOwner {
+    function setDelta(uint256[] memory array) public onlyRole(DELTA_ROLE) {
         require(array.length == 6, "invalid array.length");
         _delta = array;
     }
