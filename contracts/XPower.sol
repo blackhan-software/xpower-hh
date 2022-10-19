@@ -24,9 +24,9 @@ abstract contract XPower is ERC20, ERC20Burnable, Migratable {
     /** anchor for difficulty calculation */
     uint256 private immutable _timestamp;
     /** parametrization of treasure-for */
-    uint256[] private _thetas = [0, 2, 1, 0];
+    uint256[] private _theta = [0, 0, 2, 1, 0, 0];
     /** parametrization of difficulty-for */
-    uint256[] private _deltas = [0, 4, 1, 0];
+    uint256[] private _delta = [0, 0, 4, 1, 0, 0];
 
     /** @param symbol short token symbol */
     /** @param base address of old contract */
@@ -89,41 +89,35 @@ abstract contract XPower is ERC20, ERC20Burnable, Migratable {
 
     /** @return treasure for given amount */
     function treasureFor(uint256 amount) public view returns (uint256) {
-        if (amount > _thetas[3]) {
-            return ((amount - _thetas[3]) * _thetas[2]) / _thetas[1] + _thetas[0];
-        }
-        return _thetas[0];
+        return ((amount + _theta[5] - _theta[4]) * _theta[3]) / _theta[2] + _theta[1] - _theta[0];
     }
 
     /** @return treasure parameters */
     function getTheta() public view returns (uint256[] memory) {
-        return _thetas;
+        return _theta;
     }
 
     /** set treasure parameters */
     function setTheta(uint256[] memory array) public onlyOwner {
-        require(array.length == 4, "invalid array.length");
-        _thetas = array;
+        require(array.length == 6, "invalid array.length");
+        _theta = array;
     }
 
     /** @return difficulty for given timestamp */
     function difficultyFor(uint256 timestamp) public view returns (uint256) {
         uint256 dt = timestamp - _timestamp;
-        if (dt > _deltas[3]) {
-            return (100 * (dt - _deltas[3]) * _deltas[2]) / (_deltas[1] * 365_25 days) + _deltas[0];
-        }
-        return _deltas[0];
+        return (100 * (dt + _delta[5] - _delta[4]) * _delta[3]) / (_delta[2] * 365_25 days) + _delta[1] - _delta[0];
     }
 
     /** @return difficulty parameters */
     function getDelta() public view returns (uint256[] memory) {
-        return _deltas;
+        return _delta;
     }
 
     /** set difficulty parameters */
     function setDelta(uint256[] memory array) public onlyOwner {
-        require(array.length == 4, "invalid array.length");
-        _deltas = array;
+        require(array.length == 6, "invalid array.length");
+        _delta = array;
     }
 
     /** check whether block-hash has recently been cached or is recent */

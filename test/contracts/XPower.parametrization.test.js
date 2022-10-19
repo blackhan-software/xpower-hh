@@ -31,11 +31,11 @@ describe("XPower", async function () {
   });
   describe("parametrization of treasure-for", async function () {
     it("should get theta array", async function () {
-      Expect(await xpower.getTheta()).to.equal([0, 2, 1, 0]);
+      Expect(await xpower.getTheta()).to.equal([0, 0, 2, 1, 0, 0]);
     });
     it("should set theta array", async function () {
-      await xpower.setTheta([1, 3, 2, 0]);
-      Expect(await xpower.getTheta()).to.equal([1, 3, 2, 0]);
+      await xpower.setTheta([1, 2, 3, 4, 5, 6]);
+      Expect(await xpower.getTheta()).to.equal([1, 2, 3, 4, 5, 6]);
     });
     it("should *not* set theta array (invalid array.length)", async function () {
       expect(
@@ -45,30 +45,30 @@ describe("XPower", async function () {
           expect().to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await xpower.getTheta()).to.equal([0, 2, 1, 0]);
+      Expect(await xpower.getTheta()).to.equal([0, 0, 2, 1, 0, 0]);
     });
     it("should *not* set theta array (not owner)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await xpower
           .connect(signer_1)
-          .setTheta([1, 3, 2, 0])
+          .setTheta([1, 2, 3, 4, 5, 6])
           .catch((ex) => {
             const m = ex.message.match(/caller is not the owner/);
             if (m === null) console.debug(ex);
             expect().to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await xpower.getTheta()).to.equal([0, 2, 1, 0]);
+      Expect(await xpower.getTheta()).to.equal([0, 0, 2, 1, 0, 0]);
     });
   });
   describe("parametrization of difficulty-for", async function () {
     it("should get delta array", async function () {
-      Expect(await xpower.getDelta()).to.equal([0, 4, 1, 0]);
+      Expect(await xpower.getDelta()).to.equal([0, 0, 4, 1, 0, 0]);
     });
     it("should set delta array", async function () {
-      await xpower.setDelta([1, 3, 2, 0]);
-      Expect(await xpower.getDelta()).to.equal([1, 3, 2, 0]);
+      await xpower.setDelta([1, 2, 3, 4, 5, 6]);
+      Expect(await xpower.getDelta()).to.equal([1, 2, 3, 4, 5, 6]);
     });
     it("should *not* set delta array (invalid array.length)", async function () {
       expect(
@@ -78,21 +78,21 @@ describe("XPower", async function () {
           expect().to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await xpower.getDelta()).to.equal([0, 4, 1, 0]);
+      Expect(await xpower.getDelta()).to.equal([0, 0, 4, 1, 0, 0]);
     });
     it("should *not* set delta array (not owner)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await xpower
           .connect(signer_1)
-          .setDelta([1, 3, 2, 0])
+          .setDelta([1, 2, 3, 4, 5, 6])
           .catch((ex) => {
             const m = ex.message.match(/caller is not the owner/);
             if (m === null) console.debug(ex);
             expect().to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await xpower.getDelta()).to.equal([0, 4, 1, 0]);
+      Expect(await xpower.getDelta()).to.equal([0, 0, 4, 1, 0, 0]);
     });
   });
 });
