@@ -3,6 +3,7 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
@@ -13,7 +14,7 @@ import "./MigratableNft.sol";
 /**
  * Abstract base NFT class: publicly *not* minteable (nor burneable).
  */
-abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, MigratableNft {
+abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, MigratableNft, Ownable {
     /** NFT levels: UNIT, ..., YOTTA *or* higher! */
     uint256 public constant UNIT = 0;
     uint256 public constant KILO = 3;
@@ -94,11 +95,17 @@ abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIM
         uint256[] memory amounts,
         bytes memory data
     ) internal override(ERC1155, ERC1155Supply) {
-        super._beforeTokenTransfer(operator, from, to, nftIds, amounts, data);
+        ERC1155Supply._beforeTokenTransfer(operator, from, to, nftIds, amounts, data);
     }
 
-    /** Returns true if this contract implements the interface defined by interfaceId. */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, URIMalleable) returns (bool) {
-        return ERC1155.supportsInterface(interfaceId) || URIMalleable.supportsInterface(interfaceId);
+    /** returns true if this contract implements the interface defined by interfaceId. */
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC1155, URIMalleable, MigratableNft)
+        returns (bool)
+    {
+        return ERC1155.supportsInterface(interfaceId) || AccessControl.supportsInterface(interfaceId);
     }
 }
