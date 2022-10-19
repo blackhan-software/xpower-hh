@@ -1,6 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
-// SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";

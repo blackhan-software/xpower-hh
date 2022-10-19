@@ -1,5 +1,5 @@
-// solhint-disable not-rely-on-time
 // SPDX-License-Identifier: GPL-3.0
+// solhint-disable not-rely-on-time
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 
 /**
  * Allows migration of NFTs from an old contract; batch migration is also
- * possible. Further, manually sealing the migration is also possible.
+ * possible. Further, manually sealing the migration is possible too.
  */
 abstract contract MigratableNft is ERC1155, ERC1155Burnable, Ownable {
     /** old contract to migrate from */

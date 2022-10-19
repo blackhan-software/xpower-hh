@@ -1,5 +1,5 @@
-// solhint-disable not-rely-on-time
 // SPDX-License-Identifier: GPL-3.0
+// solhint-disable not-rely-on-time
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
