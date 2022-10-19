@@ -96,4 +96,9 @@ abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIM
     ) internal override(ERC1155, ERC1155Supply) {
         super._beforeTokenTransfer(operator, from, to, nftIds, amounts, data);
     }
+
+    /** Returns true if this contract implements the interface defined by interfaceId. */
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, URIMalleable) returns (bool) {
+        return ERC1155.supportsInterface(interfaceId) || URIMalleable.supportsInterface(interfaceId);
+    }
 }

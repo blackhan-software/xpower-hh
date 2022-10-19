@@ -182,8 +182,9 @@ describe("XPowerNft", async function () {
       ).to.eq(undefined);
     });
   });
-  describe("setURI", async function () {
+  describe("setURI", function () {
     it("should set new URI", async function () {
+      await xpower_nft.grantRole(xpower_nft.URI_ROLE(), addresses[0]);
       const nft_year = (await xpower_nft.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
       const nft_id = (await xpower_nft.idBy(nft_year, UNIT)).toNumber();
@@ -192,7 +193,8 @@ describe("XPowerNft", async function () {
       const nft_url = await xpower_nft.uri(nft_id);
       expect(nft_url).to.eq(NFT_LOKI_WWW);
     });
-    it("should *not* set new URI (caller is not the owner)", async function () {
+    it("should *not* set new URI (account is missing role)", async function () {
+      await xpower_nft.revokeRole(xpower_nft.URI_ROLE(), addresses[0]);
       const nft_year = (await xpower_nft.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
       const nft_id = (await xpower_nft.idBy(nft_year, UNIT)).toNumber();
@@ -200,7 +202,7 @@ describe("XPowerNft", async function () {
       await xpower_nft.transferOwnership(addresses[1]);
       expect(
         await xpower_nft.setURI(NFT_LOKI_WWW).catch((ex) => {
-          const m = ex.message.match(/caller is not the owner/);
+          const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
