@@ -9,12 +9,12 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 
 import "./URIMalleable.sol";
-import "./MigratableNft.sol";
+import "./NftMigratable.sol";
 
 /**
  * Abstract base NFT class: publicly *not* minteable (nor burneable).
  */
-abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, MigratableNft, Ownable {
+abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, NftMigratable, Ownable {
     /** NFT levels: UNIT, ..., YOTTA *or* higher! */
     uint256 public constant UNIT = 0;
     uint256 public constant KILO = 3;
@@ -37,7 +37,7 @@ abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIM
         // ERC1155 constructor: meta-data URI
         ERC1155(uri)
         // MigratableNft: old contract, rel. deadline [seconds]
-        MigratableNft(base, deadlineIn)
+        NftMigratable(base, deadlineIn)
     {}
 
     /** @return nft-id composed of (year, level) */
@@ -103,9 +103,9 @@ abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIM
         public
         view
         virtual
-        override(ERC1155, URIMalleable, MigratableNft)
+        override(ERC1155, NftMigratable, URIMalleable)
         returns (bool)
     {
-        return ERC1155.supportsInterface(interfaceId) || AccessControl.supportsInterface(interfaceId);
+        return super.supportsInterface(interfaceId);
     }
 }

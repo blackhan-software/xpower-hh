@@ -2,18 +2,16 @@
 // solhint-disable not-rely-on-time
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "./Supervised.sol";
 
 /**
  * Allows migration of tokens from an old contract upto a certain deadline.
  * Further, it is possible to close down the migration window earlier than
  * the specified deadline.
  */
-abstract contract Migratable is ERC20, ERC20Burnable, AccessControl {
-    bytes32 public constant SEAL_ROLE = keccak256("SEAL_ROLE");
-
+abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
     /** old contract to migrate from */
     ERC20Burnable private _token;
     /** timestamp of migration deadline */
@@ -26,7 +24,6 @@ abstract contract Migratable is ERC20, ERC20Burnable, AccessControl {
     /** @param base address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address base, uint256 deadlineIn) {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _deadlineBy = block.timestamp + deadlineIn;
         _token = ERC20Burnable(base);
     }
@@ -53,7 +50,7 @@ abstract contract Migratable is ERC20, ERC20Burnable, AccessControl {
     }
 
     /** seal migration (manually) */
-    function seal() public onlyRole(SEAL_ROLE) {
+    function seal() public virtual onlyRole(0x0) {
         _migratable = false;
     }
 
@@ -64,6 +61,24 @@ abstract contract Migratable is ERC20, ERC20Burnable, AccessControl {
 
     /** returns true if this contract implements the interface defined by interfaceId. */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return AccessControl.supportsInterface(interfaceId);
+        return super.supportsInterface(interfaceId);
+    }
+}
+
+/**
+ * Allows migration of MOE tokens from an old contract upto a certain deadline.
+ */
+abstract contract MoeMigratable is Migratable {
+    function seal() public override onlyRole(MOE_SEAL_ROLE) {
+        super.seal();
+    }
+}
+
+/**
+ * Allows migration of SOV tokens from an old contract upto a certain deadline.
+ */
+abstract contract SovMigratable is Migratable {
+    function seal() public override onlyRole(SOV_SEAL_ROLE) {
+        super.seal();
     }
 }

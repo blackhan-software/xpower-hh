@@ -109,7 +109,10 @@ describe("XPowerNft", async function () {
       await increaseAllowanceBy(1);
       await mintXPowNft(UNIT, 1);
       await setNftApprovalForAll(xpower_nft_new.address);
-      await xpower_nft_new.grantRole(xpower_nft_new.SEAL_ROLE(), addresses[0]);
+      await xpower_nft_new.grantRole(
+        xpower_nft_new.NFT_SEAL_ROLE(),
+        addresses[0]
+      );
       await xpower_nft_new.seal();
       expect(
         await migrateXPowNft(UNIT, 1).catch((ex) => {
@@ -156,7 +159,10 @@ describe("XPowerNft", async function () {
       await increaseAllowanceBy(1);
       await mintBatchXPowNft(UNIT, 1);
       await setNftApprovalForAll(xpower_nft_new.address);
-      await xpower_nft_new.grantRole(xpower_nft_new.SEAL_ROLE(), addresses[0]);
+      await xpower_nft_new.grantRole(
+        xpower_nft_new.NFT_SEAL_ROLE(),
+        addresses[0]
+      );
       await xpower_nft_new.seal();
       expect(
         await migrateBatchXPowNft(UNIT, 1).catch((ex) => {

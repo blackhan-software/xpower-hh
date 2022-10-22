@@ -13,7 +13,7 @@ let table; // pre-hashed nonces
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
-describe("XPowerTest", async function () {
+describe("XPowerThorTest", async function () {
   before(async function () {
     await network.provider.send("hardhat_reset");
   });
@@ -24,12 +24,12 @@ describe("XPowerTest", async function () {
     expect(addresses.length).to.be.greaterThan(0);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerLokiTest");
+    const factory = await ethers.getContractFactory("XPowerThorTest");
     const contract = await factory.deploy(NONE_ADDRESS, DEADLINE);
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerLokiTest");
+    XPower = await ethers.getContractFactory("XPowerThorTest");
   });
   before(async function () {
     xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
@@ -71,10 +71,10 @@ describe("XPowerTest", async function () {
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 1 }));
     });
-    it("should hash for amount=3", async function () {
+    it("should hash for amount=2", async function () {
       const interval = await xpower.interval();
       expect(interval.toNumber()).to.be.greaterThan(0);
-      const [nonce, block_hash] = table.getNonce({ amount: 3 });
+      const [nonce, block_hash] = table.getNonce({ amount: 2 });
       expect(nonce.gte(0)).to.eq(true);
       const hash = await xpower.hashOf(
         addresses[0],
@@ -83,7 +83,7 @@ describe("XPowerTest", async function () {
         nonce
       );
       expect(hash).to.be.a("string").and.to.match(/^0x/);
-      expect(hash).to.equal(table.getHash({ amount: 3 }));
+      expect(hash).to.equal(table.getHash({ amount: 2 }));
     });
   });
   describe("amount", async function () {
@@ -99,14 +99,14 @@ describe("XPowerTest", async function () {
       const amount = await xpower.amountOf(hash);
       expect(amount).to.equal(1);
     });
-    it("should return amount=3", async function () {
-      const hash = table.getHash({ amount: 3 });
+    it("should return amount=2", async function () {
+      const hash = table.getHash({ amount: 2 });
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       const amount = await xpower.amountOf(hash);
-      expect(amount).to.equal(3);
+      expect(amount).to.equal(2);
     });
   });
-  describe("zeros (for amounts={0,1,3})", async function () {
+  describe("zeros (for amounts={0,1,2})", async function () {
     it("should return amount=0", async function () {
       const hash = table.getHash({ amount: 0 });
       expect(await xpower.amountOf(hash)).to.eq(0);
@@ -123,12 +123,12 @@ describe("XPowerTest", async function () {
       const hash = table.getHash({ amount: 1 });
       expect(await xpower.zerosOf(hash)).to.eq(1);
     });
-    it("should return amount=3", async function () {
-      const hash = table.getHash({ amount: 3 });
-      expect(await xpower.amountOf(hash)).to.eq(3);
+    it("should return amount=2", async function () {
+      const hash = table.getHash({ amount: 2 });
+      expect(await xpower.amountOf(hash)).to.eq(2);
     });
     it("should return zeros=2", async function () {
-      const hash = table.getHash({ amount: 3 });
+      const hash = table.getHash({ amount: 2 });
       expect(await xpower.zerosOf(hash)).to.eq(2);
     });
   });

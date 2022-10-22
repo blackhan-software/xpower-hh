@@ -16,12 +16,7 @@ import "./Migratable.sol";
  * (as specified by the sub-classes). After the verification, the corresponding
  * amount of tokens are minted for the beneficiary (plus the treasury).
  */
-abstract contract XPower is ERC20, ERC20Burnable, Migratable, Ownable {
-    /** role grants right to change treasury's share per mint */
-    bytes32 public constant THETA_ROLE = keccak256("THETA_ROLE");
-    /** role grants right to change difficulty parametrization */
-    bytes32 public constant DELTA_ROLE = keccak256("DELTA_ROLE");
-
+abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, Ownable {
     using EnumerableSet for EnumerableSet.UintSet;
     /** set of nonce-hashes already minted for */
     EnumerableSet.UintSet private _hashes;

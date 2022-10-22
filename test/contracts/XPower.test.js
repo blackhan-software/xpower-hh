@@ -239,4 +239,9 @@ describe("XPower", async function () {
       expect(await xpower.balanceOf(addresses[1])).to.eq(1);
     });
   });
+  describe("supportsInterface", function () {
+    it("should support IAccessControl interface", async function () {
+      expect(await xpower.supportsInterface(0x7965db0b)).to.eq(true);
+    });
+  });
 });

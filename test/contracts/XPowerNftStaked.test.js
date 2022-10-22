@@ -424,7 +424,7 @@ describe("XPowerNftStaked", async function () {
   describe("setURI", function () {
     const NFT_LOKI_WWW = "https://www.xpowermine.com/nfts/loki/{id}.json";
     it("should set new URI", async function () {
-      await nft_staked.grantRole(nft_staked.URI_ROLE(), addresses[0]);
+      await nft_staked.grantRole(nft_staked.URI_DATA_ROLE(), addresses[0]);
       const nft_year = (await nft_staked.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
       const nft_id = (
@@ -436,7 +436,7 @@ describe("XPowerNftStaked", async function () {
       expect(nft_url).to.eq(NFT_LOKI_WWW);
     });
     it("should *not* set new URI (account is missing role)", async function () {
-      await nft_staked.revokeRole(nft_staked.URI_ROLE(), addresses[0]);
+      await nft_staked.revokeRole(nft_staked.URI_DATA_ROLE(), addresses[0]);
       const nft_year = (await nft_staked.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
       const nft_id = (
@@ -451,6 +451,14 @@ describe("XPowerNftStaked", async function () {
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
+    });
+  });
+  describe("supportsInterface", function () {
+    it("should support IERC1155 interface", async function () {
+      expect(await nft_staked.supportsInterface(0xd9b67a26)).to.eq(true);
+    });
+    it("should support IAccessControl interface", async function () {
+      expect(await nft_staked.supportsInterface(0x7965db0b)).to.eq(true);
     });
   });
 });

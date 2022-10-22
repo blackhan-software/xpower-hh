@@ -25,7 +25,7 @@ contract XPowerThorTest is XPowerThor {
         return _hashOf(_to, _interval, _blockHash, _nonce);
     }
 
-    function intervalOf() public view returns (uint256) {
+    function interval() public view returns (uint256) {
         return _interval();
     }
 
