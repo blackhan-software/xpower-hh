@@ -2,20 +2,17 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-
+import "./APower.sol";
 import "./XPower.sol";
 import "./XPowerNftStaked.sol";
+import "./Supervised.sol";
 
 /**
  * Treasury to claim (MoE) tokens for staked XPowerNft(s).
  */
-contract MoeTreasury is AccessControl {
-    /** role grants right to change APR parametrization */
-    bytes32 public constant ALPHA_ROLE = keccak256("ALPHA_ROLE");
-    /** role grants right to change APR bonus parametrization */
-    bytes32 public constant GAMMA_ROLE = keccak256("GAMMA_ROLE");
-
+contract MoeTreasury is Supervised {
+    /** (burnable) *aged* XPower tokens */
+    APower private _sov;
     /** (burnable) proof-of-work tokens */
     XPower private _moe;
     /** staked proof-of-work NFTs */
@@ -29,10 +26,15 @@ contract MoeTreasury is AccessControl {
     /** map of rewards claimed total: nft-id => amount */
     mapping(uint256 => uint256) private _claimedTotal;
 
-    /** @param moe address of contract for tokens */
+    /** @param sov address of contract for APower tokens */
+    /** @param moe address of contract for XPower tokens */
     /** @param nftStaked address of contract for staked NFTs */
-    constructor(address moe, address nftStaked) {
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    constructor(
+        address sov,
+        address moe,
+        address nftStaked
+    ) {
+        _sov = APower(sov);
         _moe = XPower(moe);
         _nftStaked = XPowerNftStaked(nftStaked);
     }
@@ -46,20 +48,21 @@ contract MoeTreasury is AccessControl {
     /** emitted on claiming NFT reward */
     event Claim(address account, uint256 nftId, uint256 amount);
 
-    /** claim tokens for given account and nft-id */
+    /** claim APower tokens for given account and nft-id */
     function claimFor(address account, uint256 nftId) public {
         uint256 amount = claimableFor(account, nftId);
         require(amount > 0, "nothing claimable");
         _claimed[account][nftId] += amount;
         _claimedTotal[nftId] += amount;
-        _moe.transfer(account, amount);
+        _moe.increaseAllowance((address)(_sov), amount);
+        _sov.mint(account, amount);
         emit Claim(account, nftId, amount);
     }
 
     /** emitted on claiming NFT rewards */
     event ClaimBatch(address account, uint256[] nftIds, uint256[] amounts);
 
-    /** claim tokens for given account and nft-ids */
+    /** claim APower tokens for given account and nft-ids */
     function claimForBatch(address account, uint256[] memory nftIds) public {
         uint256[] memory amounts = claimableForBatch(account, nftIds);
         for (uint256 i = 0; i < nftIds.length; i++) {
@@ -68,7 +71,8 @@ contract MoeTreasury is AccessControl {
             _claimedTotal[nftIds[i]] += amounts[i];
         }
         for (uint256 i = 0; i < nftIds.length; i++) {
-            _moe.transfer(account, amounts[i]);
+            _moe.increaseAllowance((address)(_sov), amounts[i]);
+            _sov.mint(account, amounts[i]);
         }
         emit ClaimBatch(account, nftIds, amounts);
     }

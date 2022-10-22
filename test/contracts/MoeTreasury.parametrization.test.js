@@ -5,8 +5,8 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let XPower, Nft, NftStaked, NftTreasury, MoeTreasury; // contracts
-let xpower, nft, nft_staked, nft_treasury, moe_treasury, mt; // instances
+let APower, XPower, Nft, NftStaked, NftTreasury, MoeTreasury; // contracts
+let apower, xpower, nft, nft_staked, nft_treasury, moe_treasury, mt; // instances
 
 const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -23,6 +23,8 @@ describe("MoeTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
+    APower = await ethers.getContractFactory("APowerOdin");
+    expect(APower).to.exist;
     XPower = await ethers.getContractFactory("XPowerOdinTest");
     expect(XPower).to.exist;
   });
@@ -43,6 +45,11 @@ describe("MoeTreasury", async function () {
     await xpower.init();
   });
   beforeEach(async function () {
+    apower = await APower.deploy(NONE_ADDRESS, DEADLINE, xpower.address);
+    expect(apower).to.exist;
+    await apower.deployed();
+  });
+  beforeEach(async function () {
     nft = await Nft.deploy(
       NFT_ODIN_URL,
       NONE_ADDRESS,
@@ -57,10 +64,18 @@ describe("MoeTreasury", async function () {
     nft_treasury = await NftTreasury.deploy(nft.address, nft_staked.address);
     expect(nft_treasury).to.exist;
     await nft_treasury.deployed();
-    moe_treasury = await MoeTreasury.deploy(xpower.address, nft_staked.address);
+    moe_treasury = await MoeTreasury.deploy(
+      apower.address,
+      xpower.address,
+      nft_staked.address
+    );
     expect(moe_treasury).to.exist;
     await moe_treasury.deployed();
     mt = moe_treasury;
+  });
+  beforeEach(async function () {
+    await apower.transferOwnership(moe_treasury.address);
+    expect(await apower.owner()).to.eq(moe_treasury.address);
   });
   describe("parametrization of APR", async function () {
     it("should get alpha array", async function () {

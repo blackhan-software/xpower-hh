@@ -5,8 +5,8 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let XPower, Nft, NftStaked, NftTreasury, MoeTreasury; // contracts
-let xpower, nft, nft_staked, nft_treasury, moe_treasury, mt; // instances
+let APower, XPower, Nft, NftStaked, NftTreasury, MoeTreasury; // contracts
+let apower, xpower, nft, nft_staked, nft_treasury, moe_treasury, mt; // instances
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
@@ -27,6 +27,8 @@ describe("MoeTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
+    APower = await ethers.getContractFactory("APowerOdin");
+    expect(APower).to.exist;
     XPower = await ethers.getContractFactory("XPowerOdinTest");
     expect(XPower).to.exist;
   });
@@ -45,6 +47,11 @@ describe("MoeTreasury", async function () {
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.init();
+  });
+  beforeEach(async function () {
+    apower = await APower.deploy(NONE_ADDRESS, DEADLINE, xpower.address);
+    expect(apower).to.exist;
+    await apower.deployed();
   });
   beforeEach(async function () {
     table = await new HashTable(xpower, addresses[0]).init({
@@ -69,10 +76,18 @@ describe("MoeTreasury", async function () {
     nft_treasury = await NftTreasury.deploy(nft.address, nft_staked.address);
     expect(nft_treasury).to.exist;
     await nft_treasury.deployed();
-    moe_treasury = await MoeTreasury.deploy(xpower.address, nft_staked.address);
+    moe_treasury = await MoeTreasury.deploy(
+      apower.address,
+      xpower.address,
+      nft_staked.address
+    );
     expect(moe_treasury).to.exist;
     await moe_treasury.deployed();
     mt = moe_treasury;
+  });
+  beforeEach(async function () {
+    await apower.transferOwnership(moe_treasury.address);
+    expect(await apower.owner()).to.eq(moe_treasury.address);
   });
   beforeEach(async function () {
     while (true)
