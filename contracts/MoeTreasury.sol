@@ -163,7 +163,7 @@ contract MoeTreasury is Supervised {
         uint256 aprBonus = aprBonusOf(nftId);
         uint256 reward = (apr * age * denomination) / 365_25 days;
         uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * 365_25 days);
-        return reward + rewardBonus;
+        return (reward + rewardBonus) * 10**_moe.decimals();
     }
 
     /** @return reward total of tokens for given nft-id */
@@ -174,7 +174,7 @@ contract MoeTreasury is Supervised {
         uint256 aprBonus = aprBonusOf(nftId);
         uint256 reward = (apr * age * denomination) / 365_25 days;
         uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * 365_25 days);
-        return reward + rewardBonus;
+        return (reward + rewardBonus) * 10**_moe.decimals();
     }
 
     /** @return reward of tokens for given account and nft-ids */

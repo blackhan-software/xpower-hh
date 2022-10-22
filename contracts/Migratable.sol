@@ -29,19 +29,22 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
     }
 
     /** import amount from old contract */
-    function migrate(uint256 amount) public {
+    function migrate(uint256 oldAmount) public {
         require(_migratable, "migration sealed");
         uint256 timestamp = block.timestamp;
         require(_deadlineBy >= timestamp, "deadline passed");
         uint256 myAllowance = _token.allowance(msg.sender, address(this));
-        require(amount <= myAllowance, "insufficient allowance");
+        require(oldAmount <= myAllowance, "insufficient allowance");
         uint256 oldBalance = _token.balanceOf(msg.sender);
-        require(amount <= oldBalance, "insufficient balance");
-        _token.burnFrom(msg.sender, amount);
+        require(oldAmount <= oldBalance, "insufficient balance");
+        _token.burnFrom(msg.sender, oldAmount);
         uint256 newBalance = _token.balanceOf(msg.sender);
-        require(newBalance + amount == oldBalance, "invalid balance");
-        _mint(msg.sender, amount);
-        _incrementCounter(amount);
+        require(newBalance + oldAmount == oldBalance, "invalid balance");
+        require(decimals() >= _token.decimals(), "invalid decimals");
+        uint8 deltaExponent = decimals() - _token.decimals();
+        uint256 newAmount = oldAmount * 10**deltaExponent;
+        _mint(msg.sender, newAmount);
+        _incrementCounter(newAmount);
     }
 
     /** @return number of migrated tokens */

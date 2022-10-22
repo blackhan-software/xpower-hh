@@ -1,18 +1,18 @@
 # XPower Tokens
 
-The XPower token family are proof-of-work tokens, that can only be minted by providing a correct nonce (with a recent block-hash). The THOR, LOKI and ODIN tokens are part of the same family with a maximum supply of 817.356B × 10^64 THOR, 878.779 billion &times; 10^64 LOKI and 1'024.398T × 10^64 ODIN tokens. To be exact:
+The XPower token family are proof-of-work tokens, that can only be minted by providing a correct nonce (with a recent block-hash). The THOR, LOKI and ODIN tokens are part of the same family with a maximum supply of 1.157T × 10^64 THOR, 1.240T × 10^64 LOKI and 796.794T × 10^64 ODIN tokens. To be exact:
 
 The maximum supply of THOR tokens is
 
-> 8173559240281143206369716588848558201407293035221686873373476518205632680466;
+> 11579208923731619542357098500868790785326998466564056403945758400791312963993.500;
 
 the maximum supply of LOKI tokens is
 
-> 8787792486760604116967440826552207292435668479088792806564000920878366851072;
+> 12406295275426735223954034108073704412850355499890060432797050421125652152320.000;
 
 and the maximum supply of ODIN tokens is
 
-> 10243981394713817163879045579987358347893978955888388649865763135200064687833090.
+> 7967943140642820697584478405910336659153140819804391312965175107630913290240000.000.
 
 ## Installation
 

@@ -7,6 +7,7 @@ let accounts; // all accounts
 let addresses; // all addresses
 let XPower, Nft, NftStaked, NftTreasury; // contracts
 let xpower, nft, nft_staked, nft_treasury; // instances
+let UNUM; // decimals
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
@@ -40,6 +41,12 @@ describe("NftTreasury", async function () {
     await xpower.deployed();
     await xpower.init();
   });
+  beforeEach(async function () {
+    const decimals = await xpower.decimals();
+    expect(decimals).to.greaterThan(0);
+    UNUM = 10n ** BigInt(decimals);
+    expect(UNUM >= 1n).to.be.true;
+  });
   before(async function () {
     Nft = await ethers.getContractFactory("XPowerLokiNft");
     expect(Nft).to.exist;
@@ -66,7 +73,7 @@ describe("NftTreasury", async function () {
   });
   beforeEach(async function () {
     await mintToken(1);
-    await increaseAllowanceBy(1, nft.address);
+    await increaseAllowanceBy(UNUM, nft.address);
   });
   describe("stake", async function () {
     it("should stake nft for amount=1", async function () {
@@ -287,15 +294,15 @@ async function mintToken(amount) {
   const tx_mint = await xpower.mint(addresses[0], block_hash, nonce);
   expect(tx_mint).to.be.an("object");
   const balance_0 = await xpower.balanceOf(addresses[0]);
-  expect(balance_0.toNumber()).to.be.gte(amount);
+  expect(balance_0).to.be.gte(amount);
   const balance_1 = await xpower.balanceOf(addresses[1]);
-  expect(balance_1.toNumber()).to.eq(0);
+  expect(balance_1).to.eq(0);
 }
 async function increaseAllowanceBy(amount, spender) {
   const tx_increase = await xpower.increaseAllowance(spender, amount);
   expect(tx_increase).to.be.an("object");
   const allowance = await xpower.allowance(addresses[0], spender);
-  expect(allowance.toNumber()).to.be.gte(amount);
+  expect(allowance).to.be.gte(amount);
 }
 async function mintNft(level, amount) {
   const nft_id = await nft.idBy(await nft.year(), level);

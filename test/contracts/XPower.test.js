@@ -7,6 +7,7 @@ let accounts; // all accounts
 let addresses; // all addresses
 let XPower; // contract
 let xpower; // instance
+let UNUM; // decimals
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
@@ -39,6 +40,12 @@ describe("XPower", async function () {
     await xpower.transferOwnership(addresses[1]);
     await xpower.init();
   });
+  beforeEach(async function () {
+    const decimals = await xpower.decimals();
+    expect(decimals).to.greaterThan(0);
+    UNUM = 10n ** BigInt(decimals);
+    expect(UNUM >= 1n).to.be.true;
+  });
   afterEach(async function () {
     const [owner, signer_1] = await ethers.getSigners();
     await xpower.connect(signer_1).transferOwnership(addresses[0]);
@@ -55,24 +62,28 @@ describe("XPower", async function () {
           expect().to.be.not.null;
         });
       expect(tx).to.eq(undefined);
-      expect(await xpower.balanceOf(addresses[0])).to.eq(0);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(0);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(0n);
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(0n);
     });
     it("should mint for amount=1", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower.balanceOf(addresses[0])).to.eq(1);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(0);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(UNUM);
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
+        UNUM / 2n
+      );
     });
     it("should mint for amount=1 once", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
       const tx_1st = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx_1st).to.be.an("object");
-      expect(await xpower.balanceOf(addresses[0])).to.eq(1);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(0);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(UNUM);
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
+        UNUM / 2n
+      );
       const tx_2nd = await xpower
         .mint(addresses[0], block_hash, nonce)
         .catch((ex) => {
@@ -81,8 +92,10 @@ describe("XPower", async function () {
           expect(m).to.be.not.null;
         });
       expect(tx_2nd).to.eq(undefined);
-      expect(await xpower.balanceOf(addresses[0])).to.eq(1);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(0);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(UNUM);
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
+        UNUM / 2n
+      );
     });
     it("should *not* mint for amount=1 & invalid block-hash", async function () {
       const [nonce] = table.getNonce({ amount: 1 });
@@ -119,16 +132,24 @@ describe("XPower", async function () {
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower.balanceOf(addresses[0])).to.eq(3);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(1);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(
+        3n * UNUM
+      );
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
+        (3n * UNUM) / 2n
+      );
     });
     it("should mint for amount=3 once", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 3 });
       expect(nonce.gte(0)).to.eq(true);
       const tx_1 = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx_1).to.be.an("object");
-      expect(await xpower.balanceOf(addresses[0])).to.eq(3);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(1);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(
+        3n * UNUM
+      );
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
+        (3n * UNUM) / 2n
+      );
       const tx_2nd = await xpower
         .mint(addresses[0], block_hash, nonce)
         .catch((ex) => {
@@ -137,8 +158,12 @@ describe("XPower", async function () {
           expect(m).to.be.not.null;
         });
       expect(tx_2nd).to.eq(undefined);
-      expect(await xpower.balanceOf(addresses[0])).to.eq(3);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(1);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(
+        3n * UNUM
+      );
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
+        (3n * UNUM) / 2n
+      );
     });
     it("should *not* mint for amount=3 & invalid block-hash", async function () {
       const [nonce] = table.getNonce({ amount: 3 });
@@ -183,16 +208,16 @@ describe("XPower", async function () {
           expect(m).to.be.not.null;
         });
       expect(tx_mint).to.eq(undefined);
-      expect(await xpower.balanceOf(addresses[0])).to.eq(0);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(0);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(0n);
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(0n);
       const tx_burn = await xpower.burn(1).catch((ex) => {
         const m = ex.message.match(/burn amount exceeds balance/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
       });
       expect(tx_burn).to.eq(undefined);
-      expect(await xpower.balanceOf(addresses[0])).to.eq(0);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(0);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(0n);
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(0n);
     });
     it("should *not* mint for amount=0 & *not* burn 2 tokens", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
@@ -205,38 +230,50 @@ describe("XPower", async function () {
           expect(m).to.be.not.null;
         });
       expect(tx_mint).to.eq(undefined);
-      expect(await xpower.balanceOf(addresses[0])).to.eq(0);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(0);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(0n);
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(0n);
       const tx_burn = await xpower.burn(2).catch((ex) => {
         const m = ex.message.match(/burn amount exceeds balance/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
       });
       expect(tx_burn).to.eq(undefined);
-      expect(await xpower.balanceOf(addresses[0])).to.eq(0);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(0);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(0n);
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(0n);
     });
     it("should mint for amount=1 & burn 1 token", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower.balanceOf(addresses[0])).to.eq(1);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(0);
-      await xpower.burn(1);
-      expect(await xpower.balanceOf(addresses[0])).to.eq(0);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(0);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(UNUM);
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
+        UNUM / 2n
+      );
+      await xpower.burn(UNUM);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(0n);
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
+        UNUM / 2n
+      );
     });
     it("should mint for amount=3 & burn 2 tokens", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 3 });
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower.balanceOf(addresses[0])).to.eq(3);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(1);
-      await xpower.burn(2);
-      expect(await xpower.balanceOf(addresses[0])).to.eq(1);
-      expect(await xpower.balanceOf(addresses[1])).to.eq(1);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(
+        3n * UNUM
+      );
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
+        (3n * UNUM) / 2n
+      );
+      await xpower.burn(2n * UNUM);
+      expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(
+        1n * UNUM
+      );
+      expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
+        (3n * UNUM) / 2n
+      );
     });
   });
   describe("supportsInterface", function () {

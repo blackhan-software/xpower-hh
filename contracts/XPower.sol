@@ -45,11 +45,6 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, Ownable {
         _timestamp = 0x6215621e; // 2022-02-22T22:22:22Z
     }
 
-    /** @return number of decimal places of the token */
-    function decimals() public pure override returns (uint8) {
-        return 0;
-    }
-
     /** emitted on caching most recent block-hash */
     event Init(bytes32 blockHash, uint256 timestamp);
 
@@ -204,7 +199,7 @@ contract XPowerThor is XPower {
         uint256 difficulty = difficultyFor(block.timestamp);
         uint256 zeros = _zerosOf(nonceHash);
         if (zeros > difficulty) {
-            return zeros - difficulty;
+            return (zeros - difficulty) * 10**decimals();
         }
         return 0;
     }
@@ -224,7 +219,7 @@ contract XPowerLoki is XPower {
         uint256 difficulty = difficultyFor(block.timestamp);
         uint256 zeros = _zerosOf(nonceHash);
         if (zeros > difficulty) {
-            return 2**(zeros - difficulty) - 1;
+            return (2**(zeros - difficulty) - 1) * 10**decimals();
         }
         return 0;
     }
@@ -244,7 +239,7 @@ contract XPowerOdin is XPower {
         uint256 difficulty = difficultyFor(block.timestamp);
         uint256 zeros = _zerosOf(nonceHash);
         if (zeros > difficulty) {
-            return 16**(zeros - difficulty) - 1;
+            return (16**(zeros - difficulty) - 1) * 10**decimals();
         }
         return 0;
     }

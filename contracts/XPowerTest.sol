@@ -34,6 +34,14 @@ contract XPowerThorTest is XPowerThor {
     }
 }
 
+contract XPowerThorOldTest is XPowerThorTest {
+    constructor(address _base, uint256 _deadlineIn) XPowerThorTest(_base, _deadlineIn) {}
+
+    function decimals() public pure override returns (uint8) {
+        return 0;
+    }
+}
+
 /** Test class for XPowerLoki */
 contract XPowerLokiTest is XPowerLoki {
     constructor(address _base, uint256 _deadlineIn) XPowerLoki(_base, _deadlineIn) {}
@@ -64,6 +72,14 @@ contract XPowerLokiTest is XPowerLoki {
     }
 }
 
+contract XPowerLokiOldTest is XPowerLokiTest {
+    constructor(address _base, uint256 _deadlineIn) XPowerLokiTest(_base, _deadlineIn) {}
+
+    function decimals() public pure override returns (uint8) {
+        return 0;
+    }
+}
+
 /** Test class for XPowerOdin */
 contract XPowerOdinTest is XPowerOdin {
     constructor(address _base, uint256 _deadlineIn) XPowerOdin(_base, _deadlineIn) {}
@@ -91,5 +107,13 @@ contract XPowerOdinTest is XPowerOdin {
 
     function zerosOf(bytes32 _nonceHash) public pure returns (uint8) {
         return _zerosOf(_nonceHash);
+    }
+}
+
+contract XPowerOdinOldTest is XPowerOdinTest {
+    constructor(address _base, uint256 _deadlineIn) XPowerOdinTest(_base, _deadlineIn) {}
+
+    function decimals() public pure override returns (uint8) {
+        return 0;
     }
 }

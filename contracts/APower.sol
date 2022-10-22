@@ -10,9 +10,8 @@ import "./XPower.sol";
 import "./Migratable.sol";
 
 /**
- * Abstract base class for the APower THOR, LOKI and ODIN proof-of-work tokens,
- * where only the owner of the contract i.e the MoeTreasury is entitled to mint
- * them.
+ * Abstract base class for the APower aTHOR, aLOKI and aODIN tokens, where only
+ * the owner of the contract i.e the MoeTreasury is entitled to mint them.
  */
 abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     /** (burnable) proof-of-work tokens */
@@ -34,11 +33,6 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
         Migratable(base, deadlineIn)
     {
         _moe = XPower(moe);
-    }
-
-    /** @return number of decimal places of the token */
-    function decimals() public pure override returns (uint8) {
-        return 0;
     }
 
     /** mint amount of tokens for beneficiary (after wrapping XPower) */

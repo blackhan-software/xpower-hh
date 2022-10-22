@@ -7,6 +7,7 @@ let accounts; // all accounts
 let addresses; // all addresses
 let XPower, XPowerNft; // contracts
 let xpower, xpower_nft_old, xpower_nft_new; // instances
+let UNUM; // decimals
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
@@ -44,6 +45,12 @@ describe("XPowerNft", async function () {
     await xpower.deployed();
     await xpower.transferOwnership(addresses[1]);
     await xpower.init();
+  });
+  beforeEach(async function () {
+    const decimals = await xpower.decimals();
+    expect(decimals).to.greaterThan(0);
+    UNUM = 10n ** BigInt(decimals);
+    expect(UNUM >= 1n).to.be.true;
   });
   beforeEach(async function () {
     xpower_nft_old = await XPowerNft.deploy(
@@ -174,18 +181,23 @@ describe("XPowerNft", async function () {
 });
 async function increaseAllowanceBy(amount) {
   const [owner, spender] = [addresses[0], xpower_nft_old.address];
-  const increase = await xpower.increaseAllowance(spender, amount);
+  const increase = await xpower.increaseAllowance(
+    spender,
+    BigInt(amount) * UNUM
+  );
   expect(increase).to.be.an("object");
   const allowance = await xpower.allowance(owner, spender);
-  expect(allowance.toNumber()).to.eq(amount);
+  expect(allowance).to.eq(BigInt(amount) * UNUM);
 }
 async function mintXPow(amount) {
   const [nonce, block_hash] = table.getNonce({ amount });
   expect(nonce.gte(0)).to.eq(true);
   const tx = await xpower.mint(addresses[0], block_hash, nonce);
   expect(tx).to.be.an("object");
-  expect(await xpower.balanceOf(addresses[0])).to.eq(amount);
-  expect(await xpower.balanceOf(addresses[1])).to.eq(Math.floor(amount / 2));
+  expect(await xpower.balanceOf(addresses[0])).to.eq(BigInt(amount) * UNUM);
+  expect(await xpower.balanceOf(addresses[1])).to.eq(
+    (BigInt(amount) * UNUM) / 2n
+  );
 }
 async function mintXPowNft(unit, amount) {
   const year = (await xpower_nft_old.year()).toNumber();
@@ -195,7 +207,7 @@ async function mintXPowNft(unit, amount) {
   expect(nft_id).to.be.greaterThan(0);
   const nft_balance = await xpower_nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(amount);
-  const nft_supply = (await xpower_nft_old.totalSupply(nft_id)).toNumber();
+  const nft_supply = await xpower_nft_old.totalSupply(nft_id);
   expect(nft_supply).to.eq(amount);
   const nft_exists = await xpower_nft_old.exists(nft_id);
   expect(nft_exists).to.eq(true);

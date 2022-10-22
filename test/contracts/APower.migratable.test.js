@@ -5,8 +5,13 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let APower, XPower, Nft, NftStaked, NftTreasury, MoeTreasury; // contracts
-let apower_old, xpower, nft, nft_staked, nft_treasury, moe_treasury, mt; // instances
+let APower, XPower; // contracts
+let apower_old, apower_new, xpower; // instances
+let Nft, NftStaked, NftTreasury; // contracts
+let nft, nft_staked, nft_treasury; // instances
+let MoeTreasury; // contracts
+let moe_treasury, mt; // instances
+let UNUM; // decimals
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
@@ -49,12 +54,22 @@ describe("APower Migration", async function () {
     await xpower.init();
   });
   beforeEach(async function () {
+    const decimals = await xpower.decimals();
+    expect(decimals).to.greaterThan(0);
+    UNUM = 10n ** BigInt(decimals);
+    expect(UNUM >= 1n).to.be.true;
+  });
+  beforeEach(async function () {
     // deploy old apower contract:
     apower_old = await APower.deploy(NONE_ADDRESS, DEADLINE, xpower.address);
     expect(apower_old).to.exist;
     await apower_old.deployed();
     // deploy new apower contract:
-    apower_new = await APower.deploy(apower_old.address, DEADLINE, xpower.address);
+    apower_new = await APower.deploy(
+      apower_old.address,
+      DEADLINE,
+      xpower.address
+    );
     expect(apower_new).to.exist;
     await apower_new.deployed();
   });
@@ -105,32 +120,32 @@ describe("APower Migration", async function () {
   });
   beforeEach(async function () {
     const supply = await xpower.totalSupply();
-    expect(supply.toNumber()).to.be.gte(1601);
+    expect(supply).to.be.gte(1601n * UNUM);
   });
   beforeEach(async function () {
-    await increaseAllowanceBy(1000, nft.address);
+    await increaseAllowanceBy(1000n * UNUM, nft.address);
   });
   beforeEach(async function () {
-    await xpower.transfer(moe_treasury.address, 110);
+    await xpower.transfer(moe_treasury.address, 110n * UNUM);
   });
   beforeEach(async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
     // wait for +12 months: 1st year
     await network.provider.send("evm_increaseTime", [365.25 * DAYS * 1.0]);
     expect(await mt.claimFor(account, nft_id)).to.be.an("object");
-    expect(await mt.rewardOf(account, nft_id)).to.eq(10);
-    expect(await mt.totalRewardOf(nft_id)).to.eq(10);
-    expect(await mt.claimedFor(account, nft_id)).to.eq(10);
-    expect(await mt.totalClaimedFor(nft_id)).to.eq(10);
+    expect(await mt.rewardOf(account, nft_id)).to.eq(10n * UNUM);
+    expect(await mt.totalRewardOf(nft_id)).to.eq(10n * UNUM);
+    expect(await mt.claimedFor(account, nft_id)).to.eq(10n * UNUM);
+    expect(await mt.totalClaimedFor(nft_id)).to.eq(10n * UNUM);
     expect(await mt.claimableFor(account, nft_id)).to.eq(0);
     expect(await mt.totalClaimableFor(nft_id)).to.eq(0);
-    expect(await mt.balance()).to.eq(110 - 10);
+    expect(await mt.balance()).to.eq(100n * UNUM);
     // check balances of aged tokens:
-    expect(await xpower.balanceOf(apower_old.address)).to.eq(10);
-    expect(await apower_old.balanceOf(account)).to.eq(10);
+    expect(await xpower.balanceOf(apower_old.address)).to.eq(10n * UNUM);
+    expect(await apower_old.balanceOf(account)).to.eq(10n * UNUM);
   });
   it("should *not* migrate old => new (insufficient allowance)", async function () {
-    const tx = await apower_new.migrate(10).catch((ex) => {
+    const tx = await apower_new.migrate(10n * UNUM).catch((ex) => {
       const m = ex.message.match(/insufficient allowance/);
       if (m === null) console.debug(ex);
       expect(m).to.be.not.null;
@@ -140,8 +155,8 @@ describe("APower Migration", async function () {
     expect(new_migrated).to.eq(0);
   });
   it("should *not* migrate old => new (insufficient balance)", async function () {
-    await apower_old.increaseAllowance(apower_new.address, 15);
-    const tx = await apower_new.migrate(15).catch((ex) => {
+    await apower_old.increaseAllowance(apower_new.address, 15n * UNUM);
+    const tx = await apower_new.migrate(15n * UNUM).catch((ex) => {
       const m = ex.message.match(/insufficient balance/);
       if (m === null) console.debug(ex);
       expect(m).to.be.not.null;
@@ -151,14 +166,14 @@ describe("APower Migration", async function () {
     expect(new_migrated).to.eq(0);
   });
   it("should migrate old => new", async function () {
-    await apower_old.increaseAllowance(apower_new.address, 10);
+    await apower_old.increaseAllowance(apower_new.address, 10n * UNUM);
     await apower_new.migrate(10);
   });
   it("should *not* migrate old => new (migration sealed)", async function () {
     await apower_new.grantRole(apower_new.SOV_SEAL_ROLE(), addresses[0]);
     await apower_new.seal();
-    await apower_old.increaseAllowance(apower_new.address, 10);
-    const tx = await apower_new.migrate(10).catch((ex) => {
+    await apower_old.increaseAllowance(apower_new.address, 10n * UNUM);
+    const tx = await apower_new.migrate(10n * UNUM).catch((ex) => {
       const m = ex.message.match(/migration sealed/);
       if (m === null) console.debug(ex);
       expect(m).to.be.not.null;
@@ -179,8 +194,8 @@ describe("APower Migration", async function () {
   });
   it("should *not* migrate old => new (deadline passed)", async function () {
     await network.provider.send("evm_increaseTime", [126_230_400]);
-    await apower_old.increaseAllowance(apower_new.address, 10);
-    const tx = await apower_new.migrate(10).catch((ex) => {
+    await apower_old.increaseAllowance(apower_new.address, 10n * UNUM);
+    const tx = await apower_new.migrate(10n * UNUM).catch((ex) => {
       const m = ex.message.match(/deadline passed/);
       if (m === null) console.debug(ex);
       expect(m).to.be.not.null;
@@ -198,15 +213,15 @@ async function mintToken(amount) {
   const tx_mint = await xpower.mint(addresses[0], block_hash, nonce);
   expect(tx_mint).to.be.an("object");
   const balance_0 = await xpower.balanceOf(addresses[0]);
-  expect(balance_0.toNumber()).to.be.gte(amount);
+  expect(balance_0).to.be.gte(amount);
   const balance_1 = await xpower.balanceOf(addresses[1]);
-  expect(balance_1.toNumber()).to.eq(0);
+  expect(balance_1).to.eq(0);
 }
 async function increaseAllowanceBy(amount, spender) {
   const tx_increase = await xpower.increaseAllowance(spender, amount);
   expect(tx_increase).to.be.an("object");
   const allowance = await xpower.allowance(addresses[0], spender);
-  expect(allowance.toNumber()).to.gte(amount);
+  expect(allowance).to.gte(amount);
 }
 async function mintNft(level, amount) {
   const nft_id = await nft.idBy(await nft.year(), level);
@@ -228,14 +243,14 @@ async function stakeNft(nft_id, amount) {
   const tx_transfer = await nft_staked.transferOwnership(address);
   expect(tx_transfer).to.be.an("object");
   const nft_balance_old = await nft.balanceOf(account, nft_id);
-  expect(nft_balance_old.toNumber()).to.gte(amount);
+  expect(nft_balance_old).to.gte(amount);
   const tx_stake = await nft_treasury.stake(account, nft_id, amount);
   expect(tx_stake).to.be.an("object");
   const nft_staked_balance = await nft_staked.balanceOf(account, nft_id);
-  expect(nft_staked_balance.toNumber()).to.be.gte(amount);
+  expect(nft_staked_balance).to.be.gte(amount);
   const nft_treasury_balance = await nft.balanceOf(address, nft_id);
-  expect(nft_treasury_balance.toNumber()).to.be.gte(amount);
+  expect(nft_treasury_balance).to.be.gte(amount);
   const nft_balance = await nft.balanceOf(account, nft_id);
-  expect(nft_balance.toNumber()).to.eq(nft_balance_old.sub(amount));
+  expect(nft_balance).to.eq(nft_balance_old.sub(amount));
   return [account, nft_id];
 }

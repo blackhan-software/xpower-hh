@@ -6,6 +6,7 @@ let accounts; // all accounts
 let addresses; // all addresses
 let XPower; // contract
 let xpower; // instance
+let UNUM; // decimals
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
@@ -35,6 +36,12 @@ describe("XPowerLokiTest", async function () {
     xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
     await xpower.deployed();
     await xpower.init();
+  });
+  before(async function () {
+    const decimals = await xpower.decimals();
+    expect(decimals).to.greaterThan(0);
+    UNUM = 10n ** BigInt(decimals);
+    expect(UNUM >= 1n).to.be.true;
   });
   describe("interval", async function () {
     it("should return interval>0", async function () {
@@ -97,13 +104,13 @@ describe("XPowerLokiTest", async function () {
       const hash = table.getHash({ amount: 1 });
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       const amount = await xpower.amountOf(hash);
-      expect(amount).to.equal(1);
+      expect(amount).to.equal(UNUM);
     });
     it("should return amount=3", async function () {
       const hash = table.getHash({ amount: 3 });
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       const amount = await xpower.amountOf(hash);
-      expect(amount).to.equal(3);
+      expect(amount).to.equal(3n * UNUM);
     });
   });
   describe("zeros (for amounts={0,1,3})", async function () {
@@ -117,7 +124,7 @@ describe("XPowerLokiTest", async function () {
     });
     it("should return amount=1", async function () {
       const hash = table.getHash({ amount: 1 });
-      expect(await xpower.amountOf(hash)).to.eq(1);
+      expect(await xpower.amountOf(hash)).to.eq(UNUM);
     });
     it("should return zeros=1", async function () {
       const hash = table.getHash({ amount: 1 });
@@ -125,7 +132,7 @@ describe("XPowerLokiTest", async function () {
     });
     it("should return amount=3", async function () {
       const hash = table.getHash({ amount: 3 });
-      expect(await xpower.amountOf(hash)).to.eq(3);
+      expect(await xpower.amountOf(hash)).to.eq(3n * UNUM);
     });
     it("should return zeros=2", async function () {
       const hash = table.getHash({ amount: 3 });

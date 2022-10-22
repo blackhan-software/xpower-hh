@@ -4,9 +4,11 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let XPower; // contract
+let XPowerOld; // contract
+let XPowerNew; // contract
 let xpower_old; // old instance
 let xpower_new; // new instance
+let UNUM; // decimals
 
 const { HashTable } = require("../hash-table");
 let table_0, table_2; // pre-hashed nonces
@@ -15,7 +17,7 @@ const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE_OLD = 0; // [seconds], i.e. migration not possible
 const DEADLINE_NEW = 1_814_400; // [seconds] i.e. 3 weeks
 
-describe("XPower Migration", async function () {
+describe("XPowerThor Migration", async function () {
   before(async function () {
     await network.provider.send("hardhat_reset");
   });
@@ -26,23 +28,32 @@ describe("XPower Migration", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerLokiTest");
+    const factory = await ethers.getContractFactory("XPowerThorTest");
     const contract = await factory.deploy(NONE_ADDRESS, DEADLINE_OLD);
     table_0 = await new HashTable(contract, addresses[0]).init();
     table_2 = await new HashTable(contract, addresses[2]).init();
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerLokiTest");
+    XPowerOld = await ethers.getContractFactory("XPowerThorOldTest");
+    XPowerNew = await ethers.getContractFactory("XPowerThorTest");
   });
   beforeEach(async function () {
     // deploy old xpower contract:
-    xpower_old = await XPower.deploy(NONE_ADDRESS, DEADLINE_OLD);
+    xpower_old = await XPowerOld.deploy(NONE_ADDRESS, DEADLINE_OLD);
     await xpower_old.deployed();
     await xpower_old.init();
     // deploy new xpower contract:
-    xpower_new = await XPower.deploy(xpower_old.address, DEADLINE_NEW);
+    xpower_new = await XPowerNew.deploy(xpower_old.address, DEADLINE_NEW);
     await xpower_new.deployed();
     await xpower_new.init();
+  });
+  beforeEach(async function () {
+    const old_decimals = await xpower_old.decimals();
+    expect(old_decimals).to.eq(0);
+    const new_decimals = await xpower_new.decimals();
+    expect(new_decimals).to.greaterThan(0);
+    UNUM = 10n ** BigInt(new_decimals);
+    expect(UNUM >= 1n).to.be.true;
   });
   describe("old", async function () {
     it("should mint for amount=1", async function () {
@@ -50,7 +61,7 @@ describe("XPower Migration", async function () {
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower_old.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower_old.balanceOf(addresses[0])).to.eq(1);
+      expect(await xpower_old.balanceOf(addresses[0])).to.eq(1n);
     });
   });
   describe("new", async function () {
@@ -59,23 +70,23 @@ describe("XPower Migration", async function () {
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower_new.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower_new.balanceOf(addresses[0])).to.eq(1);
-      expect(await xpower_new.balanceOf(addresses[1])).to.eq(0);
+      expect(await xpower_new.balanceOf(addresses[0])).to.eq((3n * UNUM) / 2n);
+      expect(await xpower_new.balanceOf(addresses[1])).to.eq(0n);
     });
     it("should approve allowance old[0] => new", async function () {
       const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower_old.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower_old.balanceOf(addresses[0])).to.eq(1);
-      // increase allowance for spender (i.e. XPower.new)
+      expect(await xpower_old.balanceOf(addresses[0])).to.eq(1n);
+      // increase allowance for spender (i.e. XPowerNew)
       const [owner, spender] = [addresses[0], xpower_new.address];
       const old_increase = await xpower_old.increaseAllowance(spender, 1);
       expect(old_increase).to.be.an("object");
       const old_allowance = await xpower_old.allowance(owner, spender);
-      expect(old_allowance.toNumber()).to.eq(1);
+      expect(old_allowance).to.eq(1n);
       const new_allowance = await xpower_new.allowance(owner, spender);
-      expect(new_allowance.toNumber()).to.eq(0);
+      expect(new_allowance).to.eq(0n);
     });
     it("should migrate old[0] => new", async function () {
       //
@@ -84,39 +95,39 @@ describe("XPower Migration", async function () {
       {
         const minter = accounts[2];
         expect(minter.address).to.match(/^0x/);
-        const [nonce, block_hash] = table_2.getNonce({ amount: 3 });
+        const [nonce, block_hash] = table_2.getNonce({ amount: 2 });
         expect(nonce.gte(0)).to.eq(true);
         const tx = await xpower_old
           .connect(minter)
           .mint(minter.address, block_hash, nonce);
         expect(tx).to.be.an("object");
-        expect(await xpower_old.balanceOf(minter.address)).to.eq(3);
-        // increase allowance for spender (i.e. XPower.new)
+        expect(await xpower_old.balanceOf(minter.address)).to.eq(2n);
+        // increase allowance for spender (i.e. XPowerNew)
         const [owner, spender] = [minter.address, xpower_new.address];
         const old_increase = await xpower_old
           .connect(minter)
-          .increaseAllowance(spender, 3);
+          .increaseAllowance(spender, 2);
         expect(old_increase).to.be.an("object");
         const old_allowance = await xpower_old.allowance(owner, spender);
-        expect(old_allowance.toNumber()).to.eq(3);
+        expect(old_allowance).to.eq(2n);
         const new_allowance = await xpower_new.allowance(owner, spender);
-        expect(new_allowance.toNumber()).to.eq(0);
+        expect(new_allowance).to.eq(0n);
         // migrate amount from old[owner] to new[owner]
-        const new_migrate = await xpower_new.connect(minter).migrate(3);
+        const new_migrate = await xpower_new.connect(minter).migrate(2);
         expect(new_migrate).to.be.an("object");
-        // ensure migrated amount = 3
+        // ensure migrated amount = 2
         const new_migrated = await xpower_new.migrated();
-        expect(new_migrated).to.eq(3);
+        expect(new_migrated).to.eq(2n * UNUM);
         // ensure old[owner] = 0 & old[spender] = 0
         const old_balance_owner = await xpower_old.balanceOf(owner);
-        expect(old_balance_owner.toNumber()).to.eq(0);
+        expect(old_balance_owner).to.eq(0n);
         const old_balance_spender = await xpower_old.balanceOf(spender);
-        expect(old_balance_spender.toNumber()).to.eq(0);
+        expect(old_balance_spender).to.eq(0n);
         // ensure new[owner] = 3 & new[spender] = 0
         const new_balance_owner = await xpower_new.balanceOf(owner);
-        expect(new_balance_owner.toNumber()).to.eq(3);
+        expect(new_balance_owner).to.eq(2n * UNUM);
         const new_balance_spender = await xpower_new.balanceOf(spender);
-        expect(new_balance_spender.toNumber()).to.eq(0);
+        expect(new_balance_spender).to.eq(0n);
       }
       //
       // migrate for minter #0 (project fund)
@@ -130,33 +141,33 @@ describe("XPower Migration", async function () {
           .connect(minter)
           .mint(minter.address, block_hash, nonce);
         expect(tx).to.be.an("object");
-        expect(await xpower_old.balanceOf(minter.address)).to.eq(2);
-        // increase allowance for spender (i.e. XPower.new)
+        expect(await xpower_old.balanceOf(minter.address)).to.eq(2n);
+        // increase allowance for spender (i.e. XPowerNew)
         const [owner, spender] = [minter.address, xpower_new.address];
         const old_increase = await xpower_old
           .connect(minter)
           .increaseAllowance(spender, 1);
         expect(old_increase).to.be.an("object");
         const old_allowance = await xpower_old.allowance(owner, spender);
-        expect(old_allowance.toNumber()).to.eq(1);
+        expect(old_allowance).to.eq(1n);
         const new_allowance = await xpower_new.allowance(owner, spender);
-        expect(new_allowance.toNumber()).to.eq(0);
+        expect(new_allowance).to.eq(0n);
         // migrate amount from old[owner] to new[owner]
         const new_migrate = await xpower_new.connect(minter).migrate(1);
         expect(new_migrate).to.be.an("object");
-        // ensure migrated amount = 4
+        // ensure migrated amount = 3
         const new_migrated = await xpower_new.migrated();
-        expect(new_migrated).to.eq(4);
+        expect(new_migrated).to.eq(3n * UNUM);
         // ensure old[owner] = 1 & old[spender] = 0
         const old_balance_owner = await xpower_old.balanceOf(owner);
-        expect(old_balance_owner.toNumber()).to.eq(1);
+        expect(old_balance_owner).to.eq(1n);
         const old_balance_spender = await xpower_old.balanceOf(spender);
-        expect(old_balance_spender.toNumber()).to.eq(0);
+        expect(old_balance_spender).to.eq(0n);
         // ensure new[owner] = 1 & new[spender] = 0
         const new_balance_owner = await xpower_new.balanceOf(owner);
-        expect(new_balance_owner.toNumber()).to.eq(1);
+        expect(new_balance_owner).to.eq(UNUM);
         const new_balance_spender = await xpower_new.balanceOf(spender);
-        expect(new_balance_spender.toNumber()).to.eq(0);
+        expect(new_balance_spender).to.eq(0n);
       }
     });
     it("should *not* migrate old[0] => new (insufficient allowance: old[0] = 0 balance)", async function () {
@@ -167,14 +178,14 @@ describe("XPower Migration", async function () {
       });
       expect(tx).to.eq(undefined);
       const new_migrated = await xpower_new.migrated();
-      expect(new_migrated).to.eq(0);
+      expect(new_migrated).to.eq(0n);
     });
     it("should *not* migrate old[0] => new (insufficient allowance)", async function () {
       const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower_old.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower_old.balanceOf(addresses[0])).to.eq(1);
+      expect(await xpower_old.balanceOf(addresses[0])).to.eq(1n);
       const new_migrate = await xpower_new.migrate(1).catch((ex) => {
         const m = ex.message.match(/insufficient allowance/);
         if (m === null) console.debug(ex);
@@ -182,22 +193,22 @@ describe("XPower Migration", async function () {
       });
       expect(new_migrate).to.eq(undefined);
       const new_migrated = await xpower_new.migrated();
-      expect(new_migrated).to.eq(0);
+      expect(new_migrated).to.eq(0n);
     });
     it("should *not* migrate old[0] => new (insufficient balance)", async function () {
       const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower_old.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower_old.balanceOf(addresses[0])).to.eq(1);
-      // increase allowance for spender (i.e. XPower.new)
+      expect(await xpower_old.balanceOf(addresses[0])).to.eq(1n);
+      // increase allowance for spender (i.e. XPowerNew)
       const [owner, spender] = [addresses[0], xpower_new.address];
       const old_increase = await xpower_old.increaseAllowance(spender, 5);
       expect(old_increase).to.be.an("object");
       const old_allowance = await xpower_old.allowance(owner, spender);
-      expect(old_allowance.toNumber()).to.eq(5);
+      expect(old_allowance).to.eq(5);
       const new_allowance = await xpower_new.allowance(owner, spender);
-      expect(new_allowance.toNumber()).to.eq(0);
+      expect(new_allowance).to.eq(0n);
       // migrate amount from old[owner] to new[owner]
       const new_migrate = await xpower_new.migrate(5).catch((ex) => {
         const m = ex.message.match(/insufficient balance/);
@@ -207,7 +218,7 @@ describe("XPower Migration", async function () {
       expect(new_migrate).to.eq(undefined);
       // ensure migrated amount = 0
       const new_migrated = await xpower_new.migrated();
-      expect(new_migrated).to.eq(0);
+      expect(new_migrated).to.eq(0n);
     });
     it("should migrate old[2] => new", async function () {
       const minter = accounts[2];
@@ -218,33 +229,33 @@ describe("XPower Migration", async function () {
         .connect(minter)
         .mint(minter.address, block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower_old.balanceOf(minter.address)).to.eq(1);
-      // increase allowance for spender (i.e. XPower.new)
+      expect(await xpower_old.balanceOf(minter.address)).to.eq(1n);
+      // increase allowance for spender (i.e. XPowerNew)
       const [owner, spender] = [minter.address, xpower_new.address];
       const old_increase = await xpower_old
         .connect(minter)
         .increaseAllowance(spender, 1);
       expect(old_increase).to.be.an("object");
       const old_allowance = await xpower_old.allowance(owner, spender);
-      expect(old_allowance.toNumber()).to.eq(1);
+      expect(old_allowance).to.eq(1n);
       const new_allowance = await xpower_new.allowance(owner, spender);
-      expect(new_allowance.toNumber()).to.eq(0);
+      expect(new_allowance).to.eq(0n);
       // migrate amount from old[owner] to new[owner]
       const new_migrate = await xpower_new.connect(minter).migrate(1);
       expect(new_migrate).to.be.an("object");
       // ensure migrated amount = 1
       const new_migrated = await xpower_new.migrated();
-      expect(new_migrated).to.eq(1);
+      expect(new_migrated).to.eq(UNUM);
       // ensure old[owner] = 0 & old[spender] = 0
       const old_balance_owner = await xpower_old.balanceOf(owner);
-      expect(old_balance_owner.toNumber()).to.eq(0);
+      expect(old_balance_owner).to.eq(0n);
       const old_balance_spender = await xpower_old.balanceOf(spender);
-      expect(old_balance_spender.toNumber()).to.eq(0);
+      expect(old_balance_spender).to.eq(0n);
       // ensure new[owner] = 1 & new[spender] = 0
       const new_balance_owner = await xpower_new.balanceOf(owner);
-      expect(new_balance_owner.toNumber()).to.eq(1);
+      expect(new_balance_owner).to.eq(UNUM);
       const new_balance_spender = await xpower_new.balanceOf(spender);
-      expect(new_balance_spender.toNumber()).to.eq(0);
+      expect(new_balance_spender).to.eq(0n);
     });
     it("should *not* migrate old[2] => new (migration sealed)", async function () {
       const minter = accounts[2];
@@ -255,23 +266,23 @@ describe("XPower Migration", async function () {
         .connect(minter)
         .mint(minter.address, block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower_old.balanceOf(minter.address)).to.eq(1);
-      // deploy xpower.new contract (w/o transferring ownership):
-      xpower_new = await XPower.deploy(xpower_old.address, DEADLINE_NEW);
+      expect(await xpower_old.balanceOf(minter.address)).to.eq(1n);
+      // deploy xpower_new contract (w/o transferring ownership):
+      xpower_new = await XPowerNew.deploy(xpower_old.address, DEADLINE_NEW);
       await xpower_new.deployed();
       expect(xpower_new.address).to.exists;
       const { value: block_hash_new } = await xpower_new.connect(minter).init();
-      expect(block_hash_new.toNumber()).to.eq(0);
-      // increase allowance for spender (i.e. XPower.new)
+      expect(block_hash_new).to.eq(0n);
+      // increase allowance for spender (i.e. XPowerNew)
       const [owner, spender] = [minter.address, xpower_new.address];
       const old_increase = await xpower_old
         .connect(minter)
         .increaseAllowance(spender, 1);
       expect(old_increase).to.be.an("object");
       const old_allowance = await xpower_old.allowance(owner, spender);
-      expect(old_allowance.toNumber()).to.eq(1);
+      expect(old_allowance).to.eq(1n);
       const new_allowance = await xpower_new.allowance(owner, spender);
-      expect(new_allowance.toNumber()).to.eq(0);
+      expect(new_allowance).to.eq(0n);
       // grant seal role to default account (i.e. deployer)
       await xpower_new.grantRole(xpower_new.MOE_SEAL_ROLE(), addresses[0]);
       // seal migrate option
@@ -289,13 +300,13 @@ describe("XPower Migration", async function () {
       expect(new_migrate).to.eq(undefined);
       // ensure migrated amount = 0
       const new_migrated = await xpower_new.migrated();
-      expect(new_migrated).to.eq(0);
+      expect(new_migrated).to.eq(0n);
     });
     it("should *not* seal new (account is missing role)", async function () {
       const minter = accounts[2];
       expect(minter.address).to.match(/^0x/);
-      // deploy xpower.new contract (w/o transferring ownership):
-      xpower_new = await XPower.deploy(xpower_old.address, DEADLINE_NEW);
+      // deploy xpower_new contract (w/o transferring ownership):
+      xpower_new = await XPowerNew.deploy(xpower_old.address, DEADLINE_NEW);
       await xpower_new.deployed();
       expect(xpower_new.address).to.exists;
       // grant seal role to default account (but *not* minter)
@@ -313,38 +324,38 @@ describe("XPower Migration", async function () {
     it("should *not* migrate old[2] => new (deadline passed)", async function () {
       const minter = accounts[2];
       expect(minter.address).to.match(/^0x/);
-      const [nonce, block_hash] = table_2.getNonce({ amount: 3 });
+      const [nonce, block_hash] = table_2.getNonce({ amount: 2 });
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower_old
         .connect(minter)
         .mint(minter.address, block_hash, nonce);
       expect(tx).to.be.an("object");
-      expect(await xpower_old.balanceOf(minter.address)).to.eq(3);
-      expect(await xpower_old.balanceOf(addresses[0])).to.eq(1);
-      // increase allowance for spender (i.e. XPower.new)
+      expect(await xpower_old.balanceOf(minter.address)).to.eq(2n);
+      expect(await xpower_old.balanceOf(addresses[0])).to.eq(1n);
+      // increase allowance for spender (i.e. XPowerNew)
       const [owner, spender] = [minter.address, xpower_new.address];
       const old_increase = await xpower_old
         .connect(minter)
-        .increaseAllowance(spender, 3);
+        .increaseAllowance(spender, 2);
       expect(old_increase).to.be.an("object");
       const old_allowance = await xpower_old.allowance(owner, spender);
-      expect(old_allowance.toNumber()).to.eq(3);
+      expect(old_allowance).to.eq(2n);
       const new_allowance = await xpower_new.allowance(owner, spender);
-      expect(new_allowance.toNumber()).to.eq(0);
+      expect(new_allowance).to.eq(0n);
       // forward time by one week (1st increase)
       await network.provider.send("evm_increaseTime", [604_800]);
       // migrate amount from old[owner] to new[owner]
       const new_migrate_1 = await xpower_new.connect(minter).migrate(1);
       expect(new_migrate_1).to.be.an("object");
       const new_migrated_1 = await xpower_new.migrated();
-      expect(new_migrated_1).to.eq(1);
+      expect(new_migrated_1).to.eq(UNUM);
       // forward time by one more week (2nd increase)
       await network.provider.send("evm_increaseTime", [604_800]);
       // migrate amount from old[owner] to new[owner]
       const new_migrate_2 = await xpower_new.connect(minter).migrate(1);
       expect(new_migrate_2).to.be.an("object");
       const new_migrated_2 = await xpower_new.migrated();
-      expect(new_migrated_2).to.eq(2);
+      expect(new_migrated_2).to.eq(2n * UNUM);
       // forward time by one more week (3rd increase)
       await network.provider.send("evm_increaseTime", [604_800]);
       // migrate amount from old[owner] to new[owner]
@@ -359,17 +370,17 @@ describe("XPower Migration", async function () {
       expect(new_migrate_3).to.eq(undefined);
       // ensure migrated amount = 2 (and not 3)
       const new_migrated_3 = await xpower_new.migrated();
-      expect(new_migrated_3).to.eq(2);
-      // ensure old[owner] = 1 & old[spender] = 0
+      expect(new_migrated_3).to.eq(2n * UNUM);
+      // ensure old[owner] = 0 & old[spender] = 0
       const old_balance_owner = await xpower_old.balanceOf(owner);
-      expect(old_balance_owner.toNumber()).to.eq(1);
+      expect(old_balance_owner).to.eq(0n);
       const old_balance_spender = await xpower_old.balanceOf(spender);
-      expect(old_balance_spender.toNumber()).to.eq(0);
+      expect(old_balance_spender).to.eq(0n);
       // ensure new[owner] = 2 & new[spender] = 0
       const new_balance_owner = await xpower_new.balanceOf(owner);
-      expect(new_balance_owner.toNumber()).to.eq(2);
+      expect(new_balance_owner).to.eq(2n * UNUM);
       const new_balance_spender = await xpower_new.balanceOf(spender);
-      expect(new_balance_spender.toNumber()).to.eq(0);
+      expect(new_balance_spender).to.eq(0n);
     });
   });
 });

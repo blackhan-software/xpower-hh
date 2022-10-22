@@ -35,7 +35,7 @@ contract XPowerNft is XPowerNftBase {
     ) public {
         uint256 moe = amount * denominationOf(level);
         require(moe > 0, "non-positive amount");
-        _moe.burnFrom(to, moe);
+        _moe.burnFrom(to, moe * (10 ** _moe.decimals()));
         _mint(to, idBy(year(), level), amount, "");
     }
 
@@ -51,7 +51,7 @@ contract XPowerNft is XPowerNftBase {
             require(delta > 0, "non-positive amount");
             moe += delta;
         }
-        _moe.burnFrom(to, moe);
+        _moe.burnFrom(to, moe * (10 ** _moe.decimals()));
         _mintBatch(to, idsBy(year(), levels), amounts, "");
     }
 }
