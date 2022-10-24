@@ -9,7 +9,7 @@
  */
 const hre = require("hardhat");
 const assert = require("assert");
-const { wait } = require("./wait");
+const { wait } = require("../wait");
 
 /**
  * Hardhat *always* runs the compile task when running scripts with its command
@@ -19,20 +19,22 @@ const { wait } = require("./wait");
  * > await hre.run("compile");
  */
 async function main() {
-  const thor_base = process.env.THOR_MOE_V2a;
-  assert(thor_base, "missing THOR_MOE_V2a");
-  const loki_base = process.env.LOKI_MOE_V2a;
-  assert(loki_base, "missing LOKI_MOE_V2a");
-  const odin_base = process.env.ODIN_MOE_V2a;
-  assert(odin_base, "missing ODIN_MOE_V2a");
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
+  // addresses XPower[Old]
+  const thor_moe_base = process.env.THOR_MOE_V2a;
+  assert(thor_moe_base, "missing THOR_MOE_V2a");
+  const loki_moe_base = process.env.LOKI_MOE_V2a;
+  assert(loki_moe_base, "missing LOKI_MOE_V2a");
+  const odin_moe_base = process.env.ODIN_MOE_V2a;
+  assert(odin_moe_base, "missing ODIN_MOE_V2a");
+  // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerThor[New]
   //
   const thor_moe = await deploy("XPowerThor", {
-    base: thor_base,
+    moe_base: thor_moe_base,
     deadline,
     owner,
   });
@@ -41,7 +43,7 @@ async function main() {
   // deploy XPowerLoki[New]
   //
   const loki_moe = await deploy("XPowerLoki", {
-    base: loki_base,
+    moe_base: loki_moe_base,
     deadline,
     owner,
   });
@@ -50,15 +52,15 @@ async function main() {
   // deploy XPowerOdin[New]
   //
   const odin_moe = await deploy("XPowerOdin", {
-    base: odin_base,
+    moe_base: odin_moe_base,
     deadline,
     owner,
   });
   console.log(`ODIN_MOE_V3a=${odin_moe.address}`);
 }
-async function deploy(name, { base, deadline, owner }) {
+async function deploy(name, { moe_base, deadline, owner }) {
   const factory = await hre.ethers.getContractFactory(name);
-  const contract = await factory.deploy(base, deadline);
+  const contract = await factory.deploy(moe_base, deadline);
   await wait(contract.deployTransaction);
   const transfer = await contract.transferOwnership(owner);
   await wait(transfer);

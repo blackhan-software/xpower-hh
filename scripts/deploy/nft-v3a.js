@@ -9,7 +9,7 @@
  */
 const hre = require("hardhat");
 const assert = require("assert");
-const { wait } = require("./wait");
+const { wait } = require("../wait");
 
 /**
  * Hardhat *always* runs the compile task when running scripts with its command
@@ -21,36 +21,37 @@ const { wait } = require("./wait");
 async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
-  const deadline = 126_230_400; // 4 years
-  // addresses XPower[New]
-  const thor_xpower = process.env.THOR_MOE_V3a;
-  assert(thor_xpower, "missing THOR_MOE_V3a");
-  const loki_xpower = process.env.LOKI_MOE_V3a;
-  assert(loki_xpower, "missing LOKI_MOE_V3a");
-  const odin_xpower = process.env.ODIN_MOE_V3a;
-  assert(odin_xpower, "missing ODIN_MOE_V3a");
-  // addresses XPowerNft[Uri]
-  const thor_uri = process.env.THOR_NFT_URI;
-  assert(thor_uri, "missing THOR_NFT_URI");
-  const loki_uri = process.env.LOKI_NFT_URI;
-  assert(loki_uri, "missing LOKI_NFT_URI");
-  const odin_uri = process.env.ODIN_NFT_URI;
-  assert(odin_uri, "missing ODIN_NFT_URI");
   // addresses XPowerNft[Old]
-  const thor_base = process.env.THOR_NFT_V2a;
-  assert(thor_base, "missing THOR_NFT_V2a");
-  const loki_base = process.env.LOKI_NFT_V2a;
-  assert(loki_base, "missing LOKI_NFT_V2a");
-  const odin_base = process.env.ODIN_NFT_V2a;
-  assert(odin_base, "missing ODIN_NFT_V2a");
+  const thor_nft_base = process.env.THOR_NFT_V2a;
+  assert(thor_nft_base, "missing THOR_NFT_V2a");
+  const loki_nft_base = process.env.LOKI_NFT_V2a;
+  assert(loki_nft_base, "missing LOKI_NFT_V2a");
+  const odin_nft_base = process.env.ODIN_NFT_V2a;
+  assert(odin_nft_base, "missing ODIN_NFT_V2a");
+  // addresses XPower[New]
+  const thor_moe_link = process.env.THOR_MOE_V3a;
+  assert(thor_moe_link, "missing THOR_MOE_V3a");
+  const loki_moe_link = process.env.LOKI_MOE_V3a;
+  assert(loki_moe_link, "missing LOKI_MOE_V3a");
+  const odin_moe_link = process.env.ODIN_MOE_V3a;
+  assert(odin_moe_link, "missing ODIN_MOE_V3a");
+  // addresses XPowerNft[Uri]
+  const thor_nft_uri = process.env.THOR_NFT_URI;
+  assert(thor_nft_uri, "missing THOR_NFT_URI");
+  const loki_nft_uri = process.env.LOKI_NFT_URI;
+  assert(loki_nft_uri, "missing LOKI_NFT_URI");
+  const odin_nft_uri = process.env.ODIN_NFT_URI;
+  assert(odin_nft_uri, "missing ODIN_NFT_URI");
+  // migration:
+  const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerThorNft[New]:
   //
   const thor_nft = await deploy("XPowerThorNft", {
-    uri: thor_uri,
-    base: thor_base,
+    nft_base: thor_nft_base,
+    moe_link: thor_moe_link,
+    nft_uri: thor_nft_uri,
     deadline,
-    moe: thor_xpower,
     owner,
   });
   console.log(`THOR_NFT_V3a=${thor_nft.address}`);
@@ -58,10 +59,10 @@ async function main() {
   // deploy XPowerLokiNft[New]:
   //
   const loki_nft = await deploy("XPowerLokiNft", {
-    uri: loki_uri,
-    base: loki_base,
+    nft_base: loki_nft_base,
+    moe_link: loki_moe_link,
+    nft_uri: loki_nft_uri,
     deadline,
-    moe: loki_xpower,
     owner,
   });
   console.log(`LOKI_NFT_V3a=${loki_nft.address}`);
@@ -69,17 +70,17 @@ async function main() {
   // deploy XPowerOdinNft[New]:
   //
   const odin_nft = await deploy("XPowerOdinNft", {
-    uri: odin_uri,
-    base: odin_base,
+    nft_base: odin_nft_base,
+    moe_link: odin_moe_link,
+    nft_uri: odin_nft_uri,
     deadline,
-    moe: odin_xpower,
     owner,
   });
   console.log(`ODIN_NFT_V3a=${odin_nft.address}`);
 }
-async function deploy(name, { uri, base, deadline, moe, owner }) {
+async function deploy(name, { nft_base, moe_link, nft_uri, deadline, owner }) {
   const factory = await hre.ethers.getContractFactory(name);
-  const contract = await factory.deploy(uri, base, deadline, moe);
+  const contract = await factory.deploy(nft_base, moe_link, nft_uri, deadline);
   await wait(contract.deployTransaction);
   const transfer = await contract.transferOwnership(owner);
   await wait(transfer);

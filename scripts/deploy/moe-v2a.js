@@ -9,7 +9,7 @@
  */
 const hre = require("hardhat");
 const assert = require("assert");
-const { wait } = require("./wait");
+const { wait } = require("../wait");
 
 /**
  * Hardhat *always* runs the compile task when running scripts with its command
@@ -23,12 +23,13 @@ async function main() {
   assert(none, "missing NONE_ADDRESS");
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
+  // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerThor[Old]
   //
   const thor_moe = await deploy("XPowerThor", {
-    base: none,
+    moe_base: none,
     deadline,
     owner,
   });
@@ -37,7 +38,7 @@ async function main() {
   // deploy XPowerLoki[Old]
   //
   const loki_moe = await deploy("XPowerLoki", {
-    base: none,
+    moe_base: none,
     deadline,
     owner,
   });
@@ -46,15 +47,15 @@ async function main() {
   // deploy XPowerOdin[Old]
   //
   const odin_moe = await deploy("XPowerOdin", {
-    base: none,
+    moe_base: none,
     deadline,
     owner,
   });
   console.log(`ODIN_MOE_V2a=${odin_moe.address}`);
 }
-async function deploy(name, { base, deadline, owner }) {
+async function deploy(name, { moe_base, deadline, owner }) {
   const factory = await hre.ethers.getContractFactory(name);
-  const contract = await factory.deploy(base, deadline);
+  const contract = await factory.deploy(moe_base, deadline);
   await wait(contract.deployTransaction);
   const transfer = await contract.transferOwnership(owner);
   await wait(transfer);

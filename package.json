@@ -49,6 +49,7 @@
     "clean": "hardhat clean",
     "coverage": "hardhat coverage",
     "deploy": "hardhat run 'scripts/deploy.js'",
+    "deploy-roles": "hardhat run 'scripts/deploy-roles.js'",
     "eslint": "eslint '**/*.js'",
     "eslint-fix": "eslint '**/*.js' --fix",
     "lint": "npm run eslint && npm run prettier && npm run solhint",

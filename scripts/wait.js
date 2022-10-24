@@ -7,4 +7,10 @@ async function wait(tx, { confirm = 1, ms = 2_000 } = {}) {
     });
   });
 }
-exports.wait = wait;
+async function waitAll(txs, { confirm = 1, ms = 2_000 } = {}) {
+  return Promise.all(txs.map((tx) => wait(tx, { confirm, ms })));
+}
+module.exports = {
+  wait,
+  waitAll,
+};
