@@ -17,9 +17,9 @@ contract MoeTreasury is Supervised {
     XPower private _moe;
     /** staked proof-of-work NFTs */
     XPowerNftStaked private _ppt;
-    /** parametrization of APR */
-    uint256[] private _alpha = [0, 0, 3, 1, 0, 0];
-    /** parametrization of APR bonus */
+    /** parametrization of APR: (nft.level+[5]-[4])*[3]/[2]+[1]-[0] */
+    uint256[] private _alpha = [0, 0, 3, 1000, 0, 0];
+    /** parametrization of APR bonus: (age.year+[5]-[4])*[3]/[2]+[1]-[0] */
     uint256[] private _gamma = [0, 0, 1, 10, 0, 0];
     /** map of rewards claimed: account => nft-id => amount */
     mapping(address => mapping(uint256 => uint256)) private _claimed;
@@ -161,7 +161,7 @@ contract MoeTreasury is Supervised {
         uint256 denomination = _denominationOf(_levelOf(nftId));
         uint256 apr = aprOf(nftId);
         uint256 aprBonus = aprBonusOf(nftId);
-        uint256 reward = (apr * age * denomination) / 365_25 days;
+        uint256 reward = (apr * age * denomination) / (1_000 * 365_25 days);
         uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * 365_25 days);
         return (reward + rewardBonus) * 10**_moe.decimals();
     }
@@ -172,7 +172,7 @@ contract MoeTreasury is Supervised {
         uint256 denomination = _denominationOf(_levelOf(nftId));
         uint256 apr = aprOf(nftId);
         uint256 aprBonus = aprBonusOf(nftId);
-        uint256 reward = (apr * age * denomination) / 365_25 days;
+        uint256 reward = (apr * age * denomination) / (1_000 * 365_25 days);
         uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * 365_25 days);
         return (reward + rewardBonus) * 10**_moe.decimals();
     }
@@ -212,7 +212,7 @@ contract MoeTreasury is Supervised {
         _alpha = array;
     }
 
-    /** @return apr-bonus i.e. annual percentage permille rate (per nft.year) */
+    /** @return apr-bonus i.e. annual percentage rate (per nft.year) */
     function aprBonusOf(uint256 nftId) public view returns (uint256) {
         uint256 nowYear = _ppt.year();
         uint256 nftYear = _ppt.yearOf(nftId);

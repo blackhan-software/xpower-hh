@@ -79,7 +79,7 @@ describe("MoeTreasury", async function () {
   });
   describe("parametrization of APR", async function () {
     it("should get alpha array", async function () {
-      Expect(await moe_treasury.getAlpha()).to.equal([0, 0, 3, 1, 0, 0]);
+      Expect(await moe_treasury.getAlpha()).to.equal([0, 0, 3, 1000, 0, 0]);
     });
     it("should set alpha array", async function () {
       await moe_treasury.grantRole(moe_treasury.ALPHA_ROLE(), addresses[0]);
@@ -95,7 +95,7 @@ describe("MoeTreasury", async function () {
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAlpha()).to.equal([0, 0, 3, 1, 0, 0]);
+      Expect(await moe_treasury.getAlpha()).to.equal([0, 0, 3, 1000, 0, 0]);
     });
     it("should *not* set alpha array (account is missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
@@ -109,7 +109,7 @@ describe("MoeTreasury", async function () {
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAlpha()).to.equal([0, 0, 3, 1, 0, 0]);
+      Expect(await moe_treasury.getAlpha()).to.equal([0, 0, 3, 1000, 0, 0]);
     });
   });
   describe("parametrization of APR bonus", async function () {
