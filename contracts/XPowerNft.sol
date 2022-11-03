@@ -14,17 +14,17 @@ contract XPowerNft is XPowerNftBase {
     /** (Burnable) proof-of-work tokens */
     ERC20Burnable private _moe;
 
+    /** @param nftBase address of old contract */
+    /** @param moeLink address of contract for MOE tokens */
     /** @param uri meta-data URI */
-    /** @param base address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    /** @param moe address of contract for proof-of-work tokens */
     constructor(
+        address nftBase,
+        address moeLink,
         string memory uri,
-        address base,
-        uint256 deadlineIn,
-        address moe
-    ) XPowerNftBase(uri, base, deadlineIn) {
-        _moe = ERC20Burnable(moe);
+        uint256 deadlineIn
+    ) XPowerNftBase(nftBase, uri, deadlineIn) {
+        _moe = ERC20Burnable(moeLink);
     }
 
     /** mint particular amount of NFTs for given address and level */
@@ -35,7 +35,7 @@ contract XPowerNft is XPowerNftBase {
     ) public {
         uint256 moe = amount * denominationOf(level);
         require(moe > 0, "non-positive amount");
-        _moe.burnFrom(to, moe * (10 ** _moe.decimals()));
+        _moe.burnFrom(to, moe * (10**_moe.decimals()));
         _mint(to, idBy(year(), level), amount, "");
     }
 
@@ -51,7 +51,7 @@ contract XPowerNft is XPowerNftBase {
             require(delta > 0, "non-positive amount");
             moe += delta;
         }
-        _moe.burnFrom(to, moe * (10 ** _moe.decimals()));
+        _moe.burnFrom(to, moe * (10**_moe.decimals()));
         _mintBatch(to, idsBy(year(), levels), amounts, "");
     }
 }
@@ -62,11 +62,11 @@ contract XPowerNft is XPowerNftBase {
  */
 contract XPowerThorNft is XPowerNft {
     constructor(
+        address nftBase,
+        address moeLink,
         string memory uri,
-        address base,
-        uint256 deadlineIn,
-        address moe
-    ) XPowerNft(uri, base, deadlineIn, moe) {}
+        uint256 deadlineIn
+    ) XPowerNft(nftBase, moeLink, uri, deadlineIn) {}
 }
 
 /**
@@ -75,11 +75,11 @@ contract XPowerThorNft is XPowerNft {
  */
 contract XPowerLokiNft is XPowerNft {
     constructor(
+        address nftBase,
+        address moeLink,
         string memory uri,
-        address base,
-        uint256 deadlineIn,
-        address moe
-    ) XPowerNft(uri, base, deadlineIn, moe) {}
+        uint256 deadlineIn
+    ) XPowerNft(nftBase, moeLink, uri, deadlineIn) {}
 }
 
 /**
@@ -88,9 +88,9 @@ contract XPowerLokiNft is XPowerNft {
  */
 contract XPowerOdinNft is XPowerNft {
     constructor(
+        address nftBase,
+        address moeLink,
         string memory uri,
-        address base,
-        uint256 deadlineIn,
-        address moe
-    ) XPowerNft(uri, base, deadlineIn, moe) {}
+        uint256 deadlineIn
+    ) XPowerNft(nftBase, moeLink, uri, deadlineIn) {}
 }

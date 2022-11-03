@@ -14,13 +14,13 @@ contract NftTreasury is ERC1155Holder {
     /** normal proof-of-work NFTs */
     XPowerNft private _nft;
     /** staked proof-of-work NFTs */
-    XPowerNftStaked private _nftStaked;
+    XPowerNftStaked private _ppt;
 
-    /** @param nft address of contract for normal NFTs */
-    /** @param nftStaked address of contract for staked NFTs */
-    constructor(address nft, address nftStaked) {
-        _nft = XPowerNft(nft);
-        _nftStaked = XPowerNftStaked(nftStaked);
+    /** @param nftLink address of contract for normal NFTs */
+    /** @param pptLink address of contract for staked NFTs */
+    constructor(address nftLink, address pptLink) {
+        _nft = XPowerNft(nftLink);
+        _ppt = XPowerNftStaked(pptLink);
     }
 
     /** emitted on staking an NFT */
@@ -35,7 +35,7 @@ contract NftTreasury is ERC1155Holder {
         require(amount > 0, "non-positive amount");
         address self = (address)(this);
         _nft.safeTransferFrom(from, self, nftId, amount, "");
-        _nftStaked.mint(from, nftId, amount);
+        _ppt.mint(from, nftId, amount);
         emit Stake(from, nftId, amount);
     }
 
@@ -53,7 +53,7 @@ contract NftTreasury is ERC1155Holder {
         }
         address self = (address)(this);
         _nft.safeBatchTransferFrom(from, self, nftIds, amounts, "");
-        _nftStaked.mintBatch(from, nftIds, amounts);
+        _ppt.mintBatch(from, nftIds, amounts);
         emit StakeBatch(from, nftIds, amounts);
     }
 
@@ -68,7 +68,7 @@ contract NftTreasury is ERC1155Holder {
     ) public {
         require(amount > 0, "non-positive amount");
         address self = (address)(this);
-        _nftStaked.burn(from, nftId, amount);
+        _ppt.burn(from, nftId, amount);
         _nft.safeTransferFrom(self, from, nftId, amount, "");
         emit Unstake(from, nftId, amount);
     }
@@ -86,7 +86,7 @@ contract NftTreasury is ERC1155Holder {
             require(amounts[i] > 0, "non-positive amount");
         }
         address self = (address)(this);
-        _nftStaked.burnBatch(from, nftIds, amounts);
+        _ppt.burnBatch(from, nftIds, amounts);
         _nft.safeBatchTransferFrom(self, from, nftIds, amounts, "");
         emit UnstakeBatch(from, nftIds, amounts);
     }

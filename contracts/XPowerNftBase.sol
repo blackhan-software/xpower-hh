@@ -26,18 +26,18 @@ abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIM
     uint256 public constant ZETTA = 21;
     uint256 public constant YOTTA = 24;
 
+    /** @param nftBase address of old contract */
     /** @param uri meta-data URI */
-    /** @param base address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
+        address nftBase,
         string memory uri,
-        address base,
         uint256 deadlineIn
     )
         // ERC1155 constructor: meta-data URI
         ERC1155(uri)
         // MigratableNft: old contract, rel. deadline [seconds]
-        NftMigratable(base, deadlineIn)
+        NftMigratable(nftBase, deadlineIn)
     {}
 
     /** @return nft-id composed of (year, level) */

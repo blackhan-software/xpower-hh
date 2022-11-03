@@ -30,17 +30,17 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, Ownable {
     uint256[] private _delta = [0, 0, 4, 1, 0, 0];
 
     /** @param symbol short token symbol */
-    /** @param base address of old contract */
+    /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
         string memory symbol,
-        address base,
+        address moeBase,
         uint256 deadlineIn
     )
         // ERC20 constructor: name, symbol
         ERC20("XPower", symbol)
         // Migratable: old contract, rel. deadline [seconds]
-        Migratable(base, deadlineIn)
+        Migratable(moeBase, deadlineIn)
     {
         _timestamp = 0x6215621e; // 2022-02-22T22:22:22Z
     }
@@ -190,9 +190,9 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, Ownable {
  * amount equals to *only* |leading-zeros(nonce-hash) - difficulty|.
  */
 contract XPowerThor is XPower {
-    /** @param base address of old contract */
+    /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address base, uint256 deadlineIn) XPower("THOR", base, deadlineIn) {}
+    constructor(address moeBase, uint256 deadlineIn) XPower("THOR", moeBase, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
@@ -210,9 +210,9 @@ contract XPowerThor is XPower {
  * amount equals to 2 ^ |leading-zeros(nonce-hash) - difficulty| - 1.
  */
 contract XPowerLoki is XPower {
-    /** @param base address of old contract */
+    /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address base, uint256 deadlineIn) XPower("LOKI", base, deadlineIn) {}
+    constructor(address moeBase, uint256 deadlineIn) XPower("LOKI", moeBase, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
@@ -230,9 +230,9 @@ contract XPowerLoki is XPower {
  * amount equals to 16 ^ |leading-zeros(nonce-hash) - difficulty| - 1.
  */
 contract XPowerOdin is XPower {
-    /** @param base address of old contract */
+    /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address base, uint256 deadlineIn) XPower("ODIN", base, deadlineIn) {}
+    constructor(address moeBase, uint256 deadlineIn) XPower("ODIN", moeBase, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {

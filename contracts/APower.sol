@@ -18,21 +18,21 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     XPower private _moe;
 
     /** @param symbol short token symbol */
-    /** @param base address of old contract */
+    /** @param sovBase address of old contract */
+    /** @param moeLink address of contract for MOE tokens */
     /** @param deadlineIn seconds to end-of-migration */
-    /** @param moe address of contract for XPower tokens */
     constructor(
         string memory symbol,
-        address base,
-        uint256 deadlineIn,
-        address moe
+        address sovBase,
+        address moeLink,
+        uint256 deadlineIn
     )
         // ERC20 constructor: name, symbol
         ERC20("APower", symbol)
         // Migratable: old contract, rel. deadline [seconds]
-        Migratable(base, deadlineIn)
+        Migratable(sovBase, deadlineIn)
     {
-        _moe = XPower(moe);
+        _moe = XPower(moeLink);
     }
 
     /** mint amount of tokens for beneficiary (after wrapping XPower) */
@@ -58,34 +58,34 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
 }
 
 contract APowerThor is APower {
-    /** @param base address of old contract */
+    /** @param sovBase address of old contract */
+    /** @param moeLink address of contract for XPower tokens */
     /** @param deadlineIn seconds to end-of-migration */
-    /** @param moe address of contract for XPower tokens */
     constructor(
-        address base,
-        uint256 deadlineIn,
-        address moe
-    ) APower("aTHOR", base, deadlineIn, moe) {}
+        address sovBase,
+        address moeLink,
+        uint256 deadlineIn
+    ) APower("aTHOR", sovBase, moeLink, deadlineIn) {}
 }
 
 contract APowerLoki is APower {
     /** @param base address of old contract */
-    /** @param deadlineIn seconds to end-of-migration */
     /** @param moe address of contract for XPower tokens */
+    /** @param deadlineIn seconds to end-of-migration */
     constructor(
-        address base,
-        uint256 deadlineIn,
-        address moe
-    ) APower("aLOKI", base, deadlineIn, moe) {}
+        address sovBase,
+        address moeLink,
+        uint256 deadlineIn
+    ) APower("aLOKI", sovBase, moeLink, deadlineIn) {}
 }
 
 contract APowerOdin is APower {
-    /** @param base address of old contract */
+    /** @param sovBase address of old contract */
+    /** @param moeLink address of contract for XPower tokens */
     /** @param deadlineIn seconds to end-of-migration */
-    /** @param moe address of contract for XPower tokens */
     constructor(
-        address base,
-        uint256 deadlineIn,
-        address moe
-    ) APower("aODIN", base, deadlineIn, moe) {}
+        address sovBase,
+        address moeLink,
+        uint256 deadlineIn
+    ) APower("aODIN", sovBase, moeLink, deadlineIn) {}
 }

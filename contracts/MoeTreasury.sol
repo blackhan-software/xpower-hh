@@ -16,7 +16,7 @@ contract MoeTreasury is Supervised {
     /** (burnable) proof-of-work tokens */
     XPower private _moe;
     /** staked proof-of-work NFTs */
-    XPowerNftStaked private _nftStaked;
+    XPowerNftStaked private _ppt;
     /** parametrization of APR */
     uint256[] private _alpha = [0, 0, 3, 1, 0, 0];
     /** parametrization of APR bonus */
@@ -26,17 +26,17 @@ contract MoeTreasury is Supervised {
     /** map of rewards claimed total: nft-id => amount */
     mapping(uint256 => uint256) private _claimedTotal;
 
-    /** @param sov address of contract for APower tokens */
-    /** @param moe address of contract for XPower tokens */
-    /** @param nftStaked address of contract for staked NFTs */
+    /** @param sovLink address of contract for APower tokens */
+    /** @param moeLink address of contract for XPower tokens */
+    /** @param pptLink address of contract for staked NFTs */
     constructor(
-        address sov,
-        address moe,
-        address nftStaked
+        address sovLink,
+        address moeLink,
+        address pptLink
     ) {
-        _sov = APower(sov);
-        _moe = XPower(moe);
-        _nftStaked = XPowerNftStaked(nftStaked);
+        _sov = APower(sovLink);
+        _moe = XPower(moeLink);
+        _ppt = XPowerNftStaked(pptLink);
     }
 
     /** @return balance of available tokens */
@@ -197,7 +197,7 @@ contract MoeTreasury is Supervised {
 
     /** @return apr i.e. annual percentage rate (per nft.level) */
     function aprOf(uint256 nftId) public view returns (uint256) {
-        uint256 level = _nftStaked.levelOf(nftId);
+        uint256 level = _ppt.levelOf(nftId);
         return ((level + _alpha[5] - _alpha[4]) * _alpha[3]) / _alpha[2] + _alpha[1] - _alpha[0];
     }
 
@@ -214,8 +214,8 @@ contract MoeTreasury is Supervised {
 
     /** @return apr-bonus i.e. annual percentage permille rate (per nft.year) */
     function aprBonusOf(uint256 nftId) public view returns (uint256) {
-        uint256 nowYear = _nftStaked.year();
-        uint256 nftYear = _nftStaked.yearOf(nftId);
+        uint256 nowYear = _ppt.year();
+        uint256 nftYear = _ppt.yearOf(nftId);
         uint256 ageYear = nowYear > nftYear ? nowYear - nftYear : 0;
         return ((ageYear + _gamma[5] - _gamma[4]) * _gamma[3]) / _gamma[2] + _gamma[1] - _gamma[0];
     }
@@ -233,21 +233,21 @@ contract MoeTreasury is Supervised {
 
     /** @return age seconds for given account and nft-id */
     function _ageOf(address account, uint256 nftId) internal view returns (uint256) {
-        return _nftStaked.ageOf(account, nftId); // nft.balance * nft.average-age
+        return _ppt.ageOf(account, nftId); // nft.balance * nft.average-age
     }
 
     /** @return age total seconds for given nft-id */
     function _totalAgeOf(uint256 nftId) internal view returns (uint256) {
-        return _nftStaked.totalAgeOf(nftId); // nft.supply * nft.average-age
+        return _ppt.totalAgeOf(nftId); // nft.supply * nft.average-age
     }
 
     /** @return denomination value for given nft-level */
     function _denominationOf(uint256 nftLevel) internal view returns (uint256) {
-        return _nftStaked.denominationOf(nftLevel); // 1, 1K, 1M, 1G, ...
+        return _ppt.denominationOf(nftLevel); // 1, 1K, 1M, 1G, ...
     }
 
     /** @return level for given nft-id */
     function _levelOf(uint256 nftId) internal view returns (uint256) {
-        return _nftStaked.levelOf(nftId); // 0, 3, 6, 9, ...
+        return _ppt.levelOf(nftId); // 0, 3, 6, 9, ...
     }
 }
