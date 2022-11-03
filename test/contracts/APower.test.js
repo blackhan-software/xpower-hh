@@ -6,7 +6,7 @@ const { ethers, network } = require("hardhat");
 let accounts; // all accounts
 let addresses; // all addresses
 let APower, XPower; // contracts
-let apower_old, apower_new, xpower; // instances
+let apower, xpower; // instances
 let Nft, NftStaked, NftTreasury; // contracts
 let nft, nft_staked, nft_treasury; // instances
 let MoeTreasury; // contracts
@@ -21,7 +21,7 @@ const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const DAYS = 86_400; // [seconds]
 
-describe("APower Migration", async function () {
+describe("APower", async function () {
   beforeEach(async function () {
     await network.provider.send("hardhat_reset");
   });
@@ -61,17 +61,9 @@ describe("APower Migration", async function () {
   });
   beforeEach(async function () {
     // deploy old apower contract:
-    apower_old = await APower.deploy(NONE_ADDRESS, xpower.address, DEADLINE);
-    expect(apower_old).to.exist;
-    await apower_old.deployed();
-    // deploy new apower contract:
-    apower_new = await APower.deploy(
-      apower_old.address,
-      xpower.address,
-      DEADLINE
-    );
-    expect(apower_new).to.exist;
-    await apower_new.deployed();
+    apower = await APower.deploy(NONE_ADDRESS, xpower.address, DEADLINE);
+    expect(apower).to.exist;
+    await apower.deployed();
   });
   beforeEach(async function () {
     table = await new HashTable(xpower, addresses[0]).init({
@@ -97,7 +89,7 @@ describe("APower Migration", async function () {
     expect(nft_treasury).to.exist;
     await nft_treasury.deployed();
     moe_treasury = await MoeTreasury.deploy(
-      apower_old.address,
+      apower.address,
       xpower.address,
       nft_staked.address
     );
@@ -106,8 +98,8 @@ describe("APower Migration", async function () {
     mt = moe_treasury;
   });
   beforeEach(async function () {
-    await apower_old.transferOwnership(moe_treasury.address);
-    expect(await apower_old.owner()).to.eq(moe_treasury.address);
+    await apower.transferOwnership(moe_treasury.address);
+    expect(await apower.owner()).to.eq(moe_treasury.address);
   });
   beforeEach(async function () {
     while (true)
@@ -128,78 +120,70 @@ describe("APower Migration", async function () {
   beforeEach(async function () {
     await xpower.transfer(moe_treasury.address, 110n * UNUM);
   });
-  beforeEach(async function () {
+  it("should mint after 1st year", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
     // wait for +12 months: 1st year
-    await network.provider.send("evm_increaseTime", [365.25 * DAYS * 1.0]);
+    await network.provider.send("evm_increaseTime", [365.25 * DAYS * 1]);
     expect(await mt.claimFor(account, nft_id)).to.be.an("object");
     expect(await mt.rewardOf(account, nft_id)).to.eq(10n * UNUM);
-    expect(await mt.totalRewardOf(nft_id)).to.eq(10n * UNUM);
     expect(await mt.claimedFor(account, nft_id)).to.eq(10n * UNUM);
-    expect(await mt.totalClaimedFor(nft_id)).to.eq(10n * UNUM);
     expect(await mt.claimableFor(account, nft_id)).to.eq(0);
-    expect(await mt.totalClaimableFor(nft_id)).to.eq(0);
     expect(await mt.balance()).to.eq(100n * UNUM);
+    // check balances of aged tokens:
+    expect(await xpower.balanceOf(apower.address)).to.eq(10n * UNUM);
+    expect(await apower.balanceOf(account)).to.eq(10n * UNUM);
   });
-  it("should *not* migrate old => new (insufficient allowance)", async function () {
-    const tx = await apower_new.migrate(10n * UNUM).catch((ex) => {
-      const m = ex.message.match(/insufficient allowance/);
-      if (m === null) console.debug(ex);
-      expect(m).to.be.not.null;
+  it("should mint after 2nd year", async function () {
+    const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
+    // wait for +12 months: 1st year
+    await network.provider.send("evm_increaseTime", [365.25 * DAYS]);
+    expect(await mt.claimFor(account, nft_id)).to.be.an("object");
+    // check balances of aged tokens:
+    expect(await xpower.balanceOf(apower.address)).to.eq(10n * UNUM);
+    expect(await apower.balanceOf(account)).to.eq(10n * UNUM);
+    // wait for +12 months: 2nd year
+    await network.provider.send("evm_increaseTime", [365.25 * DAYS]);
+    expect(await mt.claimFor(account, nft_id)).to.be.an("object");
+    expect(await mt.rewardOf(account, nft_id)).to.eq(20n * UNUM);
+    expect(await mt.claimedFor(account, nft_id)).to.eq(20n * UNUM);
+    expect(await mt.claimableFor(account, nft_id)).to.eq(0);
+    expect(await mt.balance()).to.eq(90n * UNUM);
+    // check balances of aged tokens:
+    expect(await xpower.balanceOf(apower.address)).to.eq(20n * UNUM);
+    expect(await apower.balanceOf(account)).to.eq(20n * UNUM);
+  });
+  it("should mint after 3rd year", async function () {
+    const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
+    // wait for +12 months: 1st year
+    await network.provider.send("evm_increaseTime", [365.25 * DAYS]);
+    expect(await mt.claimFor(account, nft_id)).to.be.an("object");
+    // check balances of aged tokens:
+    expect(await xpower.balanceOf(apower.address)).to.eq(10n * UNUM);
+    expect(await apower.balanceOf(account)).to.eq(10n * UNUM);
+    // wait for +12 months: 2nd year
+    await network.provider.send("evm_increaseTime", [365.25 * DAYS]);
+    expect(await mt.claimFor(account, nft_id)).to.be.an("object");
+    // check balances of aged tokens:
+    expect(await xpower.balanceOf(apower.address)).to.eq(20n * UNUM);
+    expect(await apower.balanceOf(account)).to.eq(20n * UNUM);
+    // wait for +12 months: 3rd year
+    await network.provider.send("evm_increaseTime", [365.25 * DAYS]);
+    expect(await mt.claimFor(account, nft_id)).to.be.an("object");
+    expect(await mt.rewardOf(account, nft_id)).to.eq(30n * UNUM);
+    expect(await mt.claimedFor(account, nft_id)).to.eq(30n * UNUM);
+    expect(await mt.claimableFor(account, nft_id)).to.eq(0);
+    expect(await mt.balance()).to.eq(80n * UNUM);
+    // check balances of aged tokens:
+    expect(await xpower.balanceOf(apower.address)).to.eq(30n * UNUM);
+    expect(await apower.balanceOf(account)).to.eq(30n * UNUM);
+  });
+  describe("supportsInterface", function () {
+    it("should support IERC165 interface", async function () {
+      expect(await apower.supportsInterface(0x01ffc9a7)).to.eq(true);
     });
-    expect(tx).to.eq(undefined);
-    const new_migrated = await apower_new.migrated();
-    expect(new_migrated).to.eq(0);
-  });
-  it("should *not* migrate old => new (insufficient balance)", async function () {
-    await apower_old.increaseAllowance(apower_new.address, 51n * UNUM);
-    const tx = await apower_new.migrate(51n * UNUM).catch((ex) => {
-      const m = ex.message.match(/insufficient balance/);
-      if (m === null) console.debug(ex);
-      expect(m).to.be.not.null;
+    it("should support IAccessControl interface", async function () {
+      expect(await apower.supportsInterface(0x7965db0b)).to.eq(true);
     });
-    expect(tx).to.eq(undefined);
-    const new_migrated = await apower_new.migrated();
-    expect(new_migrated).to.eq(0);
-  });
-  it("should migrate old => new", async function () {
-    await apower_old.increaseAllowance(apower_new.address, 10n * UNUM);
-    await apower_new.migrate(10);
-  });
-  it("should *not* migrate old => new (migration sealed)", async function () {
-    await apower_new.grantRole(apower_new.SOV_SEAL_ROLE(), addresses[0]);
-    await apower_new.seal();
-    await apower_old.increaseAllowance(apower_new.address, 10n * UNUM);
-    const tx = await apower_new.migrate(10n * UNUM).catch((ex) => {
-      const m = ex.message.match(/migration sealed/);
-      if (m === null) console.debug(ex);
-      expect(m).to.be.not.null;
-    });
-    expect(tx).to.eq(undefined);
-    const new_migrated = await apower_new.migrated();
-    expect(new_migrated).to.eq(0);
-  });
-  it("should *not* seal new (account is missing role)", async function () {
-    const tx = await apower_new.seal().catch((ex) => {
-      const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
-      if (m === null) console.debug(ex);
-      expect(m).to.be.not.null;
-    });
-    expect(tx).to.eq(undefined);
-    const new_migrated = await apower_new.migrated();
-    expect(new_migrated).to.eq(0);
-  });
-  it("should *not* migrate old => new (deadline passed)", async function () {
-    await network.provider.send("evm_increaseTime", [126_230_400]);
-    await apower_old.increaseAllowance(apower_new.address, 10n * UNUM);
-    const tx = await apower_new.migrate(10n * UNUM).catch((ex) => {
-      const m = ex.message.match(/deadline passed/);
-      if (m === null) console.debug(ex);
-      expect(m).to.be.not.null;
-    });
-    expect(tx).to.eq(undefined);
-    const new_migrated = await apower_new.migrated();
-    expect(new_migrated).to.eq(0);
   });
 });
 async function mintToken(amount) {

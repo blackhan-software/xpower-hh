@@ -29,7 +29,7 @@ describe("XPowerNftStaked", async function () {
     expect(NftStaked).to.exist;
   });
   beforeEach(async function () {
-    nft_staked = await NftStaked.deploy(NFT_LOKI_URL, NONE_ADDRESS, DEADLINE);
+    nft_staked = await NftStaked.deploy(NONE_ADDRESS, NFT_LOKI_URL, DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });
@@ -454,6 +454,9 @@ describe("XPowerNftStaked", async function () {
     });
   });
   describe("supportsInterface", function () {
+    it("should support IERC165 interface", async function () {
+      expect(await nft_staked.supportsInterface(0x01ffc9a7)).to.eq(true);
+    });
     it("should support IERC1155 interface", async function () {
       expect(await nft_staked.supportsInterface(0xd9b67a26)).to.eq(true);
     });

@@ -57,10 +57,10 @@ describe("XPowerNft", async function () {
   });
   beforeEach(async function () {
     xpower_nft = await XPowerNft.deploy(
-      NFT_LOKI_URL,
       NONE_ADDRESS,
-      DEADLINE,
-      xpower.address
+      xpower.address,
+      NFT_LOKI_URL,
+      DEADLINE
     );
     expect(xpower_nft).to.exist;
     await xpower_nft.deployed();
@@ -217,6 +217,9 @@ describe("XPowerNft", async function () {
     });
   });
   describe("supportsInterface", function () {
+    it("should support IERC165 interface", async function () {
+      expect(await xpower_nft.supportsInterface(0x01ffc9a7)).to.eq(true);
+    });
     it("should support IERC1155 interface", async function () {
       expect(await xpower_nft.supportsInterface(0xd9b67a26)).to.eq(true);
     });
@@ -252,7 +255,7 @@ async function mintXPowNft(unit, amount) {
   await xpower_nft.mint(addresses[0], unit, amount);
   const new_balance = await xpower.balanceOf(addresses[0]);
   expect(old_balance.sub(new_balance)).to.eq(
-    BigInt(amount) * 10n ** (BigInt(unit)) * UNUM
+    BigInt(amount) * 10n ** BigInt(unit) * UNUM
   );
   const nft_id = (await xpower_nft.idBy(year, unit)).toNumber();
   expect(nft_id).to.be.greaterThan(0);
@@ -272,7 +275,7 @@ async function mintBatchXPowNft(unit, amount) {
   await xpower_nft.mintBatch(addresses[0], [unit], [amount]);
   const new_balance = await xpower.balanceOf(addresses[0]);
   expect(old_balance.sub(new_balance)).to.eq(
-    BigInt(amount) * 10n ** (BigInt(unit)) * UNUM
+    BigInt(amount) * 10n ** BigInt(unit) * UNUM
   );
   const nft_ids = await xpower_nft.idsBy(year, [unit]);
   expect(nft_ids.length).to.be.greaterThan(0);

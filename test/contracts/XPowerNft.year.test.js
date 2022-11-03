@@ -39,10 +39,10 @@ describe("XPowerNft", async function () {
   });
   beforeEach(async function () {
     xpower_nft = await XPowerNft.deploy(
-      NFT_LOKI_URL,
       NONE_ADDRESS,
-      DEADLINE,
-      xpower.address
+      xpower.address,
+      NFT_LOKI_URL,
+      DEADLINE
     );
     expect(xpower_nft).to.exist;
     await xpower_nft.deployed();

@@ -57,14 +57,14 @@ describe("NftTreasury", async function () {
   });
   beforeEach(async function () {
     nft = await Nft.deploy(
-      NFT_LOKI_URL,
       NONE_ADDRESS,
-      DEADLINE,
-      xpower.address
+      xpower.address,
+      NFT_LOKI_URL,
+      DEADLINE
     );
     expect(nft).to.exist;
     await nft.deployed();
-    nft_staked = await NftStaked.deploy(NFT_LOKI_URL, NONE_ADDRESS, DEADLINE);
+    nft_staked = await NftStaked.deploy(NONE_ADDRESS, NFT_LOKI_URL, DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
     nft_treasury = await NftTreasury.deploy(nft.address, nft_staked.address);
