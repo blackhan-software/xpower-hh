@@ -216,17 +216,6 @@ describe("XPowerNft", async function () {
       ).to.eq(undefined);
     });
   });
-  describe("supportsInterface", function () {
-    it("should support IERC165 interface", async function () {
-      expect(await xpower_nft.supportsInterface(0x01ffc9a7)).to.eq(true);
-    });
-    it("should support IERC1155 interface", async function () {
-      expect(await xpower_nft.supportsInterface(0xd9b67a26)).to.eq(true);
-    });
-    it("should support IAccessControl interface", async function () {
-      expect(await xpower_nft.supportsInterface(0x7965db0b)).to.eq(true);
-    });
-  });
 });
 async function increaseAllowanceBy(amount) {
   const [owner, spender] = [addresses[0], xpower_nft.address];

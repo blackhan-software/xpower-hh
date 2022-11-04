@@ -60,7 +60,6 @@ describe("APower", async function () {
     expect(UNUM >= 1n).to.be.true;
   });
   beforeEach(async function () {
-    // deploy old apower contract:
     apower = await APower.deploy(NONE_ADDRESS, xpower.address, DEADLINE);
     expect(apower).to.exist;
     await apower.deployed();
@@ -176,14 +175,6 @@ describe("APower", async function () {
     // check balances of aged tokens:
     expect(await xpower.balanceOf(apower.address)).to.eq(30n * UNUM);
     expect(await apower.balanceOf(account)).to.eq(30n * UNUM);
-  });
-  describe("supportsInterface", function () {
-    it("should support IERC165 interface", async function () {
-      expect(await apower.supportsInterface(0x01ffc9a7)).to.eq(true);
-    });
-    it("should support IAccessControl interface", async function () {
-      expect(await apower.supportsInterface(0x7965db0b)).to.eq(true);
-    });
   });
 });
 async function mintToken(amount) {

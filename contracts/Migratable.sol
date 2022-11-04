@@ -64,7 +64,10 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
 
     /** returns true if this contract implements the interface defined by interfaceId. */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return super.supportsInterface(interfaceId);
+        return
+            interfaceId == type(IERC20).interfaceId ||
+            interfaceId == type(IERC20Metadata).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 }
 

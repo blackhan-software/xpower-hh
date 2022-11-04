@@ -276,12 +276,4 @@ describe("XPower", async function () {
       );
     });
   });
-  describe("supportsInterface", function () {
-    it("should support IERC165 interface", async function () {
-      expect(await xpower.supportsInterface(0x01ffc9a7)).to.eq(true);
-    });
-    it("should support IAccessControl interface", async function () {
-      expect(await xpower.supportsInterface(0x7965db0b)).to.eq(true);
-    });
-  });
 });
