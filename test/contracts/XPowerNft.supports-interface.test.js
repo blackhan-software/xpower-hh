@@ -38,7 +38,12 @@ describe("XPowerNft", async function () {
     await xpower.deployed();
   });
   before(async function () {
-    nft = await Nft.deploy(NONE_ADDRESS, xpower.address, NFT_ODIN_URL, DEADLINE);
+    nft = await Nft.deploy(
+      NONE_ADDRESS,
+      xpower.address,
+      NFT_ODIN_URL,
+      DEADLINE
+    );
     expect(nft).to.exist;
     await nft.deployed();
   });

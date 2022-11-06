@@ -27,11 +27,7 @@ contract NftTreasury is ERC1155Holder {
     event Stake(address from, uint256 nftId, uint256 amount);
 
     /** stake NFT for given address and amount */
-    function stake(
-        address from,
-        uint256 nftId,
-        uint256 amount
-    ) public {
+    function stake(address from, uint256 nftId, uint256 amount) public {
         require(amount > 0, "non-positive amount");
         address self = (address)(this);
         _nft.safeTransferFrom(from, self, nftId, amount, "");
@@ -43,11 +39,7 @@ contract NftTreasury is ERC1155Holder {
     event StakeBatch(address from, uint256[] nftIds, uint256[] amounts);
 
     /** stake NFTs for given address and amounts */
-    function stakeBatch(
-        address from,
-        uint256[] memory nftIds,
-        uint256[] memory amounts
-    ) public {
+    function stakeBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public {
         for (uint256 i = 0; i < amounts.length; i++) {
             require(amounts[i] > 0, "non-positive amount");
         }
@@ -61,11 +53,7 @@ contract NftTreasury is ERC1155Holder {
     event Unstake(address from, uint256 nftId, uint256 amount);
 
     /** unstake NFT for given address and amount */
-    function unstake(
-        address from,
-        uint256 nftId,
-        uint256 amount
-    ) public {
+    function unstake(address from, uint256 nftId, uint256 amount) public {
         require(amount > 0, "non-positive amount");
         address self = (address)(this);
         _ppt.burn(from, nftId, amount);
@@ -77,11 +65,7 @@ contract NftTreasury is ERC1155Holder {
     event UnstakeBatch(address from, uint256[] nftIds, uint256[] amounts);
 
     /** unstake NFTs for given address and amounts */
-    function unstakeBatch(
-        address from,
-        uint256[] memory nftIds,
-        uint256[] memory amounts
-    ) public {
+    function unstakeBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public {
         for (uint256 i = 0; i < amounts.length; i++) {
             require(amounts[i] > 0, "non-positive amount");
         }

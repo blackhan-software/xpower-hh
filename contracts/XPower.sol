@@ -59,11 +59,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, Ownable {
     }
 
     /** mint tokens for beneficiary, interval, block-hash and nonce */
-    function mint(
-        address to,
-        bytes32 blockHash,
-        uint256 nonce
-    ) public {
+    function mint(address to, bytes32 blockHash, uint256 nonce) public {
         // get current interval (in hours)
         uint256 interval = _interval();
         // check block-hash to be recent
@@ -199,7 +195,7 @@ contract XPowerThor is XPower {
         uint256 difficulty = difficultyFor(block.timestamp);
         uint256 zeros = _zerosOf(nonceHash);
         if (zeros > difficulty) {
-            return (zeros - difficulty) * 10**decimals();
+            return (zeros - difficulty) * 10 ** decimals();
         }
         return 0;
     }
@@ -219,7 +215,7 @@ contract XPowerLoki is XPower {
         uint256 difficulty = difficultyFor(block.timestamp);
         uint256 zeros = _zerosOf(nonceHash);
         if (zeros > difficulty) {
-            return (2**(zeros - difficulty) - 1) * 10**decimals();
+            return (2 ** (zeros - difficulty) - 1) * 10 ** decimals();
         }
         return 0;
     }
@@ -239,7 +235,7 @@ contract XPowerOdin is XPower {
         uint256 difficulty = difficultyFor(block.timestamp);
         uint256 zeros = _zerosOf(nonceHash);
         if (zeros > difficulty) {
-            return (16**(zeros - difficulty) - 1) * 10**decimals();
+            return (16 ** (zeros - difficulty) - 1) * 10 ** decimals();
         }
         return 0;
     }

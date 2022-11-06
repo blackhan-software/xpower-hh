@@ -42,7 +42,7 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         require(newBalance + oldAmount == oldBalance, "invalid balance");
         require(decimals() >= _token.decimals(), "invalid decimals");
         uint8 deltaExponent = decimals() - _token.decimals();
-        uint256 newAmount = oldAmount * 10**deltaExponent;
+        uint256 newAmount = oldAmount * 10 ** deltaExponent;
         _mint(msg.sender, newAmount);
         _incrementCounter(newAmount);
     }

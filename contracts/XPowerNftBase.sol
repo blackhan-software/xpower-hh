@@ -61,7 +61,7 @@ abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIM
     function denominationOf(uint256 level) public pure returns (uint256) {
         require(level % 3 == 0, "non-ternary level");
         require(level < 100, "invalid level");
-        return 10**level;
+        return 10 ** level;
     }
 
     /** @return level of nft-id (0, 3, 6, ...) */
@@ -99,13 +99,9 @@ abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIM
     }
 
     /** returns true if this contract implements the interface defined by interfaceId. */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC1155, NftMigratable, URIMalleable)
-        returns (bool)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(ERC1155, NftMigratable, URIMalleable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }

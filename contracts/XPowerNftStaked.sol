@@ -22,11 +22,7 @@ abstract contract XPowerNftStaked is XPowerNftBase {
     /** @param pptBase address of old contract */
     /** @param uri meta-data URI */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(
-        address pptBase,
-        string memory uri,
-        uint256 deadlineIn
-    ) XPowerNftBase(pptBase, uri, deadlineIn) {}
+    constructor(address pptBase, string memory uri, uint256 deadlineIn) XPowerNftBase(pptBase, uri, deadlineIn) {}
 
     /** transfer tokens (and reset age) */
     function safeTransferFrom(
@@ -55,41 +51,25 @@ abstract contract XPowerNftStaked is XPowerNftBase {
     }
 
     /** mint particular amount of staked NFTs for given address and nft-id */
-    function mint(
-        address to,
-        uint256 nftId,
-        uint256 amount
-    ) public onlyOwner {
+    function mint(address to, uint256 nftId, uint256 amount) public onlyOwner {
         _pushMint(to, nftId, amount);
         _mint(to, nftId, amount, "");
     }
 
     /** mint particular amounts of staked NFTs for given address and nft-ids */
-    function mintBatch(
-        address to,
-        uint256[] memory nftIds,
-        uint256[] memory amounts
-    ) public onlyOwner {
+    function mintBatch(address to, uint256[] memory nftIds, uint256[] memory amounts) public onlyOwner {
         _pushMintBatch(to, nftIds, amounts);
         _mintBatch(to, nftIds, amounts, "");
     }
 
     /** burn particular amount of staked NFTs for given address and nft-id */
-    function burn(
-        address from,
-        uint256 nftId,
-        uint256 amount
-    ) public override onlyOwner {
+    function burn(address from, uint256 nftId, uint256 amount) public override onlyOwner {
         _pushBurn(from, nftId, amount);
         _burn(from, nftId, amount);
     }
 
     /** burn particular amounts of staked NFTs for given address and nft-ids */
-    function burnBatch(
-        address from,
-        uint256[] memory nftIds,
-        uint256[] memory amounts
-    ) public override onlyOwner {
+    function burnBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public override onlyOwner {
         _pushBurnBatch(from, nftIds, amounts);
         _burnBatch(from, nftIds, amounts);
     }
@@ -119,22 +99,14 @@ abstract contract XPowerNftStaked is XPowerNftBase {
     }
 
     /** remember mint action */
-    function _pushMint(
-        address account,
-        uint256 nftId,
-        uint256 amount
-    ) internal {
+    function _pushMint(address account, uint256 nftId, uint256 amount) internal {
         require(amount > 0, "non-positive amount");
         _mints[account][nftId] += amount * block.timestamp;
         _mintsTotal[nftId] += amount * block.timestamp;
     }
 
     /** remember mint actions */
-    function _pushMintBatch(
-        address account,
-        uint256[] memory nftIds,
-        uint256[] memory amounts
-    ) internal {
+    function _pushMintBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) internal {
         assert(nftIds.length == amounts.length);
         for (uint256 i = 0; i < nftIds.length; i++) {
             _pushMint(account, nftIds[i], amounts[i]);
@@ -142,22 +114,14 @@ abstract contract XPowerNftStaked is XPowerNftBase {
     }
 
     /** remember burn action */
-    function _pushBurn(
-        address account,
-        uint256 nftId,
-        uint256 amount
-    ) internal {
+    function _pushBurn(address account, uint256 nftId, uint256 amount) internal {
         require(amount > 0, "non-positive amount");
         _burns[account][nftId] += amount * block.timestamp;
         _burnsTotal[nftId] += amount * block.timestamp;
     }
 
     /** remember burn actions */
-    function _pushBurnBatch(
-        address account,
-        uint256[] memory nftIds,
-        uint256[] memory amounts
-    ) internal {
+    function _pushBurnBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) internal {
         assert(nftIds.length == amounts.length);
         for (uint256 i = 0; i < nftIds.length; i++) {
             _pushBurn(account, nftIds[i], amounts[i]);
@@ -172,11 +136,7 @@ contract XPowerThorNftStaked is XPowerNftStaked {
     /** @param pptBase address of old contract */
     /** @param uri meta-data URI */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(
-        address pptBase,
-        string memory uri,
-        uint256 deadlineIn
-    ) XPowerNftStaked(pptBase, uri, deadlineIn) {}
+    constructor(address pptBase, string memory uri, uint256 deadlineIn) XPowerNftStaked(pptBase, uri, deadlineIn) {}
 }
 
 /**
@@ -186,11 +146,7 @@ contract XPowerLokiNftStaked is XPowerNftStaked {
     /** @param pptBase address of old contract */
     /** @param uri meta-data URI */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(
-        address nftBse,
-        string memory uri,
-        uint256 deadlineIn
-    ) XPowerNftStaked(nftBse, uri, deadlineIn) {}
+    constructor(address nftBse, string memory uri, uint256 deadlineIn) XPowerNftStaked(nftBse, uri, deadlineIn) {}
 }
 
 /**
@@ -200,9 +156,5 @@ contract XPowerOdinNftStaked is XPowerNftStaked {
     /** @param pptBase address of old contract */
     /** @param uri meta-data URI */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(
-        address pptBase,
-        string memory uri,
-        uint256 deadlineIn
-    ) XPowerNftStaked(pptBase, uri, deadlineIn) {}
+    constructor(address pptBase, string memory uri, uint256 deadlineIn) XPowerNftStaked(pptBase, uri, deadlineIn) {}
 }

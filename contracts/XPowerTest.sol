@@ -16,12 +16,7 @@ contract XPowerThorTest is XPowerThor {
         _timestamps[_blockHash] = block.timestamp;
     }
 
-    function hashOf(
-        address _to,
-        uint256 _interval,
-        bytes32 _blockHash,
-        uint256 _nonce
-    ) public view returns (bytes32) {
+    function hashOf(address _to, uint256 _interval, bytes32 _blockHash, uint256 _nonce) public view returns (bytes32) {
         return _hashOf(_to, _interval, _blockHash, _nonce);
     }
 
@@ -54,12 +49,7 @@ contract XPowerLokiTest is XPowerLoki {
         _timestamps[_blockHash] = block.timestamp;
     }
 
-    function hashOf(
-        address _to,
-        uint256 _interval,
-        bytes32 _blockHash,
-        uint256 _nonce
-    ) public view returns (bytes32) {
+    function hashOf(address _to, uint256 _interval, bytes32 _blockHash, uint256 _nonce) public view returns (bytes32) {
         return _hashOf(_to, _interval, _blockHash, _nonce);
     }
 
@@ -92,12 +82,7 @@ contract XPowerOdinTest is XPowerOdin {
         _timestamps[_blockHash] = block.timestamp;
     }
 
-    function hashOf(
-        address _to,
-        uint256 _interval,
-        bytes32 _blockHash,
-        uint256 _nonce
-    ) public view returns (bytes32) {
+    function hashOf(address _to, uint256 _interval, bytes32 _blockHash, uint256 _nonce) public view returns (bytes32) {
         return _hashOf(_to, _interval, _blockHash, _nonce);
     }
 

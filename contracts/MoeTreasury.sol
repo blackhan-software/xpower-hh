@@ -29,11 +29,7 @@ contract MoeTreasury is Supervised {
     /** @param sovLink address of contract for APower tokens */
     /** @param moeLink address of contract for XPower tokens */
     /** @param pptLink address of contract for staked NFTs */
-    constructor(
-        address sovLink,
-        address moeLink,
-        address pptLink
-    ) {
+    constructor(address sovLink, address moeLink, address pptLink) {
         _sov = APower(sovLink);
         _moe = XPower(moeLink);
         _ppt = XPowerNftStaked(pptLink);
@@ -163,7 +159,7 @@ contract MoeTreasury is Supervised {
         uint256 aprBonus = aprBonusOf(nftId);
         uint256 reward = (apr * age * denomination) / (1_000 * 365_25 days);
         uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * 365_25 days);
-        return (reward + rewardBonus) * 10**_moe.decimals();
+        return (reward + rewardBonus) * 10 ** _moe.decimals();
     }
 
     /** @return reward total of tokens for given nft-id */
@@ -174,7 +170,7 @@ contract MoeTreasury is Supervised {
         uint256 aprBonus = aprBonusOf(nftId);
         uint256 reward = (apr * age * denomination) / (1_000 * 365_25 days);
         uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * 365_25 days);
-        return (reward + rewardBonus) * 10**_moe.decimals();
+        return (reward + rewardBonus) * 10 ** _moe.decimals();
     }
 
     /** @return reward of tokens for given account and nft-ids */

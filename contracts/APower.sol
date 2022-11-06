@@ -61,31 +61,19 @@ contract APowerThor is APower {
     /** @param sovBase address of old contract */
     /** @param moeLink address of contract for XPower tokens */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(
-        address sovBase,
-        address moeLink,
-        uint256 deadlineIn
-    ) APower("aTHOR", sovBase, moeLink, deadlineIn) {}
+    constructor(address sovBase, address moeLink, uint256 deadlineIn) APower("aTHOR", sovBase, moeLink, deadlineIn) {}
 }
 
 contract APowerLoki is APower {
     /** @param base address of old contract */
     /** @param moe address of contract for XPower tokens */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(
-        address sovBase,
-        address moeLink,
-        uint256 deadlineIn
-    ) APower("aLOKI", sovBase, moeLink, deadlineIn) {}
+    constructor(address sovBase, address moeLink, uint256 deadlineIn) APower("aLOKI", sovBase, moeLink, deadlineIn) {}
 }
 
 contract APowerOdin is APower {
     /** @param sovBase address of old contract */
     /** @param moeLink address of contract for XPower tokens */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(
-        address sovBase,
-        address moeLink,
-        uint256 deadlineIn
-    ) APower("aODIN", sovBase, moeLink, deadlineIn) {}
+    constructor(address sovBase, address moeLink, uint256 deadlineIn) APower("aODIN", sovBase, moeLink, deadlineIn) {}
 }

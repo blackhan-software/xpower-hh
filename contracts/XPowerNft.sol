@@ -28,30 +28,22 @@ contract XPowerNft is XPowerNftBase {
     }
 
     /** mint particular amount of NFTs for given address and level */
-    function mint(
-        address to,
-        uint256 level,
-        uint256 amount
-    ) public {
+    function mint(address to, uint256 level, uint256 amount) public {
         uint256 moe = amount * denominationOf(level);
         require(moe > 0, "non-positive amount");
-        _moe.burnFrom(to, moe * (10**_moe.decimals()));
+        _moe.burnFrom(to, moe * (10 ** _moe.decimals()));
         _mint(to, idBy(year(), level), amount, "");
     }
 
     /** mint particular amounts of NFTs for given address and levels */
-    function mintBatch(
-        address to,
-        uint256[] memory levels,
-        uint256[] memory amounts
-    ) public {
+    function mintBatch(address to, uint256[] memory levels, uint256[] memory amounts) public {
         uint256 moe = 0;
         for (uint256 i = 0; i < levels.length; i++) {
             uint256 delta = amounts[i] * denominationOf(levels[i]);
             require(delta > 0, "non-positive amount");
             moe += delta;
         }
-        _moe.burnFrom(to, moe * (10**_moe.decimals()));
+        _moe.burnFrom(to, moe * (10 ** _moe.decimals()));
         _mintBatch(to, idsBy(year(), levels), amounts, "");
     }
 }
