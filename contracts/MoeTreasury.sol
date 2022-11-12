@@ -10,7 +10,7 @@ import "./Supervised.sol";
 /**
  * Treasury to claim (MoE) tokens for staked XPowerNft(s).
  */
-contract MoeTreasury is Supervised {
+contract MoeTreasury is MoeTreasurySupervised {
     /** (burnable) *aged* XPower tokens */
     APower private _sov;
     /** (burnable) proof-of-work tokens */
@@ -18,9 +18,9 @@ contract MoeTreasury is Supervised {
     /** staked proof-of-work NFTs */
     XPowerNftStaked private _ppt;
     /** parametrization of APR: (nft.level+[5]-[4])*[3]/[2]+[1]-[0] */
-    uint256[] private _alpha = [0, 0, 3, 1000, 0, 0];
+    uint256[] private _apr = [0, 0, 3, 1000, 0, 0];
     /** parametrization of APR bonus: (age.year+[5]-[4])*[3]/[2]+[1]-[0] */
-    uint256[] private _gamma = [0, 0, 1, 10, 0, 0];
+    uint256[] private _bonus = [0, 0, 1, 10, 0, 0];
     /** map of rewards claimed: account => nft-id => amount */
     mapping(address => mapping(uint256 => uint256)) private _claimed;
     /** map of rewards claimed total: nft-id => amount */
@@ -194,18 +194,18 @@ contract MoeTreasury is Supervised {
     /** @return apr i.e. annual percentage rate (per nft.level) */
     function aprOf(uint256 nftId) public view returns (uint256) {
         uint256 level = _ppt.levelOf(nftId);
-        return ((level + _alpha[5] - _alpha[4]) * _alpha[3]) / _alpha[2] + _alpha[1] - _alpha[0];
+        return ((level + _apr[5] - _apr[4]) * _apr[3]) / _apr[2] + _apr[1] - _apr[0];
     }
 
-    /** @return apr parameters */
-    function getAlpha() public view returns (uint256[] memory) {
-        return _alpha;
+    /** @return apr-parameters */
+    function getAPRParameters() public view returns (uint256[] memory) {
+        return _apr;
     }
 
-    /** set apr parameters */
-    function setAlpha(uint256[] memory array) public onlyRole(ALPHA_ROLE) {
+    /** set apr-parameters */
+    function setAPRParameters(uint256[] memory array) public onlyRole(APR_ROLE) {
         require(array.length == 6, "invalid array.length");
-        _alpha = array;
+        _apr = array;
     }
 
     /** @return apr-bonus i.e. annual percentage rate (per nft.year) */
@@ -213,18 +213,18 @@ contract MoeTreasury is Supervised {
         uint256 nowYear = _ppt.year();
         uint256 nftYear = _ppt.yearOf(nftId);
         uint256 ageYear = nowYear > nftYear ? nowYear - nftYear : 0;
-        return ((ageYear + _gamma[5] - _gamma[4]) * _gamma[3]) / _gamma[2] + _gamma[1] - _gamma[0];
+        return ((ageYear + _bonus[5] - _bonus[4]) * _bonus[3]) / _bonus[2] + _bonus[1] - _bonus[0];
     }
 
     /** @return apr-bonus parameters */
-    function getGamma() public view returns (uint256[] memory) {
-        return _gamma;
+    function getAPRBonusParameters() public view returns (uint256[] memory) {
+        return _bonus;
     }
 
     /** set apr-bonus parameters */
-    function setGamma(uint256[] memory array) public onlyRole(GAMMA_ROLE) {
+    function setAPRBonusParameters(uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
         require(array.length == 6, "invalid array.length");
-        _gamma = array;
+        _bonus = array;
     }
 
     /** @return age seconds for given account and nft-id */

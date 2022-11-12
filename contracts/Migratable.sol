@@ -43,8 +43,8 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         require(decimals() >= _token.decimals(), "invalid decimals");
         uint8 deltaExponent = decimals() - _token.decimals();
         uint256 newAmount = oldAmount * 10 ** deltaExponent;
-        _mint(msg.sender, newAmount);
         _incrementCounter(newAmount);
+        _mint(msg.sender, newAmount);
     }
 
     /** @return number of migrated tokens */
@@ -62,7 +62,7 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         _migratedTotal += amount;
     }
 
-    /** returns true if this contract implements the interface defined by interfaceId. */
+    /** returns true if this contract implements the interface defined by interfaceId */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return
             interfaceId == type(IERC20).interfaceId ||
@@ -74,17 +74,29 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
 /**
  * Allows migration of MOE tokens from an old contract upto a certain deadline.
  */
-abstract contract MoeMigratable is Migratable {
+abstract contract MoeMigratable is Migratable, MoeMigratableSupervised {
+    /** seal migration (manually) */
     function seal() public override onlyRole(MOE_SEAL_ROLE) {
         super.seal();
+    }
+
+    /** returns true if this contract implements the interface defined by interfaceId */
+    function supportsInterface(bytes4 interfaceId) public view virtual override(Migratable, Supervised) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 }
 
 /**
  * Allows migration of SOV tokens from an old contract upto a certain deadline.
  */
-abstract contract SovMigratable is Migratable {
+abstract contract SovMigratable is Migratable, SovMigratableSupervised {
+    /** seal migration (manually) */
     function seal() public override onlyRole(SOV_SEAL_ROLE) {
         super.seal();
+    }
+
+    /** returns true if this contract implements the interface defined by interfaceId */
+    function supportsInterface(bytes4 interfaceId) public view virtual override(Migratable, Supervised) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 }

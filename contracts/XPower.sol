@@ -16,7 +16,7 @@ import "./Migratable.sol";
  * (as specified by the sub-classes). After the verification, the corresponding
  * amount of tokens are minted for the beneficiary (plus the treasury).
  */
-abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, Ownable {
+abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervised, Ownable {
     using EnumerableSet for EnumerableSet.UintSet;
     /** set of nonce-hashes already minted for */
     EnumerableSet.UintSet private _hashes;
@@ -25,9 +25,9 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, Ownable {
     /** anchor for difficulty calculation */
     uint256 private immutable _timestamp;
     /** parametrization of treasure-for */
-    uint256[] private _theta = [0, 0, 2, 1, 0, 0];
+    uint256[] private _share = [0, 0, 2, 1, 0, 0];
     /** parametrization of difficulty-for */
-    uint256[] private _delta = [0, 0, 4, 1, 0, 0];
+    uint256[] private _difficulty = [0, 0, 4, 1, 0, 0];
 
     /** @param symbol short token symbol */
     /** @param moeBase address of old contract */
@@ -72,44 +72,48 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, Ownable {
         require(amount > 0, "empty nonce-hash");
         // ensure unique nonce-hash (to be used once)
         _hashes.add(uint256(nonceHash));
+        // mint tokens for owner (i.e. project treasury)
+        uint256 treasure = treasuryShare(amount);
+        if (treasure > 0) _mint(owner(), treasure);
         // mint tokens for beneficiary (e.g. nonce provider)
         _mint(to, amount);
-        // mint tokens for owner (i.e. project treasury)
-        uint256 treasure = treasureFor(amount);
-        if (treasure > 0) _mint(owner(), treasure);
     }
 
-    /** @return treasure for given amount */
-    function treasureFor(uint256 amount) public view returns (uint256) {
-        return ((amount + _theta[5] - _theta[4]) * _theta[3]) / _theta[2] + _theta[1] - _theta[0];
+    /** @return treasury-share for given amount */
+    function treasuryShare(uint256 amount) public view returns (uint256) {
+        return ((amount + _share[5] - _share[4]) * _share[3]) / _share[2] + _share[1] - _share[0];
     }
 
-    /** @return treasure parameters */
-    function getTheta() public view returns (uint256[] memory) {
-        return _theta;
+    /** @return treasury-share parameters */
+    function getTreasuryShareParameters() public view returns (uint256[] memory) {
+        return _share;
     }
 
-    /** set treasure parameters */
-    function setTheta(uint256[] memory array) public onlyRole(THETA_ROLE) {
+    /** set treasury-share parameters */
+    function setTreasuryShareParameters(uint256[] memory array) public onlyRole(TREASURY_SHARE_ROLE) {
         require(array.length == 6, "invalid array.length");
-        _theta = array;
+        _share = array;
     }
 
-    /** @return difficulty for given timestamp */
-    function difficultyFor(uint256 timestamp) public view returns (uint256) {
+    /** @return mining-difficulty for given timestamp */
+    function miningDifficulty(uint256 timestamp) public view returns (uint256) {
         uint256 dt = timestamp - _timestamp;
-        return (100 * (dt + _delta[5] - _delta[4]) * _delta[3]) / (_delta[2] * 365_25 days) + _delta[1] - _delta[0];
+        return
+            (100 * (dt + _difficulty[5] - _difficulty[4]) * _difficulty[3]) /
+            (_difficulty[2] * 365_25 days) +
+            _difficulty[1] -
+            _difficulty[0];
     }
 
-    /** @return difficulty parameters */
-    function getDelta() public view returns (uint256[] memory) {
-        return _delta;
+    /** @return mining-difficulty parameters */
+    function getMiningDifficultyParameters() public view returns (uint256[] memory) {
+        return _difficulty;
     }
 
-    /** set difficulty parameters */
-    function setDelta(uint256[] memory array) public onlyRole(DELTA_ROLE) {
+    /** set mining-difficulty parameters */
+    function setMiningDifficultyParameters(uint256[] memory array) public onlyRole(MINING_DIFFICULTY_ROLE) {
         require(array.length == 6, "invalid array.length");
-        _delta = array;
+        _difficulty = array;
     }
 
     /** check whether block-hash has recently been cached or is recent */
@@ -179,6 +183,13 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, Ownable {
         }
         return counter;
     }
+
+    /** returns true if this contract implements the interface defined by interfaceId */
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(MoeMigratable, Supervised) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
 }
 
 /**
@@ -192,7 +203,7 @@ contract XPowerThor is XPower {
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
-        uint256 difficulty = difficultyFor(block.timestamp);
+        uint256 difficulty = miningDifficulty(block.timestamp);
         uint256 zeros = _zerosOf(nonceHash);
         if (zeros > difficulty) {
             return (zeros - difficulty) * 10 ** decimals();
@@ -212,7 +223,7 @@ contract XPowerLoki is XPower {
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
-        uint256 difficulty = difficultyFor(block.timestamp);
+        uint256 difficulty = miningDifficulty(block.timestamp);
         uint256 zeros = _zerosOf(nonceHash);
         if (zeros > difficulty) {
             return (2 ** (zeros - difficulty) - 1) * 10 ** decimals();
@@ -232,7 +243,7 @@ contract XPowerOdin is XPower {
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
-        uint256 difficulty = difficultyFor(block.timestamp);
+        uint256 difficulty = miningDifficulty(block.timestamp);
         uint256 zeros = _zerosOf(nonceHash);
         if (zeros > difficulty) {
             return (16 ** (zeros - difficulty) - 1) * 10 ** decimals();

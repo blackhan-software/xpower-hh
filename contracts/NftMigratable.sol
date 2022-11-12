@@ -10,7 +10,7 @@ import "./Supervised.sol";
  * Allows migration of NFTs from an old contract; batch migration is also
  * possible. Further, manually sealing the migration is possible too.
  */
-abstract contract NftMigratable is ERC1155, ERC1155Burnable, Supervised {
+abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSupervised {
     /** old contract to migrate from */
     ERC1155Burnable private _token;
     /** timestamp of migration deadline */
@@ -52,7 +52,7 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, Supervised {
         _migratable = false;
     }
 
-    /** returns true if this contract implements the interface defined by interfaceId. */
+    /** returns true if this contract implements the interface defined by interfaceId */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
