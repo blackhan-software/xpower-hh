@@ -45,25 +45,31 @@ describe("MoeTreasury", async function () {
     await xpower.init();
   });
   beforeEach(async function () {
-    apower = await APower.deploy(NONE_ADDRESS, xpower.address, DEADLINE);
+    apower = await APower.deploy(xpower.address, NONE_ADDRESS, DEADLINE);
     expect(apower).to.exist;
     await apower.deployed();
   });
   beforeEach(async function () {
     nft = await Nft.deploy(
-      NONE_ADDRESS,
-      xpower.address,
       NFT_ODIN_URL,
+      xpower.address,
+      NONE_ADDRESS,
       DEADLINE
     );
     expect(nft).to.exist;
     await nft.deployed();
-    nft_staked = await NftStaked.deploy(NONE_ADDRESS, NFT_ODIN_URL, DEADLINE);
+  });
+  beforeEach(async function () {
+    nft_staked = await NftStaked.deploy(NFT_ODIN_URL, NONE_ADDRESS, DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
+  });
+  beforeEach(async function () {
     nft_treasury = await NftTreasury.deploy(nft.address, nft_staked.address);
     expect(nft_treasury).to.exist;
     await nft_treasury.deployed();
+  });
+  beforeEach(async function () {
     moe_treasury = await MoeTreasury.deploy(
       apower.address,
       xpower.address,
@@ -79,27 +85,27 @@ describe("MoeTreasury", async function () {
   });
   describe("parametrization of APR", async function () {
     it("should get alpha array", async function () {
-      Expect(await moe_treasury.getAPRParameters()).to.equal([
+      Expect(await moe_treasury.getAPR()).to.equal([
         0, 0, 3, 1000, 0, 0,
       ]);
     });
     it("should set alpha array", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
-      await moe_treasury.setAPRParameters([1, 2, 3, 4, 5, 6]);
-      Expect(await moe_treasury.getAPRParameters()).to.equal([
+      await moe_treasury.setAPR([1, 2, 3, 4, 5, 6]);
+      Expect(await moe_treasury.getAPR()).to.equal([
         1, 2, 3, 4, 5, 6,
       ]);
     });
     it("should *not* set alpha array (invalid array.length)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRParameters([1, 2, 3]).catch((ex) => {
+        await moe_treasury.setAPR([1, 2, 3]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRParameters()).to.equal([
+      Expect(await moe_treasury.getAPR()).to.equal([
         0, 0, 3, 1000, 0, 0,
       ]);
     });
@@ -108,41 +114,41 @@ describe("MoeTreasury", async function () {
       expect(
         await moe_treasury
           .connect(signer_1)
-          .setAPRParameters([1, 2, 3, 4, 5, 6])
+          .setAPR([1, 2, 3, 4, 5, 6])
           .catch((ex) => {
             const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRParameters()).to.equal([
+      Expect(await moe_treasury.getAPR()).to.equal([
         0, 0, 3, 1000, 0, 0,
       ]);
     });
   });
   describe("parametrization of APR bonus", async function () {
     it("should get gamma array", async function () {
-      Expect(await moe_treasury.getAPRBonusParameters()).to.equal([
+      Expect(await moe_treasury.getAPRBonus()).to.equal([
         0, 0, 1, 10, 0, 0,
       ]);
     });
     it("should set gamma array", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
-      await moe_treasury.setAPRBonusParameters([1, 2, 3, 4, 5, 6]);
-      Expect(await moe_treasury.getAPRBonusParameters()).to.equal([
+      await moe_treasury.setAPRBonus([1, 2, 3, 4, 5, 6]);
+      Expect(await moe_treasury.getAPRBonus()).to.equal([
         1, 2, 3, 4, 5, 6,
       ]);
     });
     it("should *not* set gamma array (invalid array.length)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonusParameters([1, 2, 3]).catch((ex) => {
+        await moe_treasury.setAPRBonus([1, 2, 3]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonusParameters()).to.equal([
+      Expect(await moe_treasury.getAPRBonus()).to.equal([
         0, 0, 1, 10, 0, 0,
       ]);
     });
@@ -151,14 +157,14 @@ describe("MoeTreasury", async function () {
       expect(
         await moe_treasury
           .connect(signer_1)
-          .setAPRBonusParameters([1, 2, 3, 4, 5, 6])
+          .setAPRBonus([1, 2, 3, 4, 5, 6])
           .catch((ex) => {
             const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonusParameters()).to.equal([
+      Expect(await moe_treasury.getAPRBonus()).to.equal([
         0, 0, 1, 10, 0, 0,
       ]);
     });

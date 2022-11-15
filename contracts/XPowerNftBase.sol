@@ -15,6 +15,11 @@ import "./NftMigratable.sol";
  * Abstract base NFT class: publicly *not* minteable (nor burneable).
  */
 abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, NftMigratable, Ownable {
+    /** contract name */
+    string public name;
+    /** contract symbol */
+    string public symbol;
+
     /** NFT levels: UNIT, ..., YOTTA *or* higher! */
     uint256 public constant UNIT = 0;
     uint256 public constant KILO = 3;
@@ -30,15 +35,20 @@ abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIM
     /** @param uri meta-data URI */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
+        string memory nftName,
+        string memory nftSymbol,
+        string memory nftUri,
         address nftBase,
-        string memory uri,
         uint256 deadlineIn
     )
         // ERC1155 constructor: meta-data URI
-        ERC1155(uri)
+        ERC1155(nftUri)
         // MigratableNft: old contract, rel. deadline [seconds]
         NftMigratable(nftBase, deadlineIn)
-    {}
+    {
+        name = nftName;
+        symbol = nftSymbol;
+    }
 
     /** @return nft-id composed of (year, level) */
     function idBy(uint256 anno, uint256 level) public pure returns (uint256) {

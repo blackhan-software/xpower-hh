@@ -41,14 +41,14 @@ describe("XPowerNftStaked", async function () {
   });
   before(async function () {
     nft = await Nft.deploy(
-      NONE_ADDRESS,
-      xpower.address,
       NFT_ODIN_URL,
+      xpower.address,
+      NONE_ADDRESS,
       DEADLINE
     );
     expect(nft).to.exist;
     await nft.deployed();
-    ppt = await Ppt.deploy(NONE_ADDRESS, NFT_ODIN_URL, DEADLINE);
+    ppt = await Ppt.deploy(NFT_ODIN_URL, NONE_ADDRESS, DEADLINE);
     expect(ppt).to.exist;
     await ppt.deployed();
   });

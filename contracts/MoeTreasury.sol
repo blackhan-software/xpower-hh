@@ -198,12 +198,12 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return apr-parameters */
-    function getAPRParameters() public view returns (uint256[] memory) {
+    function getAPR() public view returns (uint256[] memory) {
         return _apr;
     }
 
     /** set apr-parameters */
-    function setAPRParameters(uint256[] memory array) public onlyRole(APR_ROLE) {
+    function setAPR(uint256[] memory array) public onlyRole(APR_ROLE) {
         require(array.length == 6, "invalid array.length");
         _apr = array;
     }
@@ -217,12 +217,12 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return apr-bonus parameters */
-    function getAPRBonusParameters() public view returns (uint256[] memory) {
+    function getAPRBonus() public view returns (uint256[] memory) {
         return _bonus;
     }
 
     /** set apr-bonus parameters */
-    function setAPRBonusParameters(uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
+    function setAPRBonus(uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
         require(array.length == 6, "invalid array.length");
         _bonus = array;
     }

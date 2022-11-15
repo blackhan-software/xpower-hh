@@ -34,7 +34,7 @@ describe("APowerSupervised", async function () {
     await xpower.init();
   });
   before(async function () {
-    apower = await APower.deploy(NONE_ADDRESS, xpower.address, DEADLINE);
+    apower = await APower.deploy(xpower.address, NONE_ADDRESS, DEADLINE);
     expect(apower).to.exist;
     await apower.deployed();
   });

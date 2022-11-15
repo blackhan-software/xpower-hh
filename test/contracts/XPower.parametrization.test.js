@@ -31,27 +31,27 @@ describe("XPower", async function () {
   });
   describe("parametrization of treasure-for", async function () {
     it("should get theta array", async function () {
-      Expect(await xpower.getTreasuryShareParameters()).to.equal([
+      Expect(await xpower.getTreasuryShare()).to.equal([
         0, 0, 2, 1, 0, 0,
       ]);
     });
     it("should set theta array", async function () {
       await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
-      await xpower.setTreasuryShareParameters([1, 2, 3, 4, 5, 6]);
-      Expect(await xpower.getTreasuryShareParameters()).to.equal([
+      await xpower.setTreasuryShare([1, 2, 3, 4, 5, 6]);
+      Expect(await xpower.getTreasuryShare()).to.equal([
         1, 2, 3, 4, 5, 6,
       ]);
     });
     it("should *not* set theta array (invalid array.length)", async function () {
       await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
       expect(
-        await xpower.setTreasuryShareParameters([1, 3, 2]).catch((ex) => {
+        await xpower.setTreasuryShare([1, 3, 2]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await xpower.getTreasuryShareParameters()).to.equal([
+      Expect(await xpower.getTreasuryShare()).to.equal([
         0, 0, 2, 1, 0, 0,
       ]);
     });
@@ -60,41 +60,41 @@ describe("XPower", async function () {
       expect(
         await xpower
           .connect(signer_1)
-          .setTreasuryShareParameters([1, 2, 3, 4, 5, 6])
+          .setTreasuryShare([1, 2, 3, 4, 5, 6])
           .catch((ex) => {
             const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await xpower.getTreasuryShareParameters()).to.equal([
+      Expect(await xpower.getTreasuryShare()).to.equal([
         0, 0, 2, 1, 0, 0,
       ]);
     });
   });
   describe("parametrization of difficulty-for", async function () {
     it("should get delta array", async function () {
-      Expect(await xpower.getMiningDifficultyParameters()).to.equal([
+      Expect(await xpower.getMiningDifficulty()).to.equal([
         0, 0, 4, 1, 0, 0,
       ]);
     });
     it("should set delta array", async function () {
       await xpower.grantRole(xpower.MINING_DIFFICULTY_ROLE(), addresses[0]);
-      await xpower.setMiningDifficultyParameters([1, 2, 3, 4, 5, 6]);
-      Expect(await xpower.getMiningDifficultyParameters()).to.equal([
+      await xpower.setMiningDifficulty([1, 2, 3, 4, 5, 6]);
+      Expect(await xpower.getMiningDifficulty()).to.equal([
         1, 2, 3, 4, 5, 6,
       ]);
     });
     it("should *not* set delta array (invalid array.length)", async function () {
       await xpower.grantRole(xpower.MINING_DIFFICULTY_ROLE(), addresses[0]);
       expect(
-        await xpower.setMiningDifficultyParameters([1, 3, 2]).catch((ex) => {
+        await xpower.setMiningDifficulty([1, 3, 2]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await xpower.getMiningDifficultyParameters()).to.equal([
+      Expect(await xpower.getMiningDifficulty()).to.equal([
         0, 0, 4, 1, 0, 0,
       ]);
     });
@@ -103,14 +103,14 @@ describe("XPower", async function () {
       expect(
         await xpower
           .connect(signer_1)
-          .setMiningDifficultyParameters([1, 2, 3, 4, 5, 6])
+          .setMiningDifficulty([1, 2, 3, 4, 5, 6])
           .catch((ex) => {
             const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await xpower.getMiningDifficultyParameters()).to.equal([
+      Expect(await xpower.getMiningDifficulty()).to.equal([
         0, 0, 4, 1, 0, 0,
       ]);
     });

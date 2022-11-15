@@ -39,16 +39,16 @@ describe("XPowerNftStakedSupervised", async function () {
   });
   before(async function () {
     nft = await Nft.deploy(
-      NONE_ADDRESS,
-      xpower.address,
       NFT_ODIN_URL,
+      xpower.address,
+      NONE_ADDRESS,
       DEADLINE
     );
     expect(nft).to.exist;
     await nft.deployed();
   });
   before(async function () {
-    nft_staked = await NftStaked.deploy(NONE_ADDRESS, NFT_ODIN_URL, DEADLINE);
+    nft_staked = await NftStaked.deploy(NFT_ODIN_URL, NONE_ADDRESS, DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });

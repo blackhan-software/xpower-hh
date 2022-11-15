@@ -14,16 +14,20 @@ contract XPowerNft is XPowerNftBase {
     /** (Burnable) proof-of-work tokens */
     ERC20Burnable private _moe;
 
+    /** @param nftName NFT name */
+    /** @param nftSymbol NFT symbol */
+    /** @param nftUri metadata URI */
     /** @param nftBase address of old contract */
     /** @param moeLink address of contract for MOE tokens */
-    /** @param uri meta-data URI */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
-        address nftBase,
+        string memory nftName,
+        string memory nftSymbol,
+        string memory nftUri,
         address moeLink,
-        string memory uri,
+        address nftBase,
         uint256 deadlineIn
-    ) XPowerNftBase(nftBase, uri, deadlineIn) {
+    ) XPowerNftBase(nftName, nftSymbol, nftUri, nftBase, deadlineIn) {
         _moe = ERC20Burnable(moeLink);
     }
 
@@ -54,11 +58,11 @@ contract XPowerNft is XPowerNftBase {
  */
 contract XPowerThorNft is XPowerNft {
     constructor(
-        address nftBase,
+        string memory nftUri,
         address moeLink,
-        string memory uri,
+        address nftBase,
         uint256 deadlineIn
-    ) XPowerNft(nftBase, moeLink, uri, deadlineIn) {}
+    ) XPowerNft("XPower Thor", "THORNFT", nftUri, moeLink, nftBase, deadlineIn) {}
 }
 
 /**
@@ -67,11 +71,11 @@ contract XPowerThorNft is XPowerNft {
  */
 contract XPowerLokiNft is XPowerNft {
     constructor(
-        address nftBase,
+        string memory nftUri,
         address moeLink,
-        string memory uri,
+        address nftBase,
         uint256 deadlineIn
-    ) XPowerNft(nftBase, moeLink, uri, deadlineIn) {}
+    ) XPowerNft("XPower Loki", "LOKINFT", nftUri, moeLink, nftBase, deadlineIn) {}
 }
 
 /**
@@ -80,9 +84,9 @@ contract XPowerLokiNft is XPowerNft {
  */
 contract XPowerOdinNft is XPowerNft {
     constructor(
-        address nftBase,
+        string memory nftUri,
         address moeLink,
-        string memory uri,
+        address nftBase,
         uint256 deadlineIn
-    ) XPowerNft(nftBase, moeLink, uri, deadlineIn) {}
+    ) XPowerNft("XPower Odin", "ODINNFT", nftUri, moeLink, nftBase, deadlineIn) {}
 }

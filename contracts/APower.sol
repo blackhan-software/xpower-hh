@@ -18,13 +18,13 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     XPower private _moe;
 
     /** @param symbol short token symbol */
-    /** @param sovBase address of old contract */
     /** @param moeLink address of contract for MOE tokens */
+    /** @param sovBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
         string memory symbol,
-        address sovBase,
         address moeLink,
+        address sovBase,
         uint256 deadlineIn
     )
         // ERC20 constructor: name, symbol
@@ -61,19 +61,19 @@ contract APowerThor is APower {
     /** @param sovBase address of old contract */
     /** @param moeLink address of contract for XPower tokens */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address sovBase, address moeLink, uint256 deadlineIn) APower("aTHOR", sovBase, moeLink, deadlineIn) {}
+    constructor(address moeLink, address sovBase, uint256 deadlineIn) APower("aTHOR", moeLink, sovBase, deadlineIn) {}
 }
 
 contract APowerLoki is APower {
+    /** @param moeLink address of contract for XPower tokens */
     /** @param base address of old contract */
-    /** @param moe address of contract for XPower tokens */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address sovBase, address moeLink, uint256 deadlineIn) APower("aLOKI", sovBase, moeLink, deadlineIn) {}
+    constructor(address moeLink, address sovBase, uint256 deadlineIn) APower("aLOKI", moeLink, sovBase, deadlineIn) {}
 }
 
 contract APowerOdin is APower {
-    /** @param sovBase address of old contract */
     /** @param moeLink address of contract for XPower tokens */
+    /** @param sovBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address sovBase, address moeLink, uint256 deadlineIn) APower("aODIN", sovBase, moeLink, deadlineIn) {}
+    constructor(address moeLink, address sovBase, uint256 deadlineIn) APower("aODIN", moeLink, sovBase, deadlineIn) {}
 }

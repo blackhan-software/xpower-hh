@@ -24,10 +24,10 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     mapping(bytes32 => uint256) internal _timestamps;
     /** anchor for difficulty calculation */
     uint256 private immutable _timestamp;
-    /** parametrization of treasure-for */
+    /** parametrization of treasury-share */
     uint256[] private _share = [0, 0, 2, 1, 0, 0];
-    /** parametrization of difficulty-for */
-    uint256[] private _difficulty = [0, 0, 4, 1, 0, 0];
+    /** parametrization of mining-difficulty */
+    uint256[] private _rigor = [0, 0, 4, 1, 0, 0];
 
     /** @param symbol short token symbol */
     /** @param moeBase address of old contract */
@@ -85,12 +85,12 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     }
 
     /** @return treasury-share parameters */
-    function getTreasuryShareParameters() public view returns (uint256[] memory) {
+    function getTreasuryShare() public view returns (uint256[] memory) {
         return _share;
     }
 
     /** set treasury-share parameters */
-    function setTreasuryShareParameters(uint256[] memory array) public onlyRole(TREASURY_SHARE_ROLE) {
+    function setTreasuryShare(uint256[] memory array) public onlyRole(TREASURY_SHARE_ROLE) {
         require(array.length == 6, "invalid array.length");
         _share = array;
     }
@@ -98,22 +98,18 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     /** @return mining-difficulty for given timestamp */
     function miningDifficulty(uint256 timestamp) public view returns (uint256) {
         uint256 dt = timestamp - _timestamp;
-        return
-            (100 * (dt + _difficulty[5] - _difficulty[4]) * _difficulty[3]) /
-            (_difficulty[2] * 365_25 days) +
-            _difficulty[1] -
-            _difficulty[0];
+        return (100 * (dt + _rigor[5] - _rigor[4]) * _rigor[3]) / (_rigor[2] * 365_25 days) + _rigor[1] - _rigor[0];
     }
 
     /** @return mining-difficulty parameters */
-    function getMiningDifficultyParameters() public view returns (uint256[] memory) {
-        return _difficulty;
+    function getMiningDifficulty() public view returns (uint256[] memory) {
+        return _rigor;
     }
 
     /** set mining-difficulty parameters */
-    function setMiningDifficultyParameters(uint256[] memory array) public onlyRole(MINING_DIFFICULTY_ROLE) {
+    function setMiningDifficulty(uint256[] memory array) public onlyRole(MINING_DIFFICULTY_ROLE) {
         require(array.length == 6, "invalid array.length");
-        _difficulty = array;
+        _rigor = array;
     }
 
     /** check whether block-hash has recently been cached or is recent */

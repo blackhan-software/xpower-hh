@@ -56,7 +56,7 @@ describe("MoeTreasury", async function () {
     expect(UNUM >= 1n).to.be.true;
   });
   beforeEach(async function () {
-    apower = await APower.deploy(NONE_ADDRESS, xpower.address, DEADLINE);
+    apower = await APower.deploy(xpower.address, NONE_ADDRESS, DEADLINE);
     expect(apower).to.exist;
     await apower.deployed();
   });
@@ -70,18 +70,24 @@ describe("MoeTreasury", async function () {
   });
   beforeEach(async function () {
     nft = await Nft.deploy(
-      NONE_ADDRESS,
-      xpower.address,
       NFT_ODIN_URL,
+      xpower.address,
+      NONE_ADDRESS,
       DEADLINE
     );
     expect(nft).to.exist;
     await nft.deployed();
-    nft_staked = await NftStaked.deploy(NONE_ADDRESS, NFT_ODIN_URL, DEADLINE);
+  });
+  beforeEach(async function () {
+    nft_staked = await NftStaked.deploy(NFT_ODIN_URL, NONE_ADDRESS, DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
+  });
+  beforeEach(async function () {
     nft_treasury = await NftTreasury.deploy(nft.address, nft_staked.address);
     expect(nft_treasury).to.exist;
+  });
+  beforeEach(async function () {
     await nft_treasury.deployed();
     moe_treasury = await MoeTreasury.deploy(
       apower.address,

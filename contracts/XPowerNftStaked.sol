@@ -19,10 +19,18 @@ abstract contract XPowerNftStaked is XPowerNftBase {
     /** map of total burns: nft-id => accumulator [seconds] */
     mapping(uint256 => uint256) private _burnsTotal;
 
+    /** @param pptName NFT name */
+    /** @param pptSymbol NFT symbol */
+    /** @param pptUri meta-data URI */
     /** @param pptBase address of old contract */
-    /** @param uri meta-data URI */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address pptBase, string memory uri, uint256 deadlineIn) XPowerNftBase(pptBase, uri, deadlineIn) {}
+    constructor(
+        string memory pptName,
+        string memory pptSymbol,
+        string memory pptUri,
+        address pptBase,
+        uint256 deadlineIn
+    ) XPowerNftBase(pptName, pptSymbol, pptUri, pptBase, deadlineIn) {}
 
     /** transfer tokens (and reset age) */
     function safeTransferFrom(
@@ -133,28 +141,31 @@ abstract contract XPowerNftStaked is XPowerNftBase {
  * Staked NFT class for THOR tokens.
  */
 contract XPowerThorNftStaked is XPowerNftStaked {
-    /** @param pptBase address of old contract */
-    /** @param uri meta-data URI */
-    /** @param deadlineIn seconds to end-of-migration */
-    constructor(address pptBase, string memory uri, uint256 deadlineIn) XPowerNftStaked(pptBase, uri, deadlineIn) {}
+    constructor(
+        string memory pptUri,
+        address pptBase,
+        uint256 deadlineIn
+    ) XPowerNftStaked("XPower Thor", "THORPPT", pptUri, pptBase, deadlineIn) {}
 }
 
 /**
  * Staked NFT class for LOKI tokens.
  */
 contract XPowerLokiNftStaked is XPowerNftStaked {
-    /** @param pptBase address of old contract */
-    /** @param uri meta-data URI */
-    /** @param deadlineIn seconds to end-of-migration */
-    constructor(address nftBse, string memory uri, uint256 deadlineIn) XPowerNftStaked(nftBse, uri, deadlineIn) {}
+    constructor(
+        string memory pptUri,
+        address pptBase,
+        uint256 deadlineIn
+    ) XPowerNftStaked("XPower Loki", "LOKIPPT", pptUri, pptBase, deadlineIn) {}
 }
 
 /**
  * Staked NFT class for ODIN tokens.
  */
 contract XPowerOdinNftStaked is XPowerNftStaked {
-    /** @param pptBase address of old contract */
-    /** @param uri meta-data URI */
-    /** @param deadlineIn seconds to end-of-migration */
-    constructor(address pptBase, string memory uri, uint256 deadlineIn) XPowerNftStaked(pptBase, uri, deadlineIn) {}
+    constructor(
+        string memory pptUri,
+        address pptBase,
+        uint256 deadlineIn
+    ) XPowerNftStaked("XPower Odin", "ODINPPT", pptUri, pptBase, deadlineIn) {}
 }

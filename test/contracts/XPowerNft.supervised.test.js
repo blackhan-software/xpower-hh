@@ -37,9 +37,9 @@ describe("XPowerNftSupervised", async function () {
   });
   before(async function () {
     nft = await Nft.deploy(
-      NONE_ADDRESS,
-      xpower.address,
       NFT_ODIN_URL,
+      xpower.address,
+      NONE_ADDRESS,
       DEADLINE
     );
     expect(nft).to.exist;

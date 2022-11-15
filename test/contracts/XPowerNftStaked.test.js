@@ -29,7 +29,7 @@ describe("XPowerNftStaked", async function () {
     expect(NftStaked).to.exist;
   });
   beforeEach(async function () {
-    nft_staked = await NftStaked.deploy(NONE_ADDRESS, NFT_LOKI_URL, DEADLINE);
+    nft_staked = await NftStaked.deploy(NFT_LOKI_URL, NONE_ADDRESS, DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });
