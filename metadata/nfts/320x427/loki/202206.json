@@ -1,6 +1,6 @@
 {
   "name": "MEGA LOKI",
-  "describe": "MEGA LOKI NFT",
+  "description": "Stakeable MEGA LOKI NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/320x427/2022/Loki/3-Loki_MEGA.png",
-  "properties": { "apr": "0%", "apr-bonus": "0‱", "issue": "2022", "label": "MEGA", "level": "6", "token": "LOKI" }
+  "properties": { "apr": "2%", "apr-bonus": "0‱", "issue": "2022", "label": "MEGA", "level": "6", "token": "LOKI" }
 }

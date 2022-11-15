@@ -1,6 +1,6 @@
 {
   "name": "TERA THOR",
-  "describe": "Staked TERA THOR NFT",
+  "description": "Staked TERA THOR NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/ppts/320x427/2021/Thor/5-Thor_TERA.png",
   "properties": { "apr": "4%", "apr-bonus": "1‱", "issue": "2021", "label": "TERA", "level": "12", "token": "THOR" }
 }

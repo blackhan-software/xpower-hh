@@ -1,6 +1,6 @@
 {
   "name": "PETA THOR",
-  "describe": "PETA THOR NFT",
+  "description": "Stakeable PETA THOR NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/1620x2160/2022/Thor/6-Thor_PETA.png",
-  "properties": { "apr": "0%", "apr-bonus": "0‱", "issue": "2022", "label": "PETA", "level": "15", "token": "THOR" }
+  "properties": { "apr": "5%", "apr-bonus": "0‱", "issue": "2022", "label": "PETA", "level": "15", "token": "THOR" }
 }

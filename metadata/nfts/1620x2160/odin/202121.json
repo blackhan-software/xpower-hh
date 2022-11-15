@@ -1,6 +1,6 @@
 {
   "name": "ZETTA ODIN",
-  "describe": "ZETTA ODIN NFT",
+  "description": "Stakeable ZETTA ODIN NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/1620x2160/2021/Odin/8-Odin_ZETTA.png",
-  "properties": { "apr": "0%", "apr-bonus": "0‱", "issue": "2021", "label": "ZETA", "level": "21", "token": "ODIN" }
+  "properties": { "apr": "7%", "apr-bonus": "1‱", "issue": "2021", "label": "ZETA", "level": "21", "token": "ODIN" }
 }

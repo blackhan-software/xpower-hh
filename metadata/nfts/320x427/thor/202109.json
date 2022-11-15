@@ -1,6 +1,6 @@
 {
   "name": "GIGA THOR",
-  "describe": "GIGA THOR NFT",
+  "description": "Stakeable GIGA THOR NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/320x427/2021/Thor/4-Thor_GIGA.png",
-  "properties": { "apr": "0%", "apr-bonus": "0‱", "issue": "2021", "label": "GIGA", "level": "9", "token": "THOR" }
+  "properties": { "apr": "3%", "apr-bonus": "1‱", "issue": "2021", "label": "GIGA", "level": "9", "token": "THOR" }
 }

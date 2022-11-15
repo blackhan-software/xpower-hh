@@ -1,6 +1,6 @@
 {
   "name": "ZETTA LOKI",
-  "describe": "ZETTA LOKI NFT",
+  "description": "Stakeable ZETTA LOKI NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/320x427/2022/Loki/8-Loki_ZETTA.png",
-  "properties": { "apr": "0%", "apr-bonus": "0‱", "issue": "2022", "label": "ZETA", "level": "21", "token": "LOKI" }
+  "properties": { "apr": "7%", "apr-bonus": "0‱", "issue": "2022", "label": "ZETA", "level": "21", "token": "LOKI" }
 }

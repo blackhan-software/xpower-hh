@@ -1,6 +1,6 @@
 {
   "name": "GIGA ODIN",
-  "describe": "GIGA ODIN NFT",
+  "description": "Stakeable GIGA ODIN NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/320x427/2021/Odin/4-Odin_GIGA.png",
-  "properties": { "apr": "0%", "apr-bonus": "0‱", "issue": "2021", "label": "GIGA", "level": "9", "token": "ODIN" }
+  "properties": { "apr": "3%", "apr-bonus": "1‱", "issue": "2021", "label": "GIGA", "level": "9", "token": "ODIN" }
 }

@@ -1,6 +1,6 @@
 {
   "name": "MEGA ODIN",
-  "describe": "MEGA ODIN NFT",
+  "description": "Stakeable MEGA ODIN NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/320x427/2021/Odin/3-Odin_MEGA.png",
-  "properties": { "apr": "0%", "apr-bonus": "0‱", "issue": "2021", "label": "MEGA", "level": "6", "token": "ODIN" }
+  "properties": { "apr": "2%", "apr-bonus": "1‱", "issue": "2021", "label": "MEGA", "level": "6", "token": "ODIN" }
 }
