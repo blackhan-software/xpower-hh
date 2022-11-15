@@ -21,13 +21,6 @@ const { wait } = require("../wait");
 async function main() {
   const none = process.env.NONE_ADDRESS;
   assert(none, "missing NONE_ADDRESS");
-  // addresses APower[Nil]
-  const thor_sov_link = process.env.THOR_SOV_V4a ?? none;
-  assert(thor_sov_link, "missing THOR_SOV_V4a");
-  const loki_sov_link = process.env.LOKI_SOV_V4a ?? none;
-  assert(loki_sov_link, "missing LOKI_SOV_V4a");
-  const odin_sov_link = process.env.ODIN_SOV_V4a ?? none;
-  assert(odin_sov_link, "missing ODIN_SOV_V4a");
   // addresses XPower[New]
   const thor_moe_link = process.env.THOR_MOE_V4a;
   assert(thor_moe_link, "missing THOR_MOE_V4a");
@@ -46,7 +39,7 @@ async function main() {
   // deploy THOR NftTreasury[New]:
   //
   const thor_treasury = await deploy(["MoeTreasury"], {
-    sov_link: thor_sov_link,
+    sov_link: none,
     moe_link: thor_moe_link,
     ppt_link: thor_ppt_link,
   });
@@ -55,7 +48,7 @@ async function main() {
   // deploy LOKI NftTreasury[New]:
   //
   const loki_treasury = await deploy(["MoeTreasury"], {
-    sov_link: loki_sov_link,
+    sov_link: none,
     moe_link: loki_moe_link,
     ppt_link: loki_ppt_link,
   });
@@ -64,17 +57,17 @@ async function main() {
   // deploy ODIN NftTreasury[New]:
   //
   const odin_treasury = await deploy(["MoeTreasury"], {
-    sov_link: odin_sov_link,
+    sov_link: none,
     moe_link: odin_moe_link,
     ppt_link: odin_ppt_link,
   });
   console.log(`ODIN_MTY_V4a=${odin_treasury.address}`);
 }
-async function deploy([mot_name], { sov_link, moe_link, ppt_link }) {
-  const mot_factory = await hre.ethers.getContractFactory(mot_name);
-  const mot_contract = await mot_factory.deploy(sov_link, moe_link, ppt_link);
-  await wait(mot_contract.deployTransaction);
-  return mot_contract;
+async function deploy([mty_name], { sov_link, moe_link, ppt_link }) {
+  const mty_factory = await hre.ethers.getContractFactory(mty_name);
+  const mty_contract = await mty_factory.deploy(sov_link, moe_link, ppt_link);
+  await wait(mty_contract.deployTransaction);
+  return mty_contract;
 }
 if (require.main === module) {
   main()

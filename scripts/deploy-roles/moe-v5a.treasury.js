@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { transferRoles } = require("../roles");
+const { transferMtyRoles } = require("../roles");
 
 async function main() {
   const owner = process.env.FUND_ADDRESS;
@@ -7,9 +7,9 @@ async function main() {
   //
   // transfer roles:
   //
-  await transferRoles("MoeTreasury", "THOR_MTY_V5a", { to: owner });
-  await transferRoles("MoeTreasury", "LOKI_MTY_V5a", { to: owner });
-  await transferRoles("MoeTreasury", "ODIN_MTY_V5a", { to: owner });
+  await transferMtyRoles("MoeTreasury", "THOR_MTY_V5a", { to: owner });
+  await transferMtyRoles("MoeTreasury", "LOKI_MTY_V5a", { to: owner });
+  await transferMtyRoles("MoeTreasury", "ODIN_MTY_V5a", { to: owner });
 }
 if (require.main === module) {
   main()

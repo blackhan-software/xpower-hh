@@ -19,17 +19,22 @@ const { wait } = require("../wait");
  * > await hre.run("compile");
  */
 async function main() {
-  const none = process.env.NONE_ADDRESS;
-  assert(none, "missing NONE_ADDRESS");
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
+  // addresses APower[Old]
+  const thor_sov_base = process.env.THOR_SOV_V5a;
+  assert(thor_sov_base, "missing THOR_SOV_V5a");
+  const loki_sov_base = process.env.LOKI_SOV_V5a;
+  assert(loki_sov_base, "missing LOKI_SOV_V5a");
+  const odin_sov_base = process.env.ODIN_SOV_V5a;
+  assert(odin_sov_base, "missing ODIN_SOV_V5a");
   // addresses XPower[New]
-  const thor_moe_link = process.env.THOR_MOE_V5a;
-  assert(thor_moe_link, "missing THOR_MOE_V5a");
-  const loki_moe_link = process.env.LOKI_MOE_V5a;
-  assert(loki_moe_link, "missing LOKI_MOE_V5a");
-  const odin_moe_link = process.env.ODIN_MOE_V5a;
-  assert(odin_moe_link, "missing ODIN_MOE_V5a");
+  const thor_moe_link = process.env.THOR_MOE_V5b;
+  assert(thor_moe_link, "missing THOR_MOE_V5b");
+  const loki_moe_link = process.env.LOKI_MOE_V5b;
+  assert(loki_moe_link, "missing LOKI_MOE_V5b");
+  const odin_moe_link = process.env.ODIN_MOE_V5b;
+  assert(odin_moe_link, "missing ODIN_MOE_V5b");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
@@ -37,28 +42,28 @@ async function main() {
   //
   const thor_sov = await deploy("APowerThor", {
     moe_link: thor_moe_link,
-    sov_base: none,
+    sov_base: thor_sov_base,
     deadline,
   });
-  console.log(`THOR_SOV_V5a=${thor_sov.address}`);
+  console.log(`THOR_SOV_V5b=${thor_sov.address}`);
   //
   // deploy APowerLoki[New]
   //
   const loki_sov = await deploy("APowerLoki", {
     moe_link: loki_moe_link,
-    sov_base: none,
+    sov_base: loki_sov_base,
     deadline,
   });
-  console.log(`LOKI_SOV_V5a=${loki_sov.address}`);
+  console.log(`LOKI_SOV_V5b=${loki_sov.address}`);
   //
   // deploy APowerOdin[New]
   //
   const odin_sov = await deploy("APowerOdin", {
     moe_link: odin_moe_link,
-    sov_base: none,
+    sov_base: odin_sov_base,
     deadline,
   });
-  console.log(`ODIN_SOV_V5a=${odin_sov.address}`);
+  console.log(`ODIN_SOV_V5b=${odin_sov.address}`);
 }
 async function deploy(name, { moe_link, sov_base, deadline }) {
   const factory = await hre.ethers.getContractFactory(name);

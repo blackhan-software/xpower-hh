@@ -41,8 +41,8 @@ async function main() {
   // deploy XPowerThorNftStaked[New]:
   //
   const thor_nft = await deploy("XPowerThorNftStaked", {
-    ppt_base: thor_ppt_base,
     ppt_uri: thor_ppt_uri,
+    ppt_base: thor_ppt_base,
     deadline,
   });
   console.log(`THOR_PPT_V5a=${thor_nft.address}`);
@@ -50,8 +50,8 @@ async function main() {
   // deploy XPowerLokiNftStaked[New]:
   //
   const loki_nft = await deploy("XPowerLokiNftStaked", {
-    ppt_base: loki_ppt_base,
     ppt_uri: loki_ppt_uri,
+    ppt_base: loki_ppt_base,
     deadline,
   });
   console.log(`LOKI_PPT_V5a=${loki_nft.address}`);
@@ -59,15 +59,15 @@ async function main() {
   // deploy XPowerOdinNftStaked[New]:
   //
   const odin_nft = await deploy("XPowerOdinNftStaked", {
-    ppt_base: odin_ppt_base,
     ppt_uri: odin_ppt_uri,
+    ppt_base: odin_ppt_base,
     deadline,
   });
   console.log(`ODIN_PPT_V5a=${odin_nft.address}`);
 }
-async function deploy(name, { ppt_base, ppt_uri, deadline }) {
+async function deploy(name, { ppt_uri, ppt_base, deadline }) {
   const factory = await hre.ethers.getContractFactory(name);
-  const contract = await factory.deploy(ppt_base, ppt_uri, deadline);
+  const contract = await factory.deploy(ppt_uri, ppt_base, deadline);
   await wait(contract.deployTransaction);
   return contract;
 }

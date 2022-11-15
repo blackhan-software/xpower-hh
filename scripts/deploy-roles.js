@@ -6,29 +6,31 @@ const { main: deploy_ppt_v5a } = require("./deploy-roles/ppt-v5a");
 const { main: deploy_sov_v5a } = require("./deploy-roles/sov-v5a");
 const { main: deploy_mty_v5a } = require("./deploy-roles/moe-v5a.treasury");
 
+const { main: deploy_moe_v5b } = require("./deploy-roles/moe-v5b");
+const { main: deploy_nft_v5b } = require("./deploy-roles/nft-v5b");
+const { main: deploy_ppt_v5b } = require("./deploy-roles/ppt-v5b");
+const { main: deploy_sov_v5b } = require("./deploy-roles/sov-v5b");
+const { main: deploy_mty_v5b } = require("./deploy-roles/moe-v5b.treasury");
+
 async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   //
-  // deploy MOE contract roles:
+  // deploy v5a contract roles:
   //
   await deploy_moe_v5a();
-  //
-  // deploy NFT contract roles:
-  //
   await deploy_nft_v5a();
-  //
-  // deploy PPT contract roles:
-  //
   await deploy_ppt_v5a();
-  //
-  // deploy SOV contract roles:
-  //
   await deploy_sov_v5a();
-  //
-  // deploy MOE treasury roles:
-  //
   await deploy_mty_v5a();
+  //
+  // deploy v5b contract roles:
+  //
+  await deploy_moe_v5b();
+  await deploy_nft_v5b();
+  await deploy_ppt_v5b();
+  await deploy_sov_v5b();
+  await deploy_mty_v5b();
   //
   // show ownership address:
   //

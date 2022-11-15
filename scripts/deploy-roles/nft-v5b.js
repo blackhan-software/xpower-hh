@@ -7,9 +7,9 @@ async function main() {
   //
   // transfer roles:
   //
-  await transferNftRoles("XPowerThorNftStaked", "THOR_PPT_V5a", { to: owner });
-  await transferNftRoles("XPowerLokiNftStaked", "LOKI_PPT_V5a", { to: owner });
-  await transferNftRoles("XPowerOdinNftStaked", "ODIN_PPT_V5a", { to: owner });
+  await transferNftRoles("XPowerThorNft", "THOR_NFT_V5b", { to: owner });
+  await transferNftRoles("XPowerLokiNft", "LOKI_NFT_V5b", { to: owner });
+  await transferNftRoles("XPowerOdinNft", "ODIN_NFT_V5b", { to: owner });
 }
 if (require.main === module) {
   main()

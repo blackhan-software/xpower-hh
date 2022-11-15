@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { transferNftRoles } = require("../roles");
+const { transferSovRoles } = require("../roles");
 
 async function main() {
   const owner = process.env.FUND_ADDRESS;
@@ -7,9 +7,9 @@ async function main() {
   //
   // transfer roles:
   //
-  await transferNftRoles("XPowerThorNftStaked", "THOR_PPT_V5a", { to: owner });
-  await transferNftRoles("XPowerLokiNftStaked", "LOKI_PPT_V5a", { to: owner });
-  await transferNftRoles("XPowerOdinNftStaked", "ODIN_PPT_V5a", { to: owner });
+  await transferSovRoles("APowerThor", "THOR_SOV_V5b", { to: owner });
+  await transferSovRoles("APowerLoki", "LOKI_SOV_V5b", { to: owner });
+  await transferSovRoles("APowerOdin", "ODIN_SOV_V5b", { to: owner });
 }
 if (require.main === module) {
   main()

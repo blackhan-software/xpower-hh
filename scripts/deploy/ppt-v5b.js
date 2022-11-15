@@ -19,9 +19,16 @@ const { wait } = require("../wait");
  * > await hre.run('compile');
  */
 async function main() {
-  const none = process.env.NONE_ADDRESS;
-  assert(none, "missing NONE_ADDRESS");
-  // addresses XPowerNft[Uri]
+  const owner = process.env.FUND_ADDRESS;
+  assert(owner, "missing FUND_ADDRESS");
+  // addresses XPowerNftStaked[Old]
+  const thor_ppt_base = process.env.THOR_NFT_V5a;
+  assert(thor_ppt_base, "missing THOR_NFT_V5a");
+  const loki_ppt_base = process.env.LOKI_NFT_V5a;
+  assert(loki_ppt_base, "missing LOKI_NFT_V5a");
+  const odin_ppt_base = process.env.ODIN_NFT_V5a;
+  assert(odin_ppt_base, "missing ODIN_NFT_V5a");
+  // addresses XPowerNftStaked[Uri]
   const thor_ppt_uri = process.env.THOR_PPT_URI;
   assert(thor_ppt_uri, "missing THOR_PPT_URI");
   const loki_ppt_uri = process.env.LOKI_PPT_URI;
@@ -31,32 +38,32 @@ async function main() {
   // migration:
   const deadline = 126_230_400; // 4 years
   //
-  // deploy XPowerThorNft[New]:
+  // deploy XPowerThorNftStaked[New]:
   //
   const thor_nft = await deploy("XPowerThorNftStaked", {
     ppt_uri: thor_ppt_uri,
-    ppt_base: none,
+    ppt_base: thor_ppt_base,
     deadline,
   });
-  console.log(`THOR_PPT_V4a=${thor_nft.address}`);
+  console.log(`THOR_PPT_V5b=${thor_nft.address}`);
   //
-  // deploy XPowerLokiNft[New]:
+  // deploy XPowerLokiNftStaked[New]:
   //
   const loki_nft = await deploy("XPowerLokiNftStaked", {
     ppt_uri: loki_ppt_uri,
-    ppt_base: none,
+    ppt_base: loki_ppt_base,
     deadline,
   });
-  console.log(`LOKI_PPT_V4a=${loki_nft.address}`);
+  console.log(`LOKI_PPT_V5b=${loki_nft.address}`);
   //
-  // deploy XPowerOdinNft[New]:
+  // deploy XPowerOdinNftStaked[New]:
   //
   const odin_nft = await deploy("XPowerOdinNftStaked", {
     ppt_uri: odin_ppt_uri,
-    ppt_base: none,
+    ppt_base: odin_ppt_base,
     deadline,
   });
-  console.log(`ODIN_PPT_V4a=${odin_nft.address}`);
+  console.log(`ODIN_PPT_V5b=${odin_nft.address}`);
 }
 async function deploy(name, { ppt_uri, ppt_base, deadline }) {
   const factory = await hre.ethers.getContractFactory(name);
