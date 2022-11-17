@@ -195,7 +195,7 @@ describe("XPowerThor Migration", async function () {
       const new_migrated = await xpower_new.migrated();
       expect(new_migrated).to.eq(0n);
     });
-    it("should *not* migrate old[0] => new (insufficient balance)", async function () {
+    it("should *not* migrate old[0] => new (burn amount exceeds balance)", async function () {
       const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower_old.mint(addresses[0], block_hash, nonce);
@@ -211,7 +211,7 @@ describe("XPowerThor Migration", async function () {
       expect(new_allowance).to.eq(0n);
       // migrate amount from old[owner] to new[owner]
       const new_migrate = await xpower_new.migrate(5).catch((ex) => {
-        const m = ex.message.match(/insufficient balance/);
+        const m = ex.message.match(/burn amount exceeds balance/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
       });

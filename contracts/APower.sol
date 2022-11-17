@@ -18,7 +18,7 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     XPower private _moe;
 
     /** @param symbol short token symbol */
-    /** @param moeLink address of contract for MOE tokens */
+    /** @param moeLink address of XPower tokens */
     /** @param sovBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
@@ -29,8 +29,8 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     )
         // ERC20 constructor: name, symbol
         ERC20("APower", symbol)
-        // Migratable: old contract, rel. deadline [seconds]
-        Migratable(sovBase, deadlineIn)
+        // Migratable: XPower, old APower & rel. deadline [seconds]
+        SovMigratable(moeLink, sovBase, deadlineIn)
     {
         _moe = XPower(moeLink);
     }
@@ -58,21 +58,21 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
 }
 
 contract APowerThor is APower {
+    /** @param moeLink address of XPower tokens */
     /** @param sovBase address of old contract */
-    /** @param moeLink address of contract for XPower tokens */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address moeLink, address sovBase, uint256 deadlineIn) APower("aTHOR", moeLink, sovBase, deadlineIn) {}
 }
 
 contract APowerLoki is APower {
-    /** @param moeLink address of contract for XPower tokens */
-    /** @param base address of old contract */
+    /** @param moeLink address of XPower tokens */
+    /** @param sovBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address moeLink, address sovBase, uint256 deadlineIn) APower("aLOKI", moeLink, sovBase, deadlineIn) {}
 }
 
 contract APowerOdin is APower {
-    /** @param moeLink address of contract for XPower tokens */
+    /** @param moeLink address of XPower tokens */
     /** @param sovBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address moeLink, address sovBase, uint256 deadlineIn) APower("aODIN", moeLink, sovBase, deadlineIn) {}
