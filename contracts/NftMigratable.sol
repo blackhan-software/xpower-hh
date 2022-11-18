@@ -11,8 +11,8 @@ import "./Supervised.sol";
  * possible. Further, manually sealing the migration is possible too.
  */
 abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSupervised {
-    /** old contract to migrate from */
-    ERC1155Burnable private _token;
+    /** burnable ERC1155 tokens */
+    ERC1155Burnable private _erc1155;
     /** timestamp of migration deadline */
     uint256 private _deadlineBy;
     /** flag to control migration */
@@ -22,29 +22,39 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address base, uint256 deadlineIn) {
         _deadlineBy = block.timestamp + deadlineIn;
-        _token = ERC1155Burnable(base);
+        _erc1155 = ERC1155Burnable(base);
     }
 
     /** import NFT from old contract */
     function migrate(uint256 nftId, uint256 amount) public {
+        migrateFrom(msg.sender, nftId, amount);
+    }
+
+    /** import NFT from old contract (for account) */
+    function migrateFrom(address account, uint256 nftId, uint256 amount) public {
         require(_migratable, "migration sealed");
         uint256 timestamp = block.timestamp;
         require(_deadlineBy >= timestamp, "deadline passed");
-        _token.burn(msg.sender, nftId, amount);
+        _erc1155.burn(account, nftId, amount);
         require(amount > 0, "non-positive amount");
-        _mint(msg.sender, nftId, amount, "");
+        _mint(account, nftId, amount, "");
     }
 
     /** batch import NFTs from old contract */
     function migrateBatch(uint256[] memory nftIds, uint256[] memory amounts) public {
+        migrateFromBatch(msg.sender, nftIds, amounts);
+    }
+
+    /** batch import NFTs from old contract (for account) */
+    function migrateFromBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) public {
         require(_migratable, "migration sealed");
         uint256 timestamp = block.timestamp;
         require(_deadlineBy >= timestamp, "deadline passed");
-        _token.burnBatch(msg.sender, nftIds, amounts);
+        _erc1155.burnBatch(account, nftIds, amounts);
         for (uint256 i = 0; i < amounts.length; i++) {
             require(amounts[i] > 0, "non-positive amount");
         }
-        _mintBatch(msg.sender, nftIds, amounts, "");
+        _mintBatch(account, nftIds, amounts, "");
     }
 
     /** seal migration (manually) */
