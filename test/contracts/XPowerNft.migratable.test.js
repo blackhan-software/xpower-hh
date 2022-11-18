@@ -89,14 +89,15 @@ describe("XPowerNft", async function () {
       await setNftApprovalForAll(xpower_nft_new.address);
       await migrateXPowNft(UNIT, 1);
     });
-    it("should *not* migrate NFTs for level=UNIT & amount=1 (caller is not token owner nor approved)", async function () {
+    it("should *not* migrate NFTs for level=UNIT & amount=1 (caller is not token owner or approved)", async function () {
       await mintXPow(1);
       await increaseAllowanceBy(1);
       await mintXPowNft(UNIT, 1);
       expect(
         await migrateXPowNft(UNIT, 1).catch((ex) => {
-          const rx = /caller is not token owner nor approved/;
-          expect(ex.message.match(rx)).to.be.not.null;
+          const m = ex.message.match(/caller is not token owner or approved/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
@@ -106,8 +107,9 @@ describe("XPowerNft", async function () {
       await setNftApprovalForAll(xpower_nft_new.address);
       expect(
         await migrateXPowNft(UNIT, 1).catch((ex) => {
-          const rx = /burn amount exceeds totalSupply/;
-          expect(ex.message.match(rx)).to.be.not.null;
+          const m = ex.message.match(/burn amount exceeds totalSupply/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
@@ -123,7 +125,9 @@ describe("XPowerNft", async function () {
       await xpower_nft_new.seal();
       expect(
         await migrateXPowNft(UNIT, 1).catch((ex) => {
-          expect(ex.message.match(/migration sealed/)).to.be.not.null;
+          const m = ex.message.match(/migration sealed/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
@@ -139,14 +143,15 @@ describe("XPowerNft", async function () {
       await setNftApprovalForAll(xpower_nft_new.address);
       await migrateBatchXPowNft(UNIT, 1);
     });
-    it("should *not* migrate-batch NFTs for level=UNIT & amount=1 (caller is not token owner nor approved)", async function () {
+    it("should *not* migrate-batch NFTs for level=UNIT & amount=1 (caller is not token owner or approved)", async function () {
       await mintXPow(1);
       await increaseAllowanceBy(1);
       await mintXPowNft(UNIT, 1);
       expect(
         await migrateBatchXPowNft(UNIT, 1).catch((ex) => {
-          const rx = /caller is not token owner nor approved/;
-          expect(ex.message.match(rx)).to.be.not.null;
+          const m = ex.message.match(/caller is not token owner or approved/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
@@ -156,8 +161,9 @@ describe("XPowerNft", async function () {
       await setNftApprovalForAll(xpower_nft_new.address);
       expect(
         await migrateBatchXPowNft(UNIT, 1).catch((ex) => {
-          const rx = /burn amount exceeds totalSupply/;
-          expect(ex.message.match(rx)).to.be.not.null;
+          const m = ex.message.match(/burn amount exceeds totalSupply/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
@@ -173,7 +179,9 @@ describe("XPowerNft", async function () {
       await xpower_nft_new.seal();
       expect(
         await migrateBatchXPowNft(UNIT, 1).catch((ex) => {
-          expect(ex.message.match(/migration sealed/)).to.be.not.null;
+          const m = ex.message.match(/migration sealed/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
