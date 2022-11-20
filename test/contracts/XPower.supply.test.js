@@ -72,13 +72,12 @@ async function supplyOf(contract, delta = 0, log = undefined) {
 let XPower, xpower; // contract & instance
 let supply; // { total, other's, fund's }
 
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 1_814_400; // [seconds] i.e. 3 weeks
 
 describe("THOR Supply", async () => {
   before(async () => {
     XPower = await ethers.getContractFactory("XPowerThorTest");
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     await xpower.deployed();
     await xpower.renounceOwnership();
   });
@@ -120,7 +119,7 @@ describe("THOR Supply", async () => {
 describe("LOKI Supply", async () => {
   before(async () => {
     XPower = await ethers.getContractFactory("XPowerLokiTest");
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     await xpower.deployed();
     await xpower.renounceOwnership();
   });
@@ -160,7 +159,7 @@ describe("LOKI Supply", async () => {
 describe("ODIN Supply", async () => {
   before(async () => {
     XPower = await ethers.getContractFactory("XPowerOdinTest");
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     await xpower.deployed();
     await xpower.renounceOwnership();
   });

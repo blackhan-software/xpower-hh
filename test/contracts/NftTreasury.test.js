@@ -13,7 +13,6 @@ const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("NftTreasury", async function () {
@@ -28,7 +27,7 @@ describe("NftTreasury", async function () {
   });
   before(async function () {
     const factory = await ethers.getContractFactory("XPowerLokiTest");
-    const contract = await factory.deploy(NONE_ADDRESS, DEADLINE);
+    const contract = await factory.deploy([], DEADLINE);
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
@@ -36,7 +35,7 @@ describe("NftTreasury", async function () {
     expect(XPower).to.exist;
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.init();
@@ -56,17 +55,12 @@ describe("NftTreasury", async function () {
     expect(NftTreasury).to.exist;
   });
   beforeEach(async function () {
-    nft = await Nft.deploy(
-      NFT_LOKI_URL,
-      xpower.address,
-      NONE_ADDRESS,
-      DEADLINE
-    );
+    nft = await Nft.deploy(NFT_LOKI_URL, xpower.address, [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });
   beforeEach(async function () {
-    nft_staked = await NftStaked.deploy(NFT_LOKI_URL, NONE_ADDRESS, DEADLINE);
+    nft_staked = await NftStaked.deploy(NFT_LOKI_URL, [], DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });

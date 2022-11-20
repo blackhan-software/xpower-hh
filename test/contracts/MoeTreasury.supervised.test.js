@@ -32,12 +32,12 @@ describe("MoeTreasurySupervised", async function () {
     expect(MoeTreasury).to.exist;
   });
   before(async function () {
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
   });
   before(async function () {
-    apower = await APower.deploy(xpower.address, NONE_ADDRESS, DEADLINE);
+    apower = await APower.deploy(xpower.address, [], DEADLINE);
     expect(apower).to.exist;
     await apower.deployed();
   });

@@ -24,7 +24,7 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     constructor(
         string memory symbol,
         address moeLink,
-        address sovBase,
+        address[] memory sovBase,
         uint256 deadlineIn
     )
         // ERC20 constructor: name, symbol
@@ -61,19 +61,31 @@ contract APowerThor is APower {
     /** @param moeLink address of XPower tokens */
     /** @param sovBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address moeLink, address sovBase, uint256 deadlineIn) APower("aTHOR", moeLink, sovBase, deadlineIn) {}
+    constructor(
+        address moeLink,
+        address[] memory sovBase,
+        uint256 deadlineIn
+    ) APower("aTHOR", moeLink, sovBase, deadlineIn) {}
 }
 
 contract APowerLoki is APower {
     /** @param moeLink address of XPower tokens */
     /** @param sovBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address moeLink, address sovBase, uint256 deadlineIn) APower("aLOKI", moeLink, sovBase, deadlineIn) {}
+    constructor(
+        address moeLink,
+        address[] memory sovBase,
+        uint256 deadlineIn
+    ) APower("aLOKI", moeLink, sovBase, deadlineIn) {}
 }
 
 contract APowerOdin is APower {
     /** @param moeLink address of XPower tokens */
     /** @param sovBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address moeLink, address sovBase, uint256 deadlineIn) APower("aODIN", moeLink, sovBase, deadlineIn) {}
+    constructor(
+        address moeLink,
+        address[] memory sovBase,
+        uint256 deadlineIn
+    ) APower("aODIN", moeLink, sovBase, deadlineIn) {}
 }

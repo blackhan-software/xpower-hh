@@ -12,7 +12,6 @@ let UNUM; // decimals
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
@@ -30,7 +29,7 @@ describe("XPowerNft", async function () {
   });
   before(async function () {
     const factory = await ethers.getContractFactory("XPowerLokiTest");
-    const contract = await factory.deploy(NONE_ADDRESS, DEADLINE);
+    const contract = await factory.deploy([], DEADLINE);
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
@@ -40,7 +39,7 @@ describe("XPowerNft", async function () {
     expect(XPower).to.exist;
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.transferOwnership(addresses[1]);
@@ -56,7 +55,7 @@ describe("XPowerNft", async function () {
     xpower_nft_old = await XPowerNft.deploy(
       NFT_LOKI_URL,
       xpower.address,
-      NONE_ADDRESS,
+      [],
       DEADLINE
     );
     expect(xpower_nft_old).to.exist;
@@ -64,7 +63,7 @@ describe("XPowerNft", async function () {
     xpower_nft_new = await XPowerNft.deploy(
       NFT_LOKI_URL,
       xpower.address,
-      xpower_nft_old.address,
+      [xpower_nft_old.address],
       DEADLINE
     );
     expect(xpower_nft_new).to.exist;
@@ -77,6 +76,12 @@ describe("XPowerNft", async function () {
   after(async function () {
     const [owner, signer_1] = await ethers.getSigners();
     await xpower.connect(signer_1).transferOwnership(owner.address);
+  });
+  describe("indexOf", async function () {
+    it("should return index=0", async function () {
+      const index = await xpower_nft_new.indexOf(xpower_nft_old.address);
+      expect(index).to.eq(0);
+    });
   });
   describe("migrate", async function () {
     it("should set XPower NFT approval for all", async function () {
@@ -122,7 +127,9 @@ describe("XPowerNft", async function () {
         xpower_nft_new.NFT_SEAL_ROLE(),
         addresses[0]
       );
-      await xpower_nft_new.seal();
+      expect(await xpower_nft_new.sealedAll()).to.deep.eq([false]);
+      await xpower_nft_new.seal(0);
+      expect(await xpower_nft_new.sealedAll()).to.deep.eq([true]);
       expect(
         await migrateXPowNft(UNIT, 1).catch((ex) => {
           const m = ex.message.match(/migration sealed/);
@@ -176,7 +183,7 @@ describe("XPowerNft", async function () {
         xpower_nft_new.NFT_SEAL_ROLE(),
         addresses[0]
       );
-      await xpower_nft_new.seal();
+      await xpower_nft_new.seal(0);
       expect(
         await migrateBatchXPowNft(UNIT, 1).catch((ex) => {
           const m = ex.message.match(/migration sealed/);
@@ -251,7 +258,7 @@ async function setNftApprovalForAll(operator) {
 async function migrateXPowNft(unit, amount) {
   const year = await xpower_nft_new.year();
   const nft_id = await xpower_nft_new.idBy(year, unit);
-  await xpower_nft_new.migrate(nft_id, amount);
+  await xpower_nft_new.migrate(nft_id, amount, [0]);
   const nft_balance_v1 = await xpower_nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance_v1.toNumber()).to.eq(0);
   const nft_balance_v2 = await xpower_nft_new.balanceOf(addresses[0], nft_id);
@@ -260,7 +267,7 @@ async function migrateXPowNft(unit, amount) {
 async function migrateBatchXPowNft(unit, amount) {
   const year = await xpower_nft_new.year();
   const nft_id = await xpower_nft_new.idBy(year, unit);
-  await xpower_nft_new.migrateBatch([nft_id], [amount]);
+  await xpower_nft_new.migrateBatch([nft_id], [amount], [0]);
   const nft_balance_v1 = await xpower_nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance_v1.toNumber()).to.eq(0);
   const nft_balance_v2 = await xpower_nft_new.balanceOf(addresses[0], nft_id);

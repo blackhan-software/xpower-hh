@@ -12,7 +12,6 @@ let UNUM; // decimals
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const NFT_LOKI_WWW = "https://www.xpowermine.com/nfts/loki/{id}.json";
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const DEADLINE = 0; // [seconds]
@@ -33,7 +32,7 @@ describe("XPowerNft", async function () {
   });
   before(async function () {
     const factory = await ethers.getContractFactory("XPowerLokiTest");
-    const contract = await factory.deploy(NONE_ADDRESS, DEADLINE);
+    const contract = await factory.deploy([], DEADLINE);
     table = await new HashTable(contract, addresses[0]).init();
   });
   before(async function () {
@@ -43,7 +42,7 @@ describe("XPowerNft", async function () {
     expect(XPower).to.exist;
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.transferOwnership(addresses[1]);
@@ -59,7 +58,7 @@ describe("XPowerNft", async function () {
     xpower_nft = await XPowerNft.deploy(
       NFT_LOKI_URL,
       xpower.address,
-      NONE_ADDRESS,
+      [],
       DEADLINE
     );
     expect(xpower_nft).to.exist;

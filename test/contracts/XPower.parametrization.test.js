@@ -8,7 +8,6 @@ let addresses; // all addresses
 let XPower; // contract
 let xpower; // instance
 
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("XPower", async function () {
@@ -25,7 +24,7 @@ describe("XPower", async function () {
     XPower = await ethers.getContractFactory("XPowerLokiTest");
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     await xpower.deployed();
     await xpower.init();
   });

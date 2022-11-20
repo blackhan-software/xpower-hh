@@ -6,7 +6,7 @@ import "./XPower.sol";
 
 /** Test class for XPowerThor */
 contract XPowerThorTest is XPowerThor {
-    constructor(address _base, uint256 _deadlineIn) XPowerThor(_base, _deadlineIn) {}
+    constructor(address[] memory _base, uint256 _deadlineIn) XPowerThor(_base, _deadlineIn) {}
 
     function amountOf(bytes32 _nonceHash) public view returns (uint256) {
         return _amountOf(_nonceHash);
@@ -30,7 +30,7 @@ contract XPowerThorTest is XPowerThor {
 }
 
 contract XPowerThorOldTest is XPowerThorTest {
-    constructor(address _base, uint256 _deadlineIn) XPowerThorTest(_base, _deadlineIn) {}
+    constructor(address[] memory _base, uint256 _deadlineIn) XPowerThorTest(_base, _deadlineIn) {}
 
     function decimals() public pure override returns (uint8) {
         return 0;
@@ -39,7 +39,7 @@ contract XPowerThorOldTest is XPowerThorTest {
 
 /** Test class for XPowerLoki */
 contract XPowerLokiTest is XPowerLoki {
-    constructor(address _base, uint256 _deadlineIn) XPowerLoki(_base, _deadlineIn) {}
+    constructor(address[] memory _base, uint256 _deadlineIn) XPowerLoki(_base, _deadlineIn) {}
 
     function amountOf(bytes32 _nonceHash) public view returns (uint256) {
         return _amountOf(_nonceHash);
@@ -63,7 +63,7 @@ contract XPowerLokiTest is XPowerLoki {
 }
 
 contract XPowerLokiOldTest is XPowerLokiTest {
-    constructor(address _base, uint256 _deadlineIn) XPowerLokiTest(_base, _deadlineIn) {}
+    constructor(address[] memory _base, uint256 _deadlineIn) XPowerLokiTest(_base, _deadlineIn) {}
 
     function decimals() public pure override returns (uint8) {
         return 0;
@@ -72,7 +72,7 @@ contract XPowerLokiOldTest is XPowerLokiTest {
 
 /** Test class for XPowerOdin */
 contract XPowerOdinTest is XPowerOdin {
-    constructor(address _base, uint256 _deadlineIn) XPowerOdin(_base, _deadlineIn) {}
+    constructor(address[] memory _base, uint256 _deadlineIn) XPowerOdin(_base, _deadlineIn) {}
 
     function amountOf(bytes32 _nonceHash) public view returns (uint256) {
         return _amountOf(_nonceHash);
@@ -96,7 +96,7 @@ contract XPowerOdinTest is XPowerOdin {
 }
 
 contract XPowerOdinOldTest is XPowerOdinTest {
-    constructor(address _base, uint256 _deadlineIn) XPowerOdinTest(_base, _deadlineIn) {}
+    constructor(address[] memory _base, uint256 _deadlineIn) XPowerOdinTest(_base, _deadlineIn) {}
 
     function decimals() public pure override returns (uint8) {
         return 0;

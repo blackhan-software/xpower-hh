@@ -13,7 +13,6 @@ const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
 const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const DAYS = 86_400; // [seconds]
 
@@ -44,7 +43,7 @@ describe("MoeTreasury", async function () {
     expect(MoeTreasury).to.exist;
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.init();
@@ -56,7 +55,7 @@ describe("MoeTreasury", async function () {
     expect(UNUM >= 1n).to.be.true;
   });
   beforeEach(async function () {
-    apower = await APower.deploy(xpower.address, NONE_ADDRESS, DEADLINE);
+    apower = await APower.deploy(xpower.address, [], DEADLINE);
     expect(apower).to.exist;
     await apower.deployed();
   });
@@ -69,17 +68,12 @@ describe("MoeTreasury", async function () {
     });
   });
   beforeEach(async function () {
-    nft = await Nft.deploy(
-      NFT_ODIN_URL,
-      xpower.address,
-      NONE_ADDRESS,
-      DEADLINE
-    );
+    nft = await Nft.deploy(NFT_ODIN_URL, xpower.address, [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });
   beforeEach(async function () {
-    nft_staked = await NftStaked.deploy(NFT_ODIN_URL, NONE_ADDRESS, DEADLINE);
+    nft_staked = await NftStaked.deploy(NFT_ODIN_URL, [], DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });

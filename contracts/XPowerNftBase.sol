@@ -38,7 +38,7 @@ abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIM
         string memory nftName,
         string memory nftSymbol,
         string memory nftUri,
-        address nftBase,
+        address[] memory nftBase,
         uint256 deadlineIn
     )
         // ERC1155 constructor: meta-data URI

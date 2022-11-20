@@ -25,7 +25,7 @@ contract XPowerNft is XPowerNftBase {
         string memory nftSymbol,
         string memory nftUri,
         address moeLink,
-        address nftBase,
+        address[] memory nftBase,
         uint256 deadlineIn
     ) XPowerNftBase(nftName, nftSymbol, nftUri, nftBase, deadlineIn) {
         _moe = ERC20Burnable(moeLink);
@@ -60,7 +60,7 @@ contract XPowerThorNft is XPowerNft {
     constructor(
         string memory nftUri,
         address moeLink,
-        address nftBase,
+        address[] memory nftBase,
         uint256 deadlineIn
     ) XPowerNft("XPower Thor", "THORNFT", nftUri, moeLink, nftBase, deadlineIn) {}
 }
@@ -73,7 +73,7 @@ contract XPowerLokiNft is XPowerNft {
     constructor(
         string memory nftUri,
         address moeLink,
-        address nftBase,
+        address[] memory nftBase,
         uint256 deadlineIn
     ) XPowerNft("XPower Loki", "LOKINFT", nftUri, moeLink, nftBase, deadlineIn) {}
 }
@@ -86,7 +86,7 @@ contract XPowerOdinNft is XPowerNft {
     constructor(
         string memory nftUri,
         address moeLink,
-        address nftBase,
+        address[] memory nftBase,
         uint256 deadlineIn
     ) XPowerNft("XPower Odin", "ODINNFT", nftUri, moeLink, nftBase, deadlineIn) {}
 }

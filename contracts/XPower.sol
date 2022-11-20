@@ -34,7 +34,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
         string memory symbol,
-        address moeBase,
+        address[] memory moeBase,
         uint256 deadlineIn
     )
         // ERC20 constructor: name, symbol
@@ -195,7 +195,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
 contract XPowerThor is XPower {
     /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address moeBase, uint256 deadlineIn) XPower("THOR", moeBase, deadlineIn) {}
+    constructor(address[] memory moeBase, uint256 deadlineIn) XPower("THOR", moeBase, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
@@ -215,7 +215,7 @@ contract XPowerThor is XPower {
 contract XPowerLoki is XPower {
     /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address moeBase, uint256 deadlineIn) XPower("LOKI", moeBase, deadlineIn) {}
+    constructor(address[] memory moeBase, uint256 deadlineIn) XPower("LOKI", moeBase, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
@@ -235,7 +235,7 @@ contract XPowerLoki is XPower {
 contract XPowerOdin is XPower {
     /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
-    constructor(address moeBase, uint256 deadlineIn) XPower("ODIN", moeBase, deadlineIn) {}
+    constructor(address[] memory moeBase, uint256 deadlineIn) XPower("ODIN", moeBase, deadlineIn) {}
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {

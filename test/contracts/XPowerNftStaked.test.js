@@ -11,7 +11,6 @@ let nft_staked; // instance
 const DATA =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("XPowerNftStaked", async function () {
@@ -29,7 +28,7 @@ describe("XPowerNftStaked", async function () {
     expect(NftStaked).to.exist;
   });
   beforeEach(async function () {
-    nft_staked = await NftStaked.deploy(NFT_LOKI_URL, NONE_ADDRESS, DEADLINE);
+    nft_staked = await NftStaked.deploy(NFT_LOKI_URL, [], DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });

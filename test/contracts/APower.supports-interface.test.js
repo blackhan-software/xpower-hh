@@ -8,7 +8,6 @@ let addresses; // all addresses
 let APower, XPower; // contracts
 let apower, xpower; // instances
 
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("APower", async function () {
@@ -28,12 +27,12 @@ describe("APower", async function () {
     expect(XPower).to.exist;
   });
   before(async function () {
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
   });
   before(async function () {
-    apower = await APower.deploy(xpower.address, NONE_ADDRESS, DEADLINE);
+    apower = await APower.deploy(xpower.address, [], DEADLINE);
     expect(apower).to.exist;
     await apower.deployed();
   });

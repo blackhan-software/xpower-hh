@@ -13,7 +13,6 @@ let UNUM; // decimals
 const { HashTable } = require("../hash-table");
 let table_0, table_2; // pre-hashed nonces
 
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE_OLD = 0; // [seconds], i.e. migration not possible
 const DEADLINE_NEW = 1_814_400; // [seconds] i.e. 3 weeks
 
@@ -29,7 +28,7 @@ describe("XPowerLoki Migration", async function () {
   });
   before(async function () {
     const factory = await ethers.getContractFactory("XPowerLokiTest");
-    const contract = await factory.deploy(NONE_ADDRESS, DEADLINE_OLD);
+    const contract = await factory.deploy([], DEADLINE_OLD);
     table_0 = await new HashTable(contract, addresses[0]).init();
     table_2 = await new HashTable(contract, addresses[2]).init();
   });
@@ -39,11 +38,11 @@ describe("XPowerLoki Migration", async function () {
   });
   beforeEach(async function () {
     // deploy old xpower contract:
-    xpower_old = await XPowerOld.deploy(NONE_ADDRESS, DEADLINE_OLD);
+    xpower_old = await XPowerOld.deploy([], DEADLINE_OLD);
     await xpower_old.deployed();
     await xpower_old.init();
     // deploy new xpower contract:
-    xpower_new = await XPowerNew.deploy(xpower_old.address, DEADLINE_NEW);
+    xpower_new = await XPowerNew.deploy([xpower_old.address], DEADLINE_NEW);
     await xpower_new.deployed();
     await xpower_new.init();
   });
@@ -65,6 +64,10 @@ describe("XPowerLoki Migration", async function () {
     });
   });
   describe("new", async function () {
+    it("should return index=0", async function () {
+      const index = await xpower_new.indexOf(xpower_old.address);
+      expect(index).to.eq(0);
+    });
     it("should mint for amount=1", async function () {
       const [nonce, block_hash] = table_0.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
@@ -113,7 +116,7 @@ describe("XPowerLoki Migration", async function () {
         const new_allowance = await xpower_new.allowance(owner, spender);
         expect(new_allowance).to.eq(0n);
         // migrate amount from old[owner] to new[owner]
-        const new_migrate = await xpower_new.connect(minter).migrate(3);
+        const new_migrate = await xpower_new.connect(minter).migrate(3, [0, 0]);
         expect(new_migrate).to.be.an("object");
         // ensure migrated amount = 3
         const new_migrated = await xpower_new.migrated();
@@ -153,7 +156,7 @@ describe("XPowerLoki Migration", async function () {
         const new_allowance = await xpower_new.allowance(owner, spender);
         expect(new_allowance).to.eq(0n);
         // migrate amount from old[owner] to new[owner]
-        const new_migrate = await xpower_new.connect(minter).migrate(1);
+        const new_migrate = await xpower_new.connect(minter).migrate(1, [0, 0]);
         expect(new_migrate).to.be.an("object");
         // ensure migrated amount = 4
         const new_migrated = await xpower_new.migrated();
@@ -171,7 +174,7 @@ describe("XPowerLoki Migration", async function () {
       }
     });
     it("should *not* migrate old[0] => new (insufficient allowance: old[0] = 0 balance)", async function () {
-      const tx = await xpower_new.migrate(1).catch((ex) => {
+      const tx = await xpower_new.migrate(1, [0, 0]).catch((ex) => {
         const m = ex.message.match(/insufficient allowance/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
@@ -186,7 +189,7 @@ describe("XPowerLoki Migration", async function () {
       const tx = await xpower_old.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await xpower_old.balanceOf(addresses[0])).to.eq(1n);
-      const new_migrate = await xpower_new.migrate(1).catch((ex) => {
+      const new_migrate = await xpower_new.migrate(1, [0, 0]).catch((ex) => {
         const m = ex.message.match(/insufficient allowance/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
@@ -210,7 +213,7 @@ describe("XPowerLoki Migration", async function () {
       const new_allowance = await xpower_new.allowance(owner, spender);
       expect(new_allowance).to.eq(0n);
       // migrate amount from old[owner] to new[owner]
-      const new_migrate = await xpower_new.migrate(5).catch((ex) => {
+      const new_migrate = await xpower_new.migrate(5, [0, 0]).catch((ex) => {
         const m = ex.message.match(/burn amount exceeds balance/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
@@ -241,7 +244,7 @@ describe("XPowerLoki Migration", async function () {
       const new_allowance = await xpower_new.allowance(owner, spender);
       expect(new_allowance).to.eq(0n);
       // migrate amount from old[owner] to new[owner]
-      const new_migrate = await xpower_new.connect(minter).migrate(1);
+      const new_migrate = await xpower_new.connect(minter).migrate(1, [0, 0]);
       expect(new_migrate).to.be.an("object");
       // ensure migrated amount = 1
       const new_migrated = await xpower_new.migrated();
@@ -268,7 +271,7 @@ describe("XPowerLoki Migration", async function () {
       expect(tx).to.be.an("object");
       expect(await xpower_old.balanceOf(minter.address)).to.eq(1n);
       // deploy xpower_new contract (w/o transferring ownership):
-      xpower_new = await XPowerNew.deploy(xpower_old.address, DEADLINE_NEW);
+      xpower_new = await XPowerNew.deploy([xpower_old.address], DEADLINE_NEW);
       await xpower_new.deployed();
       expect(xpower_new.address).to.exists;
       const { value: block_hash_new } = await xpower_new.connect(minter).init();
@@ -286,12 +289,13 @@ describe("XPowerLoki Migration", async function () {
       // grant seal role to default account (i.e. deployer)
       await xpower_new.grantRole(xpower_new.MOE_SEAL_ROLE(), addresses[0]);
       // seal migrate option
-      const new_seal = await xpower_new.seal();
-      expect(new_seal).to.be.an("object");
+      expect(await xpower_new.sealedAll()).to.deep.eq([false]);
+      await xpower_new.seal(0);
+      expect(await xpower_new.sealedAll()).to.deep.eq([true]);
       // migrate amount from old[owner] to new[owner]
       const new_migrate = await xpower_new
         .connect(minter)
-        .migrate(1)
+        .migrate(1, [0, 0])
         .catch((ex) => {
           const m = ex.message.match(/migration sealed/);
           if (m === null) console.debug(ex);
@@ -306,14 +310,14 @@ describe("XPowerLoki Migration", async function () {
       const minter = accounts[2];
       expect(minter.address).to.match(/^0x/);
       // deploy xpower_new contract (w/o transferring ownership):
-      xpower_new = await XPowerNew.deploy(xpower_old.address, DEADLINE_NEW);
+      xpower_new = await XPowerNew.deploy([xpower_old.address], DEADLINE_NEW);
       await xpower_new.deployed();
       expect(xpower_new.address).to.exists;
       // grant seal role to default account (but *not* minter)
       await xpower_new.grantRole(xpower_new.MOE_SEAL_ROLE(), addresses[0]);
       // try to seal migrate option
       try {
-        const new_seal = await xpower_new.connect(minter).seal();
+        const new_seal = await xpower_new.connect(minter).seal(0);
         expect(new_seal).to.be.an(undefined);
       } catch (ex) {
         const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
@@ -345,14 +349,14 @@ describe("XPowerLoki Migration", async function () {
       // forward time by one week (1st increase)
       await network.provider.send("evm_increaseTime", [604_800]);
       // migrate amount from old[owner] to new[owner]
-      const new_migrate_1 = await xpower_new.connect(minter).migrate(1);
+      const new_migrate_1 = await xpower_new.connect(minter).migrate(1, [0, 0]);
       expect(new_migrate_1).to.be.an("object");
       const new_migrated_1 = await xpower_new.migrated();
       expect(new_migrated_1).to.eq(UNUM);
       // forward time by one more week (2nd increase)
       await network.provider.send("evm_increaseTime", [604_800]);
       // migrate amount from old[owner] to new[owner]
-      const new_migrate_2 = await xpower_new.connect(minter).migrate(1);
+      const new_migrate_2 = await xpower_new.connect(minter).migrate(1, [0, 0]);
       expect(new_migrate_2).to.be.an("object");
       const new_migrated_2 = await xpower_new.migrated();
       expect(new_migrated_2).to.eq(2n * UNUM);
@@ -361,7 +365,7 @@ describe("XPowerLoki Migration", async function () {
       // migrate amount from old[owner] to new[owner]
       const new_migrate_3 = await xpower_new
         .connect(minter)
-        .migrate(1)
+        .migrate(1, [0, 0])
         .catch((ex) => {
           const m = ex.message.match(/deadline passed/);
           if (m === null) console.debug(ex);

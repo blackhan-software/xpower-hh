@@ -8,7 +8,6 @@ let addresses; // all addresses
 let XPower, XPowerNft; // contracts
 let xpower, xpower_nft; // instances
 
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const DEADLINE = 0; // [seconds]
 
@@ -31,7 +30,7 @@ describe("XPowerNft", async function () {
     expect(XPower).to.exist;
   });
   before(async function () {
-    xpower = await XPower.deploy(NONE_ADDRESS, DEADLINE);
+    xpower = await XPower.deploy([], DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.transferOwnership(addresses[1]);
@@ -41,7 +40,7 @@ describe("XPowerNft", async function () {
     xpower_nft = await XPowerNft.deploy(
       NFT_LOKI_URL,
       xpower.address,
-      NONE_ADDRESS,
+      [],
       DEADLINE
     );
     expect(xpower_nft).to.exist;

@@ -28,7 +28,7 @@ abstract contract XPowerNftStaked is XPowerNftBase {
         string memory pptName,
         string memory pptSymbol,
         string memory pptUri,
-        address pptBase,
+        address[] memory pptBase,
         uint256 deadlineIn
     ) XPowerNftBase(pptName, pptSymbol, pptUri, pptBase, deadlineIn) {}
 
@@ -143,7 +143,7 @@ abstract contract XPowerNftStaked is XPowerNftBase {
 contract XPowerThorNftStaked is XPowerNftStaked {
     constructor(
         string memory pptUri,
-        address pptBase,
+        address[] memory pptBase,
         uint256 deadlineIn
     ) XPowerNftStaked("XPower Thor", "THORPPT", pptUri, pptBase, deadlineIn) {}
 }
@@ -154,7 +154,7 @@ contract XPowerThorNftStaked is XPowerNftStaked {
 contract XPowerLokiNftStaked is XPowerNftStaked {
     constructor(
         string memory pptUri,
-        address pptBase,
+        address[] memory pptBase,
         uint256 deadlineIn
     ) XPowerNftStaked("XPower Loki", "LOKIPPT", pptUri, pptBase, deadlineIn) {}
 }
@@ -165,7 +165,7 @@ contract XPowerLokiNftStaked is XPowerNftStaked {
 contract XPowerOdinNftStaked is XPowerNftStaked {
     constructor(
         string memory pptUri,
-        address pptBase,
+        address[] memory pptBase,
         uint256 deadlineIn
     ) XPowerNftStaked("XPower Odin", "ODINPPT", pptUri, pptBase, deadlineIn) {}
 }
