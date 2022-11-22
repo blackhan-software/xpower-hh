@@ -11,7 +11,7 @@ let xpower_new; // new instance
 let UNUM; // decimals
 
 const { HashTable } = require("../hash-table");
-let table_0, table_2; // pre-hashed nonces
+let table_0, table_1, table_2; // pre-hashed nonces
 
 const DEADLINE_OLD = 0; // [seconds], i.e. migration not possible
 const DEADLINE_NEW = 1_814_400; // [seconds] i.e. 3 weeks
@@ -27,12 +27,6 @@ describe("XPowerOdin Migration", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerOdinTest");
-    const contract = await factory.deploy([], DEADLINE_OLD);
-    table_0 = await new HashTable(contract, addresses[0]).init();
-    table_2 = await new HashTable(contract, addresses[2]).init();
-  });
-  before(async function () {
     XPowerOld = await ethers.getContractFactory("XPowerOdinOldTest");
     XPowerNew = await ethers.getContractFactory("XPowerOdinTest");
   });
@@ -45,6 +39,11 @@ describe("XPowerOdin Migration", async function () {
     xpower_new = await XPowerNew.deploy([xpower_old.address], DEADLINE_NEW);
     await xpower_new.deployed();
     await xpower_new.init();
+  });
+  beforeEach(async function () {
+    table_0 = await new HashTable(xpower_old, addresses[0]).init();
+    table_1 = await new HashTable(xpower_new, addresses[0]).init();
+    table_2 = await new HashTable(xpower_old, addresses[2]).init();
   });
   beforeEach(async function () {
     const old_decimals = await xpower_old.decimals();
@@ -69,7 +68,7 @@ describe("XPowerOdin Migration", async function () {
       expect(index).to.eq(0);
     });
     it("should mint for amount=1", async function () {
-      const [nonce, block_hash] = table_0.getNonce({ amount: 15 });
+      const [nonce, block_hash] = table_1.getNonce({ amount: 15 });
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower_new.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");

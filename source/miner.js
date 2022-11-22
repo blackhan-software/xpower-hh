@@ -28,20 +28,20 @@ class Miner {
   async init(level) {
     await InitializeKeccak();
     const abi_encode = this.abi_encoder(level);
-    return (token, address, interval, block_hash, nonce) => {
-      const data = abi_encode(token, address, interval, block_hash, nonce);
+    return (contract, address, interval, block_hash, nonce) => {
+      const data = abi_encode(contract, address, interval, block_hash, nonce);
       return "0x" + keccak256(data);
     };
   }
 
   abi_encoder(level) {
     const lazy_arrayify = this.arrayifier(level);
-    return (token, address, interval, block_hash, nonce) => {
+    return (contract, address, interval, block_hash, nonce) => {
       let value = this.abi_encoded[interval];
       if (value === undefined) {
         const template = abi.encode(
-          ["string", "address", "uint256", "bytes32", "uint256"],
-          [token, address, interval, block_hash, 0]
+          ["address", "address", "uint256", "bytes32", "uint256"],
+          [contract, address, interval, block_hash, 0]
         );
         this.abi_encoded[interval] = value = this.arrayify(template.slice(2));
         this.array_cache[level] = this.arrayify(nonce.toString(16));

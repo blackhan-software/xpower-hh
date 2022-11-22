@@ -42,24 +42,24 @@ describe("MoeTreasury", async function () {
     MoeTreasury = await ethers.getContractFactory("MoeTreasury");
     expect(MoeTreasury).to.exist;
   });
-  beforeEach(async function () {
+  before(async function () {
     xpower = await XPower.deploy([], DEADLINE);
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.init();
   });
-  beforeEach(async function () {
+  before(async function () {
     const decimals = await xpower.decimals();
     expect(decimals).to.greaterThan(0);
     UNUM = 10n ** BigInt(decimals);
     expect(UNUM >= 1n).to.be.true;
   });
-  beforeEach(async function () {
+  before(async function () {
     apower = await APower.deploy(xpower.address, [], DEADLINE);
     expect(apower).to.exist;
     await apower.deployed();
   });
-  beforeEach(async function () {
+  before(async function () {
     table = await new HashTable(xpower, addresses[0]).init({
       length: 2n,
       min_level: 5,
@@ -67,22 +67,22 @@ describe("MoeTreasury", async function () {
       use_cache: true,
     });
   });
-  beforeEach(async function () {
+  before(async function () {
     nft = await Nft.deploy(NFT_ODIN_URL, xpower.address, [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });
-  beforeEach(async function () {
+  before(async function () {
     nft_staked = await NftStaked.deploy(NFT_ODIN_URL, [], DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });
-  beforeEach(async function () {
+  before(async function () {
     nft_treasury = await NftTreasury.deploy(nft.address, nft_staked.address);
     expect(nft_treasury).to.exist;
     await nft_treasury.deployed();
   });
-  beforeEach(async function () {
+  before(async function () {
     moe_treasury = await MoeTreasury.deploy(
       apower.address,
       xpower.address,
@@ -92,11 +92,11 @@ describe("MoeTreasury", async function () {
     await moe_treasury.deployed();
     mt = moe_treasury;
   });
-  beforeEach(async function () {
+  before(async function () {
     await apower.transferOwnership(moe_treasury.address);
     expect(await apower.owner()).to.eq(moe_treasury.address);
   });
-  beforeEach(async function () {
+  before(async function () {
     while (true)
       try {
         await mintToken(1_048_575);
@@ -105,14 +105,14 @@ describe("MoeTreasury", async function () {
       }
     table.reset();
   });
-  beforeEach(async function () {
+  before(async function () {
     const supply = await xpower.totalSupply();
     expect(supply).to.be.gte(1_180_09n * UNUM);
   });
-  beforeEach(async function () {
+  before(async function () {
     await increaseAllowanceBy(1_000_000n * UNUM, nft.address);
   });
-  beforeEach(async function () {
+  before(async function () {
     await xpower.transfer(moe_treasury.address, 210_000n * UNUM);
   });
   describe("balance", async function () {

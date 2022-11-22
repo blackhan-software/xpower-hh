@@ -24,17 +24,15 @@ describe("XPowerThorTest", async function () {
     expect(addresses.length).to.be.greaterThan(0);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerThorTest");
-    const contract = await factory.deploy([], DEADLINE);
-    table = await new HashTable(contract, addresses[0]).init();
-  });
-  before(async function () {
     XPower = await ethers.getContractFactory("XPowerThorTest");
   });
   before(async function () {
     xpower = await XPower.deploy([], DEADLINE);
     await xpower.deployed();
     await xpower.init();
+  });
+  before(async function () {
+    table = await new HashTable(xpower, addresses[0]).init();
   });
   before(async function () {
     const decimals = await xpower.decimals();

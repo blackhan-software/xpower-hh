@@ -26,11 +26,6 @@ describe("NftTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerLokiTest");
-    const contract = await factory.deploy([], DEADLINE);
-    table = await new HashTable(contract, addresses[0]).init();
-  });
-  before(async function () {
     XPower = await ethers.getContractFactory("XPowerLokiTest");
     expect(XPower).to.exist;
   });
@@ -39,6 +34,9 @@ describe("NftTreasury", async function () {
     expect(xpower).to.exist;
     await xpower.deployed();
     await xpower.init();
+  });
+  beforeEach(async function () {
+    table = await new HashTable(xpower, addresses[0]).init();
   });
   beforeEach(async function () {
     const decimals = await xpower.decimals();

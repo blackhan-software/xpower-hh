@@ -28,11 +28,6 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    const factory = await ethers.getContractFactory("XPowerLokiTest");
-    const contract = await factory.deploy([], DEADLINE);
-    table = await new HashTable(contract, addresses[0]).init();
-  });
-  before(async function () {
     XPowerNft = await ethers.getContractFactory("XPowerLokiNft");
     expect(XPowerNft).to.exist;
     XPower = await ethers.getContractFactory("XPowerLoki");
@@ -44,6 +39,9 @@ describe("XPowerNft", async function () {
     await xpower.deployed();
     await xpower.transferOwnership(addresses[1]);
     await xpower.init();
+  });
+  beforeEach(async function () {
+    table = await new HashTable(xpower, addresses[0]).init();
   });
   beforeEach(async function () {
     const decimals = await xpower.decimals();

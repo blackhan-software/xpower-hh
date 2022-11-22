@@ -140,7 +140,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         bytes32 blockHash,
         uint256 nonce
     ) internal view virtual returns (bytes32) {
-        return keccak256(abi.encode(symbol(), to, interval, blockHash, nonce));
+        return keccak256(abi.encode(address(this), to, interval, blockHash, nonce));
     }
 
     /** @return amount for provided nonce-hash */
