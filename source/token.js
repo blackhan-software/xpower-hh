@@ -52,18 +52,18 @@ const zeros = (hash) => {
 const contract = async (symbol) => {
   switch (symbol) {
     case "THOR": {
-      const address = process.env.THOR_MOE_V4a;
-      assert(address, "missing THOR_MOE_V4a");
+      const address = process.env.THOR_MOE_V5a;
+      assert(address, "missing THOR_MOE_V5a");
       return await hre.ethers.getContractAt("XPowerThor", address);
     }
     case "LOKI": {
-      const address = process.env.LOKI_MOE_V4a;
-      assert(address, "missing LOKI_MOE_V4a");
+      const address = process.env.LOKI_MOE_V5a;
+      assert(address, "missing LOKI_MOE_V5a");
       return await hre.ethers.getContractAt("XPowerLoki", address);
     }
     case "ODIN": {
-      const address = process.env.ODIN_MOE_V4a;
-      assert(address, "missing ODIN_MOE_V4a");
+      const address = process.env.ODIN_MOE_V5a;
+      assert(address, "missing ODIN_MOE_V5a");
       return await hre.ethers.getContractAt("XPowerOdin", address);
     }
     default:
