@@ -34,7 +34,7 @@ async function main() {
   // deploy XPowerThor[New]
   //
   const thor_moe = await deploy("XPowerThor", {
-    moe_base: thor_moe_base,
+    moe_base: [thor_moe_base],
     deadline,
     owner,
   });
@@ -43,7 +43,7 @@ async function main() {
   // deploy XPowerLoki[New]
   //
   const loki_moe = await deploy("XPowerLoki", {
-    moe_base: loki_moe_base,
+    moe_base: [loki_moe_base],
     deadline,
     owner,
   });
@@ -52,7 +52,7 @@ async function main() {
   // deploy XPowerOdin[New]
   //
   const odin_moe = await deploy("XPowerOdin", {
-    moe_base: odin_moe_base,
+    moe_base: [odin_moe_base],
     deadline,
     owner,
   });

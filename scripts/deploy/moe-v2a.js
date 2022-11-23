@@ -19,8 +19,6 @@ const { wait } = require("../wait");
  * > await hre.run("compile");
  */
 async function main() {
-  const none = process.env.NONE_ADDRESS;
-  assert(none, "missing NONE_ADDRESS");
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // migration:
@@ -29,7 +27,7 @@ async function main() {
   // deploy XPowerThor[Old]
   //
   const thor_moe = await deploy("XPowerThor", {
-    moe_base: none,
+    moe_base: [],
     deadline,
     owner,
   });
@@ -38,7 +36,7 @@ async function main() {
   // deploy XPowerLoki[Old]
   //
   const loki_moe = await deploy("XPowerLoki", {
-    moe_base: none,
+    moe_base: [],
     deadline,
     owner,
   });
@@ -47,7 +45,7 @@ async function main() {
   // deploy XPowerOdin[Old]
   //
   const odin_moe = await deploy("XPowerOdin", {
-    moe_base: none,
+    moe_base: [],
     deadline,
     owner,
   });

@@ -50,7 +50,7 @@ async function main() {
   const thor_nft = await deploy("XPowerThorNft", {
     nft_uri: thor_nft_uri,
     moe_link: thor_moe_link,
-    nft_base: thor_nft_base,
+    nft_base: [thor_nft_base],
     deadline,
     owner,
   });
@@ -61,7 +61,7 @@ async function main() {
   const loki_nft = await deploy("XPowerLokiNft", {
     nft_uri: loki_nft_uri,
     moe_link: loki_moe_link,
-    nft_base: loki_nft_base,
+    nft_base: [loki_nft_base],
     deadline,
     owner,
   });
@@ -72,7 +72,7 @@ async function main() {
   const odin_nft = await deploy("XPowerOdinNft", {
     nft_uri: odin_nft_uri,
     moe_link: odin_moe_link,
-    nft_base: odin_nft_base,
+    nft_base: [odin_nft_base],
     deadline,
     owner,
   });

@@ -22,12 +22,12 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPowerNftStaked[Old]
-  const thor_ppt_base = process.env.THOR_NFT_V5a;
-  assert(thor_ppt_base, "missing THOR_NFT_V5a");
-  const loki_ppt_base = process.env.LOKI_NFT_V5a;
-  assert(loki_ppt_base, "missing LOKI_NFT_V5a");
-  const odin_ppt_base = process.env.ODIN_NFT_V5a;
-  assert(odin_ppt_base, "missing ODIN_NFT_V5a");
+  const thor_ppt_base = process.env.THOR_PPT_V5a;
+  assert(thor_ppt_base, "missing THOR_PPT_V5a");
+  const loki_ppt_base = process.env.LOKI_PPT_V5a;
+  assert(loki_ppt_base, "missing LOKI_PPT_V5a");
+  const odin_ppt_base = process.env.ODIN_PPT_V5a;
+  assert(odin_ppt_base, "missing ODIN_PPT_V5a");
   // addresses XPowerNftStaked[Uri]
   const thor_ppt_uri = process.env.THOR_PPT_URI;
   assert(thor_ppt_uri, "missing THOR_PPT_URI");
@@ -42,7 +42,7 @@ async function main() {
   //
   const thor_nft = await deploy("XPowerThorNftStaked", {
     ppt_uri: thor_ppt_uri,
-    ppt_base: thor_ppt_base,
+    ppt_base: [thor_ppt_base],
     deadline,
   });
   console.log(`THOR_PPT_V5b=${thor_nft.address}`);
@@ -51,7 +51,7 @@ async function main() {
   //
   const loki_nft = await deploy("XPowerLokiNftStaked", {
     ppt_uri: loki_ppt_uri,
-    ppt_base: loki_ppt_base,
+    ppt_base: [loki_ppt_base],
     deadline,
   });
   console.log(`LOKI_PPT_V5b=${loki_nft.address}`);
@@ -60,7 +60,7 @@ async function main() {
   //
   const odin_nft = await deploy("XPowerOdinNftStaked", {
     ppt_uri: odin_ppt_uri,
-    ppt_base: odin_ppt_base,
+    ppt_base: [odin_ppt_base],
     deadline,
   });
   console.log(`ODIN_PPT_V5b=${odin_nft.address}`);

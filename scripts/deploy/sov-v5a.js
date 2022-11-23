@@ -19,8 +19,6 @@ const { wait } = require("../wait");
  * > await hre.run("compile");
  */
 async function main() {
-  const none = process.env.NONE_ADDRESS;
-  assert(none, "missing NONE_ADDRESS");
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPower[New]
@@ -37,7 +35,7 @@ async function main() {
   //
   const thor_sov = await deploy("APowerThor", {
     moe_link: thor_moe_link,
-    sov_base: none,
+    sov_base: [],
     deadline,
   });
   console.log(`THOR_SOV_V5a=${thor_sov.address}`);
@@ -46,7 +44,7 @@ async function main() {
   //
   const loki_sov = await deploy("APowerLoki", {
     moe_link: loki_moe_link,
-    sov_base: none,
+    sov_base: [],
     deadline,
   });
   console.log(`LOKI_SOV_V5a=${loki_sov.address}`);
@@ -55,7 +53,7 @@ async function main() {
   //
   const odin_sov = await deploy("APowerOdin", {
     moe_link: odin_moe_link,
-    sov_base: none,
+    sov_base: [],
     deadline,
   });
   console.log(`ODIN_SOV_V5a=${odin_sov.address}`);

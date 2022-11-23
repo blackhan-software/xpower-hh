@@ -42,7 +42,7 @@ async function main() {
   //
   const thor_sov = await deploy("APowerThor", {
     moe_link: thor_moe_link,
-    sov_base: thor_sov_base,
+    sov_base: [thor_sov_base],
     deadline,
   });
   console.log(`THOR_SOV_V5b=${thor_sov.address}`);
@@ -51,7 +51,7 @@ async function main() {
   //
   const loki_sov = await deploy("APowerLoki", {
     moe_link: loki_moe_link,
-    sov_base: loki_sov_base,
+    sov_base: [loki_sov_base],
     deadline,
   });
   console.log(`LOKI_SOV_V5b=${loki_sov.address}`);
@@ -60,7 +60,7 @@ async function main() {
   //
   const odin_sov = await deploy("APowerOdin", {
     moe_link: odin_moe_link,
-    sov_base: odin_sov_base,
+    sov_base: [odin_sov_base],
     deadline,
   });
   console.log(`ODIN_SOV_V5b=${odin_sov.address}`);

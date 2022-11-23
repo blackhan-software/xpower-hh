@@ -19,8 +19,6 @@ const { wait } = require("../wait");
  * > await hre.run('compile');
  */
 async function main() {
-  const none = process.env.NONE_ADDRESS;
-  assert(none, "missing NONE_ADDRESS");
   // addresses XPowerNft[Uri]
   const thor_ppt_uri = process.env.THOR_PPT_URI;
   assert(thor_ppt_uri, "missing THOR_PPT_URI");
@@ -35,7 +33,7 @@ async function main() {
   //
   const thor_nft = await deploy("XPowerThorNftStaked", {
     ppt_uri: thor_ppt_uri,
-    ppt_base: none,
+    ppt_base: [],
     deadline,
   });
   console.log(`THOR_PPT_V4a=${thor_nft.address}`);
@@ -44,7 +42,7 @@ async function main() {
   //
   const loki_nft = await deploy("XPowerLokiNftStaked", {
     ppt_uri: loki_ppt_uri,
-    ppt_base: none,
+    ppt_base: [],
     deadline,
   });
   console.log(`LOKI_PPT_V4a=${loki_nft.address}`);
@@ -53,7 +51,7 @@ async function main() {
   //
   const odin_nft = await deploy("XPowerOdinNftStaked", {
     ppt_uri: odin_ppt_uri,
-    ppt_base: none,
+    ppt_base: [],
     deadline,
   });
   console.log(`ODIN_PPT_V4a=${odin_nft.address}`);

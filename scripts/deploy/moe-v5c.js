@@ -12,6 +12,16 @@ const assert = require("assert");
 const { wait } = require("../wait");
 
 /**
+ * @returns list of base contract addresses
+ */
+function moe_bases(token, versions = ["V2a", "V3a", "V4a", "V5a", "V5b"]) {
+  return versions.map((version) => {
+    const moe_base = process.env[`${token}_MOE_${version}`];
+    assert(moe_base, `missing ${token}_MOE_${version}`);
+    return moe_base;
+  });
+}
+/**
  * Hardhat *always* runs the compile task when running scripts with its command
  * line interface. But, if this script is run *directly* using `node`, then you
  * may want to call compile manually to make sure everything is compiled:
@@ -22,41 +32,47 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPower[Old]
-  const thor_moe_base = process.env.THOR_MOE_V2a;
-  assert(thor_moe_base, "missing THOR_MOE_V2a");
-  const loki_moe_base = process.env.LOKI_MOE_V2a;
-  assert(loki_moe_base, "missing LOKI_MOE_V2a");
-  const odin_moe_base = process.env.ODIN_MOE_V2a;
-  assert(odin_moe_base, "missing ODIN_MOE_V2a");
+  const thor_moe_base = moe_bases("THOR");
+  assert(thor_moe_base.length === 5);
+  const loki_moe_base = moe_bases("LOKI");
+  assert(loki_moe_base.length === 5);
+  const odin_moe_base = moe_bases("ODIN");
+  assert(odin_moe_base.length === 5);
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerThor[New]
   //
-  const thor_moe = await deploy("XPowerThor", {
-    moe_base: [thor_moe_base],
+  const thor = await deploy("XPowerThor", {
+    moe_base: thor_moe_base,
     deadline,
     owner,
   });
-  console.log(`THOR_MOE_V3a=${thor_moe.address}`);
+  console.log(`THOR_MOE_V5c=${thor.moe.address}`);
   //
   // deploy XPowerLoki[New]
   //
-  const loki_moe = await deploy("XPowerLoki", {
-    moe_base: [loki_moe_base],
+  const loki = await deploy("XPowerLoki", {
+    moe_base: loki_moe_base,
     deadline,
     owner,
   });
-  console.log(`LOKI_MOE_V3a=${loki_moe.address}`);
+  console.log(`LOKI_MOE_V5c=${loki.moe.address}`);
   //
   // deploy XPowerOdin[New]
   //
-  const odin_moe = await deploy("XPowerOdin", {
-    moe_base: [odin_moe_base],
+  const odin = await deploy("XPowerOdin", {
+    moe_base: odin_moe_base,
     deadline,
     owner,
   });
-  console.log(`ODIN_MOE_V3a=${odin_moe.address}`);
+  console.log(`ODIN_MOE_V5c=${odin.moe.address}`);
+  //
+  // verify contract(s):
+  //
+  await verify("XPowerThor", thor.moe, thor_moe_base, deadline);
+  await verify("XPowerLoki", loki.moe, loki_moe_base, deadline);
+  await verify("XPowerOdin", odin.moe, odin_moe_base, deadline);
 }
 async function deploy(name, { moe_base, deadline, owner }) {
   const factory = await hre.ethers.getContractFactory(name);
@@ -64,7 +80,16 @@ async function deploy(name, { moe_base, deadline, owner }) {
   await wait(contract.deployTransaction);
   const transfer = await contract.transferOwnership(owner);
   await wait(transfer);
-  return contract;
+  return { moe: contract };
+}
+async function verify(name, { address }, ...args) {
+  if (hre.network.name.match(/mainnet|fuji/)) {
+    return await hre.run("verify:verify", {
+      address,
+      contract: `contracts/XPower.sol:${name}`,
+      constructorArguments: args,
+    });
+  }
 }
 if (require.main === module) {
   main()
