@@ -20,7 +20,7 @@
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@openzeppelin/contracts": "^4.8.0",
     "chai": "^4.3.7",
-    "eslint": "^8.27.0",
+    "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
@@ -29,7 +29,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "hardhat-gas-reporter": "^1.0.9",
     "moment": "^2.29.4",
-    "prettier": "^2.7.1",
+    "prettier": "^2.8.0",
     "prettier-plugin-solidity": "^1.0.0",
     "solhint": "^3.3.7",
     "solidity-coverage": "^0.8.2"
