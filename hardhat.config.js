@@ -150,6 +150,13 @@ module.exports = {
       gasMultiplier: 1.25, // gasPrice: 100_000_000_000,
     },
   },
+  etherscan: {
+    apiKey: {
+      avalancheFujiTestnet: "",
+      avalanche: "",
+    },
+    url: "https://api.snowtrace.io/api",
+  },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
