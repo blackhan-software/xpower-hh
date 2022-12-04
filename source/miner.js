@@ -55,8 +55,8 @@ class Miner {
 
   arrayifier(level) {
     const diff_max = 16n ** BigInt(level) - 1n;
-    const offset_2 = 64 - level * 2;
-    const offset_1 = 32 - level;
+    const offset_2 = 64 - Math.max(64, level * 2);
+    const offset_1 = 32 - Math.max(32, level);
     return (nonce, hex_nonce) => {
       if (nonce - this.nonce_cache[level] > diff_max) {
         this.array_cache[level] = this.arrayify(hex_nonce);
