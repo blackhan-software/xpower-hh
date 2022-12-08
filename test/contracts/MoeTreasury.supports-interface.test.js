@@ -7,7 +7,7 @@ let accounts; // all accounts
 let addresses; // all addresses
 let APower, XPower; // contracts
 let apower, xpower; // instances
-let Nft, NftStaked, NftTreasury; // contracts
+let Nft, Ppt, NftTreasury; // contracts
 let nft, nft_staked, nft_treasury; // instances
 let MoeTreasury; // contracts
 let moe_treasury, mt; // instances
@@ -34,8 +34,8 @@ describe("MoeTreasury", async function () {
   beforeEach(async function () {
     Nft = await ethers.getContractFactory("XPowerOdinNft");
     expect(Nft).to.exist;
-    NftStaked = await ethers.getContractFactory("XPowerOdinNftStaked");
-    expect(NftStaked).to.exist;
+    Ppt = await ethers.getContractFactory("XPowerOdinPpt");
+    expect(Ppt).to.exist;
     NftTreasury = await ethers.getContractFactory("NftTreasury");
     expect(NftTreasury).to.exist;
     MoeTreasury = await ethers.getContractFactory("MoeTreasury");
@@ -57,7 +57,7 @@ describe("MoeTreasury", async function () {
     await nft.deployed();
   });
   beforeEach(async function () {
-    nft_staked = await NftStaked.deploy(NFT_ODIN_URL, [], DEADLINE);
+    nft_staked = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });

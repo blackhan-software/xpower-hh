@@ -104,7 +104,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         _totalMints += 1;
         // increment total amounts minted
         _totalMinted += amount;
-        // increment total fees paid
+        // increment total fees spent
         _totalMintingFees += (gas - gasleft()) * tx.gasprice;
     }
 

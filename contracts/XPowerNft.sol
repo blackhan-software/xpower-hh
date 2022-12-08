@@ -62,7 +62,7 @@ contract XPowerThorNft is XPowerNft {
         address moeLink,
         address[] memory nftBase,
         uint256 deadlineIn
-    ) XPowerNft("XPower Thor", "THORNFT", nftUri, moeLink, nftBase, deadlineIn) {}
+    ) XPowerNft("XPower Thor NFTs", "THORNFT", nftUri, moeLink, nftBase, deadlineIn) {}
 }
 
 /**
@@ -75,7 +75,7 @@ contract XPowerLokiNft is XPowerNft {
         address moeLink,
         address[] memory nftBase,
         uint256 deadlineIn
-    ) XPowerNft("XPower Loki", "LOKINFT", nftUri, moeLink, nftBase, deadlineIn) {}
+    ) XPowerNft("XPower Loki NFTs", "LOKINFT", nftUri, moeLink, nftBase, deadlineIn) {}
 }
 
 /**
@@ -88,5 +88,5 @@ contract XPowerOdinNft is XPowerNft {
         address moeLink,
         address[] memory nftBase,
         uint256 deadlineIn
-    ) XPowerNft("XPower Odin", "ODINNFT", nftUri, moeLink, nftBase, deadlineIn) {}
+    ) XPowerNft("XPower Odin NFTs", "ODINNFT", nftUri, moeLink, nftBase, deadlineIn) {}
 }

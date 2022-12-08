@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 import "./XPowerNft.sol";
-import "./XPowerNftStaked.sol";
+import "./XPowerPpt.sol";
 
 /**
  * NFT treasury to stake and unstake XPowerNft(s).
@@ -14,13 +14,13 @@ contract NftTreasury is ERC1155Holder {
     /** normal proof-of-work NFTs */
     XPowerNft private _nft;
     /** staked proof-of-work NFTs */
-    XPowerNftStaked private _ppt;
+    XPowerPpt private _ppt;
 
     /** @param nftLink address of contract for normal NFTs */
     /** @param pptLink address of contract for staked NFTs */
     constructor(address nftLink, address pptLink) {
         _nft = XPowerNft(nftLink);
-        _ppt = XPowerNftStaked(pptLink);
+        _ppt = XPowerPpt(pptLink);
     }
 
     /** emitted on staking an NFT */

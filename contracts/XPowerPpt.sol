@@ -6,10 +6,10 @@ pragma solidity ^0.8.0;
 import "./XPowerNftBase.sol";
 
 /**
- * Abstract base class for staked XPowerNft(s): Contract owner only is allowed
- * to mint and burn XPowerNftStaked tokens.
+ * Abstract base class for staked XPowerNft(s): Only the contract owner is
+ * allowed to mint and burn XPowerPpt tokens.
  */
-abstract contract XPowerNftStaked is XPowerNftBase {
+abstract contract XPowerPpt is XPowerNftBase {
     /** map of mints: account => nft-id => accumulator [seconds] */
     mapping(address => mapping(uint256 => uint256)) private _mints;
     /** map of burns: account => nft-id => accumulator [seconds] */
@@ -140,32 +140,32 @@ abstract contract XPowerNftStaked is XPowerNftBase {
 /**
  * Staked NFT class for THOR tokens.
  */
-contract XPowerThorNftStaked is XPowerNftStaked {
+contract XPowerThorPpt is XPowerPpt {
     constructor(
         string memory pptUri,
         address[] memory pptBase,
         uint256 deadlineIn
-    ) XPowerNftStaked("XPower Thor", "THORPPT", pptUri, pptBase, deadlineIn) {}
+    ) XPowerPpt("XPower Thor PPTs", "THORPPT", pptUri, pptBase, deadlineIn) {}
 }
 
 /**
  * Staked NFT class for LOKI tokens.
  */
-contract XPowerLokiNftStaked is XPowerNftStaked {
+contract XPowerLokiPpt is XPowerPpt {
     constructor(
         string memory pptUri,
         address[] memory pptBase,
         uint256 deadlineIn
-    ) XPowerNftStaked("XPower Loki", "LOKIPPT", pptUri, pptBase, deadlineIn) {}
+    ) XPowerPpt("XPower Loki PPTs", "LOKIPPT", pptUri, pptBase, deadlineIn) {}
 }
 
 /**
  * Staked NFT class for ODIN tokens.
  */
-contract XPowerOdinNftStaked is XPowerNftStaked {
+contract XPowerOdinPpt is XPowerPpt {
     constructor(
         string memory pptUri,
         address[] memory pptBase,
         uint256 deadlineIn
-    ) XPowerNftStaked("XPower Odin", "ODINPPT", pptUri, pptBase, deadlineIn) {}
+    ) XPowerPpt("XPower Odin PPTs", "ODINPPT", pptUri, pptBase, deadlineIn) {}
 }

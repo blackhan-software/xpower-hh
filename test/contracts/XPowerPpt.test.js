@@ -5,7 +5,7 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let NftStaked; // contract
+let Ppt; // contract
 let nft_staked; // instance
 
 const DATA =
@@ -13,7 +13,7 @@ const DATA =
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
-describe("XPowerNftStaked", async function () {
+describe("XPowerPpt", async function () {
   before(async function () {
     await network.provider.send("hardhat_reset");
   });
@@ -24,39 +24,39 @@ describe("XPowerNftStaked", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    NftStaked = await ethers.getContractFactory("XPowerLokiNftStaked");
-    expect(NftStaked).to.exist;
+    Ppt = await ethers.getContractFactory("XPowerLokiPpt");
+    expect(Ppt).to.exist;
   });
   beforeEach(async function () {
-    nft_staked = await NftStaked.deploy(NFT_LOKI_URL, [], DEADLINE);
+    nft_staked = await Ppt.deploy(NFT_LOKI_URL, [], DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });
   describe("mint", async function () {
     it("should mint nft-staked for amount=1", async function () {
-      await mintNftStaked(202100, 1);
+      await mintPpt(202100, 1);
     });
   });
   describe("mint-batch", async function () {
     it("should mint nft-staked for amount=1", async function () {
-      await mintBatchNftStaked(202100, 1);
+      await mintBatchPpt(202100, 1);
     });
   });
   describe("burn", async function () {
     it("should burn nft-staked for amount=3", async function () {
-      await mintNftStaked(202100, 5);
-      await burnNftStaked(202100, 5);
+      await mintPpt(202100, 5);
+      await burnPpt(202100, 5);
     });
   });
   describe("mint-batch", async function () {
     it("should mint nft-staked for amount=1", async function () {
-      await mintBatchNftStaked(202100, 1);
+      await mintBatchPpt(202100, 1);
     });
   });
   describe("burn-batch", async function () {
     it("should burn nft-staked for amount=3", async function () {
-      await mintBatchNftStaked(202100, 5);
-      await burnBatchNftStaked(202100, 5);
+      await mintBatchPpt(202100, 5);
+      await burnBatchPpt(202100, 5);
     });
   });
   describe("age [10×mint]", async function () {
@@ -304,7 +304,7 @@ describe("XPowerNftStaked", async function () {
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // transfer:
-      await transferNftStaked(from, to, 202200, 1);
+      await transferPpt(from, to, 202200, 1);
       expect(await ageOf(from, 202200)).to.approximately(0, 5);
       expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
@@ -371,7 +371,7 @@ describe("XPowerNftStaked", async function () {
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // transfer:
-      await batchTransferNftStaked(from, to, [202200], [1]);
+      await batchTransferPpt(from, to, [202200], [1]);
       expect(await ageOf(from, 202200)).to.approximately(0, 5);
       expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
@@ -453,7 +453,7 @@ describe("XPowerNftStaked", async function () {
     });
   });
 });
-async function mintNftStaked(nft_id, amount) {
+async function mintPpt(nft_id, amount) {
   await nft_staked.mint(addresses[0], nft_id, amount);
   const nft_balance = await nft_staked.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(amount);
@@ -462,7 +462,7 @@ async function mintNftStaked(nft_id, amount) {
   const nft_exists = await nft_staked.exists(nft_id);
   expect(nft_exists).to.eq(nft_balance.gt(0));
 }
-async function burnNftStaked(nft_id, amount) {
+async function burnPpt(nft_id, amount) {
   const nft_balance_old = await nft_staked.balanceOf(addresses[0], nft_id);
   expect(nft_balance_old.gte(amount)).be.eq(true);
   const nft_supply_old = await nft_staked.totalSupply(nft_id);
@@ -475,7 +475,7 @@ async function burnNftStaked(nft_id, amount) {
   const nft_exists = await nft_staked.exists(nft_id);
   expect(nft_exists).to.eq(nft_balance_old.sub(amount).gt(0));
 }
-async function mintBatchNftStaked(nft_id, amount) {
+async function mintBatchPpt(nft_id, amount) {
   await nft_staked.mintBatch(addresses[0], [nft_id], [amount]);
   const nft_balance = await nft_staked.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(amount);
@@ -484,7 +484,7 @@ async function mintBatchNftStaked(nft_id, amount) {
   const nft_exists = await nft_staked.exists(nft_id);
   expect(nft_exists).to.eq(nft_balance.gt(0));
 }
-async function burnBatchNftStaked(nft_id, amount) {
+async function burnBatchPpt(nft_id, amount) {
   const nft_balance_old = await nft_staked.balanceOf(addresses[0], nft_id);
   expect(nft_balance_old.gte(amount)).be.eq(true);
   const nft_supply_old = await nft_staked.totalSupply(nft_id);
@@ -497,7 +497,7 @@ async function burnBatchNftStaked(nft_id, amount) {
   const nft_exists = await nft_staked.exists(nft_id);
   expect(nft_exists).to.eq(nft_balance_old.sub(amount).gt(0));
 }
-async function transferNftStaked(from, to, nft_id, amount) {
+async function transferPpt(from, to, nft_id, amount) {
   const from_old = await nft_staked.balanceOf(from, nft_id);
   const to_old = await nft_staked.balanceOf(to, nft_id);
   await nft_staked.safeTransferFrom(from, to, nft_id, amount, DATA);
@@ -506,7 +506,7 @@ async function transferNftStaked(from, to, nft_id, amount) {
   expect(from_old.sub(amount)).to.eq(from_new);
   expect(to_old.add(amount)).to.eq(to_new);
 }
-async function batchTransferNftStaked(from, to, nft_ids, amounts) {
+async function batchTransferPpt(from, to, nft_ids, amounts) {
   const from_olds = await nft_staked.balanceOfBatch([from], nft_ids);
   const to_olds = await nft_staked.balanceOfBatch([to], nft_ids);
   await nft_staked.safeBatchTransferFrom(from, to, nft_ids, amounts, DATA);

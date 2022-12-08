@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "./APower.sol";
 import "./XPower.sol";
-import "./XPowerNftStaked.sol";
+import "./XPowerPpt.sol";
 import "./Supervised.sol";
 
 /**
@@ -16,7 +16,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** (burnable) proof-of-work tokens */
     XPower private _moe;
     /** staked proof-of-work NFTs */
-    XPowerNftStaked private _ppt;
+    XPowerPpt private _ppt;
     /** parametrization of APR: (nft.level+[5]-[4])*[3]/[2]+[1]-[0] */
     uint256[] private _apr = [0, 0, 3, 1000, 0, 0];
     /** parametrization of APR bonus: (age.year+[5]-[4])*[3]/[2]+[1]-[0] */
@@ -32,7 +32,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     constructor(address sovLink, address moeLink, address pptLink) {
         _sov = APower(sovLink);
         _moe = XPower(moeLink);
-        _ppt = XPowerNftStaked(pptLink);
+        _ppt = XPowerPpt(pptLink);
     }
 
     /** @return balance of available tokens */

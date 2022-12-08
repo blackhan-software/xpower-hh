@@ -5,7 +5,7 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let APower, XPower, Nft, NftStaked, NftTreasury, MoeTreasury; // contracts
+let APower, XPower, Nft, Ppt, NftTreasury, MoeTreasury; // contracts
 let apower, xpower, nft, nft_staked, nft_treasury, moe_treasury, mt; // instances
 let UNUM; // decimals
 
@@ -35,8 +35,8 @@ describe("MoeTreasury", async function () {
   before(async function () {
     Nft = await ethers.getContractFactory("XPowerThorNft");
     expect(Nft).to.exist;
-    NftStaked = await ethers.getContractFactory("XPowerThorNftStaked");
-    expect(NftStaked).to.exist;
+    Ppt = await ethers.getContractFactory("XPowerThorPpt");
+    expect(Ppt).to.exist;
     NftTreasury = await ethers.getContractFactory("NftTreasury");
     expect(NftTreasury).to.exist;
     MoeTreasury = await ethers.getContractFactory("MoeTreasury");
@@ -73,7 +73,7 @@ describe("MoeTreasury", async function () {
     await nft.deployed();
   });
   before(async function () {
-    nft_staked = await NftStaked.deploy(NFT_THOR_URL, [], DEADLINE);
+    nft_staked = await Ppt.deploy(NFT_THOR_URL, [], DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });

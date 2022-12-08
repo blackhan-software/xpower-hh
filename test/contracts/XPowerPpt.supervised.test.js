@@ -5,13 +5,13 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let XPower, Nft, NftStaked; // contracts
+let XPower, Nft, Ppt; // contracts
 let xpower, nft, nft_staked; // instances
 
 const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
-describe("XPowerNftStakedSupervised", async function () {
+describe("XPowerPptSupervised", async function () {
   before(async function () {
     await network.provider.send("hardhat_reset");
   });
@@ -28,8 +28,8 @@ describe("XPowerNftStakedSupervised", async function () {
   before(async function () {
     Nft = await ethers.getContractFactory("XPowerOdinNft");
     expect(Nft).to.exist;
-    NftStaked = await ethers.getContractFactory("XPowerOdinNftStaked");
-    expect(NftStaked).to.exist;
+    Ppt = await ethers.getContractFactory("XPowerOdinPpt");
+    expect(Ppt).to.exist;
   });
   before(async function () {
     xpower = await XPower.deploy([], DEADLINE);
@@ -42,7 +42,7 @@ describe("XPowerNftStakedSupervised", async function () {
     await nft.deployed();
   });
   before(async function () {
-    nft_staked = await NftStaked.deploy(NFT_ODIN_URL, [], DEADLINE);
+    nft_staked = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });

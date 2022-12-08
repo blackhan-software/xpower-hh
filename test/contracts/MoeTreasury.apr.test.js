@@ -5,7 +5,7 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let APower, XPower, Nft, NftStaked, NftTreasury, MoeTreasury; // contracts
+let APower, XPower, Nft, Ppt, NftTreasury, MoeTreasury; // contracts
 let apower, xpower, nft, nft_staked, nft_treasury, moe_treasury; // instances
 
 const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
@@ -31,8 +31,8 @@ describe("MoeTreasury", async function () {
   before(async function () {
     Nft = await ethers.getContractFactory("XPowerOdinNft");
     expect(Nft).to.exist;
-    NftStaked = await ethers.getContractFactory("XPowerOdinNftStaked");
-    expect(NftStaked).to.exist;
+    Ppt = await ethers.getContractFactory("XPowerOdinPpt");
+    expect(Ppt).to.exist;
     NftTreasury = await ethers.getContractFactory("NftTreasury");
     expect(NftTreasury).to.exist;
     MoeTreasury = await ethers.getContractFactory("MoeTreasury");
@@ -55,7 +55,7 @@ describe("MoeTreasury", async function () {
     await nft.deployed();
   });
   before(async function () {
-    nft_staked = await NftStaked.deploy(NFT_ODIN_URL, [], DEADLINE);
+    nft_staked = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
     expect(nft_staked).to.exist;
     await nft_staked.deployed();
   });
