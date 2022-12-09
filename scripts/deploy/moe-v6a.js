@@ -14,7 +14,10 @@ const { wait } = require("../wait");
 /**
  * @returns list of base contract addresses
  */
-function moe_bases(token, versions = ["V3a"]) {
+function moe_bases(
+  token,
+  versions = ["V2a", "V3a", "V4a", "V5a", "V5b", "V5c"]
+) {
   return versions.map((version) => {
     const moe_base = process.env[`${token}_MOE_${version}`];
     assert(moe_base, `missing ${token}_MOE_${version}`);
@@ -33,40 +36,46 @@ async function main() {
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPower[Old]
   const thor_moe_base = moe_bases("THOR");
-  assert(thor_moe_base.length === 1);
+  assert(thor_moe_base.length === 6);
   const loki_moe_base = moe_bases("LOKI");
-  assert(loki_moe_base.length === 1);
+  assert(loki_moe_base.length === 6);
   const odin_moe_base = moe_bases("ODIN");
-  assert(odin_moe_base.length === 1);
+  assert(odin_moe_base.length === 6);
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerThor[New]
   //
-  const thor_moe = await deploy("XPowerThor", {
+  const thor = await deploy("XPowerThor", {
     moe_base: thor_moe_base,
     deadline,
     owner,
   });
-  console.log(`THOR_MOE_V4a=${thor_moe.address}`);
+  console.log(`THOR_MOE_V6a=${thor.moe.address}`);
   //
   // deploy XPowerLoki[New]
   //
-  const loki_moe = await deploy("XPowerLoki", {
+  const loki = await deploy("XPowerLoki", {
     moe_base: loki_moe_base,
     deadline,
     owner,
   });
-  console.log(`LOKI_MOE_V4a=${loki_moe.address}`);
+  console.log(`LOKI_MOE_V6a=${loki.moe.address}`);
   //
   // deploy XPowerOdin[New]
   //
-  const odin_moe = await deploy("XPowerOdin", {
+  const odin = await deploy("XPowerOdin", {
     moe_base: odin_moe_base,
     deadline,
     owner,
   });
-  console.log(`ODIN_MOE_V4a=${odin_moe.address}`);
+  console.log(`ODIN_MOE_V6a=${odin.moe.address}`);
+  //
+  // verify contract(s):
+  //
+  await verify("XPowerThor", thor.moe, thor_moe_base, deadline);
+  await verify("XPowerLoki", loki.moe, loki_moe_base, deadline);
+  await verify("XPowerOdin", odin.moe, odin_moe_base, deadline);
 }
 async function deploy(name, { moe_base, deadline, owner }) {
   const factory = await hre.ethers.getContractFactory(name);
@@ -74,7 +83,16 @@ async function deploy(name, { moe_base, deadline, owner }) {
   await wait(contract.deployTransaction);
   const transfer = await contract.transferOwnership(owner);
   await wait(transfer);
-  return contract;
+  return { moe: contract };
+}
+async function verify(name, { address }, ...args) {
+  if (hre.network.name.match(/mainnet|fuji/)) {
+    return await hre.run("verify:verify", {
+      address,
+      contract: `contracts/XPower.sol:${name}`,
+      constructorArguments: args,
+    });
+  }
 }
 if (require.main === module) {
   main()

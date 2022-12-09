@@ -26,7 +26,7 @@ async function main() {
   assert(loki_nft_link, "missing LOKI_NFT_V5a");
   const odin_nft_link = process.env.ODIN_NFT_V5a;
   assert(odin_nft_link, "missing ODIN_NFT_V5a");
-  // addresses XPowerNftStaked[New]
+  // addresses XPowerPpt[New]
   const thor_ppt_link = process.env.THOR_PPT_V5a;
   assert(thor_ppt_link, "missing THOR_PPT_V5a");
   const loki_ppt_link = process.env.LOKI_PPT_V5a;
@@ -34,25 +34,25 @@ async function main() {
   const odin_ppt_link = process.env.ODIN_PPT_V5a;
   assert(odin_ppt_link, "missing ODIN_PPT_V5a");
   //
-  // deploy THOR NftTreasury[New] & re-own XPowerThorNftStaked[New]:
+  // deploy THOR NftTreasury[New] & re-own XPowerPpt[New]:
   //
-  const thor_treasury = await deploy(["NftTreasury", "XPowerThorNftStaked"], {
+  const thor_treasury = await deploy(["NftTreasury", "XPowerPpt"], {
     nft_link: thor_nft_link,
     ppt_link: thor_ppt_link,
   });
   console.log(`THOR_PTY_V5a=${thor_treasury.address}`);
   //
-  // deploy LOKI NftTreasury[New & re-own XPowerLokiNftStaked[New]:
+  // deploy LOKI NftTreasury[New & re-own XPowerPpt[New]:
   //
-  const loki_treasury = await deploy(["NftTreasury", "XPowerLokiNftStaked"], {
+  const loki_treasury = await deploy(["NftTreasury", "XPowerPpt"], {
     nft_link: loki_nft_link,
     ppt_link: loki_ppt_link,
   });
   console.log(`LOKI_PTY_V5a=${loki_treasury.address}`);
   //
-  // deploy ODIN NftTreasury[New] & re-own XPowerOdinNftStaked[New]:
+  // deploy ODIN NftTreasury[New] & re-own XPowerPpt[New]:
   //
-  const odin_treasury = await deploy(["NftTreasury", "XPowerOdinNftStaked"], {
+  const odin_treasury = await deploy(["NftTreasury", "XPowerPpt"], {
     nft_link: odin_nft_link,
     ppt_link: odin_ppt_link,
   });

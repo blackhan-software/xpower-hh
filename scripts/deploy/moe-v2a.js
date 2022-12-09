@@ -12,6 +12,16 @@ const assert = require("assert");
 const { wait } = require("../wait");
 
 /**
+ * @returns list of base contract addresses
+ */
+function moe_bases(token, versions = []) {
+  return versions.map((version) => {
+    const moe_base = process.env[`${token}_MOE_${version}`];
+    assert(moe_base, `missing ${token}_MOE_${version}`);
+    return moe_base;
+  });
+}
+/**
  * Hardhat *always* runs the compile task when running scripts with its command
  * line interface. But, if this script is run *directly* using `node`, then you
  * may want to call compile manually to make sure everything is compiled:
@@ -21,13 +31,20 @@ const { wait } = require("../wait");
 async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
+  // addresses XPower[Old]
+  const thor_moe_base = moe_bases("THOR");
+  assert(thor_moe_base.length === 0);
+  const loki_moe_base = moe_bases("LOKI");
+  assert(loki_moe_base.length === 0);
+  const odin_moe_base = moe_bases("ODIN");
+  assert(odin_moe_base.length === 0);
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerThor[Old]
   //
   const thor_moe = await deploy("XPowerThor", {
-    moe_base: [],
+    moe_base: thor_moe_base,
     deadline,
     owner,
   });
@@ -36,7 +53,7 @@ async function main() {
   // deploy XPowerLoki[Old]
   //
   const loki_moe = await deploy("XPowerLoki", {
-    moe_base: [],
+    moe_base: loki_moe_base,
     deadline,
     owner,
   });
@@ -45,7 +62,7 @@ async function main() {
   // deploy XPowerOdin[Old]
   //
   const odin_moe = await deploy("XPowerOdin", {
-    moe_base: [],
+    moe_base: odin_moe_base,
     deadline,
     owner,
   });

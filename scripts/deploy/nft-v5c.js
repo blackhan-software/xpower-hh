@@ -49,42 +49,38 @@ async function main() {
   const odin_moe_link = process.env.ODIN_MOE_V5c;
   assert(odin_moe_link, "missing ODIN_MOE_V5c");
   // addresses XPowerNft[Uri]
-  const thor_nft_uri = process.env.THOR_NFT_URI;
-  assert(thor_nft_uri, "missing THOR_NFT_URI");
-  const loki_nft_uri = process.env.LOKI_NFT_URI;
-  assert(loki_nft_uri, "missing LOKI_NFT_URI");
-  const odin_nft_uri = process.env.ODIN_NFT_URI;
-  assert(odin_nft_uri, "missing ODIN_NFT_URI");
+  const xpow_nft_uri = process.env.XPOW_NFT_URI;
+  assert(xpow_nft_uri, "missing XPOW_NFT_URI");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
-  // deploy XPowerThorNft[New]:
+  // deploy XPowerNft[New]:
   //
-  const thor = await deploy("XPowerThorNft", {
-    nft_uri: thor_nft_uri,
-    moe_link: thor_moe_link,
+  const thor = await deploy("XPowerNft", {
+    nft_uri: xpow_nft_uri,
+    moe_link: [thor_moe_link],
     nft_base: thor_nft_base,
     deadline,
     owner,
   });
   console.log(`THOR_NFT_V5c=${thor.nft.address}`);
   //
-  // deploy XPowerLokiNft[New]:
+  // deploy XPowerNft[New]:
   //
-  const loki = await deploy("XPowerLokiNft", {
-    nft_uri: loki_nft_uri,
-    moe_link: loki_moe_link,
+  const loki = await deploy("XPowerNft", {
+    nft_uri: xpow_nft_uri,
+    moe_link: [loki_moe_link],
     nft_base: loki_nft_base,
     deadline,
     owner,
   });
   console.log(`LOKI_NFT_V5c=${loki.nft.address}`);
   //
-  // deploy XPowerOdinNft[New]:
+  // deploy XPowerNft[New]:
   //
-  const odin = await deploy("XPowerOdinNft", {
-    nft_uri: odin_nft_uri,
-    moe_link: odin_moe_link,
+  const odin = await deploy("XPowerNft", {
+    nft_uri: xpow_nft_uri,
+    moe_link: [odin_moe_link],
     nft_base: odin_nft_base,
     deadline,
     owner,
@@ -94,25 +90,25 @@ async function main() {
   // verify contract(s):
   //
   await verify(
-    "XPowerThorNft",
+    "XPowerNft",
     thor.nft,
-    thor_nft_uri,
+    xpow_nft_uri,
     thor_moe_link,
     thor_nft_base,
     deadline
   );
   await verify(
-    "XPowerLokiNft",
+    "XPowerNft",
     loki.nft,
-    loki_nft_uri,
+    xpow_nft_uri,
     loki_moe_link,
     loki_nft_base,
     deadline
   );
   await verify(
-    "XPowerOdinNft",
+    "XPowerNft",
     odin.nft,
-    odin_nft_uri,
+    xpow_nft_uri,
     odin_moe_link,
     odin_nft_base,
     deadline

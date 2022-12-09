@@ -10,11 +10,12 @@
 const hre = require("hardhat");
 const assert = require("assert");
 const { wait } = require("../wait");
+const { zip } = require("../zip");
 
 /**
  * @returns list of base contract addresses
  */
-function ppt_bases(token, versions = ["V5a"]) {
+function ppt_bases(token, versions = ["V4a", "V5a", "V5b", "V5c"]) {
   return versions.map((version) => {
     const ppt_base = process.env[`${token}_PPT_${version}`];
     assert(ppt_base, `missing ${token}_PPT_${version}`);
@@ -33,11 +34,11 @@ async function main() {
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPowerPpt[Old]
   const thor_ppt_base = ppt_bases("THOR");
-  assert(thor_ppt_base.length === 1);
+  assert(thor_ppt_base.length === 4);
   const loki_ppt_base = ppt_bases("LOKI");
-  assert(loki_ppt_base.length === 1);
+  assert(loki_ppt_base.length === 4);
   const odin_ppt_base = ppt_bases("ODIN");
-  assert(odin_ppt_base.length === 1);
+  assert(odin_ppt_base.length === 4);
   // addresses XPowerPpt[Uri]
   const xpow_ppt_uri = process.env.XPOW_PPT_URI;
   assert(xpow_ppt_uri, "missing XPOW_PPT_URI");
@@ -46,36 +47,37 @@ async function main() {
   //
   // deploy XPowerPpt[New]:
   //
-  const thor_nft = await deploy("XPowerPpt", {
+  const xpow = await deploy("XPowerPpt", {
     ppt_uri: xpow_ppt_uri,
-    ppt_base: thor_ppt_base,
+    ppt_base: zip(thor_ppt_base, loki_ppt_base, odin_ppt_base),
     deadline,
   });
-  console.log(`THOR_PPT_V5b=${thor_nft.address}`);
+  console.log(`XPOW_PPT_V6a=${xpow.ppt.address}`);
   //
-  // deploy XPowerPpt[New]:
+  // verify contract(s):
   //
-  const loki_nft = await deploy("XPowerPpt", {
-    ppt_uri: xpow_ppt_uri,
-    ppt_base: loki_ppt_base,
-    deadline,
-  });
-  console.log(`LOKI_PPT_V5b=${loki_nft.address}`);
-  //
-  // deploy XPowerPpt[New]:
-  //
-  const odin_nft = await deploy("XPowerPpt", {
-    ppt_uri: xpow_ppt_uri,
-    ppt_base: odin_ppt_base,
-    deadline,
-  });
-  console.log(`ODIN_PPT_V5b=${odin_nft.address}`);
+  await verify(
+    "XPowerPpt",
+    xpow.ppt,
+    xpow_ppt_uri,
+    zip(thor_ppt_base, loki_ppt_base, odin_ppt_base),
+    deadline
+  );
 }
 async function deploy(name, { ppt_uri, ppt_base, deadline }) {
   const factory = await hre.ethers.getContractFactory(name);
   const contract = await factory.deploy(ppt_uri, ppt_base, deadline);
   await wait(contract.deployTransaction);
-  return contract;
+  return { ppt: contract };
+}
+async function verify(name, { address }, ...args) {
+  if (hre.network.name.match(/mainnet|fuji/)) {
+    return await hre.run("verify:verify", {
+      address,
+      contract: `contracts/XPowerPpt.sol:${name}`,
+      constructorArguments: args,
+    });
+  }
 }
 if (require.main === module) {
   main()

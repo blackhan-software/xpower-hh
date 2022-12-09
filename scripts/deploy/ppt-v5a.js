@@ -12,6 +12,16 @@ const assert = require("assert");
 const { wait } = require("../wait");
 
 /**
+ * @returns list of base contract addresses
+ */
+function ppt_bases(token, versions = ["V4a"]) {
+  return versions.map((version) => {
+    const ppt_base = process.env[`${token}_PPT_${version}`];
+    assert(ppt_base, `missing ${token}_PPT_${version}`);
+    return ppt_base;
+  });
+}
+/**
  * Hardhat *always* runs the compile task when running scripts with its command
  * line interface. But, if this script is run *directly* using `node`, then you
  * may want to call compile manually to make sure everything is compiled:
@@ -21,46 +31,42 @@ const { wait } = require("../wait");
 async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
-  // addresses XPowerNftStaked[Old]
-  const thor_ppt_base = process.env.THOR_PPT_V4a;
-  assert(thor_ppt_base, "missing THOR_PPT_V4a");
-  const loki_ppt_base = process.env.LOKI_PPT_V4a;
-  assert(loki_ppt_base, "missing LOKI_PPT_V4a");
-  const odin_ppt_base = process.env.ODIN_PPT_V4a;
-  assert(odin_ppt_base, "missing ODIN_PPT_V4a");
-  // addresses XPowerNftStaked[Uri]
-  const thor_ppt_uri = process.env.THOR_PPT_URI;
-  assert(thor_ppt_uri, "missing THOR_PPT_URI");
-  const loki_ppt_uri = process.env.LOKI_PPT_URI;
-  assert(loki_ppt_uri, "missing LOKI_PPT_URI");
-  const odin_ppt_uri = process.env.ODIN_PPT_URI;
-  assert(odin_ppt_uri, "missing ODIN_PPT_URI");
+  // addresses XPowerPpt[Old]
+  const thor_ppt_base = ppt_bases("THOR");
+  assert(thor_ppt_base.length === 1);
+  const loki_ppt_base = ppt_bases("LOKI");
+  assert(loki_ppt_base.length === 1);
+  const odin_ppt_base = ppt_bases("ODIN");
+  assert(odin_ppt_base.length === 1);
+  // addresses XPowerPpt[Uri]
+  const xpow_ppt_uri = process.env.XPOW_PPT_URI;
+  assert(xpow_ppt_uri, "missing XPOW_PPT_URI");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
-  // deploy XPowerThorNftStaked[New]:
+  // deploy XPowerPpt[New]:
   //
-  const thor_nft = await deploy("XPowerThorNftStaked", {
-    ppt_uri: thor_ppt_uri,
-    ppt_base: [thor_ppt_base],
+  const thor_nft = await deploy("XPowerPpt", {
+    ppt_uri: xpow_ppt_uri,
+    ppt_base: thor_ppt_base,
     deadline,
   });
   console.log(`THOR_PPT_V5a=${thor_nft.address}`);
   //
-  // deploy XPowerLokiNftStaked[New]:
+  // deploy XPowerPpt[New]:
   //
-  const loki_nft = await deploy("XPowerLokiNftStaked", {
-    ppt_uri: loki_ppt_uri,
-    ppt_base: [loki_ppt_base],
+  const loki_nft = await deploy("XPowerPpt", {
+    ppt_uri: xpow_ppt_uri,
+    ppt_base: loki_ppt_base,
     deadline,
   });
   console.log(`LOKI_PPT_V5a=${loki_nft.address}`);
   //
-  // deploy XPowerOdinNftStaked[New]:
+  // deploy XPowerPpt[New]:
   //
-  const odin_nft = await deploy("XPowerOdinNftStaked", {
-    ppt_uri: odin_ppt_uri,
-    ppt_base: [odin_ppt_base],
+  const odin_nft = await deploy("XPowerPpt", {
+    ppt_uri: xpow_ppt_uri,
+    ppt_base: odin_ppt_base,
     deadline,
   });
   console.log(`ODIN_PPT_V5a=${odin_nft.address}`);

@@ -33,7 +33,7 @@ async function main() {
   assert(loki_moe_link, "missing LOKI_MOE_V5c");
   const odin_moe_link = process.env.ODIN_MOE_V5c;
   assert(odin_moe_link, "missing ODIN_MOE_V5c");
-  // addresses XPowerNftStaked[New]
+  // addresses XPowerPpt[New]
   const thor_ppt_link = process.env.THOR_PPT_V5c;
   assert(thor_ppt_link, "missing THOR_PPT_V5c");
   const loki_ppt_link = process.env.LOKI_PPT_V5c;

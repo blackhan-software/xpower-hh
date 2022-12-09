@@ -20,53 +20,59 @@ const { wait } = require("../wait");
  */
 async function main() {
   // addresses APower[New]
-  const thor_sov_link = process.env.THOR_SOV_V5b;
-  assert(thor_sov_link, "missing THOR_SOV_V5b");
-  const loki_sov_link = process.env.LOKI_SOV_V5b;
-  assert(loki_sov_link, "missing LOKI_SOV_V5b");
-  const odin_sov_link = process.env.ODIN_SOV_V5b;
-  assert(odin_sov_link, "missing ODIN_SOV_V5b");
+  const thor_sov_link = process.env.THOR_SOV_V6a;
+  assert(thor_sov_link, "missing THOR_SOV_V6a");
+  const loki_sov_link = process.env.LOKI_SOV_V6a;
+  assert(loki_sov_link, "missing LOKI_SOV_V6a");
+  const odin_sov_link = process.env.ODIN_SOV_V6a;
+  assert(odin_sov_link, "missing ODIN_SOV_V6a");
   // addresses XPower[New]
-  const thor_moe_link = process.env.THOR_MOE_V5b;
-  assert(thor_moe_link, "missing THOR_MOE_V5b");
-  const loki_moe_link = process.env.LOKI_MOE_V5b;
-  assert(loki_moe_link, "missing LOKI_MOE_V5b");
-  const odin_moe_link = process.env.ODIN_MOE_V5b;
-  assert(odin_moe_link, "missing ODIN_MOE_V5b");
+  const thor_moe_link = process.env.THOR_MOE_V6a;
+  assert(thor_moe_link, "missing THOR_MOE_V6a");
+  const loki_moe_link = process.env.LOKI_MOE_V6a;
+  assert(loki_moe_link, "missing LOKI_MOE_V6a");
+  const odin_moe_link = process.env.ODIN_MOE_V6a;
+  assert(odin_moe_link, "missing ODIN_MOE_V6a");
   // addresses XPowerPpt[New]
-  const thor_ppt_link = process.env.THOR_PPT_V5b;
-  assert(thor_ppt_link, "missing THOR_PPT_V5b");
-  const loki_ppt_link = process.env.LOKI_PPT_V5b;
-  assert(loki_ppt_link, "missing LOKI_PPT_V5b");
-  const odin_ppt_link = process.env.ODIN_PPT_V5b;
-  assert(odin_ppt_link, "missing ODIN_PPT_V5b");
+  const xpow_ppt_link = process.env.XPOW_PPT_V6a;
+  assert(xpow_ppt_link, "missing XPOW_PPT_V6a");
   //
   // deploy THOR NftTreasury[New] & re-own APowerThor[New]:
   //
-  const thor_treasury = await deploy(["MoeTreasury", "APowerThor"], {
+  const thor = await deploy(["MoeTreasury", "APowerThor"], {
     sov_link: thor_sov_link,
     moe_link: thor_moe_link,
-    ppt_link: thor_ppt_link,
+    ppt_link: xpow_ppt_link,
   });
-  console.log(`THOR_MTY_V5b=${thor_treasury.address}`);
+  console.log(`THOR_MTY_V6a=${thor.mty.address}`);
   //
   // deploy LOKI NftTreasury[New] & re-own APowerLoki[New]:
   //
-  const loki_treasury = await deploy(["MoeTreasury", "APowerLoki"], {
+  const loki = await deploy(["MoeTreasury", "APowerLoki"], {
     sov_link: loki_sov_link,
     moe_link: loki_moe_link,
-    ppt_link: loki_ppt_link,
+    ppt_link: xpow_ppt_link,
   });
-  console.log(`LOKI_MTY_V5b=${loki_treasury.address}`);
+  console.log(`LOKI_MTY_V6a=${loki.mty.address}`);
   //
   // deploy ODIN NftTreasury[New] & re-own APowerOdin[New]:
   //
-  const odin_treasury = await deploy(["MoeTreasury", "APowerOdin"], {
+  const odin = await deploy(["MoeTreasury", "APowerOdin"], {
     sov_link: odin_sov_link,
     moe_link: odin_moe_link,
-    ppt_link: odin_ppt_link,
+    ppt_link: xpow_ppt_link,
   });
-  console.log(`ODIN_MTY_V5b=${odin_treasury.address}`);
+  console.log(`ODIN_MTY_V6a=${odin.mty.address}`);
+  //
+  // verify contract(s):
+  //
+  await verify(
+    "MoeTreasury",
+    thor.mty,
+    thor_sov_link,
+    thor_moe_link,
+    xpow_ppt_link
+  );
 }
 async function deploy([mty_name, sov_name], { sov_link, moe_link, ppt_link }) {
   const mty_factory = await hre.ethers.getContractFactory(mty_name);
@@ -78,7 +84,16 @@ async function deploy([mty_name, sov_name], { sov_link, moe_link, ppt_link }) {
     mty_contract.address
   );
   await wait(sov_transfer);
-  return mty_contract;
+  return { mty: mty_contract };
+}
+async function verify(name, { address }, ...args) {
+  if (hre.network.name.match(/mainnet|fuji/)) {
+    return await hre.run("verify:verify", {
+      address,
+      contract: `contracts/MoeTreasury.sol:${name}`,
+      constructorArguments: args,
+    });
+  }
 }
 if (require.main === module) {
   main()
