@@ -29,6 +29,28 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     /** parametrization of mining-difficulty */
     uint256[] private _rigor = [0, 0, 4, 1, 0, 0];
 
+    /** total mints */
+    uint256 private _totalMints = 0;
+    /** total minted amounts */
+    uint256 private _totalMinted = 0;
+    /** total minting fees */
+    uint256 private _totalMintingFees = 0;
+
+    /** @return total mints */
+    function totalMints() public view returns (uint256) {
+        return _totalMints;
+    }
+
+    /** @return total minted amounts */
+    function totalMinted() public view returns (uint256) {
+        return _totalMinted;
+    }
+
+    /** @return total minting fees */
+    function totalMintingFees() public view returns (uint256) {
+        return _totalMintingFees;
+    }
+
     /** @param symbol short token symbol */
     /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
@@ -60,6 +82,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
 
     /** mint tokens for beneficiary, interval, block-hash and nonce */
     function mint(address to, bytes32 blockHash, uint256 nonce) public {
+        uint256 gas = gasleft();
         // get current interval (in hours)
         uint256 interval = _interval();
         // check block-hash to be recent
@@ -77,6 +100,12 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         if (treasure > 0) _mint(owner(), treasure);
         // mint tokens for beneficiary (e.g. nonce provider)
         _mint(to, amount);
+        // increment total mints
+        _totalMints += 1;
+        // increment total amounts minted
+        _totalMinted += amount;
+        // increment total fees paid
+        _totalMintingFees += (gas - gasleft()) * tx.gasprice;
     }
 
     /** @return treasury-share for given amount */
