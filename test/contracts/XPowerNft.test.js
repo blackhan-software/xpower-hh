@@ -12,7 +12,6 @@ let UNUM; // decimals
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NFT_LOKI_WWW = "https://www.xpowermine.com/nfts/loki/{id}.json";
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const DEADLINE = 0; // [seconds]
 
@@ -180,33 +179,6 @@ describe("XPowerNft", async function () {
       expect(
         await mintBatchXPowNft(UNIT, 3).catch((ex) => {
           const m = ex.message.match(/insufficient allowance/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        })
-      ).to.eq(undefined);
-    });
-  });
-  describe("setURI", function () {
-    it("should set new URI", async function () {
-      await xpower_nft.grantRole(xpower_nft.URI_DATA_ROLE(), addresses[0]);
-      const nft_year = (await xpower_nft.year()).toNumber();
-      expect(nft_year).to.be.greaterThan(0);
-      const nft_id = (await xpower_nft.idBy(nft_year, UNIT)).toNumber();
-      expect(nft_id).to.be.greaterThan(0);
-      await xpower_nft.setURI(NFT_LOKI_WWW);
-      const nft_url = await xpower_nft.uri(nft_id);
-      expect(nft_url).to.eq(NFT_LOKI_WWW);
-    });
-    it("should *not* set new URI (account is missing role)", async function () {
-      await xpower_nft.revokeRole(xpower_nft.URI_DATA_ROLE(), addresses[0]);
-      const nft_year = (await xpower_nft.year()).toNumber();
-      expect(nft_year).to.be.greaterThan(0);
-      const nft_id = (await xpower_nft.idBy(nft_year, UNIT)).toNumber();
-      expect(nft_id).to.be.greaterThan(0);
-      await xpower_nft.transferOwnership(addresses[1]);
-      expect(
-        await xpower_nft.setURI(NFT_LOKI_WWW).catch((ex) => {
-          const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
