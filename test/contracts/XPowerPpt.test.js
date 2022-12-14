@@ -24,7 +24,7 @@ describe("XPowerPpt", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    Ppt = await ethers.getContractFactory("XPowerLokiPpt");
+    Ppt = await ethers.getContractFactory("XPowerPpt");
     expect(Ppt).to.exist;
   });
   beforeEach(async function () {
@@ -427,7 +427,7 @@ describe("XPowerPpt", async function () {
       const nft_year = (await nft_staked.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
       const nft_id = (
-        await nft_staked.idBy(nft_year, nft_staked.UNIT())
+        await nft_staked.idBy(nft_year, nft_staked.UNIT(), 0)
       ).toNumber();
       expect(nft_id).to.be.greaterThan(0);
       await nft_staked.setURI(NFT_LOKI_WWW);
@@ -439,7 +439,7 @@ describe("XPowerPpt", async function () {
       const nft_year = (await nft_staked.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
       const nft_id = (
-        await nft_staked.idBy(nft_year, nft_staked.UNIT())
+        await nft_staked.idBy(nft_year, nft_staked.UNIT(), 0)
       ).toNumber();
       expect(nft_id).to.be.greaterThan(0);
       await nft_staked.transferOwnership(addresses[1]);

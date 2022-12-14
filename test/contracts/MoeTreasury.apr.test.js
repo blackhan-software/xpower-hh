@@ -29,9 +29,9 @@ describe("MoeTreasury", async function () {
     expect(XPower).to.exist;
   });
   before(async function () {
-    Nft = await ethers.getContractFactory("XPowerOdinNft");
+    Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
-    Ppt = await ethers.getContractFactory("XPowerOdinPpt");
+    Ppt = await ethers.getContractFactory("XPowerPpt");
     expect(Ppt).to.exist;
     NftTreasury = await ethers.getContractFactory("NftTreasury");
     expect(NftTreasury).to.exist;
@@ -50,7 +50,7 @@ describe("MoeTreasury", async function () {
     await apower.deployed();
   });
   before(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, xpower.address, [], DEADLINE);
+    nft = await Nft.deploy(NFT_ODIN_URL, [xpower.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });
@@ -124,15 +124,15 @@ describe("MoeTreasury", async function () {
         const rate = positive(now_year - y) * 10;
         const rate_padded = String(rate).padStart(3, "0");
         it(`should return 0.${rate_padded}[%] for nft-year=${y} & now-year=${now_year}`, async () => {
-          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 0))).to.eq(rate);
-          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 3))).to.eq(rate);
-          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 6))).to.eq(rate);
-          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 9))).to.eq(rate);
-          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 12))).to.eq(rate);
-          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 15))).to.eq(rate);
-          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 18))).to.eq(rate);
-          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 21))).to.eq(rate);
-          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 24))).to.eq(rate);
+          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 0, 0))).to.eq(rate);
+          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 3, 0))).to.eq(rate);
+          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 6, 0))).to.eq(rate);
+          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 9, 0))).to.eq(rate);
+          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 12, 0))).to.eq(rate);
+          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 15, 0))).to.eq(rate);
+          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 18, 0))).to.eq(rate);
+          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 21, 0))).to.eq(rate);
+          expect(await moe_treasury.aprBonusOf(nft.idBy(y, 24, 0))).to.eq(rate);
         });
       }
       it(`should forward time by one year`, async function () {

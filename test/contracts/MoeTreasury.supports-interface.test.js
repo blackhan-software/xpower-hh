@@ -32,9 +32,9 @@ describe("MoeTreasury", async function () {
     expect(XPower).to.exist;
   });
   beforeEach(async function () {
-    Nft = await ethers.getContractFactory("XPowerOdinNft");
+    Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
-    Ppt = await ethers.getContractFactory("XPowerOdinPpt");
+    Ppt = await ethers.getContractFactory("XPowerPpt");
     expect(Ppt).to.exist;
     NftTreasury = await ethers.getContractFactory("NftTreasury");
     expect(NftTreasury).to.exist;
@@ -52,7 +52,7 @@ describe("MoeTreasury", async function () {
     await apower.deployed();
   });
   beforeEach(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, xpower.address, [], DEADLINE);
+    nft = await Nft.deploy(NFT_ODIN_URL, [xpower.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });

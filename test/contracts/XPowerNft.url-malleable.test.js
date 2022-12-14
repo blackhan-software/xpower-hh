@@ -29,7 +29,7 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerLokiNft");
+    XPowerNft = await ethers.getContractFactory("XPowerNft");
     expect(XPowerNft).to.exist;
     XPower = await ethers.getContractFactory("XPowerLoki");
     expect(XPower).to.exist;
@@ -53,7 +53,7 @@ describe("XPowerNft", async function () {
   beforeEach(async function () {
     xpower_nft = await XPowerNft.deploy(
       NFT_LOKI_URL,
-      xpower.address,
+      [xpower.address],
       [],
       DEADLINE
     );
@@ -73,7 +73,7 @@ describe("XPowerNft", async function () {
       await xpower_nft.grantRole(xpower_nft.URI_DATA_ROLE(), addresses[0]);
       const nft_year = (await xpower_nft.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
-      const nft_id = (await xpower_nft.idBy(nft_year, UNIT)).toNumber();
+      const nft_id = (await xpower_nft.idBy(nft_year, UNIT, 0)).toNumber();
       expect(nft_id).to.be.greaterThan(0);
       await xpower_nft.setURI(NFT_LOKI_WWW);
       const nft_url = await xpower_nft.uri(nft_id);
@@ -83,7 +83,7 @@ describe("XPowerNft", async function () {
       await xpower_nft.revokeRole(xpower_nft.URI_DATA_ROLE(), addresses[0]);
       const nft_year = (await xpower_nft.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
-      const nft_id = (await xpower_nft.idBy(nft_year, UNIT)).toNumber();
+      const nft_id = (await xpower_nft.idBy(nft_year, UNIT, 0)).toNumber();
       expect(nft_id).to.be.greaterThan(0);
       await xpower_nft.transferOwnership(addresses[1]);
       expect(

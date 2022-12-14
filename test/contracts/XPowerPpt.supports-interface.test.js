@@ -28,9 +28,9 @@ describe("XPowerPpt", async function () {
     expect(XPower).to.exist;
   });
   before(async function () {
-    Nft = await ethers.getContractFactory("XPowerOdinNft");
+    Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
-    Ppt = await ethers.getContractFactory("XPowerOdinPpt");
+    Ppt = await ethers.getContractFactory("XPowerPpt");
     expect(Ppt).to.exist;
   });
   before(async function () {
@@ -39,7 +39,7 @@ describe("XPowerPpt", async function () {
     await xpower.deployed();
   });
   before(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, xpower.address, [], DEADLINE);
+    nft = await Nft.deploy(NFT_ODIN_URL, [xpower.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
     ppt = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);

@@ -26,7 +26,7 @@ describe("XPowerNftSupervised", async function () {
     expect(XPower).to.exist;
   });
   before(async function () {
-    Nft = await ethers.getContractFactory("XPowerOdinNft");
+    Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
   });
   before(async function () {
@@ -35,7 +35,7 @@ describe("XPowerNftSupervised", async function () {
     await xpower.deployed();
   });
   before(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, xpower.address, [], DEADLINE);
+    nft = await Nft.deploy(NFT_ODIN_URL, [xpower.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });

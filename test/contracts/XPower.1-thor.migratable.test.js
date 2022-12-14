@@ -64,7 +64,7 @@ describe("XPowerThor Migration", async function () {
   });
   describe("new", async function () {
     it("should return index=0", async function () {
-      const index = await xpower_new.indexOf(xpower_old.address);
+      const index = await xpower_new.oldIndexOf(xpower_old.address);
       expect(index).to.eq(0);
     });
     it("should mint for amount=1", async function () {

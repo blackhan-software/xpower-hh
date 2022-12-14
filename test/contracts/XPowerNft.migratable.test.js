@@ -28,7 +28,7 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerLokiNft");
+    XPowerNft = await ethers.getContractFactory("XPowerNft");
     expect(XPowerNft).to.exist;
     XPower = await ethers.getContractFactory("XPowerLoki");
     expect(XPower).to.exist;
@@ -52,7 +52,7 @@ describe("XPowerNft", async function () {
   beforeEach(async function () {
     xpower_nft_old = await XPowerNft.deploy(
       NFT_LOKI_URL,
-      xpower.address,
+      [xpower.address],
       [],
       DEADLINE
     );
@@ -60,7 +60,7 @@ describe("XPowerNft", async function () {
     await xpower_nft_old.deployed();
     xpower_nft_new = await XPowerNft.deploy(
       NFT_LOKI_URL,
-      xpower.address,
+      [xpower.address],
       [xpower_nft_old.address],
       DEADLINE
     );
@@ -75,9 +75,9 @@ describe("XPowerNft", async function () {
     const [owner, signer_1] = await ethers.getSigners();
     await xpower.connect(signer_1).transferOwnership(owner.address);
   });
-  describe("indexOf", async function () {
+  describe("oldIndexOf", async function () {
     it("should return index=0", async function () {
-      const index = await xpower_nft_new.indexOf(xpower_nft_old.address);
+      const index = await xpower_nft_new.oldIndexOf(xpower_nft_old.address);
       expect(index).to.eq(0);
     });
   });
@@ -215,8 +215,10 @@ async function mintXPow(amount) {
 async function mintXPowNft(unit, amount) {
   const year = (await xpower_nft_old.year()).toNumber();
   expect(year).to.be.greaterThan(0);
-  await xpower_nft_old.mint(addresses[0], unit, amount);
-  const nft_id = (await xpower_nft_old.idBy(year, unit)).toNumber();
+  const moe_index = await xpower_nft_old.moeIndexOf(xpower.address);
+  await xpower_nft_old.mint(addresses[0], unit, amount, moe_index);
+  const moe_prefix = await xpower.prefix();
+  const nft_id = (await xpower_nft_old.idBy(year, unit, moe_prefix)).toNumber();
   expect(nft_id).to.be.greaterThan(0);
   const nft_balance = await xpower_nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(amount);
@@ -230,8 +232,10 @@ async function mintXPowNft(unit, amount) {
 async function mintBatchXPowNft(unit, amount) {
   const year = (await xpower_nft_old.year()).toNumber();
   expect(year).to.be.greaterThan(0);
-  await xpower_nft_old.mintBatch(addresses[0], [unit], [amount]);
-  const nft_ids = await xpower_nft_old.idsBy(year, [unit]);
+  const moe_index = await xpower_nft_old.moeIndexOf(xpower.address);
+  await xpower_nft_old.mintBatch(addresses[0], [unit], [amount], moe_index);
+  const moe_prefix = await xpower.prefix();
+  const nft_ids = await xpower_nft_old.idsBy(year, [unit], moe_prefix);
   expect(nft_ids.length).to.be.greaterThan(0);
   const nft_id = nft_ids[0].toNumber();
   expect(nft_id).to.be.greaterThan(0);
@@ -255,8 +259,10 @@ async function setNftApprovalForAll(operator) {
 }
 async function migrateXPowNft(unit, amount) {
   const year = await xpower_nft_new.year();
-  const nft_id = await xpower_nft_new.idBy(year, unit);
-  await xpower_nft_new.migrate(nft_id, amount, [0]);
+  const moe_prefix = await xpower.prefix();
+  const nft_id = await xpower_nft_new.idBy(year, unit, moe_prefix);
+  const moe_index = await xpower_nft_old.moeIndexOf(xpower.address);
+  await xpower_nft_new.migrate(nft_id, amount, [moe_index]);
   const nft_balance_v1 = await xpower_nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance_v1.toNumber()).to.eq(0);
   const nft_balance_v2 = await xpower_nft_new.balanceOf(addresses[0], nft_id);
@@ -264,8 +270,10 @@ async function migrateXPowNft(unit, amount) {
 }
 async function migrateBatchXPowNft(unit, amount) {
   const year = await xpower_nft_new.year();
-  const nft_id = await xpower_nft_new.idBy(year, unit);
-  await xpower_nft_new.migrateBatch([nft_id], [amount], [0]);
+  const moe_prefix = await xpower.prefix();
+  const nft_id = await xpower_nft_new.idBy(year, unit, moe_prefix);
+  const moe_index = await xpower_nft_old.moeIndexOf(xpower.address);
+  await xpower_nft_new.migrateBatch([nft_id], [amount], [moe_index]);
   const nft_balance_v1 = await xpower_nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance_v1.toNumber()).to.eq(0);
   const nft_balance_v2 = await xpower_nft_new.balanceOf(addresses[0], nft_id);

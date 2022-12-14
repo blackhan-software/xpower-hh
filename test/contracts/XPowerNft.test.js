@@ -30,7 +30,7 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerLokiNft");
+    XPowerNft = await ethers.getContractFactory("XPowerNft");
     expect(XPowerNft).to.exist;
     XPower = await ethers.getContractFactory("XPowerLoki");
     expect(XPower).to.exist;
@@ -54,7 +54,7 @@ describe("XPowerNft", async function () {
   beforeEach(async function () {
     xpower_nft = await XPowerNft.deploy(
       NFT_LOKI_URL,
-      xpower.address,
+      [xpower.address],
       [],
       DEADLINE
     );
@@ -210,12 +210,14 @@ async function mintXPowNft(unit, amount) {
   const year = (await xpower_nft.year()).toNumber();
   expect(year).to.be.greaterThan(0);
   const old_balance = await xpower.balanceOf(addresses[0]);
-  await xpower_nft.mint(addresses[0], unit, amount);
+  const moe_index = await xpower_nft.moeIndexOf(xpower.address);
+  await xpower_nft.mint(addresses[0], unit, amount, moe_index);
   const new_balance = await xpower.balanceOf(addresses[0]);
   expect(old_balance.sub(new_balance)).to.eq(
     BigInt(amount) * 10n ** BigInt(unit) * UNUM
   );
-  const nft_id = (await xpower_nft.idBy(year, unit)).toNumber();
+  const moe_prefix = await xpower.prefix();
+  const nft_id = (await xpower_nft.idBy(year, unit, moe_prefix)).toNumber();
   expect(nft_id).to.be.greaterThan(0);
   const nft_balance = await xpower_nft.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(amount);
@@ -230,12 +232,14 @@ async function mintBatchXPowNft(unit, amount) {
   const year = (await xpower_nft.year()).toNumber();
   expect(year).to.be.greaterThan(0);
   const old_balance = await xpower.balanceOf(addresses[0]);
-  await xpower_nft.mintBatch(addresses[0], [unit], [amount]);
+  const moe_index = await xpower_nft.moeIndexOf(xpower.address);
+  await xpower_nft.mintBatch(addresses[0], [unit], [amount], moe_index);
   const new_balance = await xpower.balanceOf(addresses[0]);
   expect(old_balance.sub(new_balance)).to.eq(
     BigInt(amount) * 10n ** BigInt(unit) * UNUM
   );
-  const nft_ids = await xpower_nft.idsBy(year, [unit]);
+  const moe_prefix = await xpower.prefix();
+  const nft_ids = await xpower_nft.idsBy(year, [unit], moe_prefix);
   expect(nft_ids.length).to.be.greaterThan(0);
   const nft_id = nft_ids[0].toNumber();
   expect(nft_id).to.be.greaterThan(0);

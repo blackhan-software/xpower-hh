@@ -24,7 +24,7 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerLokiNft");
+    XPowerNft = await ethers.getContractFactory("XPowerNft");
     expect(XPowerNft).to.exist;
     XPower = await ethers.getContractFactory("XPowerLoki");
     expect(XPower).to.exist;
@@ -39,7 +39,7 @@ describe("XPowerNft", async function () {
   before(async function () {
     xpower_nft = await XPowerNft.deploy(
       NFT_LOKI_URL,
-      xpower.address,
+      [xpower.address],
       [],
       DEADLINE
     );

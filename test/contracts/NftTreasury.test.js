@@ -45,15 +45,15 @@ describe("NftTreasury", async function () {
     expect(UNUM >= 1n).to.be.true;
   });
   before(async function () {
-    Nft = await ethers.getContractFactory("XPowerLokiNft");
+    Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
-    Ppt = await ethers.getContractFactory("XPowerLokiPpt");
+    Ppt = await ethers.getContractFactory("XPowerPpt");
     expect(Ppt).to.exist;
     NftTreasury = await ethers.getContractFactory("NftTreasury");
     expect(NftTreasury).to.exist;
   });
   beforeEach(async function () {
-    nft = await Nft.deploy(NFT_LOKI_URL, xpower.address, [], DEADLINE);
+    nft = await Nft.deploy(NFT_LOKI_URL, [xpower.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });
@@ -301,9 +301,11 @@ async function increaseAllowanceBy(amount, spender) {
   expect(allowance).to.be.gte(amount);
 }
 async function mintNft(level, amount) {
-  const nft_id = await nft.idBy(await nft.year(), level);
+  const moe_prefix = await xpower.prefix();
+  const nft_id = await nft.idBy(await nft.year(), level, moe_prefix);
   expect(nft_id.gt(0)).to.eq(true);
-  const tx_mint = await nft.mint(addresses[0], level, amount);
+  const moe_index = await nft.moeIndexOf(xpower.address);
+  const tx_mint = await nft.mint(addresses[0], level, amount, moe_index);
   expect(tx_mint).to.be.an("object");
   const nft_balance = await nft.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(amount);

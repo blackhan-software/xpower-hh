@@ -42,9 +42,9 @@ describe("APower Migration", async function () {
     XPowerNew = await ethers.getContractFactory("XPowerOdinTest");
   });
   beforeEach(async function () {
-    Nft = await ethers.getContractFactory("XPowerOdinNft");
+    Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
-    Ppt = await ethers.getContractFactory("XPowerOdinPpt");
+    Ppt = await ethers.getContractFactory("XPowerPpt");
     expect(Ppt).to.exist;
     NftTreasury = await ethers.getContractFactory("NftTreasury");
     expect(NftTreasury).to.exist;
@@ -100,7 +100,7 @@ describe("APower Migration", async function () {
     });
   });
   beforeEach(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, xpower_old.address, [], DEADLINE);
+    nft = await Nft.deploy(NFT_ODIN_URL, [xpower_old.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });
@@ -168,9 +168,9 @@ describe("APower Migration", async function () {
     const new_supply = await apower_new.totalSupply();
     expect(new_supply).to.be.eq(0);
   });
-  describe("indexOf", async function () {
+  describe("oldIndexOf", async function () {
     it("should return index=0", async function () {
-      const index = await apower_new.indexOf(apower_old.address);
+      const index = await apower_new.oldIndexOf(apower_old.address);
       expect(index).to.eq(0);
     });
   });
@@ -262,9 +262,11 @@ async function increaseAllowanceBy(amount, spender) {
   expect(allowance).to.gte(amount);
 }
 async function mintNft(level, amount) {
-  const nft_id = await nft.idBy(await nft.year(), level);
+  const moe_prefix = await xpower_old.prefix();
+  const nft_id = await nft.idBy(await nft.year(), level, moe_prefix);
   expect(nft_id.gt(0)).to.eq(true);
-  const tx_mint = await nft.mint(A0, level, amount);
+  const moe_index = await nft.moeIndexOf(xpower_old.address);
+  const tx_mint = await nft.mint(A0, level, amount, moe_index);
   expect(tx_mint).to.be.an("object");
   const nft_balance = await nft.balanceOf(A0, nft_id);
   expect(nft_balance).to.eq(amount);

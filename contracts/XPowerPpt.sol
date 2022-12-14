@@ -6,10 +6,10 @@ pragma solidity ^0.8.0;
 import "./XPowerNftBase.sol";
 
 /**
- * Abstract base class for staked XPowerNft(s): Only the contract owner is
- * allowed to mint and burn XPowerPpt tokens.
+ * Abstract base class for staked XPowerNft(s): Only the contract owner i.e.
+ * the NftTreasury is allowed to mint and burn XPowerPpt tokens.
  */
-abstract contract XPowerPpt is XPowerNftBase {
+contract XPowerPpt is XPowerNftBase {
     /** map of mints: account => nft-id => accumulator [seconds] */
     mapping(address => mapping(uint256 => uint256)) private _mints;
     /** map of burns: account => nft-id => accumulator [seconds] */
@@ -19,18 +19,14 @@ abstract contract XPowerPpt is XPowerNftBase {
     /** map of total burns: nft-id => accumulator [seconds] */
     mapping(uint256 => uint256) private _burnsTotal;
 
-    /** @param pptName NFT name */
-    /** @param pptSymbol NFT symbol */
     /** @param pptUri meta-data URI */
-    /** @param pptBase address of old contract */
+    /** @param pptBase addresses of old contracts */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
-        string memory pptName,
-        string memory pptSymbol,
         string memory pptUri,
         address[] memory pptBase,
         uint256 deadlineIn
-    ) XPowerNftBase(pptName, pptSymbol, pptUri, pptBase, deadlineIn) {}
+    ) XPowerNftBase("XPower PPTs", "XPOWPPT", pptUri, pptBase, deadlineIn) {}
 
     /** transfer tokens (and reset age) */
     function safeTransferFrom(
@@ -135,37 +131,4 @@ abstract contract XPowerPpt is XPowerNftBase {
             _pushBurn(account, nftIds[i], amounts[i]);
         }
     }
-}
-
-/**
- * Staked NFT class for THOR tokens.
- */
-contract XPowerThorPpt is XPowerPpt {
-    constructor(
-        string memory pptUri,
-        address[] memory pptBase,
-        uint256 deadlineIn
-    ) XPowerPpt("XPower Thor PPTs", "THORPPT", pptUri, pptBase, deadlineIn) {}
-}
-
-/**
- * Staked NFT class for LOKI tokens.
- */
-contract XPowerLokiPpt is XPowerPpt {
-    constructor(
-        string memory pptUri,
-        address[] memory pptBase,
-        uint256 deadlineIn
-    ) XPowerPpt("XPower Loki PPTs", "LOKIPPT", pptUri, pptBase, deadlineIn) {}
-}
-
-/**
- * Staked NFT class for ODIN tokens.
- */
-contract XPowerOdinPpt is XPowerPpt {
-    constructor(
-        string memory pptUri,
-        address[] memory pptBase,
-        uint256 deadlineIn
-    ) XPowerPpt("XPower Odin PPTs", "ODINPPT", pptUri, pptBase, deadlineIn) {}
 }

@@ -36,7 +36,7 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
     }
 
     /** @return index of base address */
-    function indexOf(address base) public view returns (uint256) {
+    function oldIndexOf(address base) public view returns (uint256) {
         return _index[base];
     }
 

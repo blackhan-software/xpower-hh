@@ -3,90 +3,58 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "./XPowerNftBase.sol";
+import "./XPower.sol";
 
 /**
  * Abstract base class for the THOR, LOKI & ODIN proof-of-work NFTs, where each
  * can only be minted by burning the corresponding amount of tokens.
  */
 contract XPowerNft is XPowerNftBase {
-    /** (Burnable) proof-of-work tokens */
-    ERC20Burnable private _moe;
+    /** burnable proof-of-work tokens */
+    XPower[] private _moe;
+    /** MOE token address to index map */
+    mapping(address => uint) private _moeIndex;
 
-    /** @param nftName NFT name */
-    /** @param nftSymbol NFT symbol */
     /** @param nftUri metadata URI */
-    /** @param nftBase address of old contract */
-    /** @param moeLink address of contract for MOE tokens */
+    /** @param moeLink addresses of contracts for MOE tokens */
+    /** @param nftBase addresses of old contracts */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
-        string memory nftName,
-        string memory nftSymbol,
         string memory nftUri,
-        address moeLink,
+        address[] memory moeLink,
         address[] memory nftBase,
         uint256 deadlineIn
-    ) XPowerNftBase(nftName, nftSymbol, nftUri, nftBase, deadlineIn) {
-        _moe = ERC20Burnable(moeLink);
-    }
-
-    /** mint particular amount of NFTs for given address and level */
-    function mint(address to, uint256 level, uint256 amount) public {
-        uint256 moe = amount * denominationOf(level);
-        require(moe > 0, "non-positive amount");
-        _moe.burnFrom(to, moe * (10 ** _moe.decimals()));
-        _mint(to, idBy(year(), level), amount, "");
-    }
-
-    /** mint particular amounts of NFTs for given address and levels */
-    function mintBatch(address to, uint256[] memory levels, uint256[] memory amounts) public {
-        uint256 moe = 0;
-        for (uint256 i = 0; i < levels.length; i++) {
-            uint256 delta = amounts[i] * denominationOf(levels[i]);
-            require(delta > 0, "non-positive amount");
-            moe += delta;
+    ) XPowerNftBase("XPower NFTs", "XPOWNFT", nftUri, nftBase, deadlineIn) {
+        _moe = new XPower[](moeLink.length);
+        for (uint256 i = 0; i < moeLink.length; i++) {
+            _moe[i] = XPower(moeLink[i]);
+            _moeIndex[moeLink[i]] = i;
         }
-        _moe.burnFrom(to, moe * (10 ** _moe.decimals()));
-        _mintBatch(to, idsBy(year(), levels), amounts, "");
     }
-}
 
-/**
- * NFT class for THOR tokens: Only the latter are allowed to get burned, to
- * mint THOR NFTs.
- */
-contract XPowerThorNft is XPowerNft {
-    constructor(
-        string memory nftUri,
-        address moeLink,
-        address[] memory nftBase,
-        uint256 deadlineIn
-    ) XPowerNft("XPower Thor NFTs", "THORNFT", nftUri, moeLink, nftBase, deadlineIn) {}
-}
+    /** mint particular amount of NFTs for given to-address, level and token-index */
+    function mint(address to, uint256 level, uint256 amount, uint256 index) public {
+        uint256 moeAmount = amount * denominationOf(level);
+        require(moeAmount > 0, "non-positive amount");
+        _moe[index].burnFrom(to, moeAmount * (10 ** _moe[index].decimals()));
+        _mint(to, idBy(year(), level, _moe[index].prefix()), amount, "");
+    }
 
-/**
- * NFT class for LOKI tokens: Only the latter are allowed to get burned, to
- * mint LOKI NFTs.
- */
-contract XPowerLokiNft is XPowerNft {
-    constructor(
-        string memory nftUri,
-        address moeLink,
-        address[] memory nftBase,
-        uint256 deadlineIn
-    ) XPowerNft("XPower Loki NFTs", "LOKINFT", nftUri, moeLink, nftBase, deadlineIn) {}
-}
+    /** mint particular amounts of NFTs for given to-address, levels and token-index */
+    function mintBatch(address to, uint256[] memory levels, uint256[] memory amounts, uint256 index) public {
+        uint256 sumAmount = 0;
+        for (uint256 i = 0; i < levels.length; i++) {
+            uint256 moeAmount = amounts[i] * denominationOf(levels[i]);
+            require(moeAmount > 0, "non-positive amount");
+            sumAmount += moeAmount;
+        }
+        _moe[index].burnFrom(to, sumAmount * (10 ** _moe[index].decimals()));
+        _mintBatch(to, idsBy(year(), levels, _moe[index].prefix()), amounts, "");
+    }
 
-/**
- * NFT class for ODIN tokens: Only the latter are allowed to get burned, to
- * mint ODIN NFTs.
- */
-contract XPowerOdinNft is XPowerNft {
-    constructor(
-        string memory nftUri,
-        address moeLink,
-        address[] memory nftBase,
-        uint256 deadlineIn
-    ) XPowerNft("XPower Odin NFTs", "ODINNFT", nftUri, moeLink, nftBase, deadlineIn) {}
+    /** @return index of MOE token address */
+    function moeIndexOf(address moe) public view returns (uint256) {
+        return _moeIndex[moe];
+    }
 }

@@ -215,6 +215,9 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     ) public view virtual override(MoeMigratable, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
+
+    /** @return prefix of token */
+    function prefix() public pure virtual returns (uint256);
 }
 
 /**
@@ -234,6 +237,11 @@ contract XPowerThor is XPower {
             return (zeros - difficulty) * 10 ** decimals();
         }
         return 0;
+    }
+
+    /** @return prefix of token */
+    function prefix() public pure override returns (uint256) {
+        return 1;
     }
 }
 
@@ -255,6 +263,11 @@ contract XPowerLoki is XPower {
         }
         return 0;
     }
+
+    /** @return prefix of token */
+    function prefix() public pure override returns (uint256) {
+        return 2;
+    }
 }
 
 /**
@@ -274,5 +287,10 @@ contract XPowerOdin is XPower {
             return (16 ** (zeros - difficulty) - 1) * 10 ** decimals();
         }
         return 0;
+    }
+
+    /** @return prefix of token */
+    function prefix() public pure override returns (uint256) {
+        return 3;
     }
 }

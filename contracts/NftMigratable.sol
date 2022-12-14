@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 // solhint-disable not-rely-on-time
+// solhint-disable reason-string
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
@@ -33,7 +34,7 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     }
 
     /** @return index of base address */
-    function indexOf(address base) public view returns (uint256) {
+    function oldIndexOf(address base) public view returns (uint256) {
         return _index[base];
     }
 
@@ -44,12 +45,24 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
 
     /** migrate amount of ERC1155 (for account) */
     function migrateFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) public {
-        require(!_sealed[index[0]], "migration sealed");
         uint256 timestamp = block.timestamp;
         require(_deadlineBy >= timestamp, "deadline passed");
-        _base[index[0]].burn(account, nftId, amount);
-        require(amount > 0, "non-positive amount");
+        _burnFrom(account, nftId, amount, index);
         _mint(account, nftId, amount, "");
+    }
+
+    /** burn amount of ERC1155 (for account) */
+    function _burnFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) private {
+        require(amount > 0, "non-positive amount");
+        uint256 tryId = nftId % _eonOf(_yearOf(nftId));
+        assert(tryId > 0); // cannot be zero
+        uint256 token = nftId / _eonOf(_yearOf(nftId));
+        assert(token > 0); // cannot be zero
+        uint256 tidx = token <= index.length ? token - 1 : index.length - 1;
+        assert(tidx >= 0); // token index: zero *or* larger
+        require(!_sealed[index[tidx]], "migration sealed");
+        uint256 tryBalance = _base[index[tidx]].balanceOf(account, tryId);
+        _base[index[tidx]].burn(account, tryBalance > 0 ? tryId : nftId, amount);
     }
 
     /** batch migrate amounts of ERC1155 */
@@ -64,12 +77,10 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         uint256[] memory amounts,
         uint256[] memory index
     ) public {
-        require(!_sealed[index[0]], "migration sealed");
         uint256 timestamp = block.timestamp;
         require(_deadlineBy >= timestamp, "deadline passed");
-        _base[index[0]].burnBatch(account, nftIds, amounts);
-        for (uint256 i = 0; i < amounts.length; i++) {
-            require(amounts[i] > 0, "non-positive amount");
+        for (uint256 i = 0; i < nftIds.length; i++) {
+            _burnFrom(account, nftIds[i], amounts[i], index);
         }
         _mintBatch(account, nftIds, amounts, "");
     }
@@ -84,8 +95,24 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         return _sealed;
     }
 
-    /** returns true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interfaceId */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
+    }
+
+    /** @return eon the given year belongs to: 1M, 10M, 100M, ... */
+    function _eonOf(uint256 anno) internal pure returns (uint256) {
+        uint256 eon = 10_000;
+        while (anno / eon > 0) {
+            eon *= 10;
+        }
+        return 100 * eon;
+    }
+
+    /** @return year of nft-id (2021, 2022, ...) */
+    function _yearOf(uint256 nftId) internal pure returns (uint256) {
+        uint256 anno = (nftId / 100) % 10_000;
+        require(anno > 2020, "invalid year");
+        return anno;
     }
 }
