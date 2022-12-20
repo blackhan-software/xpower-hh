@@ -125,9 +125,9 @@ describe("XPowerNft", async function () {
         xpower_nft_new.NFT_SEAL_ROLE(),
         addresses[0]
       );
-      expect(await xpower_nft_new.sealedAll()).to.deep.eq([false]);
-      await xpower_nft_new.seal(0);
-      expect(await xpower_nft_new.sealedAll()).to.deep.eq([true]);
+      expect(await xpower_nft_new.seals()).to.deep.eq([false]);
+      await xpower_nft_new.sealAll();
+      expect(await xpower_nft_new.seals()).to.deep.eq([true]);
       expect(
         await migrateXPowNft(UNIT, 1).catch((ex) => {
           const m = ex.message.match(/migration sealed/);
