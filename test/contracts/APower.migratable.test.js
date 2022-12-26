@@ -207,9 +207,11 @@ describe("APower Migration", async function () {
   });
   it("should *not* migrate old => new (migration sealed)", async function () {
     await apower_new.grantRole(apower_new.SOV_SEAL_ROLE(), A0);
-    expect(await apower_new.sealedAll()).to.deep.eq([false]);
+    expect(await apower_new.seals()).to.deep.eq([false]);
     await apower_new.seal(0);
-    expect(await apower_new.sealedAll()).to.deep.eq([true]);
+    expect(await apower_new.seals()).to.deep.eq([true]);
+    await apower_new.sealAll();
+    expect(await apower_new.seals()).to.deep.eq([true]);
     await apower_old.increaseAllowance(apower_new.address, DECI_OLD);
     const tx = await apower_new.migrate(DECI_OLD, [0, 0]).catch((ex) => {
       const m = ex.message.match(/migration sealed/);

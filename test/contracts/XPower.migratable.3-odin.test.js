@@ -292,9 +292,11 @@ describe("XPowerOdin Migration", async function () {
       // grant seal role to default account (i.e. deployer)
       await xpower_new.grantRole(xpower_new.MOE_SEAL_ROLE(), addresses[0]);
       // seal migrate option
-      expect(await xpower_new.sealedAll()).to.deep.eq([false]);
+      expect(await xpower_new.seals()).to.deep.eq([false]);
       await xpower_new.seal(0);
-      expect(await xpower_new.sealedAll()).to.deep.eq([true]);
+      expect(await xpower_new.seals()).to.deep.eq([true]);
+      await xpower_new.sealAll();
+      expect(await xpower_new.seals()).to.deep.eq([true]);
       // migrate amount from old[owner] to new[owner]
       const new_migrate = await xpower_new
         .connect(minter)

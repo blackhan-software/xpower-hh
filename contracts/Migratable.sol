@@ -88,12 +88,19 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
     }
 
     /** seal migration (manually) */
-    function seal(uint256 index) public virtual onlyRole(0x0) {
+    function _seal(uint256 index) internal {
         _sealed[index] = true;
     }
 
-    /** @return sealed flags (for all bases) */
-    function sealedAll() public view returns (bool[] memory) {
+    /** seal-all migration (manually) */
+    function _sealAll() internal {
+        for (uint256 i = 0; i < _sealed.length; i++) {
+            _seal(i);
+        }
+    }
+
+    /** @return seal flags (for all bases) */
+    function seals() public view returns (bool[] memory) {
         return _sealed;
     }
 
@@ -111,8 +118,13 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
  */
 abstract contract MoeMigratable is Migratable, MoeMigratableSupervised {
     /** seal migration (manually) */
-    function seal(uint256 index) public override onlyRole(MOE_SEAL_ROLE) {
-        super.seal(index);
+    function seal(uint256 index) public onlyRole(MOE_SEAL_ROLE) {
+        _seal(index);
+    }
+
+    /** seal-all migration (manually) */
+    function sealAll() public onlyRole(MOE_SEAL_ROLE) {
+        _sealAll();
     }
 
     /** returns true if this contract implements the interface defined by interfaceId */
@@ -173,8 +185,13 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
     }
 
     /** seal migration (manually) */
-    function seal(uint256 index) public override onlyRole(SOV_SEAL_ROLE) {
-        super.seal(index);
+    function seal(uint256 index) public onlyRole(SOV_SEAL_ROLE) {
+        _seal(index);
+    }
+
+    /** seal-all migration (manually) */
+    function sealAll() public onlyRole(SOV_SEAL_ROLE) {
+        _sealAll();
     }
 
     /** returns true if this contract implements the interface defined by interfaceId */
