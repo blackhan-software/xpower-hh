@@ -5,7 +5,7 @@
   "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/ppts/320x427/2022/Thor/1-Thor_UNIT.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr", "value": "0%" },
-    { "trait_type": "apr-bonus", "value": "1‱" },
+    { "trait_type": "apr-bonus", "value": "0‱" },
     { "trait_type": "issue", "value": "2022" },
     { "trait_type": "label", "value": "UNIT" },
     { "trait_type": "level", "max_value": 24, "value": 0 },
