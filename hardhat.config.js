@@ -113,6 +113,9 @@ module.exports = {
     },
   },
   networks: {
+    /* avalanche */ hardhat: {
+      blockGasLimit: 8_000_000,
+    },
     /* avalanche */ local: {
       url: "http://127.0.0.1:9650/ext/bc/C/rpc",
       chainId: 43112,
@@ -158,7 +161,11 @@ module.exports = {
     url: "https://api.snowtrace.io/api",
   },
   gasReporter: {
+    gasPriceApi:
+      "https://api.snowtrace.io/api?module=proxy&action=eth_gasPrice",
     enabled: process.env.REPORT_GAS !== undefined,
+    coinmarketcap: process.env.CMCC_API_KEY,
     currency: "USD",
+    token: "AVAX",
   },
 };
