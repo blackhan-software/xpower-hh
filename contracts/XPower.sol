@@ -171,36 +171,10 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
 
     /** @return leading zeros of provided nonce-hash */
     function _zerosOf(bytes32 nonceHash) internal pure returns (uint8) {
-        uint8 counter = 0;
-        for (uint8 i = 0; i < 32; i++) {
-            bytes1 b = nonceHash[i];
-            if (b == 0x00) {
-                counter += 2;
-                continue;
-            }
-            if (
-                b == 0x01 ||
-                b == 0x02 ||
-                b == 0x03 ||
-                b == 0x04 ||
-                b == 0x05 ||
-                b == 0x06 ||
-                b == 0x07 ||
-                b == 0x08 ||
-                b == 0x09 ||
-                b == 0x0a ||
-                b == 0x0b ||
-                b == 0x0c ||
-                b == 0x0d ||
-                b == 0x0e ||
-                b == 0x0f
-            ) {
-                counter += 1;
-                break;
-            }
-            break;
+        if (nonceHash > 0) {
+            return uint8(63 - (Math.log2(uint256(nonceHash)) >> 2));
         }
-        return counter;
+        return 64;
     }
 
     /** returns true if this contract implements the interface defined by interfaceId */
