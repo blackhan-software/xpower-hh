@@ -41,6 +41,12 @@ describe("XPowerLoki Migration", async function () {
     await xpower_new.init();
   });
   beforeEach(async function () {
+    // trigger else-case in XPowerOld.init
+    await xpower_old.init();
+    // trigger else-case in XPowerNew.init
+    await xpower_new.init();
+  });
+  beforeEach(async function () {
     table_0 = await new HashTable(xpower_old, addresses[0]).init();
     table_1 = await new HashTable(xpower_new, addresses[0]).init();
     table_2 = await new HashTable(xpower_old, addresses[2]).init();

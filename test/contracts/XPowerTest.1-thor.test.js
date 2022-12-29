@@ -40,52 +40,39 @@ describe("XPowerThorTest", async function () {
     UNUM = 10n ** BigInt(decimals);
     expect(UNUM >= 1n).to.be.true;
   });
-  describe("interval", async function () {
+  describe("current-interval", async function () {
     it("should return interval>0", async function () {
-      const interval = await xpower.interval();
+      const interval = await xpower.currentInterval();
       expect(interval.toNumber()).to.be.greaterThan(0);
+    });
+  });
+  describe("block-hash-of(interval)", async function () {
+    it("should return block-hash>0", async function () {
+      const interval = await xpower.currentInterval();
+      expect(interval.toNumber()).to.be.greaterThan(0);
+      const block_hash = await xpower.blockHashOf(interval);
+      expect(block_hash).to.not.match(/^0x0+$/);
     });
   });
   describe("hash w/block-hash", async function () {
     it("should hash for amount=0", async function () {
-      const interval = await xpower.interval();
-      expect(interval.toNumber()).to.be.greaterThan(0);
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
       expect(nonce.gte(0)).to.eq(true);
-      const hash = await xpower.hashOf(
-        addresses[0],
-        interval,
-        block_hash,
-        nonce
-      );
+      const hash = await xpower.hashOf(addresses[0], block_hash, nonce);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 0 }));
     });
     it("should hash for amount=1", async function () {
-      const interval = await xpower.interval();
-      expect(interval.toNumber()).to.be.greaterThan(0);
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
-      const hash = await xpower.hashOf(
-        addresses[0],
-        interval,
-        block_hash,
-        nonce
-      );
+      const hash = await xpower.hashOf(addresses[0], block_hash, nonce);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 1 }));
     });
     it("should hash for amount=2", async function () {
-      const interval = await xpower.interval();
-      expect(interval.toNumber()).to.be.greaterThan(0);
       const [nonce, block_hash] = table.getNonce({ amount: 2 });
       expect(nonce.gte(0)).to.eq(true);
-      const hash = await xpower.hashOf(
-        addresses[0],
-        interval,
-        block_hash,
-        nonce
-      );
+      const hash = await xpower.hashOf(addresses[0], block_hash, nonce);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 2 }));
     });

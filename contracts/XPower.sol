@@ -22,6 +22,8 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     EnumerableSet.UintSet private _hashes;
     /** map from block-hashes to timestamps */
     mapping(bytes32 => uint256) internal _timestamps;
+    /** map from intervals to block-hashes */
+    mapping(uint256 => bytes32) internal _blockHashes;
     /** anchor for difficulty calculation */
     uint256 private immutable _timestamp;
     /** parametrization of treasury-share */
@@ -72,23 +74,29 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
 
     /** cache most recent block-hash */
     function init() public {
-        bytes32 blockHash = blockhash(block.number - 1);
-        require(blockHash > 0, "invalid block-hash");
-        uint256 timestamp = block.timestamp;
-        require(timestamp > 0, "invalid timestamp");
-        _timestamps[blockHash] = timestamp;
-        emit Init(blockHash, timestamp);
+        uint256 interval = currentInterval();
+        if (uint256(_blockHashes[interval]) == 0) {
+            bytes32 blockHash = blockhash(block.number - 1);
+            require(blockHash > 0, "invalid block-hash");
+            uint256 timestamp = block.timestamp;
+            require(timestamp > 0, "invalid timestamp");
+            _timestamps[blockHash] = timestamp;
+            _blockHashes[interval] = blockHash;
+            emit Init(blockHash, timestamp);
+        } else {
+            bytes32 blockHash = _blockHashes[interval];
+            uint256 timestamp = _timestamps[blockHash];
+            emit Init(blockHash, timestamp);
+        }
     }
 
     /** mint tokens for beneficiary, interval, block-hash and nonce */
     function mint(address to, bytes32 blockHash, uint256 nonce) public {
         uint256 gas = gasleft();
-        // get current interval (in hours)
-        uint256 interval = _interval();
-        // check block-hash to be recent
-        _requireRecent(blockHash, interval);
-        // calculate nonce-hash for to, interval, block-hash & nonce
-        bytes32 nonceHash = _hashOf(to, interval, blockHash, nonce);
+        // check block-hash to be in current interval
+        _requireCurrent(blockHash, currentInterval());
+        // calculate nonce-hash for to, block-hash & nonce
+        bytes32 nonceHash = _hashOf(to, blockHash, nonce);
         require(!_hashes.contains(uint256(nonceHash)), "duplicate nonce-hash");
         // calculate amount of tokens for nonce-hash
         uint256 amount = _amountOf(nonceHash);
@@ -106,6 +114,18 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         _totalMinted += amount;
         // increment total fees spent
         _totalMintingFees += (gas - gasleft()) * tx.gasprice;
+    }
+
+    /** @return current interval (in hours) */
+    function currentInterval() public view returns (uint256) {
+        uint256 interval = block.timestamp / (1 hours);
+        require(interval > 0, "invalid interval");
+        return interval;
+    }
+
+    /** @return block-hash of given interval */
+    function blockHashOf(uint256 interval) public view returns (bytes32) {
+        return _blockHashes[interval];
     }
 
     /** @return treasury-share for given amount */
@@ -141,35 +161,18 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         _rigor = array;
     }
 
-    /** check whether block-hash has recently been cached or is recent */
-    function _requireRecent(bytes32 blockHash, uint256 interval) internal view {
+    /** check whether block-hash has been cached for given interval */
+    function _requireCurrent(bytes32 blockHash, uint256 interval) internal view {
         require(blockHash > 0, "invalid block-hash");
         uint256 timestamp = _timestamps[blockHash];
         if (timestamp / (1 hours) != interval) {
-            for (uint256 i = 1; i <= 256; i++) {
-                if (block.number >= i && blockhash(block.number - i) == blockHash) {
-                    return; // block-hash is within the last 256 blocks
-                }
-            }
             revert("expired block-hash");
         }
     }
 
-    /** @return current interval (in hours) */
-    function _interval() internal view returns (uint256) {
-        uint256 interval = block.timestamp / (1 hours);
-        require(interval > 0, "invalid interval");
-        return interval;
-    }
-
-    /** @return hash of beneficiary, interval, block-hash & nonce */
-    function _hashOf(
-        address to,
-        uint256 interval,
-        bytes32 blockHash,
-        uint256 nonce
-    ) internal view virtual returns (bytes32) {
-        return keccak256(abi.encode(address(this), to, interval, blockHash, nonce));
+    /** @return hash of contract, beneficiary, block-hash & nonce */
+    function _hashOf(address to, bytes32 blockHash, uint256 nonce) internal view virtual returns (bytes32) {
+        return keccak256(abi.encode(address(this), to, blockHash, nonce));
     }
 
     /** @return amount for provided nonce-hash */

@@ -17,38 +17,38 @@ class Miner {
   }
 
   constructor() {
-    // cache: (interval: number) => abi.encode(token, ...)
+    // cache: (block-hash) => abi.encode(token, ...)
     this.abi_encoded = {};
-    // cache: (level: number) => arrayify(nonce)
+    // cache: (level) => arrayify(nonce)
     this.array_cache = {};
-    // cache: (level: number) => nonce
+    // cache: (level) => nonce
     this.nonce_cache = {};
   }
 
   async init(level) {
     await InitializeKeccak();
     const abi_encode = this.abi_encoder(level);
-    return (contract, address, interval, block_hash, nonce) => {
-      const data = abi_encode(contract, address, interval, block_hash, nonce);
+    return (contract, address, block_hash, nonce) => {
+      const data = abi_encode(contract, address, block_hash, nonce);
       return "0x" + keccak256(data);
     };
   }
 
   abi_encoder(level) {
     const lazy_arrayify = this.arrayifier(level);
-    return (contract, address, interval, block_hash, nonce) => {
-      let value = this.abi_encoded[interval];
+    return (contract, address, block_hash, nonce) => {
+      let value = this.abi_encoded[block_hash];
       if (value === undefined) {
         const template = abi.encode(
-          ["address", "address", "uint256", "bytes32", "uint256"],
-          [contract, address, interval, block_hash, 0]
+          ["address", "address", "bytes32", "uint256"],
+          [contract, address, block_hash, 0]
         );
-        this.abi_encoded[interval] = value = this.arrayify(template.slice(2));
+        this.abi_encoded[block_hash] = value = this.arrayify(template.slice(2));
         this.array_cache[level] = this.arrayify(nonce.toString(16));
         this.nonce_cache[level] = nonce;
       }
       const array = lazy_arrayify(nonce, nonce.toString(16));
-      value.set(array, 128);
+      value.set(array, 96);
       return value;
     };
   }

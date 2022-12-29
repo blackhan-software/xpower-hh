@@ -33,6 +33,7 @@ class HashTable {
   } = {}) {
     const address = this.address;
     const at_interval = Miner.interval();
+    const block_hash = await this.contract.blockHashOf(at_interval);
     const symbol = await this.contract.symbol();
     const contract_address = this.contract.address;
     const [date] = new Date().toISOString().split("T");
@@ -78,18 +79,9 @@ class HashTable {
     const min_threshold = token.threshold(min_level);
     const max_threshold = token.threshold(max_level);
     try {
-      const { hash: block_hash } = await ethers.provider.getBlock(
-        (await ethers.provider.getBlockNumber()) - 1
-      );
       for (let nonce = start; length > 0; nonce++) {
         const x = "0x" + nonce.toString(16); // hexadecimal nonce
-        const h = mine(
-          contract_address,
-          address,
-          at_interval,
-          block_hash,
-          nonce
-        );
+        const h = mine(contract_address, address, block_hash, nonce);
         const a = token.amount_of(h);
         if (a < min_threshold) {
           continue;
