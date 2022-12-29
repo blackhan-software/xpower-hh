@@ -31,21 +31,14 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     /** parametrization of mining-difficulty */
     uint256[] private _rigor = [0, 0, 4, 1, 0, 0];
 
-    /** total mints */
-    uint256 private _totalMints = 0;
-    /** total minted amounts */
-    uint256 private _totalMinted = 0;
+    /** total minted amount */
+    uint256 private _totalMintedAmount = 0;
     /** total minting fees */
     uint256 private _totalMintingFees = 0;
 
-    /** @return total mints */
-    function totalMints() public view returns (uint256) {
-        return _totalMints;
-    }
-
-    /** @return total minted amounts */
-    function totalMinted() public view returns (uint256) {
-        return _totalMinted;
+    /** @return total minted amount */
+    function totalMintedAmount() public view returns (uint256) {
+        return _totalMintedAmount;
     }
 
     /** @return total minting fees */
@@ -108,10 +101,8 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         if (treasure > 0) _mint(owner(), treasure);
         // mint tokens for beneficiary (e.g. nonce provider)
         _mint(to, amount);
-        // increment total mints
-        _totalMints += 1;
         // increment total amounts minted
-        _totalMinted += amount;
+        _totalMintedAmount += amount;
         // increment total fees spent
         _totalMintingFees += (gas - gasleft()) * tx.gasprice;
     }
