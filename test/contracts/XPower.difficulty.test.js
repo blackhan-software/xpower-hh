@@ -11,6 +11,7 @@ const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
+const UNUM = 10n ** 18n;
 
 describe("XPower", async function () {
   before(async function () {
@@ -41,37 +42,37 @@ describe("XPower", async function () {
       const hash = table.getHash({ amount: 0 }); // w.r.t. difficulty=0
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       const amount = await xpower.amountOf(hash);
-      expect(amount).to.eq(0);
+      expect(amount.toBigInt()).to.eq(0n);
     });
-    it("should return difficulty=1", async function () {
+    it("should return difficulty=0", async function () {
       await network.provider.send("hardhat_mine", ["0x7861f80"]); // 4 years
-      expect(await xpower.miningDifficulty(await block("timestamp"))).to.eq(1);
+      expect(await xpower.miningDifficulty(await block("timestamp"))).to.eq(0);
     });
-    it("should return amount=0 (at difficulty=1)", async function () {
+    it("should return amount=1 (at difficulty=0)", async function () {
       const hash = table.getHash({ amount: 1 }); // w.r.t. difficulty=0
       expect(hash).to.be.a("string").and.to.match(/^0x0/);
       const amount = await xpower.amountOf(hash);
-      expect(amount).to.eq(0);
+      expect(amount.toBigInt()).to.eq(1n * UNUM);
     });
-    it("should return difficulty=2", async function () {
+    it("should return difficulty=0", async function () {
       await network.provider.send("hardhat_mine", ["0x7861f80"]); // 4 years
-      expect(await xpower.miningDifficulty(await block("timestamp"))).to.eq(2);
+      expect(await xpower.miningDifficulty(await block("timestamp"))).to.eq(0);
     });
-    it("should return amount=0 (at difficulty=2)", async function () {
+    it("should return amount=3 (at difficulty=0)", async function () {
       const hash = table.getHash({ amount: 3 }); // w.r.t. difficulty=0
       expect(hash).to.be.a("string").and.to.match(/^0x00/);
       const amount = await xpower.amountOf(hash);
-      expect(amount).to.eq(0);
+      expect(amount.toBigInt()).to.eq(3n * UNUM);
     });
-    it("should return difficulty=3", async function () {
+    it("should return difficulty=0", async function () {
       await network.provider.send("hardhat_mine", ["0x7861f80"]); // 4 years
-      expect(await xpower.miningDifficulty(await block("timestamp"))).to.eq(3);
+      expect(await xpower.miningDifficulty(await block("timestamp"))).to.eq(0);
     });
-    it("should return amount=0 (at difficulty=3)", async function () {
+    it("should return amount=0 (at difficulty=0)", async function () {
       const hash = table.getHash({ amount: 0 }); // w.r.t. difficulty=0
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       const amount = await xpower.amountOf(hash);
-      expect(amount).to.eq(0);
+      expect(amount.toBigInt()).to.eq(0n);
     });
   });
 });

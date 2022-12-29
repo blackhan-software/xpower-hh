@@ -29,7 +29,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     /** parametrization of treasury-share */
     uint256[] private _share = [0, 0, 2, 1, 0, 0];
     /** parametrization of mining-difficulty */
-    uint256[] private _rigor = [0, 0, 4, 1, 0, 0];
+    uint256[] private _rigor = [0, 0, 1, 0, 0, 0];
 
     /** total minted amount */
     uint256 private _totalMintedAmount = 0;

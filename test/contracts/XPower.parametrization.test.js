@@ -65,7 +65,7 @@ describe("XPower", async function () {
   });
   describe("parametrization of difficulty-for", async function () {
     it("should get delta array", async function () {
-      Expect(await xpower.getMiningDifficulty()).to.equal([0, 0, 4, 1, 0, 0]);
+      Expect(await xpower.getMiningDifficulty()).to.equal([0, 0, 1, 0, 0, 0]);
     });
     it("should set delta array", async function () {
       await xpower.grantRole(xpower.MINING_DIFFICULTY_ROLE(), addresses[0]);
@@ -81,7 +81,7 @@ describe("XPower", async function () {
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await xpower.getMiningDifficulty()).to.equal([0, 0, 4, 1, 0, 0]);
+      Expect(await xpower.getMiningDifficulty()).to.equal([0, 0, 1, 0, 0, 0]);
     });
     it("should *not* set delta array (account is missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
@@ -95,7 +95,7 @@ describe("XPower", async function () {
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await xpower.getMiningDifficulty()).to.equal([0, 0, 4, 1, 0, 0]);
+      Expect(await xpower.getMiningDifficulty()).to.equal([0, 0, 1, 0, 0, 0]);
     });
   });
 });
