@@ -61,8 +61,8 @@ describe("XPower", async function () {
       expect(tx).to.eq(undefined);
       expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(0n);
       expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(0n);
-      expect((await xpower.totalMintedAmount()).toBigInt()).to.eq(0n);
-      expect((await xpower.totalMintingFees()).toBigInt()).to.eq(0n);
+      const fees_eqz = (await xpower.mintingFees()).map((f) => f.eq(0));
+      expect(fees_eqz.reduce((a, b) => a && b)).to.deep.eq(true);
     });
     it("should mint for amount=1", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
@@ -73,8 +73,8 @@ describe("XPower", async function () {
       expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(
         UNUM / 2n
       );
-      expect((await xpower.totalMintedAmount()).toBigInt()).to.eq(UNUM);
-      expect((await xpower.totalMintingFees()).gt(0)).to.eq(true);
+      const fees_gtz = (await xpower.mintingFees()).map((f) => f.gt(0));
+      expect(fees_gtz.reduce((a, b) => a && b)).to.deep.eq(true);
     });
     it("should mint for amount=1 once", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
