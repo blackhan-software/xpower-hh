@@ -19,11 +19,6 @@ async function transferMoeRoles(factory_name, contract_name, { to: owner }) {
     to: owner,
   });
   await transferRole(contract, {
-    role: contract.MINING_DIFFICULTY_ADMIN_ROLE(),
-    from: signer.address,
-    to: owner,
-  });
-  await transferRole(contract, {
     role: contract.MOE_SEAL_ADMIN_ROLE(),
     from: signer.address,
     to: owner,
@@ -125,10 +120,18 @@ async function transferRole(contract, { role, from, to }) {
       for (let index = 0; index < count; index++) {
         const member = await contract.getRoleMember(await role, index);
         if (member !== to) {
-          await wait(await contract.grantRole(await role, to));
+          await wait(
+            await contract.grantRole(await role, to, {
+              gasLimit: 500_000,
+            })
+          );
         }
         if (member === from) {
-          await wait(await contract.renounceRole(await role, from));
+          await wait(
+            await contract.renounceRole(await role, from, {
+              gasLimit: 500_000,
+            })
+          );
         }
       }
       process.stdout.write(".");

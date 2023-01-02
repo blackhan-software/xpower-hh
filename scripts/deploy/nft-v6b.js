@@ -17,9 +17,23 @@ const { wait } = require("../wait");
  */
 function nft_bases(
   token,
-  versions = ["V2a", "V3a", "V3b", "V4a", "V5a", "V5b", "V5c"]
+  versions = [
+    "V2a",
+    "V2b",
+    "V2c",
+    "V3a",
+    "V3b",
+    "V4a",
+    "V5a",
+    "V5b",
+    "V5c",
+    "V6a",
+  ]
 ) {
   return versions.map((version) => {
+    if (version >= "V6a") {
+      token = "XPOW";
+    }
     const nft_base = process.env[`${token}_NFT_${version}`];
     assert(nft_base, `missing ${token}_NFT_${version}`);
     return nft_base;
@@ -37,18 +51,18 @@ async function main() {
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPowerNft[Old]
   const thor_nft_base = nft_bases("THOR");
-  assert(thor_nft_base.length === 7);
+  assert(thor_nft_base.length === 10);
   const loki_nft_base = nft_bases("LOKI");
-  assert(loki_nft_base.length === 7);
+  assert(loki_nft_base.length === 10);
   const odin_nft_base = nft_bases("ODIN");
-  assert(odin_nft_base.length === 7);
+  assert(odin_nft_base.length === 10);
   // addresses XPower[New]
-  const thor_moe_link = process.env.THOR_MOE_V6a;
-  assert(thor_moe_link, "missing THOR_MOE_V6a");
-  const loki_moe_link = process.env.LOKI_MOE_V6a;
-  assert(loki_moe_link, "missing LOKI_MOE_V6a");
-  const odin_moe_link = process.env.ODIN_MOE_V6a;
-  assert(odin_moe_link, "missing ODIN_MOE_V6a");
+  const thor_moe_link = process.env.THOR_MOE_V6b;
+  assert(thor_moe_link, "missing THOR_MOE_V6b");
+  const loki_moe_link = process.env.LOKI_MOE_V6b;
+  assert(loki_moe_link, "missing LOKI_MOE_V6b");
+  const odin_moe_link = process.env.ODIN_MOE_V6b;
+  assert(odin_moe_link, "missing ODIN_MOE_V6b");
   // addresses XPowerNft[Uri]
   const xpow_nft_uri = process.env.XPOW_NFT_URI;
   assert(xpow_nft_uri, "missing XPOW_NFT_URI");
@@ -66,7 +80,7 @@ async function main() {
     deadline,
     owner,
   });
-  console.log(`XPOW_NFT_V6a=${xpow.nft.address}`);
+  console.log(`XPOW_NFT_V6b=${xpow.nft.address}`);
   //
   // verify contract(s):
   //

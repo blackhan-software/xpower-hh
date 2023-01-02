@@ -20,61 +20,55 @@ const { wait } = require("../wait");
  */
 async function main() {
   // addresses XPower[New]
-  const thor_moe_link = process.env.THOR_MOE_V6a;
-  assert(thor_moe_link, "missing THOR_MOE_V6a");
-  const loki_moe_link = process.env.LOKI_MOE_V6a;
-  assert(loki_moe_link, "missing LOKI_MOE_V6a");
-  const odin_moe_link = process.env.ODIN_MOE_V6a;
-  assert(odin_moe_link, "missing ODIN_MOE_V6a");
+  const thor_moe_link = process.env.THOR_MOE_V6b;
+  assert(thor_moe_link, "missing THOR_MOE_V6b");
+  const loki_moe_link = process.env.LOKI_MOE_V6b;
+  assert(loki_moe_link, "missing LOKI_MOE_V6b");
+  const odin_moe_link = process.env.ODIN_MOE_V6b;
+  assert(odin_moe_link, "missing ODIN_MOE_V6b");
   // addresses APower[New]
-  const thor_sov_link = process.env.THOR_SOV_V6a;
-  assert(thor_sov_link, "missing THOR_SOV_V6a");
-  const loki_sov_link = process.env.LOKI_SOV_V6a;
-  assert(loki_sov_link, "missing LOKI_SOV_V6a");
-  const odin_sov_link = process.env.ODIN_SOV_V6a;
-  assert(odin_sov_link, "missing ODIN_SOV_V6a");
+  const thor_sov_link = process.env.THOR_SOV_V6b;
+  assert(thor_sov_link, "missing THOR_SOV_V6b");
+  const loki_sov_link = process.env.LOKI_SOV_V6b;
+  assert(loki_sov_link, "missing LOKI_SOV_V6b");
+  const odin_sov_link = process.env.ODIN_SOV_V6b;
+  assert(odin_sov_link, "missing ODIN_SOV_V6b");
   // addresses XPowerPpt[New]
-  const xpow_ppt_link = process.env.XPOW_PPT_V6a;
-  assert(xpow_ppt_link, "missing XPOW_PPT_V6a");
+  const xpow_ppt_link = process.env.XPOW_PPT_V6b;
+  assert(xpow_ppt_link, "missing XPOW_PPT_V6b");
   //
-  // deploy THOR NftTreasury[New] & re-own APowerThor[New]:
+  // deploy XPOW NftTreasury[New] & re-own APower{Thor,Loki,Odin}[New]:
   //
-  const thor_treasury = await deploy("MoeTreasury", {
-    moe_links: [thor_moe_link],
-    sov_links: [thor_sov_link],
+  const xpow_moe_links = [thor_moe_link, loki_moe_link, odin_moe_link];
+  const xpow_sov_links = [thor_sov_link, loki_sov_link, odin_sov_link];
+  const xpow_treasury = await deploy("MoeTreasury", {
+    moe_links: xpow_moe_links,
+    sov_links: xpow_sov_links,
     ppt_link: xpow_ppt_link,
   });
   await transfer("APowerThor", {
     sov_link: thor_sov_link,
-    treasury: thor_treasury,
-  });
-  console.log(`THOR_MTY_V6a=${thor_treasury.address}`);
-  //
-  // deploy LOKI NftTreasury[New] & re-own APowerLoki[New]:
-  //
-  const loki_treasury = await deploy("MoeTreasury", {
-    moe_links: [loki_moe_link],
-    sov_links: [loki_sov_link],
-    ppt_link: xpow_ppt_link,
+    treasury: xpow_treasury,
   });
   await transfer("APowerLoki", {
     sov_link: loki_sov_link,
-    treasury: loki_treasury,
-  });
-  console.log(`LOKI_MTY_V6a=${loki_treasury.address}`);
-  //
-  // deploy ODIN NftTreasury[New] & re-own APowerOdin[New]:
-  //
-  const odin_treasury = await deploy("MoeTreasury", {
-    moe_links: [odin_moe_link],
-    sov_links: [odin_sov_link],
-    ppt_link: xpow_ppt_link,
+    treasury: xpow_treasury,
   });
   await transfer("APowerOdin", {
     sov_link: odin_sov_link,
-    treasury: odin_treasury,
+    treasury: xpow_treasury,
   });
-  console.log(`ODIN_MTY_V6a=${odin_treasury.address}`);
+  console.log(`XPOW_MTY_V6b=${xpow_treasury.address}`);
+  //
+  // verify contract(s):
+  //
+  await verify(
+    "MoeTreasury",
+    xpow_treasury,
+    xpow_moe_links,
+    xpow_sov_links,
+    xpow_ppt_link
+  );
 }
 async function deploy(mty_name, { moe_links, sov_links, ppt_link }) {
   const mty_factory = await hre.ethers.getContractFactory(mty_name);
@@ -87,6 +81,15 @@ async function transfer(sov_name, { sov_link, treasury }) {
   const sov_contract = sov_factory.attach(sov_link);
   const sov_transfer = await sov_contract.transferOwnership(treasury.address);
   await wait(sov_transfer);
+}
+async function verify(name, { address }, ...args) {
+  if (hre.network.name.match(/mainnet|fuji/)) {
+    return await hre.run("verify:verify", {
+      address,
+      contract: `contracts/MoeTreasury.sol:${name}`,
+      constructorArguments: args,
+    });
+  }
 }
 if (require.main === module) {
   main()

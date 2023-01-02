@@ -24,6 +24,12 @@ const { main: deploy_ppt_v6a } = require("./deploy-roles/ppt-v6a");
 const { main: deploy_sov_v6a } = require("./deploy-roles/sov-v6a");
 const { main: deploy_mty_v6a } = require("./deploy-roles/mty-v6a");
 
+const { main: deploy_moe_v6b } = require("./deploy-roles/moe-v6b");
+const { main: deploy_nft_v6b } = require("./deploy-roles/nft-v6b");
+const { main: deploy_ppt_v6b } = require("./deploy-roles/ppt-v6b");
+const { main: deploy_sov_v6b } = require("./deploy-roles/sov-v6b");
+const { main: deploy_mty_v6b } = require("./deploy-roles/mty-v6b");
+
 async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
@@ -59,6 +65,14 @@ async function main() {
   await deploy_ppt_v6a();
   await deploy_sov_v6a();
   await deploy_mty_v6a();
+  //
+  // deploy v6b contract roles:
+  //
+  await deploy_moe_v6b();
+  await deploy_nft_v6b();
+  await deploy_ppt_v6b();
+  await deploy_sov_v6b();
+  await deploy_mty_v6b();
   //
   // show ownership address:
   //

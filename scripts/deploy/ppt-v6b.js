@@ -15,8 +15,11 @@ const { wait } = require("../wait");
 /**
  * @returns list of base contract addresses
  */
-function ppt_bases(token, versions = ["V4a", "V5a", "V5b", "V5c"]) {
+function ppt_bases(token, versions = ["V4a", "V5a", "V5b", "V5c", "V6a"]) {
   return versions.map((version) => {
+    if (version >= "V6a") {
+      token = "XPOW";
+    }
     const ppt_base = process.env[`${token}_PPT_${version}`];
     assert(ppt_base, `missing ${token}_PPT_${version}`);
     return ppt_base;
@@ -34,11 +37,11 @@ async function main() {
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPowerPpt[Old]
   const thor_ppt_base = ppt_bases("THOR");
-  assert(thor_ppt_base.length === 4);
+  assert(thor_ppt_base.length === 5);
   const loki_ppt_base = ppt_bases("LOKI");
-  assert(loki_ppt_base.length === 4);
+  assert(loki_ppt_base.length === 5);
   const odin_ppt_base = ppt_bases("ODIN");
-  assert(odin_ppt_base.length === 4);
+  assert(odin_ppt_base.length === 5);
   // addresses XPowerPpt[Uri]
   const xpow_ppt_uri = process.env.XPOW_PPT_URI;
   assert(xpow_ppt_uri, "missing XPOW_PPT_URI");
@@ -53,7 +56,7 @@ async function main() {
     ppt_base: xpow_ppt_base,
     deadline,
   });
-  console.log(`XPOW_PPT_V6a=${xpow.ppt.address}`);
+  console.log(`XPOW_PPT_V6b=${xpow.ppt.address}`);
   //
   // verify contract(s):
   //

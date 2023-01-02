@@ -38,34 +38,35 @@ async function main() {
   //
   // deploy THOR NftTreasury[New]:
   //
-  const thor_treasury = await deploy(["MoeTreasury"], {
-    sov_link: none,
-    moe_link: thor_moe_link,
+  const thor_treasury = await deploy("MoeTreasury", {
+    moe_links: [thor_moe_link, loki_moe_link, odin_moe_link],
     ppt_link: thor_ppt_link,
   });
   console.log(`THOR_MTY_V4a=${thor_treasury.address}`);
   //
   // deploy LOKI NftTreasury[New]:
   //
-  const loki_treasury = await deploy(["MoeTreasury"], {
-    sov_link: none,
-    moe_link: loki_moe_link,
+  const loki_treasury = await deploy("MoeTreasury", {
+    moe_links: [thor_moe_link, loki_moe_link, odin_moe_link],
     ppt_link: loki_ppt_link,
   });
   console.log(`LOKI_MTY_V4a=${loki_treasury.address}`);
   //
   // deploy ODIN NftTreasury[New]:
   //
-  const odin_treasury = await deploy(["MoeTreasury"], {
-    sov_link: none,
-    moe_link: odin_moe_link,
+  const odin_treasury = await deploy("MoeTreasury", {
+    moe_links: [thor_moe_link, loki_moe_link, odin_moe_link],
     ppt_link: odin_ppt_link,
   });
   console.log(`ODIN_MTY_V4a=${odin_treasury.address}`);
 }
-async function deploy([mty_name], { sov_link, moe_link, ppt_link }) {
+async function deploy(mty_name, { moe_links, sov_links, ppt_link }) {
   const mty_factory = await hre.ethers.getContractFactory(mty_name);
-  const mty_contract = await mty_factory.deploy(sov_link, moe_link, ppt_link);
+  const mty_contract = await mty_factory.deploy(
+    moe_links,
+    sov_links ?? [],
+    ppt_link
+  );
   await wait(mty_contract.deployTransaction);
   return mty_contract;
 }
