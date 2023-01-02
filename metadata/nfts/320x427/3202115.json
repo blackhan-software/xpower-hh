@@ -2,10 +2,10 @@
   "name": "PETA ODIN",
   "description": "Stakeable PETA ODIN NFT",
   "external_url": "https://www.xpowermine.com/nfts?token=ODIN",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/320x427/2021/Odin/6-Odin_PETA.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmaxCcv7MiQ7xBab9HXqJQHtyCb9ZQCwGDEgjwHU3w2cXU/320x427/2021/Odin/6-Odin_PETA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr", "value": "5%" },
-    { "trait_type": "apr-bonus", "value": "1‱" },
+    { "trait_type": "apr-bonus", "value": "2‱" },
     { "trait_type": "issue", "value": "2021" },
     { "trait_type": "label", "value": "PETA" },
     { "trait_type": "level", "max_value": 24, "value": 15 },

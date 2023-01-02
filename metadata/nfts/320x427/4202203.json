@@ -2,10 +2,10 @@
   "name": "KILO HELA",
   "description": "Stakeable KILO HELA NFT",
   "external_url": "https://www.xpowermine.com/nfts?token=HELA",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/320x427/2022/Hela/2-Hela_KILO.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmaxCcv7MiQ7xBab9HXqJQHtyCb9ZQCwGDEgjwHU3w2cXU/320x427/2022/Hela/2-Hela_KILO.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr", "value": "1%" },
-    { "trait_type": "apr-bonus", "value": "0‱" },
+    { "trait_type": "apr-bonus", "value": "1‱" },
     { "trait_type": "issue", "value": "2022" },
     { "trait_type": "label", "value": "KILO" },
     { "trait_type": "level", "max_value": 24, "value": 3 },

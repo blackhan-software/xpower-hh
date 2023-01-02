@@ -2,10 +2,10 @@
   "name": "KILO THOR",
   "description": "Stakeable KILO THOR NFT",
   "external_url": "https://www.xpowermine.com/nfts?token=THOR",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/1620x2160/2021/Thor/2-Thor_KILO.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmaxCcv7MiQ7xBab9HXqJQHtyCb9ZQCwGDEgjwHU3w2cXU/1620x2160/2021/Thor/2-Thor_KILO.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr", "value": "1%" },
-    { "trait_type": "apr-bonus", "value": "1‱" },
+    { "trait_type": "apr-bonus", "value": "2‱" },
     { "trait_type": "issue", "value": "2021" },
     { "trait_type": "label", "value": "KILO" },
     { "trait_type": "level", "max_value": 24, "value": 3 },

@@ -1,0 +1,14 @@
+{
+  "name": "EXA ODIN",
+  "description": "Stakeable EXA ODIN NFT",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmaxCcv7MiQ7xBab9HXqJQHtyCb9ZQCwGDEgjwHU3w2cXU/320x427/2023/Odin/7-Odin_EXA.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr", "value": "6%" },
+    { "trait_type": "apr-bonus", "value": "0‱" },
+    { "trait_type": "issue", "value": "2023" },
+    { "trait_type": "label", "value": "EXA" },
+    { "trait_type": "level", "max_value": 24, "value": 18 },
+    { "trait_type": "staked", "value": "false" },
+    { "trait_type": "token", "value": "ODIN" }
+  ]
+}

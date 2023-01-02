@@ -1,10 +1,10 @@
 {
   "name": "YOTTA HELA",
   "description": "Stakeable YOTTA HELA NFT",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/1620x2160/2022/Hela/9-Hela_YOTTA.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmaxCcv7MiQ7xBab9HXqJQHtyCb9ZQCwGDEgjwHU3w2cXU/1620x2160/2022/Hela/9-Hela_YOTTA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr", "value": "8%" },
-    { "trait_type": "apr-bonus", "value": "0‱" },
+    { "trait_type": "apr-bonus", "value": "1‱" },
     { "trait_type": "issue", "value": "2022" },
     { "trait_type": "label", "value": "YOTTA" },
     { "trait_type": "level", "max_value": 24, "value": 24 },

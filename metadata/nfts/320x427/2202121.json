@@ -1,10 +1,10 @@
 {
   "name": "ZETTA LOKI",
   "description": "Stakeable ZETTA LOKI NFT",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/nfts/320x427/2021/Loki/8-Loki_ZETTA.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmaxCcv7MiQ7xBab9HXqJQHtyCb9ZQCwGDEgjwHU3w2cXU/320x427/2021/Loki/8-Loki_ZETTA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr", "value": "7%" },
-    { "trait_type": "apr-bonus", "value": "1‱" },
+    { "trait_type": "apr-bonus", "value": "2‱" },
     { "trait_type": "issue", "value": "2021" },
     { "trait_type": "label", "value": "ZETA" },
     { "trait_type": "level", "max_value": 24, "value": 21 },

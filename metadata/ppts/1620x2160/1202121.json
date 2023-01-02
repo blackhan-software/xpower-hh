@@ -1,10 +1,10 @@
 {
   "name": "ZETTA THOR",
   "description": "Staked ZETTA THOR NFT",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmcMVdnJV6VaicjukafsTK1pX4Zthx6JbRvC9igLScrAjD/ppts/1620x2160/2021/Thor/8-Thor_ZETTA.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmSdo3XVCj388jAhyFvfkKfersEZHV5bMDS4sDt6J74nsB/1620x2160/2021/Thor/8-Thor_ZETTA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr", "value": "7%" },
-    { "trait_type": "apr-bonus", "value": "1‱" },
+    { "trait_type": "apr-bonus", "value": "2‱" },
     { "trait_type": "issue", "value": "2021" },
     { "trait_type": "label", "value": "ZETA" },
     { "trait_type": "level", "max_value": 24, "value": 21 },
