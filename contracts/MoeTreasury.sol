@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
+// solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
@@ -11,34 +12,62 @@ import "./Supervised.sol";
  * Treasury to claim (MoE) tokens for staked XPowerNft(s).
  */
 contract MoeTreasury is MoeTreasurySupervised {
-    /** (burnable) *aged* XPower tokens */
-    APower private _sov;
+    using Polynomials for Polynomial;
     /** (burnable) proof-of-work tokens */
-    XPower private _moe;
+    XPower[] private _moe;
+    /** (burnable) *aged* XPower tokens */
+    APower[] private _sov;
     /** staked proof-of-work NFTs */
     XPowerPpt private _ppt;
-    /** parametrization of APR: (nft.level+[5]-[4])*[3]/[2]+[1]-[0] */
-    uint256[] private _apr = [0, 0, 3, 1000, 0, 0];
-    /** parametrization of APR bonus: (age.year+[5]-[4])*[3]/[2]+[1]-[0] */
-    uint256[] private _bonus = [0, 0, 1, 10, 0, 0];
+
     /** map of rewards claimed: account => nft-id => amount */
     mapping(address => mapping(uint256 => uint256)) private _claimed;
     /** map of rewards claimed total: nft-id => amount */
     mapping(uint256 => uint256) private _claimedTotal;
 
-    /** @param sovLink address of contract for APower tokens */
+    /** anchor for apr[-bonus] reparametrization */
+    uint256 private immutable _timestamp;
+
     /** @param moeLink address of contract for XPower tokens */
+    /** @param sovLink address of contract for APower tokens */
     /** @param pptLink address of contract for staked NFTs */
-    constructor(address sovLink, address moeLink, address pptLink) {
-        _sov = APower(sovLink);
-        _moe = XPower(moeLink);
+    constructor(address[] memory moeLink, address[] memory sovLink, address pptLink) {
+        require(moeLink.length > 0 && moeLink.length == sovLink.length, "invalid moeLink.length");
+        require(sovLink.length > 0 && sovLink.length == moeLink.length, "invalid sovLink.length");
+        _moe = new XPower[](moeLink.length);
+        for (uint256 i = 0; i < moeLink.length; i++) {
+            XPower moe = XPower(moeLink[i]);
+            assert(moe.prefix() == i + 1);
+            _moe[i] = moe;
+        }
+        _sov = new APower[](sovLink.length);
+        for (uint256 i = 0; i < sovLink.length; i++) {
+            APower sov = APower(sovLink[i]);
+            assert(sov.prefix() == i + 1);
+            _sov[i] = sov;
+        }
         _ppt = XPowerPpt(pptLink);
+        _timestamp = block.timestamp;
     }
 
-    /** @return balance of available tokens */
-    function balance() public view returns (uint256) {
-        address self = (address)(this);
-        return _moe.balanceOf(self);
+    /** @return MOE balance of available tokens */
+    function moeBalance(uint256 index) public view returns (uint256) {
+        return _moe[index].balanceOf((address)(this));
+    }
+
+    /** @return index of MOE token address */
+    function moeIndexOf(address moe) public pure returns (uint256) {
+        return XPower(moe).prefix() - 1;
+    }
+
+    /** @return SOV balance of available tokens */
+    function sovBalance(uint256 index) public view returns (uint256) {
+        return _sov[index].balanceOf((address)(this));
+    }
+
+    /** @return index of SOV token address */
+    function sovIndexOf(address sov) public view returns (uint256) {
+        return APower(sov).prefix() - 1;
     }
 
     /** emitted on claiming NFT reward */
@@ -50,8 +79,10 @@ contract MoeTreasury is MoeTreasurySupervised {
         require(amount > 0, "nothing claimable");
         _claimed[account][nftId] += amount;
         _claimedTotal[nftId] += amount;
-        _moe.increaseAllowance((address)(_sov), amount);
-        _sov.mint(account, amount);
+        XPower moe = _moe[_indexOf(nftId)];
+        APower sov = _sov[_indexOf(nftId)];
+        moe.increaseAllowance((address)(sov), amount);
+        sov.mint(account, amount);
         emit Claim(account, nftId, amount);
     }
 
@@ -67,8 +98,10 @@ contract MoeTreasury is MoeTreasurySupervised {
             _claimedTotal[nftIds[i]] += amounts[i];
         }
         for (uint256 i = 0; i < nftIds.length; i++) {
-            _moe.increaseAllowance((address)(_sov), amounts[i]);
-            _sov.mint(account, amounts[i]);
+            XPower moe = _moe[_indexOf(nftIds[i])];
+            APower sov = _sov[_indexOf(nftIds[i])];
+            moe.increaseAllowance((address)(sov), amounts[i]);
+            sov.mint(account, amounts[i]);
         }
         emit ClaimBatch(account, nftIds, amounts);
     }
@@ -153,24 +186,24 @@ contract MoeTreasury is MoeTreasurySupervised {
 
     /** @return reward of tokens for given account and nft-id */
     function rewardOf(address account, uint256 nftId) public view returns (uint256) {
-        uint256 age = _ageOf(account, nftId);
-        uint256 denomination = _denominationOf(_levelOf(nftId));
+        uint256 age = _ppt.ageOf(account, nftId);
+        uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
         uint256 apr = aprOf(nftId);
-        uint256 aprBonus = aprBonusOf(nftId);
+        uint256 aprBonus = aprBonusOf2(nftId);
         uint256 reward = (apr * age * denomination) / (1_000 * 365_25 days);
         uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * 365_25 days);
-        return (reward + rewardBonus) * 10 ** _moe.decimals();
+        return (reward + rewardBonus) * 10 ** _moe[_indexOf(nftId)].decimals();
     }
 
     /** @return reward total of tokens for given nft-id */
     function totalRewardOf(uint256 nftId) public view returns (uint256) {
-        uint256 age = _totalAgeOf(nftId);
-        uint256 denomination = _denominationOf(_levelOf(nftId));
+        uint256 age = _ppt.totalAgeOf(nftId);
+        uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
         uint256 apr = aprOf(nftId);
-        uint256 aprBonus = aprBonusOf(nftId);
+        uint256 aprBonus = aprBonusOf2(nftId);
         uint256 reward = (apr * age * denomination) / (1_000 * 365_25 days);
         uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * 365_25 days);
-        return (reward + rewardBonus) * 10 ** _moe.decimals();
+        return (reward + rewardBonus) * 10 ** _moe[_indexOf(nftId)].decimals();
     }
 
     /** @return reward of tokens for given account and nft-ids */
@@ -191,59 +224,165 @@ contract MoeTreasury is MoeTreasurySupervised {
         return rewardsTotal;
     }
 
-    /** @return apr i.e. annual percentage rate (per nft.level) */
+    /** time-weighted average of APR: nft-id => value */
+    mapping(uint256 => uint256) private _aprSourceValue;
+    /** timestamp for average of APR: nft-id => timestamp */
+    mapping(uint256 => uint256) private _aprSourceStamp;
+    /** parametrization of APR: nft-{prefix, year} => coefficients */
+    mapping(uint256 => mapping(uint256 => uint256[])) private _apr;
+
+    /** @return interpolated value of APR (per nft.level) */
     function aprOf(uint256 nftId) public view returns (uint256) {
-        uint256 level = _ppt.levelOf(nftId);
-        return ((level + _apr[5] - _apr[4]) * _apr[3]) / _apr[2] + _apr[1] - _apr[0];
+        if (_aprSourceStamp[nftId] == 0) {
+            return aprTargetOf(nftId);
+        }
+        uint256 nowStamp = block.timestamp;
+        uint256 srcStamp = _aprSourceStamp[nftId];
+        uint256 tgtStamp = srcStamp + 365.25 days;
+        uint256 srcValue = _aprSourceValue[nftId];
+        uint256 tgtValue = aprTargetOf(nftId);
+        uint256 aprValue = _interpolate(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
+        return aprValue;
     }
 
-    /** @return apr-parameters */
-    function getAPR() public view returns (uint256[] memory) {
-        return _apr;
+    /** @return time-weighted average of APR (per nft.level) */
+    function aprOf2(uint256 nftId) public view returns (uint256) {
+        if (_aprSourceStamp[nftId] == 0) {
+            return aprTargetOf(nftId);
+        }
+        uint256 srcStamp = _aprSourceStamp[nftId] - _timestamp;
+        uint256 tgtStamp = block.timestamp - _timestamp;
+        uint256 srcValue = _aprSourceValue[nftId];
+        uint256 tgtValue = aprTargetOf(nftId);
+        uint256 lhsValue = tgtValue * (tgtStamp - srcStamp);
+        uint256 rhsValue = srcValue * (srcStamp);
+        uint256 aprValue = (lhsValue + rhsValue) / tgtStamp;
+        return aprValue;
     }
 
-    /** set apr-parameters */
-    function setAPR(uint256[] memory array) public onlyRole(APR_ROLE) {
+    /** @return target for annualized percentage rate (per nft.level) */
+    function aprTargetOf(uint256 nftId) public view returns (uint256) {
+        uint256 nftYear = _ppt.yearOf(nftId);
+        uint256 nftLevel = _ppt.levelOf(nftId);
+        uint256 nftPrefix = _ppt.prefixOf(nftId);
+        return Polynomial(getAPR(nftPrefix, nftYear)).evalClamped(nftLevel);
+    }
+
+    /** @return APR parameters (for given nft-{prefix, year}) */
+    function getAPR(uint256 nftPrefix, uint256 nftYear) public view returns (uint256[] memory) {
+        if (_apr[nftPrefix][nftYear].length > 0) {
+            return _apr[nftPrefix][nftYear];
+        }
+        uint256[] memory apr = new uint256[](6);
+        apr[3] = 1000;
+        apr[2] = 3;
+        return apr;
+    }
+
+    /** set APR parameters to retarget average (for given nft-{prefix, year}) */
+    function setAPR(uint256 prefix, uint256 year, uint256[] memory array) public onlyRole(APR_ROLE) {
         require(array.length == 6, "invalid array.length");
-        _apr = array;
+        require(array[2] > 0, "invalid array[2] entry");
+        for (uint256 level = 0; level < 100; level += 3) {
+            uint256 nftId = _ppt.idBy(year, level, prefix);
+            _aprSourceValue[nftId] = aprOf(nftId);
+            _aprSourceStamp[nftId] = block.timestamp;
+        }
+        _apr[prefix][year] = array;
     }
 
-    /** @return apr-bonus i.e. annual percentage rate (per nft.year) */
+    /** time-weighted average of APR bonus: nft-id => value */
+    mapping(uint256 => uint256) private _bonusSourceValue;
+    /** timestamp for average of APR bonus: nft-id => timestamp */
+    mapping(uint256 => uint256) private _bonusSourceStamp;
+    /** parametrization of APR bonus: nft-{prefix, year} => coefficients */
+    mapping(uint256 => mapping(uint256 => uint256[])) private _bonus;
+
+    /** @return interpolated value of APR bonus (per nft.level) */
     function aprBonusOf(uint256 nftId) public view returns (uint256) {
+        if (_bonusSourceStamp[nftId] == 0) {
+            return aprBonusTargetOf(nftId);
+        }
+        uint256 nowStamp = block.timestamp;
+        uint256 srcStamp = _bonusSourceStamp[nftId];
+        uint256 tgtStamp = srcStamp + 365.25 days;
+        uint256 srcValue = _bonusSourceValue[nftId];
+        uint256 tgtValue = aprBonusTargetOf(nftId);
+        uint256 aprValue = _interpolate(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
+        return aprValue;
+    }
+
+    /** @return time-weighted average of APR bonus (per nft.level) */
+    function aprBonusOf2(uint256 nftId) public view returns (uint256) {
+        if (_bonusSourceStamp[nftId] == 0) {
+            return aprBonusTargetOf(nftId);
+        }
+        uint256 srcStamp = _bonusSourceStamp[nftId] - _timestamp;
+        uint256 tgtStamp = block.timestamp - _timestamp;
+        uint256 srcValue = _bonusSourceValue[nftId];
+        uint256 tgtValue = aprBonusTargetOf(nftId);
+        uint256 lhsValue = tgtValue * (tgtStamp - srcStamp);
+        uint256 rhsValue = srcValue * (srcStamp);
+        return (lhsValue + rhsValue) / tgtStamp;
+    }
+
+    /** @return target for annualized percentage rate bonus (per nft.year) */
+    function aprBonusTargetOf(uint256 nftId) public view returns (uint256) {
         uint256 nowYear = _ppt.year();
         uint256 nftYear = _ppt.yearOf(nftId);
+        uint256 nftPrefix = _ppt.prefixOf(nftId);
         uint256 ageYear = nowYear > nftYear ? nowYear - nftYear : 0;
-        return ((ageYear + _bonus[5] - _bonus[4]) * _bonus[3]) / _bonus[2] + _bonus[1] - _bonus[0];
+        return Polynomial(getAPRBonus(nftPrefix, nftYear)).evalClamped(ageYear);
     }
 
-    /** @return apr-bonus parameters */
-    function getAPRBonus() public view returns (uint256[] memory) {
-        return _bonus;
+    /** @return APR bonus parameters (for given nft-{prefix, year}) */
+    function getAPRBonus(uint256 nftPrefix, uint256 nftYear) public view returns (uint256[] memory) {
+        if (_bonus[nftPrefix][nftYear].length > 0) {
+            return _bonus[nftPrefix][nftYear];
+        }
+        uint256[] memory bonus = new uint256[](6);
+        bonus[3] = 10;
+        bonus[2] = 1;
+        return bonus;
     }
 
-    /** set apr-bonus parameters */
-    function setAPRBonus(uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
+    /** set APR bonus parameters to retarget average (for given nft-{prefix, year}) */
+    function setAPRBonus(uint256 nftPrefix, uint256 nftYear, uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
         require(array.length == 6, "invalid array.length");
-        _bonus = array;
+        require(array[2] > 0, "invalid array[2] entry");
+        for (uint256 nftLevel = 0; nftLevel < 100; nftLevel += 3) {
+            uint256 nftId = _ppt.idBy(nftYear, nftLevel, nftPrefix);
+            _bonusSourceValue[nftId] = aprBonusOf(nftId);
+            _bonusSourceStamp[nftId] = block.timestamp;
+        }
+        _bonus[nftPrefix][nftYear] = array;
     }
 
-    /** @return age seconds for given account and nft-id */
-    function _ageOf(address account, uint256 nftId) internal view returns (uint256) {
-        return _ppt.ageOf(account, nftId); // nft.balance * nft.average-age
+    /** @return index *associated* with nft-id */
+    function _indexOf(uint256 nftId) private view returns (uint256) {
+        return _ppt.prefixOf(nftId) - 1;
     }
 
-    /** @return age total seconds for given nft-id */
-    function _totalAgeOf(uint256 nftId) internal view returns (uint256) {
-        return _ppt.totalAgeOf(nftId); // nft.supply * nft.average-age
-    }
-
-    /** @return denomination value for given nft-level */
-    function _denominationOf(uint256 nftLevel) internal view returns (uint256) {
-        return _ppt.denominationOf(nftLevel); // 1, 1K, 1M, 1G, ...
-    }
-
-    /** @return level for given nft-id */
-    function _levelOf(uint256 nftId) internal view returns (uint256) {
-        return _ppt.levelOf(nftId); // 0, 3, 6, 9, ...
+    /** @return capped linear interpolation of v=t*(v1-v0)/(t1-t0) with v in [v0, v1] */
+    function _interpolate(uint256 t0, uint256 v0, uint256 t1, uint256 v1, uint256 t) private pure returns (uint256) {
+        if (t0 > t1) {
+            return _interpolate(t1, v1, t0, v0, t);
+        }
+        if (t <= t0) {
+            return v0;
+        }
+        if (t >= t1) {
+            return v1;
+        }
+        if (t1 > t0) {
+            uint256 dt = t1 - t0;
+            if (v1 > v0) {
+                return v0 + ((t - t0) * (v1 - v0)) / dt;
+            }
+            if (v0 > v1) {
+                return v0 - ((t - t0) * (v0 - v1)) / dt;
+            }
+        }
+        return v0;
     }
 }

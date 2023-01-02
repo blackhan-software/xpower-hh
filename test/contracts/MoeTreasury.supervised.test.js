@@ -5,8 +5,10 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let APower, XPower, MoeTreasury; // contracts
-let apower, xpower, moe_treasury; // instances
+let MoeTreasury; // contracts
+let moe_treasury; // instances
+let AThor, XThor, ALoki, XLoki, AOdin, XOdin; // contracts
+let athor, xthor, aloki, xloki, aodin, xodin; // instances
 
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
@@ -22,29 +24,52 @@ describe("MoeTreasurySupervised", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    APower = await ethers.getContractFactory("APowerOdin");
-    expect(APower).to.exist;
-    XPower = await ethers.getContractFactory("XPowerOdinTest");
-    expect(XPower).to.exist;
+    AThor = await ethers.getContractFactory("APowerThor");
+    expect(AThor).to.exist;
+    XThor = await ethers.getContractFactory("XPowerThorTest");
+    expect(XThor).to.exist;
+    ALoki = await ethers.getContractFactory("APowerLoki");
+    expect(ALoki).to.exist;
+    XLoki = await ethers.getContractFactory("XPowerLokiTest");
+    expect(XLoki).to.exist;
+    AOdin = await ethers.getContractFactory("APowerOdin");
+    expect(AOdin).to.exist;
+    XOdin = await ethers.getContractFactory("XPowerOdinTest");
+    expect(XOdin).to.exist;
   });
   before(async function () {
     MoeTreasury = await ethers.getContractFactory("MoeTreasury");
     expect(MoeTreasury).to.exist;
   });
   before(async function () {
-    xpower = await XPower.deploy([], DEADLINE);
-    expect(xpower).to.exist;
-    await xpower.deployed();
+    xthor = await XThor.deploy([], DEADLINE);
+    expect(xthor).to.exist;
+    await xthor.deployed();
+    await xthor.init();
+    xloki = await XLoki.deploy([], DEADLINE);
+    expect(xloki).to.exist;
+    await xloki.deployed();
+    await xloki.init();
+    xodin = await XOdin.deploy([], DEADLINE);
+    expect(xodin).to.exist;
+    await xodin.deployed();
+    await xodin.init();
   });
   before(async function () {
-    apower = await APower.deploy(xpower.address, [], DEADLINE);
-    expect(apower).to.exist;
-    await apower.deployed();
+    athor = await AThor.deploy(xthor.address, [], DEADLINE);
+    expect(athor).to.exist;
+    await athor.deployed();
+    aloki = await ALoki.deploy(xloki.address, [], DEADLINE);
+    expect(aloki).to.exist;
+    await aloki.deployed();
+    aodin = await AOdin.deploy(xodin.address, [], DEADLINE);
+    expect(aodin).to.exist;
+    await aodin.deployed();
   });
   before(async function () {
     moe_treasury = await MoeTreasury.deploy(
-      apower.address,
-      xpower.address,
+      [xthor.address, xloki.address, xodin.address],
+      [athor.address, aloki.address, aodin.address],
       NONE_ADDRESS
     );
     expect(moe_treasury).to.exist;

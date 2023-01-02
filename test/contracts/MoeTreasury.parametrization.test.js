@@ -5,8 +5,10 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let APower, XPower, Nft, Ppt, NftTreasury, MoeTreasury; // contracts
-let apower, xpower, nft, nft_staked, nft_treasury, moe_treasury, mt; // instances
+let Nft, Ppt, NftTreasury, MoeTreasury; // contracts
+let nft, ppt, nft_treasury, moe_treasury, mt; // instances
+let AThor, XThor, ALoki, XLoki, AOdin, XOdin; // contracts
+let athor, xthor, aloki, xloki, aodin, xodin; // instances
 
 const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
@@ -22,10 +24,18 @@ describe("MoeTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    APower = await ethers.getContractFactory("APowerOdin");
-    expect(APower).to.exist;
-    XPower = await ethers.getContractFactory("XPowerOdinTest");
-    expect(XPower).to.exist;
+    AThor = await ethers.getContractFactory("APowerThor");
+    expect(AThor).to.exist;
+    XThor = await ethers.getContractFactory("XPowerThorTest");
+    expect(XThor).to.exist;
+    ALoki = await ethers.getContractFactory("APowerLoki");
+    expect(ALoki).to.exist;
+    XLoki = await ethers.getContractFactory("XPowerLokiTest");
+    expect(XLoki).to.exist;
+    AOdin = await ethers.getContractFactory("APowerOdin");
+    expect(AOdin).to.exist;
+    XOdin = await ethers.getContractFactory("XPowerOdinTest");
+    expect(XOdin).to.exist;
   });
   before(async function () {
     Nft = await ethers.getContractFactory("XPowerNft");
@@ -38,113 +48,173 @@ describe("MoeTreasury", async function () {
     expect(MoeTreasury).to.exist;
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy([], DEADLINE);
-    expect(xpower).to.exist;
-    await xpower.deployed();
-    await xpower.init();
+    xthor = await XThor.deploy([], DEADLINE);
+    expect(xthor).to.exist;
+    await xthor.deployed();
+    await xthor.init();
+    xloki = await XLoki.deploy([], DEADLINE);
+    expect(xloki).to.exist;
+    await xloki.deployed();
+    await xloki.init();
+    xodin = await XOdin.deploy([], DEADLINE);
+    expect(xodin).to.exist;
+    await xodin.deployed();
+    await xodin.init();
   });
   beforeEach(async function () {
-    apower = await APower.deploy(xpower.address, [], DEADLINE);
-    expect(apower).to.exist;
-    await apower.deployed();
+    athor = await AThor.deploy(xthor.address, [], DEADLINE);
+    expect(athor).to.exist;
+    await athor.deployed();
+    aloki = await ALoki.deploy(xloki.address, [], DEADLINE);
+    expect(aloki).to.exist;
+    await aloki.deployed();
+    aodin = await AOdin.deploy(xodin.address, [], DEADLINE);
+    expect(aodin).to.exist;
+    await aodin.deployed();
   });
   beforeEach(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, [xpower.address], [], DEADLINE);
+    nft = await Nft.deploy(NFT_ODIN_URL, [xodin.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });
   beforeEach(async function () {
-    nft_staked = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
-    expect(nft_staked).to.exist;
-    await nft_staked.deployed();
+    ppt = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
+    expect(ppt).to.exist;
+    await ppt.deployed();
   });
   beforeEach(async function () {
-    nft_treasury = await NftTreasury.deploy(nft.address, nft_staked.address);
+    nft_treasury = await NftTreasury.deploy(nft.address, ppt.address);
     expect(nft_treasury).to.exist;
     await nft_treasury.deployed();
   });
   beforeEach(async function () {
     moe_treasury = await MoeTreasury.deploy(
-      apower.address,
-      xpower.address,
-      nft_staked.address
+      [xthor.address, xloki.address, xodin.address],
+      [athor.address, aloki.address, aodin.address],
+      ppt.address
     );
     expect(moe_treasury).to.exist;
     await moe_treasury.deployed();
     mt = moe_treasury;
   });
   beforeEach(async function () {
-    await apower.transferOwnership(moe_treasury.address);
-    expect(await apower.owner()).to.eq(moe_treasury.address);
+    await athor.transferOwnership(moe_treasury.address);
+    expect(await athor.owner()).to.eq(moe_treasury.address);
+    await aloki.transferOwnership(moe_treasury.address);
+    expect(await aloki.owner()).to.eq(moe_treasury.address);
+    await aodin.transferOwnership(moe_treasury.address);
+    expect(await aodin.owner()).to.eq(moe_treasury.address);
   });
   describe("parametrization of APR", async function () {
-    it("should get alpha array", async function () {
-      Expect(await moe_treasury.getAPR()).to.equal([0, 0, 3, 1000, 0, 0]);
+    it("should get array", async function () {
+      Expect(await moe_treasury.getAPR(3, 2021)).to.equal([
+        0, 0, 3, 1000, 0, 0,
+      ]);
     });
-    it("should set alpha array", async function () {
+    it("should set array", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
-      await moe_treasury.setAPR([1, 2, 3, 4, 5, 6]);
-      Expect(await moe_treasury.getAPR()).to.equal([1, 2, 3, 4, 5, 6]);
+      await moe_treasury.setAPR(3, 2021, [1, 2, 3, 4, 5, 6]);
+      Expect(await moe_treasury.getAPR(3, 2021)).to.equal([1, 2, 3, 4, 5, 6]);
     });
-    it("should *not* set alpha array (invalid array.length)", async function () {
+    it("should *not* set array (invalid array.length)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR([1, 2, 3]).catch((ex) => {
+        await moe_treasury.setAPR(3, 2021, [1, 2, 3]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPR()).to.equal([0, 0, 3, 1000, 0, 0]);
+      Expect(await moe_treasury.getAPR(3, 2021)).to.equal([
+        0, 0, 3, 1000, 0, 0,
+      ]);
     });
-    it("should *not* set alpha array (account is missing role)", async function () {
+    it("should *not* set array (invalid array[2] entry)", async function () {
+      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
+      expect(
+        await moe_treasury.setAPR(3, 2021, [0, 0, 0, 0, 0, 0]).catch((ex) => {
+          const m = ex.message.match(/invalid array\[2\] entry/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        })
+      ).to.eq(undefined);
+      Expect(await moe_treasury.getAPR(3, 2021)).to.equal([
+        0, 0, 3, 1000, 0, 0,
+      ]);
+    });
+    it("should *not* set array (account is missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await moe_treasury
           .connect(signer_1)
-          .setAPR([1, 2, 3, 4, 5, 6])
+          .setAPR(3, 2021, [1, 2, 3, 4, 5, 6])
           .catch((ex) => {
             const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPR()).to.equal([0, 0, 3, 1000, 0, 0]);
+      Expect(await moe_treasury.getAPR(3, 2021)).to.equal([
+        0, 0, 3, 1000, 0, 0,
+      ]);
     });
   });
   describe("parametrization of APR bonus", async function () {
-    it("should get gamma array", async function () {
-      Expect(await moe_treasury.getAPRBonus()).to.equal([0, 0, 1, 10, 0, 0]);
+    it("should get array", async function () {
+      Expect(await moe_treasury.getAPRBonus(3, 2021)).to.equal([
+        0, 0, 1, 10, 0, 0,
+      ]);
     });
-    it("should set gamma array", async function () {
+    it("should set array", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
-      await moe_treasury.setAPRBonus([1, 2, 3, 4, 5, 6]);
-      Expect(await moe_treasury.getAPRBonus()).to.equal([1, 2, 3, 4, 5, 6]);
+      await moe_treasury.setAPRBonus(3, 2021, [1, 2, 3, 4, 5, 6]);
+      Expect(await moe_treasury.getAPRBonus(3, 2021)).to.equal([
+        1, 2, 3, 4, 5, 6,
+      ]);
     });
-    it("should *not* set gamma array (invalid array.length)", async function () {
+    it("should *not* set array (invalid array.length)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus([1, 2, 3]).catch((ex) => {
+        await moe_treasury.setAPRBonus(3, 2021, [1, 2, 3]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonus()).to.equal([0, 0, 1, 10, 0, 0]);
+      Expect(await moe_treasury.getAPRBonus(3, 2021)).to.equal([
+        0, 0, 1, 10, 0, 0,
+      ]);
     });
-    it("should *not* set gamma array (account is missing role)", async function () {
+    it("should *not* set array (invalid array[2] entry)", async function () {
+      await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
+      expect(
+        await moe_treasury
+          .setAPRBonus(3, 2021, [0, 0, 0, 0, 0, 0])
+          .catch((ex) => {
+            const m = ex.message.match(/invalid array\[2\] entry/);
+            if (m === null) console.debug(ex);
+            expect(m).to.be.not.null;
+          })
+      ).to.eq(undefined);
+      Expect(await moe_treasury.getAPRBonus(3, 2021)).to.equal([
+        0, 0, 1, 10, 0, 0,
+      ]);
+    });
+    it("should *not* set array (account is missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await moe_treasury
           .connect(signer_1)
-          .setAPRBonus([1, 2, 3, 4, 5, 6])
+          .setAPRBonus(3, 2021, [1, 2, 3, 4, 5, 6])
           .catch((ex) => {
             const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonus()).to.equal([0, 0, 1, 10, 0, 0]);
+      Expect(await moe_treasury.getAPRBonus(3, 2021)).to.equal([
+        0, 0, 1, 10, 0, 0,
+      ]);
     });
   });
 });
