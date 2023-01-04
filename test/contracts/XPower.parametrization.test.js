@@ -28,16 +28,16 @@ describe("XPower", async function () {
     await xpower.deployed();
     await xpower.init();
   });
-  describe("parametrization of treasure-for", async function () {
-    it("should get theta array", async function () {
+  describe("parametrization of treasury-share", async function () {
+    it("should get array", async function () {
       Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
     });
-    it("should set theta array", async function () {
+    it("should set array", async function () {
       await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
       await xpower.setTreasuryShare([1, 2, 3, 4, 5, 6]);
       Expect(await xpower.getTreasuryShare()).to.equal([1, 2, 3, 4, 5, 6]);
     });
-    it("should *not* set theta array (invalid array.length)", async function () {
+    it("should *not* set array (invalid array.length)", async function () {
       await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
       expect(
         await xpower.setTreasuryShare([1, 3, 2]).catch((ex) => {
@@ -48,7 +48,18 @@ describe("XPower", async function () {
       ).to.eq(undefined);
       Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
     });
-    it("should *not* set theta array (account is missing role)", async function () {
+    it("should *not* set array (invalid array[2] entry)", async function () {
+      await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
+      expect(
+        await xpower.setTreasuryShare([0, 0, 0, 0, 0, 0]).catch((ex) => {
+          const m = ex.message.match(/invalid array\[2\] entry/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        })
+      ).to.eq(undefined);
+      Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
+    });
+    it("should *not* set array (account is missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await xpower
@@ -63,16 +74,16 @@ describe("XPower", async function () {
       Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
     });
   });
-  describe("parametrization of difficulty-for", async function () {
-    it("should get delta array", async function () {
+  describe("parametrization of mining-difficulty", async function () {
+    it("should get array", async function () {
       Expect(await xpower.getMiningDifficulty()).to.equal([0, 0, 1, 0, 0, 0]);
     });
-    it("should set delta array", async function () {
+    it("should set array", async function () {
       await xpower.grantRole(xpower.MINING_DIFFICULTY_ROLE(), addresses[0]);
       await xpower.setMiningDifficulty([1, 2, 3, 4, 5, 6]);
       Expect(await xpower.getMiningDifficulty()).to.equal([1, 2, 3, 4, 5, 6]);
     });
-    it("should *not* set delta array (invalid array.length)", async function () {
+    it("should *not* set array (invalid array.length)", async function () {
       await xpower.grantRole(xpower.MINING_DIFFICULTY_ROLE(), addresses[0]);
       expect(
         await xpower.setMiningDifficulty([1, 3, 2]).catch((ex) => {
@@ -83,7 +94,18 @@ describe("XPower", async function () {
       ).to.eq(undefined);
       Expect(await xpower.getMiningDifficulty()).to.equal([0, 0, 1, 0, 0, 0]);
     });
-    it("should *not* set delta array (account is missing role)", async function () {
+    it("should *not* set array (invalid array[2] entry)", async function () {
+      await xpower.grantRole(xpower.MINING_DIFFICULTY_ROLE(), addresses[0]);
+      expect(
+        await xpower.setMiningDifficulty([0, 0, 0, 0, 0, 0]).catch((ex) => {
+          const m = ex.message.match(/invalid array\[2\] entry/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        })
+      ).to.eq(undefined);
+      Expect(await xpower.getMiningDifficulty()).to.equal([0, 0, 1, 0, 0, 0]);
+    });
+    it("should *not* set array (account is missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await xpower

@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import "./Migratable.sol";
+import "./Polynomials.sol";
 
 /**
  * Abstract base class for the XPower THOR, LOKI and ODIN proof-of-work tokens.
@@ -18,6 +19,7 @@ import "./Migratable.sol";
  */
 abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervised, Ownable {
     using EnumerableSet for EnumerableSet.UintSet;
+    using Polynomials for Polynomial;
     /** set of nonce-hashes already minted for */
     EnumerableSet.UintSet private _hashes;
     /** map from block-hashes to timestamps */
@@ -113,7 +115,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
 
     /** @return treasury-share for given amount */
     function treasuryShare(uint256 amount) public view returns (uint256) {
-        return _linear(amount, _share);
+        return Polynomial(_share).evalClamped(amount);
     }
 
     /** @return treasury-share parameters */
@@ -124,12 +126,13 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     /** set treasury-share parameters */
     function setTreasuryShare(uint256[] memory array) public onlyRole(TREASURY_SHARE_ROLE) {
         require(array.length == 6, "invalid array.length");
+        require(array[2] > 0, "invalid array[2] entry");
         _share = array;
     }
 
     /** @return mining-difficulty for given timestamp */
     function miningDifficulty(uint256 timestamp) public view returns (uint256) {
-        return _linear(timestamp - _timestamp, _rigor);
+        return Polynomial(_rigor).evalClamped(timestamp - _timestamp);
     }
 
     /** @return mining-difficulty parameters */
@@ -140,6 +143,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     /** set mining-difficulty parameters */
     function setMiningDifficulty(uint256[] memory array) public onlyRole(MINING_DIFFICULTY_ROLE) {
         require(array.length == 6, "invalid array.length");
+        require(array[2] > 0, "invalid array[2] entry");
         _rigor = array;
     }
 
@@ -166,14 +170,6 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
             return uint8(63 - (Math.log2(uint256(nonceHash)) >> 2));
         }
         return 64;
-    }
-
-    /** @return value evaluated with (value+[5]-[4])*[3]/[2]+[1]-[0] */
-    function _linear(uint256 value, uint256[] memory param) private pure returns (uint256) {
-        uint256 inc = value + param[5];
-        uint256 dec = inc > param[4] ? inc - param[4] : 0;
-        uint256 div = (dec * param[3]) / param[2] + param[1];
-        return div > param[0] ? div - param[0] : 0;
     }
 
     /** returns true if this contract implements the interface defined by interfaceId */
