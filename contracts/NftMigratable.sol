@@ -56,9 +56,9 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         require(amount > 0, "non-positive amount");
         uint256 tryId = nftId % _eonOf(_yearOf(nftId));
         assert(tryId > 0); // cannot be zero
-        uint256 token = nftId / _eonOf(_yearOf(nftId));
-        assert(token > 0); // cannot be zero
-        uint256 tidx = token <= index.length ? token - 1 : index.length - 1;
+        uint256 prefix = _prefixOf(nftId);
+        assert(prefix > 0); // cannot be zero
+        uint256 tidx = prefix <= index.length ? prefix - 1 : index.length - 1;
         assert(tidx >= 0); // token index: zero *or* larger
         require(!_sealed[index[tidx]], "migration sealed");
         uint256 tryBalance = _base[index[tidx]].balanceOf(account, tryId);
@@ -105,6 +105,12 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     /** @return true if this contract implements the interface defined by interfaceId */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
+    }
+
+    function _prefixOf(uint256 nftId) internal pure returns (uint256) {
+        uint256 prefix = nftId / _eonOf(_yearOf(nftId));
+        require(prefix > 0, "invalid prefix");
+        return prefix;
     }
 
     /** @return eon the given year belongs to: 1M, 10M, 100M, ... */

@@ -82,6 +82,11 @@ abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIM
         return level;
     }
 
+    /** @return prefix of nft-id (1, 2, 3, ...) */
+    function prefixOf(uint256 nftId) public pure returns (uint256) {
+        return _prefixOf(nftId);
+    }
+
     /** @return year of nft-id (2021, 2022, ...) */
     function yearOf(uint256 nftId) public pure returns (uint256) {
         return _yearOf(nftId);
