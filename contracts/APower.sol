@@ -55,6 +55,11 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
         super.burnFrom(account, amount);
         _moe.transfer(account, amount);
     }
+
+    /** @return prefix of token */
+    function prefix() public view returns (uint256) {
+        return _moe.prefix();
+    }
 }
 
 contract APowerThor is APower {
