@@ -78,7 +78,7 @@ npx hardhat coverage [...test-files]
 
 ## Deployment
 
-### Start a local node
+### Start a localhost node
 
 ```sh
 npx hardhat node
@@ -86,10 +86,11 @@ npx hardhat node
 
 ..which can be skipped, if another EVM compatible chain is available. In such a case, ensure to add the `--network $NETWORK` argument below. Possible networks are:
 
-- Hardhat's `hardhat` network (for development and testing &mdash; default),
-- Avalanche's `local` network (requires an `avalanchego` instance),
-- Avalanche's `fuji` network (for development and testing),
-- Avalache's `mainnet` network,
+- Hardhat's `hardhat` (for development and testing &mdash; default),
+- Hardhat's `localhost` (for development and testing &mdash; use with `hardhat node`),
+- Avalanche's `local` (requires an `avalanchego` instance),
+- Avalanche's `fuji` (for development and testing),
+- Avalache's `mainnet`,
 
 ..where the configuration details of each network can be found in `hardhat.config.js`.
 
@@ -114,7 +115,7 @@ npm install && npm run build
 ### Environment Variables
 
 ```sh
-cp .env-main .env
+cp .env-avalanche-main .env
 ```
 
 ..plus change in `.env` the `MINT_ADDRESS` to _your own_ one; don't forget to set the corresponding `MINT_ADDRESS_PK` _private key_ too. It's also possible to use the private key of a *different* address: That way the account of the beneficiary and the minting fee payer can be &mdash; for security purposes &mdash; separated.
