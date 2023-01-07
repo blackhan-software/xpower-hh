@@ -3,14 +3,14 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
-import "./XPowerNftBase.sol";
+import "./base/NftBase.sol";
 import "./XPower.sol";
 
 /**
  * Abstract base class for the THOR, LOKI & ODIN proof-of-work NFTs, where each
  * can only be minted by burning the corresponding amount of tokens.
  */
-contract XPowerNft is XPowerNftBase {
+contract XPowerNft is NftBase {
     /** burnable proof-of-work tokens */
     XPower[] private _moe;
     /** MOE token address to index map */
@@ -25,7 +25,7 @@ contract XPowerNft is XPowerNftBase {
         address[] memory moeLink,
         address[] memory nftBase,
         uint256 deadlineIn
-    ) XPowerNftBase("XPower NFTs", "XPOWNFT", nftUri, nftBase, deadlineIn) {
+    ) NftBase("XPower NFTs", "XPOWNFT", nftUri, nftBase, deadlineIn) {
         _moe = new XPower[](moeLink.length);
         for (uint256 i = 0; i < moeLink.length; i++) {
             _moe[i] = XPower(moeLink[i]);

@@ -3,13 +3,13 @@
 // solhint-disable not-rely-on-time
 pragma solidity ^0.8.0;
 
-import "./XPowerNftBase.sol";
+import "./base/NftBase.sol";
 
 /**
  * Abstract base class for staked XPowerNft(s): Only the contract owner i.e.
  * the NftTreasury is allowed to mint and burn XPowerPpt tokens.
  */
-contract XPowerPpt is XPowerNftBase {
+contract XPowerPpt is NftBase {
     /** map of mints: account => nft-id => accumulator [seconds] */
     mapping(address => mapping(uint256 => uint256)) private _mints;
     /** map of burns: account => nft-id => accumulator [seconds] */
@@ -26,7 +26,7 @@ contract XPowerPpt is XPowerNftBase {
         string memory pptUri,
         address[] memory pptBase,
         uint256 deadlineIn
-    ) XPowerNftBase("XPower PPTs", "XPOWPPT", pptUri, pptBase, deadlineIn) {}
+    ) NftBase("XPower PPTs", "XPOWPPT", pptUri, pptBase, deadlineIn) {}
 
     /** transfer tokens (and reset age) */
     function safeTransferFrom(

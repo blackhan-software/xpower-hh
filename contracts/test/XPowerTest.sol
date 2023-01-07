@@ -2,7 +2,7 @@
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
-import "./XPower.sol";
+import "../XPower.sol";
 
 /** Test class for XPowerThor */
 contract XPowerThorTest is XPowerThor {

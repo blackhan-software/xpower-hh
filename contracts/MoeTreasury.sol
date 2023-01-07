@@ -6,7 +6,7 @@ pragma solidity ^0.8.0;
 import "./APower.sol";
 import "./XPower.sol";
 import "./XPowerPpt.sol";
-import "./Supervised.sol";
+import "./libs/Interpolators.sol";
 
 /**
  * Treasury to claim (MoE) tokens for staked XPowerNft(s).
@@ -231,7 +231,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** parametrization of APR: nft-{prefix, year} => coefficients */
     mapping(uint256 => mapping(uint256 => uint256[])) private _apr;
 
-    /** @return interpolated value of APR (per nft.level) */
+    /** @return interpolated APR w/1-year lag (per nft.level) */
     function aprOf(uint256 nftId) public view returns (uint256) {
         if (_aprSourceStamp[nftId] == 0) {
             return aprTargetOf(nftId);
@@ -241,7 +241,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 tgtStamp = srcStamp + 365.25 days;
         uint256 srcValue = _aprSourceValue[nftId];
         uint256 tgtValue = aprTargetOf(nftId);
-        uint256 aprValue = _interpolate(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
+        uint256 aprValue = Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
         return aprValue;
     }
 
@@ -298,7 +298,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** parametrization of APR bonus: nft-{prefix, year} => coefficients */
     mapping(uint256 => mapping(uint256 => uint256[])) private _bonus;
 
-    /** @return interpolated value of APR bonus (per nft.level) */
+    /** @return interpolated APR bonus w/1-year lag (per nft.level) */
     function aprBonusOf(uint256 nftId) public view returns (uint256) {
         if (_bonusSourceStamp[nftId] == 0) {
             return aprBonusTargetOf(nftId);
@@ -308,7 +308,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 tgtStamp = srcStamp + 365.25 days;
         uint256 srcValue = _bonusSourceValue[nftId];
         uint256 tgtValue = aprBonusTargetOf(nftId);
-        uint256 aprValue = _interpolate(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
+        uint256 aprValue = Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
         return aprValue;
     }
 
@@ -361,28 +361,5 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** @return index *associated* with nft-id */
     function _indexOf(uint256 nftId) private view returns (uint256) {
         return _ppt.prefixOf(nftId) - 1;
-    }
-
-    /** @return capped linear interpolation of v=t*(v1-v0)/(t1-t0) with v in [v0, v1] */
-    function _interpolate(uint256 t0, uint256 v0, uint256 t1, uint256 v1, uint256 t) private pure returns (uint256) {
-        if (t0 > t1) {
-            return _interpolate(t1, v1, t0, v0, t);
-        }
-        if (t <= t0) {
-            return v0;
-        }
-        if (t >= t1) {
-            return v1;
-        }
-        if (t1 > t0) {
-            uint256 dt = t1 - t0;
-            if (v1 > v0) {
-                return v0 + ((t - t0) * (v1 - v0)) / dt;
-            }
-            if (v0 > v1) {
-                return v0 - ((t - t0) * (v0 - v1)) / dt;
-            }
-        }
-        return v0;
     }
 }

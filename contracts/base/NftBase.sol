@@ -14,7 +14,7 @@ import "./NftMigratable.sol";
 /**
  * Abstract base NFT class: publicly *not* minteable (nor burnable).
  */
-abstract contract XPowerNftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, NftMigratable, Ownable {
+abstract contract NftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, NftMigratable, Ownable {
     /** contract name */
     string public name;
     /** contract symbol */

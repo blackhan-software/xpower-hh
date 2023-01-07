@@ -104,7 +104,7 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         return _sealed;
     }
 
-    /** returns true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interfaceId */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return
             interfaceId == type(IERC20).interfaceId ||
@@ -127,7 +127,7 @@ abstract contract MoeMigratable is Migratable, MoeMigratableSupervised {
         _sealAll();
     }
 
-    /** returns true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interfaceId */
     function supportsInterface(bytes4 interfaceId) public view virtual override(Migratable, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
@@ -194,7 +194,7 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
         _sealAll();
     }
 
-    /** returns true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interfaceId */
     function supportsInterface(bytes4 interfaceId) public view virtual override(Migratable, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
     }

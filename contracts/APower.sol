@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 
 import "./XPower.sol";
-import "./Migratable.sol";
 
 /**
  * Abstract base class for the APower aTHOR, aLOKI and aODIN tokens, where only
