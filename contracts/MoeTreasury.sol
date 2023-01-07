@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
+// solhint-disable reason-string
 pragma solidity ^0.8.0;
 
 import "./APower.sol";
@@ -25,8 +26,12 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** map of rewards claimed total: nft-id => amount */
     mapping(uint256 => uint256) private _claimedTotal;
 
-    /** anchor for apr[-bonus] reparametrization */
-    uint256 private immutable _timestamp;
+    /** century in seconds (approximation) */
+    uint256 private constant CENTUM = 365_25 days;
+    /** single year in seconds (approximation) */
+    uint256 private constant ANNUM = CENTUM / 100;
+    /** single month in seconds (approximation) */
+    uint256 private constant MONTH = ANNUM / 12;
 
     /** @param moeLink address of contract for XPower tokens */
     /** @param sovLink address of contract for APower tokens */
@@ -47,7 +52,6 @@ contract MoeTreasury is MoeTreasurySupervised {
             _sov[i] = sov;
         }
         _ppt = XPowerPpt(pptLink);
-        _timestamp = block.timestamp;
     }
 
     /** @return MOE balance of available tokens */
@@ -189,9 +193,9 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 age = _ppt.ageOf(account, nftId);
         uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
         uint256 apr = aprOf(nftId);
-        uint256 aprBonus = aprBonusOf2(nftId);
-        uint256 reward = (apr * age * denomination) / (1_000 * 365_25 days);
-        uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * 365_25 days);
+        uint256 aprBonus = aprBonusOf(nftId);
+        uint256 reward = (apr * age * denomination) / (1_000 * CENTUM);
+        uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * CENTUM);
         return (reward + rewardBonus) * 10 ** _moe[_indexOf(nftId)].decimals();
     }
 
@@ -200,9 +204,9 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 age = _ppt.totalAgeOf(nftId);
         uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
         uint256 apr = aprOf(nftId);
-        uint256 aprBonus = aprBonusOf2(nftId);
-        uint256 reward = (apr * age * denomination) / (1_000 * 365_25 days);
-        uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * 365_25 days);
+        uint256 aprBonus = aprBonusOf(nftId);
+        uint256 reward = (apr * age * denomination) / (1_000 * CENTUM);
+        uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * CENTUM);
         return (reward + rewardBonus) * 10 ** _moe[_indexOf(nftId)].decimals();
     }
 
@@ -238,26 +242,10 @@ contract MoeTreasury is MoeTreasurySupervised {
         }
         uint256 nowStamp = block.timestamp;
         uint256 srcStamp = _aprSourceStamp[nftId];
-        uint256 tgtStamp = srcStamp + 365.25 days;
+        uint256 tgtStamp = srcStamp + ANNUM;
         uint256 srcValue = _aprSourceValue[nftId];
         uint256 tgtValue = aprTargetOf(nftId);
-        uint256 aprValue = Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
-        return aprValue;
-    }
-
-    /** @return time-weighted average of APR (per nft.level) */
-    function aprOf2(uint256 nftId) public view returns (uint256) {
-        if (_aprSourceStamp[nftId] == 0) {
-            return aprTargetOf(nftId);
-        }
-        uint256 srcStamp = _aprSourceStamp[nftId] - _timestamp;
-        uint256 tgtStamp = block.timestamp - _timestamp;
-        uint256 srcValue = _aprSourceValue[nftId];
-        uint256 tgtValue = aprTargetOf(nftId);
-        uint256 lhsValue = tgtValue * (tgtStamp - srcStamp);
-        uint256 rhsValue = srcValue * (srcStamp);
-        uint256 aprValue = (lhsValue + rhsValue) / tgtStamp;
-        return aprValue;
+        return Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
     }
 
     /** @return target for annualized percentage rate (per nft.level) */
@@ -279,7 +267,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         return apr;
     }
 
-    /** set APR parameters to retarget average (for given nft-{prefix, year}) */
+    /** set APR parameters for retargeting (for given nft-{prefix, year}) */
     function setAPR(uint256 prefix, uint256 year, uint256[] memory array) public onlyRole(APR_ROLE) {
         require(array.length == 6, "invalid array.length");
         require(array[2] > 0, "invalid array[2] entry");
@@ -305,25 +293,10 @@ contract MoeTreasury is MoeTreasurySupervised {
         }
         uint256 nowStamp = block.timestamp;
         uint256 srcStamp = _bonusSourceStamp[nftId];
-        uint256 tgtStamp = srcStamp + 365.25 days;
+        uint256 tgtStamp = srcStamp + ANNUM;
         uint256 srcValue = _bonusSourceValue[nftId];
         uint256 tgtValue = aprBonusTargetOf(nftId);
-        uint256 aprValue = Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
-        return aprValue;
-    }
-
-    /** @return time-weighted average of APR bonus (per nft.level) */
-    function aprBonusOf2(uint256 nftId) public view returns (uint256) {
-        if (_bonusSourceStamp[nftId] == 0) {
-            return aprBonusTargetOf(nftId);
-        }
-        uint256 srcStamp = _bonusSourceStamp[nftId] - _timestamp;
-        uint256 tgtStamp = block.timestamp - _timestamp;
-        uint256 srcValue = _bonusSourceValue[nftId];
-        uint256 tgtValue = aprBonusTargetOf(nftId);
-        uint256 lhsValue = tgtValue * (tgtStamp - srcStamp);
-        uint256 rhsValue = srcValue * (srcStamp);
-        return (lhsValue + rhsValue) / tgtStamp;
+        return Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
     }
 
     /** @return target for annualized percentage rate bonus (per nft.year) */
@@ -346,7 +319,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         return bonus;
     }
 
-    /** set APR bonus parameters to retarget average (for given nft-{prefix, year}) */
+    /** set APR bonus parameters for retargeting (for given nft-{prefix, year}) */
     function setAPRBonus(uint256 nftPrefix, uint256 nftYear, uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
         require(array.length == 6, "invalid array.length");
         require(array[2] > 0, "invalid array[2] entry");
