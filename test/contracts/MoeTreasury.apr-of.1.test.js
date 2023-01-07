@@ -111,12 +111,72 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS]);
       await network.provider.send("evm_mine", []);
     });
-    it("should reparameterize APR=2[%][1/level]", async function () {
+    it("should *not* reparameterize (invalid change: too large)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
-      await moe_treasury.setAPR(1, 2021, [0, 0, 3, 2000, 0, 0]);
+      expect(
+        await moe_treasury
+          .setAPR(1, 2021, [0, 0, 3, 2001, 0, 0])
+          .catch((ex) => {
+            const m = ex.message.match(/invalid change: too large/);
+            if (m === null) console.debug(ex);
+            expect(m).to.be.not.null;
+          })
+      ).to.eq(undefined);
+    });
+    it("should *not* reparameterize (invalid change: too large)", async function () {
+      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
+      expect(
+        await moe_treasury
+          .setAPR(1, 2021, [0, 1001, 3, 1000, 0, 0])
+          .catch((ex) => {
+            const m = ex.message.match(/invalid change: too large/);
+            if (m === null) console.debug(ex);
+            expect(m).to.be.not.null;
+          })
+      ).to.eq(undefined);
+    });
+    it("should *not* reparameterize (invalid change: too small)", async function () {
+      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
+      expect(
+        await moe_treasury.setAPR(1, 2021, [0, 0, 3, 499, 0, 0]).catch((ex) => {
+          const m = ex.message.match(/invalid change: too small/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        })
+      ).to.eq(undefined);
+    });
+    it("should *not* reparameterize (invalid change: too small)", async function () {
+      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
+      expect(
+        await moe_treasury
+          .setAPR(1, 2021, [501, 0, 3, 1000, 0, 0])
+          .catch((ex) => {
+            const m = ex.message.match(/invalid change: too small/);
+            if (m === null) console.debug(ex);
+            expect(m).to.be.not.null;
+          })
+      ).to.eq(undefined);
+    });
+    it("should reparameterize APR", async function () {
+      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
+      expect(
+        await moe_treasury.setAPR(1, 2021, [0, 0, 3, 2000, 0, 0])
+      ).to.not.eq(undefined);
+    });
+    it("should *not* reparameterize (invalid change: too frequent)", async function () {
+      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
+      expect(
+        await moe_treasury
+          .setAPR(1, 2021, [0, 0, 3, 1000, 0, 0])
+          .catch((ex) => {
+            const m = ex.message.match(/invalid change: too frequent/);
+            if (m === null) console.debug(ex);
+            expect(m).to.be.not.null;
+          })
+      ).to.eq(undefined);
     });
   });
-  describe("apr-of (i.e rewards ~ nft-level × age)", async function () {
+  describe("apr-of (i.e rewards ~ nft-level × time)", async function () {
     it(`should forward time by 0.25 year`, async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.25]);
       await network.provider.send("evm_mine", []);
@@ -149,7 +209,7 @@ describe("MoeTreasury", async function () {
       expect(await mt.aprOf(1202124)).to.eq(10_000);
     });
   });
-  describe("apr-of (i.e rewards ~ nft-level × age)", async function () {
+  describe("apr-of (i.e rewards ~ nft-level × time)", async function () {
     it(`should forward time by 0.25 year`, async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.25]);
       await network.provider.send("evm_mine", []);
@@ -182,7 +242,7 @@ describe("MoeTreasury", async function () {
       expect(await mt.aprOf(1202124)).to.eq(12_000);
     });
   });
-  describe("apr-of (i.e rewards ~ nft-level × age)", async function () {
+  describe("apr-of (i.e rewards ~ nft-level × time)", async function () {
     it(`should forward time by 0.25 year`, async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.25]);
       await network.provider.send("evm_mine", []);
@@ -215,7 +275,7 @@ describe("MoeTreasury", async function () {
       expect(await mt.aprOf(1202124)).to.eq(14_000);
     });
   });
-  describe("apr-of (i.e rewards ~ nft-level × age)", async function () {
+  describe("apr-of (i.e rewards ~ nft-level × time)", async function () {
     it(`should forward time by 0.25 years`, async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.25]);
       await network.provider.send("evm_mine", []);
@@ -248,7 +308,7 @@ describe("MoeTreasury", async function () {
       expect(await mt.aprOf(1202124)).to.eq(16_000);
     });
   });
-  describe("apr-of (i.e rewards ~ nft-level × age)", async function () {
+  describe("apr-of (i.e rewards ~ nft-level × time)", async function () {
     it(`should forward time by 999 years`, async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 999]);
       await network.provider.send("evm_mine", []);

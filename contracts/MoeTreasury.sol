@@ -7,6 +7,8 @@ pragma solidity ^0.8.0;
 import "./APower.sol";
 import "./XPower.sol";
 import "./XPowerPpt.sol";
+
+import "./libs/Constants.sol";
 import "./libs/Interpolators.sol";
 
 /**
@@ -25,13 +27,6 @@ contract MoeTreasury is MoeTreasurySupervised {
     mapping(address => mapping(uint256 => uint256)) private _claimed;
     /** map of rewards claimed total: nft-id => amount */
     mapping(uint256 => uint256) private _claimedTotal;
-
-    /** century in seconds (approximation) */
-    uint256 private constant CENTUM = 365_25 days;
-    /** single year in seconds (approximation) */
-    uint256 private constant ANNUM = CENTUM / 100;
-    /** single month in seconds (approximation) */
-    uint256 private constant MONTH = ANNUM / 12;
 
     /** @param moeLink address of contract for XPower tokens */
     /** @param sovLink address of contract for APower tokens */
@@ -194,8 +189,8 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
         uint256 apr = aprOf(nftId);
         uint256 aprBonus = aprBonusOf(nftId);
-        uint256 reward = (apr * age * denomination) / (1_000 * CENTUM);
-        uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * CENTUM);
+        uint256 reward = (apr * age * denomination) / (1_000 * Constants.CENTURY);
+        uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * Constants.CENTURY);
         return (reward + rewardBonus) * 10 ** _moe[_indexOf(nftId)].decimals();
     }
 
@@ -205,8 +200,8 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
         uint256 apr = aprOf(nftId);
         uint256 aprBonus = aprBonusOf(nftId);
-        uint256 reward = (apr * age * denomination) / (1_000 * CENTUM);
-        uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * CENTUM);
+        uint256 reward = (apr * age * denomination) / (1_000 * Constants.CENTURY);
+        uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * Constants.CENTURY);
         return (reward + rewardBonus) * 10 ** _moe[_indexOf(nftId)].decimals();
     }
 
@@ -228,9 +223,9 @@ contract MoeTreasury is MoeTreasurySupervised {
         return rewardsTotal;
     }
 
-    /** time-weighted average of APR: nft-id => value */
+    /** interpolation anchor of APR: nft-id => value */
     mapping(uint256 => uint256) private _aprSourceValue;
-    /** timestamp for average of APR: nft-id => timestamp */
+    /** interpolation anchor of APR: nft-id => timestamp */
     mapping(uint256 => uint256) private _aprSourceStamp;
     /** parametrization of APR: nft-{prefix, year} => coefficients */
     mapping(uint256 => mapping(uint256 => uint256[])) private _apr;
@@ -242,7 +237,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         }
         uint256 nowStamp = block.timestamp;
         uint256 srcStamp = _aprSourceStamp[nftId];
-        uint256 tgtStamp = srcStamp + ANNUM;
+        uint256 tgtStamp = srcStamp + Constants.YEAR;
         uint256 srcValue = _aprSourceValue[nftId];
         uint256 tgtValue = aprTargetOf(nftId);
         return Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
@@ -251,9 +246,13 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** @return target for annualized percentage rate (per nft.level) */
     function aprTargetOf(uint256 nftId) public view returns (uint256) {
         uint256 nftYear = _ppt.yearOf(nftId);
-        uint256 nftLevel = _ppt.levelOf(nftId);
         uint256 nftPrefix = _ppt.prefixOf(nftId);
-        return Polynomial(getAPR(nftPrefix, nftYear)).evalClamped(nftLevel);
+        return aprTargetOf(nftId, getAPR(nftPrefix, nftYear));
+    }
+
+    /** @return target for annualized percentage rate (per nft.level & parametrization) */
+    function aprTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256) {
+        return Polynomial(array).evalClamped(_ppt.levelOf(nftId));
     }
 
     /** @return APR parameters (for given nft-{prefix, year}) */
@@ -268,20 +267,51 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** set APR parameters for retargeting (for given nft-{prefix, year}) */
-    function setAPR(uint256 prefix, uint256 year, uint256[] memory array) public onlyRole(APR_ROLE) {
+    function setAPR(uint256 nftPrefix, uint256 nftYear, uint256[] memory array) public onlyRole(APR_ROLE) {
         require(array.length == 6, "invalid array.length");
-        require(array[2] > 0, "invalid array[2] entry");
-        for (uint256 level = 0; level < 100; level += 3) {
-            uint256 nftId = _ppt.idBy(year, level, prefix);
+        // eliminate possibility of division-by-zero
+        require(array[2] > 0, "invalid array[2] == 0");
+        // eliminate possibility of all-zero values
+        require(array[3] > 0, "invalid array[3] == 0");
+        for (uint256 nftLevel = 0; nftLevel < 100; nftLevel += 3) {
+            uint256 nftId = _ppt.idBy(nftYear, nftLevel, nftPrefix);
+            // check APR reparamerization of value
+            uint256 lastValue = aprTargetOf(nftId);
+            uint256 nextValue = aprTargetOf(nftId, array);
+            _checkAPRValue(nextValue, lastValue);
             _aprSourceValue[nftId] = aprOf(nftId);
-            _aprSourceStamp[nftId] = block.timestamp;
+            // check APR reparamerization of stamp
+            uint256 lastStamp = _aprSourceStamp[nftId];
+            uint256 nextStamp = block.timestamp;
+            _checkAPRStamp(nextStamp, lastStamp);
+            _aprSourceStamp[nftId] = nextStamp;
         }
-        _apr[prefix][year] = array;
+        _apr[nftPrefix][nftYear] = array;
     }
 
-    /** time-weighted average of APR bonus: nft-id => value */
+    /** validate APR change: 0.5 <= next / last <= 2.0 or next <= 1.000[%] */
+    function _checkAPRValue(uint256 nextValue, uint256 lastValue) private pure {
+        if (nextValue < lastValue) {
+            require(lastValue <= 2 * nextValue, "invalid change: too small");
+        }
+        if (nextValue > lastValue && lastValue > 0) {
+            require(nextValue <= 2 * lastValue, "invalid change: too large");
+        }
+        if (nextValue > lastValue && lastValue == 0) {
+            require(nextValue <= 1_000, "invalid change: too large");
+        }
+    }
+
+    /** validate APR change: invocation frequency at most at once per month */
+    function _checkAPRStamp(uint256 nextStamp, uint256 lastStamp) private pure {
+        if (lastStamp > 0) {
+            require(nextStamp - lastStamp > Constants.MONTH, "invalid change: too frequent");
+        }
+    }
+
+    /** interpolation anchor of APR bonus: nft-id => value */
     mapping(uint256 => uint256) private _bonusSourceValue;
-    /** timestamp for average of APR bonus: nft-id => timestamp */
+    /** interpolation anchor of APR bonus: nft-id => timestamp */
     mapping(uint256 => uint256) private _bonusSourceStamp;
     /** parametrization of APR bonus: nft-{prefix, year} => coefficients */
     mapping(uint256 => mapping(uint256 => uint256[])) private _bonus;
@@ -293,7 +323,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         }
         uint256 nowStamp = block.timestamp;
         uint256 srcStamp = _bonusSourceStamp[nftId];
-        uint256 tgtStamp = srcStamp + ANNUM;
+        uint256 tgtStamp = srcStamp + Constants.YEAR;
         uint256 srcValue = _bonusSourceValue[nftId];
         uint256 tgtValue = aprBonusTargetOf(nftId);
         return Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
@@ -301,11 +331,17 @@ contract MoeTreasury is MoeTreasurySupervised {
 
     /** @return target for annualized percentage rate bonus (per nft.year) */
     function aprBonusTargetOf(uint256 nftId) public view returns (uint256) {
-        uint256 nowYear = _ppt.year();
         uint256 nftYear = _ppt.yearOf(nftId);
         uint256 nftPrefix = _ppt.prefixOf(nftId);
+        return aprBonusTargetOf(nftId, getAPRBonus(nftPrefix, nftYear));
+    }
+
+    /** @return target for annualized percentage rate bonus (per nft.year & parametrization) */
+    function aprBonusTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256) {
+        uint256 nowYear = _ppt.year();
+        uint256 nftYear = _ppt.yearOf(nftId);
         uint256 ageYear = nowYear > nftYear ? nowYear - nftYear : 0;
-        return Polynomial(getAPRBonus(nftPrefix, nftYear)).evalClamped(ageYear);
+        return Polynomial(array).evalClamped(ageYear);
     }
 
     /** @return APR bonus parameters (for given nft-{prefix, year}) */
@@ -322,13 +358,44 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** set APR bonus parameters for retargeting (for given nft-{prefix, year}) */
     function setAPRBonus(uint256 nftPrefix, uint256 nftYear, uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
         require(array.length == 6, "invalid array.length");
-        require(array[2] > 0, "invalid array[2] entry");
+        // eliminate possibility of division-by-zero
+        require(array[2] > 0, "invalid array[2] == 0");
+        // eliminate possibility of all-zero values
+        require(array[3] > 0, "invalid array[3] == 0");
         for (uint256 nftLevel = 0; nftLevel < 100; nftLevel += 3) {
             uint256 nftId = _ppt.idBy(nftYear, nftLevel, nftPrefix);
+            // check APR bonus reparamerization of value
+            uint256 lastValue = aprBonusTargetOf(nftId);
+            uint256 nextValue = aprBonusTargetOf(nftId, array);
+            _checkAPRBonusValue(nextValue, lastValue);
             _bonusSourceValue[nftId] = aprBonusOf(nftId);
-            _bonusSourceStamp[nftId] = block.timestamp;
+            // check APR bonus reparamerization of stamp
+            uint256 lastStamp = _bonusSourceStamp[nftId];
+            uint256 nextStamp = block.timestamp;
+            _checkAPRBonusStamp(nextStamp, lastStamp);
+            _bonusSourceStamp[nftId] = nextStamp;
         }
         _bonus[nftPrefix][nftYear] = array;
+    }
+
+    /** validate APR bonus change: 0.5 <= next / last <= 2.0 or next <= 0.010[%] */
+    function _checkAPRBonusValue(uint256 nextValue, uint256 lastValue) private pure {
+        if (nextValue < lastValue) {
+            require(lastValue <= 2 * nextValue, "invalid change: too small");
+        }
+        if (nextValue > lastValue && lastValue > 0) {
+            require(nextValue <= 2 * lastValue, "invalid change: too large");
+        }
+        if (nextValue > lastValue && lastValue == 0) {
+            require(nextValue <= 10, "invalid change: too large");
+        }
+    }
+
+    /** validate APR bonus change: invocation frequency at most at once per month */
+    function _checkAPRBonusStamp(uint256 nextStamp, uint256 lastStamp) private pure {
+        if (lastStamp > 0) {
+            require(nextStamp - lastStamp > Constants.MONTH, "invalid change: too frequent");
+        }
     }
 
     /** @return index *associated* with nft-id */
