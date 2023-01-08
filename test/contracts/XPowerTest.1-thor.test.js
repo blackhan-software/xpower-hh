@@ -81,26 +81,35 @@ describe("XPowerThorTest", async function () {
     it("should return amount=0", async function () {
       const hash = table.getHash({ amount: 0 });
       expect(hash).to.be.a("string").and.to.match(/^0x/);
-      const amount = await xpower.amountOf(hash);
+      const zeros = await xpower.zerosOf(hash);
+      expect(zeros).to.eq(0);
+      const amount = await xpower.amountOf(zeros);
       expect(amount).to.equal(0);
     });
     it("should return amount=1", async function () {
       const hash = table.getHash({ amount: 1 });
       expect(hash).to.be.a("string").and.to.match(/^0x/);
-      const amount = await xpower.amountOf(hash);
+      const zeros = await xpower.zerosOf(hash);
+      expect(zeros).to.eq(1);
+      const amount = await xpower.amountOf(zeros);
       expect(amount).to.equal(UNUM);
     });
     it("should return amount=2", async function () {
       const hash = table.getHash({ amount: 2 });
       expect(hash).to.be.a("string").and.to.match(/^0x/);
-      const amount = await xpower.amountOf(hash);
+      const zeros = await xpower.zerosOf(hash);
+      expect(zeros).to.eq(2);
+      const amount = await xpower.amountOf(zeros);
       expect(amount).to.equal(2n * UNUM);
     });
   });
   describe("zeros (for amounts={0,1,2})", async function () {
     it("should return amount=0", async function () {
       const hash = table.getHash({ amount: 0 });
-      expect(await xpower.amountOf(hash)).to.eq(0);
+      expect(hash).to.be.a("string").and.to.match(/^0x/);
+      const zeros = await xpower.zerosOf(hash);
+      expect(zeros).to.eq(0);
+      expect(await xpower.amountOf(zeros)).to.eq(0);
     });
     it("should return zeros=0", async function () {
       const hash = table.getHash({ amount: 0 });
@@ -108,7 +117,10 @@ describe("XPowerThorTest", async function () {
     });
     it("should return amount=1", async function () {
       const hash = table.getHash({ amount: 1 });
-      expect(await xpower.amountOf(hash)).to.eq(UNUM);
+      expect(hash).to.be.a("string").and.to.match(/^0x/);
+      const zeros = await xpower.zerosOf(hash);
+      expect(zeros).to.eq(1);
+      expect(await xpower.amountOf(zeros)).to.eq(UNUM);
     });
     it("should return zeros=1", async function () {
       const hash = table.getHash({ amount: 1 });
@@ -116,7 +128,10 @@ describe("XPowerThorTest", async function () {
     });
     it("should return amount=2", async function () {
       const hash = table.getHash({ amount: 2 });
-      expect(await xpower.amountOf(hash)).to.eq(2n * UNUM);
+      expect(hash).to.be.a("string").and.to.match(/^0x/);
+      const zeros = await xpower.zerosOf(hash);
+      expect(zeros).to.eq(2);
+      expect(await xpower.amountOf(zeros)).to.eq(2n * UNUM);
     });
     it("should return zeros=2", async function () {
       const hash = table.getHash({ amount: 2 });

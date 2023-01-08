@@ -34,8 +34,8 @@ describe("XPower", async function () {
     });
     it("should set array", async function () {
       await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
-      await xpower.setTreasuryShare([1, 2, 3, 4, 5, 6]);
-      Expect(await xpower.getTreasuryShare()).to.equal([1, 2, 3, 4, 5, 6]);
+      await xpower.setTreasuryShare([0, 0, 1, 1, 0, 0]);
+      Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 1, 1, 0, 0]);
     });
     it("should *not* set array (invalid array.length)", async function () {
       await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
@@ -48,11 +48,22 @@ describe("XPower", async function () {
       ).to.eq(undefined);
       Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
     });
-    it("should *not* set array (invalid array[2] entry)", async function () {
+    it("should *not* set array (invalid array[2] == 0)", async function () {
       await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
       expect(
         await xpower.setTreasuryShare([0, 0, 0, 0, 0, 0]).catch((ex) => {
-          const m = ex.message.match(/invalid array\[2\] entry/);
+          const m = ex.message.match(/invalid array\[2\] == 0/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        })
+      ).to.eq(undefined);
+      Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
+    });
+    it("should *not* set array (invalid array[3] == 0)", async function () {
+      await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
+      expect(
+        await xpower.setTreasuryShare([0, 0, 1, 0, 0, 0]).catch((ex) => {
+          const m = ex.message.match(/invalid array\[3\] == 0/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
@@ -64,7 +75,7 @@ describe("XPower", async function () {
       expect(
         await xpower
           .connect(signer_1)
-          .setTreasuryShare([1, 2, 3, 4, 5, 6])
+          .setTreasuryShare([0, 0, 1, 1, 0, 0])
           .catch((ex) => {
             const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);

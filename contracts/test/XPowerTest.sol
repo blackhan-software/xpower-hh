@@ -8,8 +8,8 @@ import "../XPower.sol";
 contract XPowerThorTest is XPowerThor {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerThor(_base, _deadlineIn) {}
 
-    function amountOf(bytes32 _nonceHash) public view returns (uint256) {
-        return _amountOf(_nonceHash);
+    function amountOf(uint256 _zeros) public view returns (uint256) {
+        return _amountOf(_zeros);
     }
 
     function cache(bytes32 _blockHash) public {
@@ -37,8 +37,8 @@ contract XPowerThorOldTest is XPowerThorTest {
 contract XPowerLokiTest is XPowerLoki {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerLoki(_base, _deadlineIn) {}
 
-    function amountOf(bytes32 _nonceHash) public view returns (uint256) {
-        return _amountOf(_nonceHash);
+    function amountOf(uint256 _zeros) public view returns (uint256) {
+        return _amountOf(_zeros);
     }
 
     function cache(bytes32 _blockHash) public {
@@ -66,8 +66,8 @@ contract XPowerLokiOldTest is XPowerLokiTest {
 contract XPowerOdinTest is XPowerOdin {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerOdin(_base, _deadlineIn) {}
 
-    function amountOf(bytes32 _nonceHash) public view returns (uint256) {
-        return _amountOf(_nonceHash);
+    function amountOf(uint256 _zeros) public view returns (uint256) {
+        return _amountOf(_zeros);
     }
 
     function cache(bytes32 _blockHash) public {

@@ -8,8 +8,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
+import "./libs/Constants.sol";
 import "./base/Migratable.sol";
 import "./libs/Polynomials.sol";
+import "./libs/Interpolators.sol";
 
 /**
  * Abstract base class for the XPower THOR, LOKI and ODIN proof-of-work tokens.
@@ -26,15 +28,6 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     mapping(bytes32 => uint256) internal _timestamps;
     /** map from intervals to block-hashes */
     mapping(uint256 => bytes32) internal _blockHashes;
-    /** parametrization of treasury-share */
-    uint256[] private _share = [0, 0, 2, 1, 0, 0];
-    /** moving averages of minting fees spent */
-    uint256[] private _mintingFees = [0, 0];
-
-    /** @return moving averages of minting fees spent */
-    function mintingFees() public view returns (uint256[] memory) {
-        return _mintingFees;
-    }
 
     /** @param symbol short token symbol */
     /** @param moeBase address of old contract */
@@ -80,18 +73,20 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         bytes32 nonceHash = _hashOf(to, blockHash, nonce);
         require(!_hashes.contains(uint256(nonceHash)), "duplicate nonce-hash");
         // calculate amount of tokens for nonce-hash
-        uint256 amount = _amountOf(nonceHash);
+        uint256 amount = _amountOf(_zerosOf(nonceHash));
         require(amount > 0, "empty nonce-hash");
         // ensure unique nonce-hash (to be used once)
         _hashes.add(uint256(nonceHash));
         // mint tokens for owner (i.e. project treasury)
-        uint256 treasure = treasuryShare(amount);
+        uint256 treasure = shareOf(amount);
         if (treasure > 0) _mint(owner(), treasure);
         // mint tokens for beneficiary (e.g. nonce provider)
         _mint(to, amount);
-        // moving averages over minting fees spent
+        // calculate the current fees spent (so far)
         uint256 fees = (gas - gasleft()) * tx.gasprice;
+        // moving-average over the last 16 fees spent
         _mintingFees[0] = (_mintingFees[0] * 0x0f + fees) >> 4;
+        // moving-average over the last 256 fees spent
         _mintingFees[1] = (_mintingFees[1] * 0xff + fees) >> 8;
     }
 
@@ -107,9 +102,42 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         return _blockHashes[interval];
     }
 
+    /** moving averages of minting fees spent */
+    uint256[] private _mintingFees = [0, 0];
+
+    /** @return moving averages of minting fees spent */
+    function mintingFees() public view returns (uint256[] memory) {
+        return _mintingFees;
+    }
+
+    /** interpolation anchor of treasury-share: amount => value */
+    mapping(uint256 => uint256) private _shareSourceValue;
+    /** interpolation anchor of treasury-share: amount => timestamp */
+    mapping(uint256 => uint256) private _shareSourceStamp;
+    /** parametrization of treasury-share */
+    uint256[] private _share = [0, 0, 2, 1, 0, 0];
+
+    /** @return interpolated share w/1-year lag (for amount) */
+    function shareOf(uint256 amount) public view returns (uint256) {
+        if (_shareSourceStamp[amount] == 0) {
+            return shareTargetOf(amount);
+        }
+        uint256 nowStamp = block.timestamp;
+        uint256 srcStamp = _shareSourceStamp[amount];
+        uint256 tgtStamp = srcStamp + Constants.YEAR;
+        uint256 srcValue = _shareSourceValue[amount];
+        uint256 tgtValue = shareTargetOf(amount);
+        return Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
+    }
+
     /** @return treasury-share for given amount */
-    function treasuryShare(uint256 amount) public view returns (uint256) {
-        return Polynomial(_share).evalClamped(amount);
+    function shareTargetOf(uint256 amount) public view returns (uint256) {
+        return shareTargetOf(amount, _share);
+    }
+
+    /** @return treasury-share for given amount (and parametrization) */
+    function shareTargetOf(uint256 amount, uint256[] memory array) private pure returns (uint256) {
+        return Polynomial(array).evalClamped(amount);
     }
 
     /** @return treasury-share parameters */
@@ -120,8 +148,44 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     /** set treasury-share parameters */
     function setTreasuryShare(uint256[] memory array) public onlyRole(TREASURY_SHARE_ROLE) {
         require(array.length == 6, "invalid array.length");
-        require(array[2] > 0, "invalid array[2] entry");
+        // eliminate possibility of division-by-zero
+        require(array[2] > 0, "invalid array[2] == 0");
+        // eliminate possibility of all-zero values
+        require(array[3] > 0, "invalid array[3] == 0");
+        for (uint256 zeros = 0; zeros <= 64; zeros++) {
+            uint256 amount = _amountOf(zeros);
+            // check share reparamerization of value
+            uint256 lastValue = shareTargetOf(amount);
+            uint256 nextValue = shareTargetOf(amount, array);
+            _checkShareValue(nextValue, lastValue);
+            _shareSourceValue[amount] = shareOf(amount);
+            // check share reparamerization of stamp
+            uint256 lastStamp = _shareSourceStamp[amount];
+            uint256 nextStamp = block.timestamp;
+            _checkShareStamp(nextStamp, lastStamp);
+            _shareSourceStamp[amount] = nextStamp;
+        }
         _share = array;
+    }
+
+    /** validate treasury-share change: 0.5 <= next / last <= 2.0 or next <= amountOf(1) */
+    function _checkShareValue(uint256 nextValue, uint256 lastValue) private view {
+        if (nextValue < lastValue) {
+            require(lastValue <= 2 * nextValue, "invalid change: too small");
+        }
+        if (nextValue > lastValue && lastValue > 0) {
+            require(nextValue <= 2 * lastValue, "invalid change: too large");
+        }
+        if (nextValue > lastValue && lastValue == 0) {
+            require(nextValue <= _amountOf(1), "invalid change: too large");
+        }
+    }
+
+    /** validate treasury-share change: invocation frequency at most at once per month */
+    function _checkShareStamp(uint256 nextStamp, uint256 lastStamp) private pure {
+        if (lastStamp > 0) {
+            require(nextStamp - lastStamp > Constants.MONTH, "invalid change: too frequent");
+        }
     }
 
     /** check whether block-hash has been cached for given interval */
@@ -133,13 +197,13 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         }
     }
 
-    /** @return hash of contract, beneficiary, block-hash & nonce */
+    /** @return hash of contract, beneficiary, block-hash and nonce */
     function _hashOf(address to, bytes32 blockHash, uint256 nonce) internal view virtual returns (bytes32) {
         return keccak256(abi.encode(address(this), to, blockHash, nonce));
     }
 
-    /** @return amount for provided nonce-hash */
-    function _amountOf(bytes32 nonceHash) internal view virtual returns (uint256);
+    /** @return amount for provided number of zeros */
+    function _amountOf(uint256 zeros) internal view virtual returns (uint256);
 
     /** @return leading zeros of provided nonce-hash */
     function _zerosOf(bytes32 nonceHash) internal pure returns (uint8) {
@@ -162,16 +226,16 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
 
 /**
  * Allow mining & minting for THOR proof-of-work tokens, where the rewarded
- * amount equals to *only* |leading-zeros(nonce-hash) - difficulty|.
+ * amount equals to *only* |leading-zeros(nonce-hash)|.
  */
 contract XPowerThor is XPower {
     /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address[] memory moeBase, uint256 deadlineIn) XPower("THOR", moeBase, deadlineIn) {}
 
-    /** @return amount for provided nonce-hash */
-    function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
-        return _zerosOf(nonceHash) * 10 ** decimals();
+    /** @return amount for provided number of zeros */
+    function _amountOf(uint256 zeros) internal view override returns (uint256) {
+        return zeros * 10 ** decimals();
     }
 
     /** @return prefix of token */
@@ -182,16 +246,16 @@ contract XPowerThor is XPower {
 
 /**
  * Allow mining & minting for LOKI proof-of-work tokens, where the rewarded
- * amount equals to 2 ^ |leading-zeros(nonce-hash) - difficulty| - 1.
+ * amount equals to 2 ^ |leading-zeros(nonce-hash)| - 1.
  */
 contract XPowerLoki is XPower {
     /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address[] memory moeBase, uint256 deadlineIn) XPower("LOKI", moeBase, deadlineIn) {}
 
-    /** @return amount for provided nonce-hash */
-    function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
-        return (2 ** _zerosOf(nonceHash) - 1) * 10 ** decimals();
+    /** @return amount for provided number of zeros */
+    function _amountOf(uint256 zeros) internal view override returns (uint256) {
+        return (2 ** zeros - 1) * 10 ** decimals();
     }
 
     /** @return prefix of token */
@@ -202,16 +266,16 @@ contract XPowerLoki is XPower {
 
 /**
  * Allow mining & minting for ODIN proof-of-work tokens, where the rewarded
- * amount equals to 16 ^ |leading-zeros(nonce-hash) - difficulty| - 1.
+ * amount equals to 16 ^ |leading-zeros(nonce-hash)| - 1.
  */
 contract XPowerOdin is XPower {
     /** @param moeBase address of old contract */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address[] memory moeBase, uint256 deadlineIn) XPower("ODIN", moeBase, deadlineIn) {}
 
-    /** @return amount for provided nonce-hash */
-    function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
-        return (16 ** _zerosOf(nonceHash) - 1) * 10 ** decimals();
+    /** @return amount for provided number of zeros */
+    function _amountOf(uint256 zeros) internal view override returns (uint256) {
+        return (16 ** zeros - 1) * 10 ** decimals();
     }
 
     /** @return prefix of token */
