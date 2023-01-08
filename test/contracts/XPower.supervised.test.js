@@ -58,20 +58,6 @@ describe("XPowerSupervised", async function () {
     await revoke_role(role, { revoked: true });
     await grant_role(role, { granted: true });
   });
-  it("should grant & revoke MINING_DIFFICULTY_ROLE", async function () {
-    const role = await has_role(xpower.MINING_DIFFICULTY_ROLE(), {
-      has: false,
-    });
-    await grant_role(role, { granted: true });
-    await revoke_role(role, { revoked: true });
-  });
-  it("should revoke & grant MINING_DIFFICULTY_ADMIN_ROLE", async function () {
-    const role = await has_role(xpower.MINING_DIFFICULTY_ADMIN_ROLE(), {
-      has: true,
-    });
-    await revoke_role(role, { revoked: true });
-    await grant_role(role, { granted: true });
-  });
   it("should transfer DEFAULT_ADMIN_ROLE", async function () {
     const role = await has_role(xpower.DEFAULT_ADMIN_ROLE(), {
       has: true,

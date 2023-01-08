@@ -8,7 +8,7 @@ abstract contract Supervised is AccessControlEnumerable {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    /** returns true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interfaceId */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return super.supportsInterface(interfaceId);
     }
@@ -18,15 +18,10 @@ abstract contract XPowerSupervised is Supervised {
     /** role grants right to change treasury's share per mint */
     bytes32 public constant TREASURY_SHARE_ROLE = keccak256("TREASURY_SHARE_ROLE");
     bytes32 public constant TREASURY_SHARE_ADMIN_ROLE = keccak256("TREASURY_SHARE_ADMIN_ROLE");
-    /** role grants right to change mining-difficulty parametrization */
-    bytes32 public constant MINING_DIFFICULTY_ROLE = keccak256("MINING_DIFFICULTY_ROLE");
-    bytes32 public constant MINING_DIFFICULTY_ADMIN_ROLE = keccak256("MINING_DIFFICULTY_ADMIN_ROLE");
 
     constructor() {
         _setRoleAdmin(TREASURY_SHARE_ROLE, TREASURY_SHARE_ADMIN_ROLE);
         _grantRole(TREASURY_SHARE_ADMIN_ROLE, msg.sender);
-        _setRoleAdmin(MINING_DIFFICULTY_ROLE, MINING_DIFFICULTY_ADMIN_ROLE);
-        _grantRole(MINING_DIFFICULTY_ADMIN_ROLE, msg.sender);
     }
 }
 

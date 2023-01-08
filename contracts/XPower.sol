@@ -26,12 +26,8 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     mapping(bytes32 => uint256) internal _timestamps;
     /** map from intervals to block-hashes */
     mapping(uint256 => bytes32) internal _blockHashes;
-    /** anchor for difficulty calculation */
-    uint256 private immutable _timestamp;
     /** parametrization of treasury-share */
     uint256[] private _share = [0, 0, 2, 1, 0, 0];
-    /** parametrization of mining-difficulty */
-    uint256[] private _rigor = [0, 0, 1, 0, 0, 0];
     /** moving averages of minting fees spent */
     uint256[] private _mintingFees = [0, 0];
 
@@ -52,9 +48,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         ERC20("XPower", symbol)
         // Migratable: old contract, rel. deadline [seconds]
         Migratable(moeBase, deadlineIn)
-    {
-        _timestamp = 0x6215621e; // 2022-02-22T22:22:22Z
-    }
+    {}
 
     /** emitted on caching most recent block-hash */
     event Init(bytes32 blockHash, uint256 timestamp);
@@ -130,23 +124,6 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         _share = array;
     }
 
-    /** @return mining-difficulty for given timestamp */
-    function miningDifficulty(uint256 timestamp) public view returns (uint256) {
-        return Polynomial(_rigor).evalClamped(timestamp - _timestamp);
-    }
-
-    /** @return mining-difficulty parameters */
-    function getMiningDifficulty() public view returns (uint256[] memory) {
-        return _rigor;
-    }
-
-    /** set mining-difficulty parameters */
-    function setMiningDifficulty(uint256[] memory array) public onlyRole(MINING_DIFFICULTY_ROLE) {
-        require(array.length == 6, "invalid array.length");
-        require(array[2] > 0, "invalid array[2] entry");
-        _rigor = array;
-    }
-
     /** check whether block-hash has been cached for given interval */
     function _requireCurrent(bytes32 blockHash, uint256 interval) internal view {
         require(blockHash > 0, "invalid block-hash");
@@ -194,12 +171,7 @@ contract XPowerThor is XPower {
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
-        uint256 difficulty = miningDifficulty(block.timestamp);
-        uint256 zeros = _zerosOf(nonceHash);
-        if (zeros > difficulty) {
-            return (zeros - difficulty) * 10 ** decimals();
-        }
-        return 0;
+        return _zerosOf(nonceHash) * 10 ** decimals();
     }
 
     /** @return prefix of token */
@@ -219,12 +191,7 @@ contract XPowerLoki is XPower {
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
-        uint256 difficulty = miningDifficulty(block.timestamp);
-        uint256 zeros = _zerosOf(nonceHash);
-        if (zeros > difficulty) {
-            return (2 ** (zeros - difficulty) - 1) * 10 ** decimals();
-        }
-        return 0;
+        return (2 ** _zerosOf(nonceHash) - 1) * 10 ** decimals();
     }
 
     /** @return prefix of token */
@@ -244,12 +211,7 @@ contract XPowerOdin is XPower {
 
     /** @return amount for provided nonce-hash */
     function _amountOf(bytes32 nonceHash) internal view override returns (uint256) {
-        uint256 difficulty = miningDifficulty(block.timestamp);
-        uint256 zeros = _zerosOf(nonceHash);
-        if (zeros > difficulty) {
-            return (16 ** (zeros - difficulty) - 1) * 10 ** decimals();
-        }
-        return 0;
+        return (16 ** _zerosOf(nonceHash) - 1) * 10 ** decimals();
     }
 
     /** @return prefix of token */
