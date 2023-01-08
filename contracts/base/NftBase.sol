@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 
 import "./URIMalleable.sol";
 import "./NftMigratable.sol";
+import "../libs/Constants.sol";
 
 /**
  * Abstract base NFT class: publicly *not* minteable (nor burnable).
@@ -94,7 +95,7 @@ abstract contract NftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleab
 
     /** @return current number of years since anno domini */
     function year() public view returns (uint256) {
-        uint256 anno = 1970 + (100 * block.timestamp) / (365_25 days);
+        uint256 anno = 1970 + (100 * block.timestamp) / Constants.CENTURY;
         require(anno > 2020, "invalid year");
         return anno;
     }
