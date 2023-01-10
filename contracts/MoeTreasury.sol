@@ -16,6 +16,12 @@ import "./libs/Interpolators.sol";
  */
 contract MoeTreasury is MoeTreasurySupervised {
     using Polynomials for Polynomial;
+
+    /** map of MOE indices: prefix => index */
+    mapping(uint256 => uint256) private _moeIndex;
+    /** map of SOV indices: prefix => index */
+    mapping(uint256 => uint256) private _sovIndex;
+
     /** (burnable) proof-of-work tokens */
     XPower[] private _moe;
     /** (burnable) *aged* XPower tokens */
@@ -32,41 +38,29 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** @param sovLink address of contract for APower tokens */
     /** @param pptLink address of contract for staked NFTs */
     constructor(address[] memory moeLink, address[] memory sovLink, address pptLink) {
-        require(moeLink.length > 0 && moeLink.length == sovLink.length, "invalid moeLink.length");
-        require(sovLink.length > 0 && sovLink.length == moeLink.length, "invalid sovLink.length");
         _moe = new XPower[](moeLink.length);
         for (uint256 i = 0; i < moeLink.length; i++) {
             XPower moe = XPower(moeLink[i]);
-            assert(moe.prefix() == i + 1);
+            _moeIndex[moe.prefix()] = i;
             _moe[i] = moe;
         }
         _sov = new APower[](sovLink.length);
         for (uint256 i = 0; i < sovLink.length; i++) {
             APower sov = APower(sovLink[i]);
-            assert(sov.prefix() == i + 1);
+            _sovIndex[sov.prefix()] = i;
             _sov[i] = sov;
         }
         _ppt = XPowerPpt(pptLink);
     }
 
     /** @return MOE balance of available tokens */
-    function moeBalance(uint256 index) public view returns (uint256) {
+    function moeBalanceOf(uint256 index) public view returns (uint256) {
         return _moe[index].balanceOf((address)(this));
     }
 
     /** @return index of MOE token address */
-    function moeIndexOf(address moe) public pure returns (uint256) {
-        return XPower(moe).prefix() - 1;
-    }
-
-    /** @return SOV balance of available tokens */
-    function sovBalance(uint256 index) public view returns (uint256) {
-        return _sov[index].balanceOf((address)(this));
-    }
-
-    /** @return index of SOV token address */
-    function sovIndexOf(address sov) public view returns (uint256) {
-        return APower(sov).prefix() - 1;
+    function moeIndexOf(address moe) public view returns (uint256) {
+        return _moeIndex[XPower(moe).prefix()];
     }
 
     /** emitted on claiming NFT reward */
@@ -78,8 +72,8 @@ contract MoeTreasury is MoeTreasurySupervised {
         require(amount > 0, "nothing claimable");
         _claimed[account][nftId] += amount;
         _claimedTotal[nftId] += amount;
-        XPower moe = _moe[_indexOf(nftId)];
-        APower sov = _sov[_indexOf(nftId)];
+        XPower moe = _moeOf(_ppt.prefixOf(nftId));
+        APower sov = _sovOf(_ppt.prefixOf(nftId));
         moe.increaseAllowance((address)(sov), amount);
         sov.mint(account, amount);
         emit Claim(account, nftId, amount);
@@ -97,8 +91,8 @@ contract MoeTreasury is MoeTreasurySupervised {
             _claimedTotal[nftIds[i]] += amounts[i];
         }
         for (uint256 i = 0; i < nftIds.length; i++) {
-            XPower moe = _moe[_indexOf(nftIds[i])];
-            APower sov = _sov[_indexOf(nftIds[i])];
+            XPower moe = _moeOf(_ppt.prefixOf(nftIds[i]));
+            APower sov = _sovOf(_ppt.prefixOf(nftIds[i]));
             moe.increaseAllowance((address)(sov), amounts[i]);
             sov.mint(account, amounts[i]);
         }
@@ -161,8 +155,6 @@ contract MoeTreasury is MoeTreasurySupervised {
         for (uint256 i = 0; i < nftIds.length; i++) {
             if (rewards[i] > claimed[i]) {
                 pending[i] = rewards[i] - claimed[i];
-            } else {
-                pending[i] = 0;
             }
         }
         return pending;
@@ -176,8 +168,6 @@ contract MoeTreasury is MoeTreasurySupervised {
         for (uint256 i = 0; i < nftIds.length; i++) {
             if (rewardsTotal[i] > claimedTotal[i]) {
                 pendingTotal[i] = rewardsTotal[i] - claimedTotal[i];
-            } else {
-                pendingTotal[i] = 0;
             }
         }
         return pendingTotal;
@@ -191,7 +181,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 aprBonus = aprBonusOf(nftId);
         uint256 reward = (apr * age * denomination) / (1_000 * Constants.CENTURY);
         uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * Constants.CENTURY);
-        return (reward + rewardBonus) * 10 ** _moe[_indexOf(nftId)].decimals();
+        return (reward + rewardBonus) * 10 ** _moeOf(_ppt.prefixOf(nftId)).decimals();
     }
 
     /** @return reward total of tokens for given nft-id */
@@ -202,7 +192,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 aprBonus = aprBonusOf(nftId);
         uint256 reward = (apr * age * denomination) / (1_000 * Constants.CENTURY);
         uint256 rewardBonus = (aprBonus * age * denomination) / (1_000 * Constants.CENTURY);
-        return (reward + rewardBonus) * 10 ** _moe[_indexOf(nftId)].decimals();
+        return (reward + rewardBonus) * 10 ** _moeOf(_ppt.prefixOf(nftId)).decimals();
     }
 
     /** @return reward of tokens for given account and nft-ids */
@@ -275,12 +265,12 @@ contract MoeTreasury is MoeTreasurySupervised {
         require(array[3] > 0, "invalid array[3] == 0");
         for (uint256 nftLevel = 0; nftLevel < 100; nftLevel += 3) {
             uint256 nftId = _ppt.idBy(nftYear, nftLevel, nftPrefix);
-            // check APR reparamerization of value
+            // check APR reparametrization of value
             uint256 lastValue = aprTargetOf(nftId);
             uint256 nextValue = aprTargetOf(nftId, array);
             _checkAPRValue(nextValue, lastValue);
             _aprSourceValue[nftId] = aprOf(nftId);
-            // check APR reparamerization of stamp
+            // check APR reparametrization of stamp
             uint256 lastStamp = _aprSourceStamp[nftId];
             uint256 nextStamp = block.timestamp;
             _checkAPRStamp(nextStamp, lastStamp);
@@ -364,12 +354,12 @@ contract MoeTreasury is MoeTreasurySupervised {
         require(array[3] > 0, "invalid array[3] == 0");
         for (uint256 nftLevel = 0; nftLevel < 100; nftLevel += 3) {
             uint256 nftId = _ppt.idBy(nftYear, nftLevel, nftPrefix);
-            // check APR bonus reparamerization of value
+            // check APR bonus reparametrization of value
             uint256 lastValue = aprBonusTargetOf(nftId);
             uint256 nextValue = aprBonusTargetOf(nftId, array);
             _checkAPRBonusValue(nextValue, lastValue);
             _bonusSourceValue[nftId] = aprBonusOf(nftId);
-            // check APR bonus reparamerization of stamp
+            // check APR bonus reparametrization of stamp
             uint256 lastStamp = _bonusSourceStamp[nftId];
             uint256 nextStamp = block.timestamp;
             _checkAPRBonusStamp(nextStamp, lastStamp);
@@ -398,8 +388,13 @@ contract MoeTreasury is MoeTreasurySupervised {
         }
     }
 
-    /** @return index *associated* with nft-id */
-    function _indexOf(uint256 nftId) private view returns (uint256) {
-        return _ppt.prefixOf(nftId) - 1;
+    /** @return MOE token for prefix */
+    function _moeOf(uint256 moePrefix) private view returns (XPower) {
+        return _moe[_moeIndex[moePrefix]];
+    }
+
+    /** @return SOV token for prefix */
+    function _sovOf(uint256 sovPrefix) private view returns (APower) {
+        return _sov[_sovIndex[sovPrefix]];
     }
 }

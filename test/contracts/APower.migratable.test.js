@@ -216,7 +216,7 @@ describe("APower Migration", async function () {
     expect(await mt.totalClaimedFor(nft_id)).to.eq(DECI_OLD);
     expect(await mt.claimableFor(account, nft_id)).to.eq(0);
     expect(await mt.totalClaimableFor(nft_id)).to.eq(0);
-    expect(await mt.moeBalance(2)).to.eq(100n * UNUM_OLD);
+    expect(await mt.moeBalanceOf(2)).to.eq(100n * UNUM_OLD);
   });
   beforeEach(async function () {
     const old_supply = await aodin_old.totalSupply();
