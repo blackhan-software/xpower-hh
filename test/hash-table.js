@@ -32,7 +32,7 @@ class HashTable {
     start = large_random(),
   } = {}) {
     const address = this.address;
-    const at_interval = Miner.interval();
+    const at_interval = await this.contract.currentInterval();
     const block_hash = await this.contract.blockHashOf(at_interval);
     const symbol = await this.contract.symbol();
     const contract_address = this.contract.address;

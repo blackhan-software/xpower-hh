@@ -8,8 +8,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-import "./libs/Constants.sol";
 import "./base/Migratable.sol";
+import "./base/FeeTracker.sol";
+
+import "./libs/Constants.sol";
 import "./libs/Polynomials.sol";
 import "./libs/Interpolators.sol";
 
@@ -19,7 +21,7 @@ import "./libs/Interpolators.sol";
  * (as specified by the sub-classes). After the verification, the corresponding
  * amount of tokens are minted for the beneficiary (plus the treasury).
  */
-abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervised, Ownable {
+abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSupervised, Ownable {
     using EnumerableSet for EnumerableSet.UintSet;
     using Polynomials for Polynomial;
     /** set of nonce-hashes already minted for */
@@ -30,7 +32,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
     mapping(uint256 => bytes32) internal _blockHashes;
 
     /** @param symbol short token symbol */
-    /** @param moeBase address of old contract */
+    /** @param moeBase addresses of old contracts */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
         string memory symbol,
@@ -64,51 +66,63 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         }
     }
 
-    /** mint tokens for beneficiary, interval, block-hash and nonce */
-    function mint(address to, bytes32 blockHash, uint256 nonce) public {
-        uint256 gas = gasleft();
+    /** mint tokens for to-beneficiary, block-hash & nonce */
+    function mint(address to, bytes32 blockHash, uint256 nonce) public tracked {
         // check block-hash to be in current interval
         _requireCurrent(blockHash, currentInterval());
         // calculate nonce-hash for to, block-hash & nonce
         bytes32 nonceHash = _hashOf(to, blockHash, nonce);
         require(!_hashes.contains(uint256(nonceHash)), "duplicate nonce-hash");
-        // calculate amount of tokens for nonce-hash
-        uint256 amount = _amountOf(_zerosOf(nonceHash));
-        require(amount > 0, "empty nonce-hash");
-        // ensure unique nonce-hash (to be used once)
+        // calculate number of zeros of nonce-hash
+        uint256 zeros = _zerosOf(nonceHash);
+        require(zeros > 0, "empty nonce-hash");
+        // calculate amount of tokens of zeros
+        uint256 amount = _amountOf(zeros);
+        // ensure unique nonce-hash (once-only use)
         _hashes.add(uint256(nonceHash));
         // mint tokens for owner (i.e. project treasury)
         uint256 treasure = shareOf(amount);
         if (treasure > 0) _mint(owner(), treasure);
-        // mint tokens for beneficiary (e.g. nonce provider)
+        // mint tokens for to-beneficiary (e.g. nonce provider)
         _mint(to, amount);
-        // calculate the current fees spent (so far)
-        uint256 fees = (gas - gasleft()) * tx.gasprice;
-        // moving-average over the last 16 fees spent
-        _mintingFees[0] = (_mintingFees[0] * 0x0f + fees) >> 4;
-        // moving-average over the last 256 fees spent
-        _mintingFees[1] = (_mintingFees[1] * 0xff + fees) >> 8;
     }
 
-    /** @return current interval (in hours) */
+    /** @return block-hash (for given interval) */
+    function blockHashOf(uint256 interval) public view returns (bytes32) {
+        return _blockHashes[interval];
+    }
+
+    /** @return current interval [hour] */
     function currentInterval() public view returns (uint256) {
         uint256 interval = block.timestamp / (1 hours);
         require(interval > 0, "invalid interval");
         return interval;
     }
 
-    /** @return block-hash of given interval */
-    function blockHashOf(uint256 interval) public view returns (bytes32) {
-        return _blockHashes[interval];
+    /** check whether block-hash has been cached (for given interval) */
+    function _requireCurrent(bytes32 blockHash, uint256 interval) internal view {
+        require(blockHash > 0, "invalid block-hash");
+        uint256 timestamp = _timestamps[blockHash];
+        if (timestamp / (1 hours) != interval) {
+            revert("expired block-hash");
+        }
     }
 
-    /** moving averages of minting fees spent */
-    uint256[] private _mintingFees = [0, 0];
-
-    /** @return moving averages of minting fees spent */
-    function mintingFees() public view returns (uint256[] memory) {
-        return _mintingFees;
+    /** @return hash of contract, to-beneficiary, block-hash & nonce */
+    function _hashOf(address to, bytes32 blockHash, uint256 nonce) internal view virtual returns (bytes32) {
+        return keccak256(abi.encode(address(this), to, blockHash, nonce));
     }
+
+    /** @return leading-zeros (for given nonce-hash) */
+    function _zerosOf(bytes32 nonceHash) internal pure returns (uint8) {
+        if (nonceHash > 0) {
+            return uint8(63 - (Math.log2(uint256(nonceHash)) >> 2));
+        }
+        return 64;
+    }
+
+    /** @return amount (for given level) */
+    function _amountOf(uint256 level) internal view virtual returns (uint256);
 
     /** interpolation anchor of treasury-share: amount => value */
     mapping(uint256 => uint256) private _shareSourceValue;
@@ -130,12 +144,12 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         return Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
     }
 
-    /** @return treasury-share for given amount */
+    /** @return treasury-share (for given amount) */
     function shareTargetOf(uint256 amount) public view returns (uint256) {
         return shareTargetOf(amount, _share);
     }
 
-    /** @return treasury-share for given amount (and parametrization) */
+    /** @return treasury-share (for given amount & parametrization) */
     function shareTargetOf(uint256 amount, uint256[] memory array) private pure returns (uint256) {
         return Polynomial(array).evalClamped(amount);
     }
@@ -154,12 +168,12 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         require(array[3] > 0, "invalid array[3] == 0");
         for (uint256 zeros = 0; zeros <= 64; zeros++) {
             uint256 amount = _amountOf(zeros);
-            // check share reparamerization of value
+            // check share reparametrization of value
             uint256 lastValue = shareTargetOf(amount);
             uint256 nextValue = shareTargetOf(amount, array);
             _checkShareValue(nextValue, lastValue);
             _shareSourceValue[amount] = shareOf(amount);
-            // check share reparamerization of stamp
+            // check share reparametrization of stamp
             uint256 lastStamp = _shareSourceStamp[amount];
             uint256 nextStamp = block.timestamp;
             _checkShareStamp(nextStamp, lastStamp);
@@ -188,32 +202,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
         }
     }
 
-    /** check whether block-hash has been cached for given interval */
-    function _requireCurrent(bytes32 blockHash, uint256 interval) internal view {
-        require(blockHash > 0, "invalid block-hash");
-        uint256 timestamp = _timestamps[blockHash];
-        if (timestamp / (1 hours) != interval) {
-            revert("expired block-hash");
-        }
-    }
-
-    /** @return hash of contract, beneficiary, block-hash and nonce */
-    function _hashOf(address to, bytes32 blockHash, uint256 nonce) internal view virtual returns (bytes32) {
-        return keccak256(abi.encode(address(this), to, blockHash, nonce));
-    }
-
-    /** @return amount for provided number of zeros */
-    function _amountOf(uint256 zeros) internal view virtual returns (uint256);
-
-    /** @return leading zeros of provided nonce-hash */
-    function _zerosOf(bytes32 nonceHash) internal pure returns (uint8) {
-        if (nonceHash > 0) {
-            return uint8(63 - (Math.log2(uint256(nonceHash)) >> 2));
-        }
-        return 64;
-    }
-
-    /** returns true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interfaceId */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(MoeMigratable, Supervised) returns (bool) {
@@ -229,13 +218,13 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, XPowerSupervise
  * amount equals to *only* |leading-zeros(nonce-hash)|.
  */
 contract XPowerThor is XPower {
-    /** @param moeBase address of old contract */
+    /** @param moeBase addresses of old contracts */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address[] memory moeBase, uint256 deadlineIn) XPower("THOR", moeBase, deadlineIn) {}
 
-    /** @return amount for provided number of zeros */
-    function _amountOf(uint256 zeros) internal view override returns (uint256) {
-        return zeros * 10 ** decimals();
+    /** @return amount (for given level) */
+    function _amountOf(uint256 level) internal view override returns (uint256) {
+        return level * 10 ** decimals();
     }
 
     /** @return prefix of token */
@@ -249,13 +238,13 @@ contract XPowerThor is XPower {
  * amount equals to 2 ^ |leading-zeros(nonce-hash)| - 1.
  */
 contract XPowerLoki is XPower {
-    /** @param moeBase address of old contract */
+    /** @param moeBase addresses of old contracts */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address[] memory moeBase, uint256 deadlineIn) XPower("LOKI", moeBase, deadlineIn) {}
 
-    /** @return amount for provided number of zeros */
-    function _amountOf(uint256 zeros) internal view override returns (uint256) {
-        return (2 ** zeros - 1) * 10 ** decimals();
+    /** @return amount (for given level) */
+    function _amountOf(uint256 level) internal view override returns (uint256) {
+        return (2 ** level - 1) * 10 ** decimals();
     }
 
     /** @return prefix of token */
@@ -269,13 +258,13 @@ contract XPowerLoki is XPower {
  * amount equals to 16 ^ |leading-zeros(nonce-hash)| - 1.
  */
 contract XPowerOdin is XPower {
-    /** @param moeBase address of old contract */
+    /** @param moeBase addresses of old contracts */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address[] memory moeBase, uint256 deadlineIn) XPower("ODIN", moeBase, deadlineIn) {}
 
-    /** @return amount for provided number of zeros */
-    function _amountOf(uint256 zeros) internal view override returns (uint256) {
-        return (16 ** zeros - 1) * 10 ** decimals();
+    /** @return amount (for given level) */
+    function _amountOf(uint256 level) internal view override returns (uint256) {
+        return (16 ** level - 1) * 10 ** decimals();
     }
 
     /** @return prefix of token */
