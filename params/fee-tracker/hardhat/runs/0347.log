@@ -1,0 +1,726 @@
+
+> xpower@6.0.0 test-gas
+> REPORT_GAS=true npm test ./test/contracts/XPower.fees.1-thor.test.js
+
+
+> xpower@6.0.0 test
+> hardhat test ./test/contracts/XPower.fees.1-thor.test.js
+
+
+  XPowerThor
+    mint
+[FEE] 348773550898120 162282 1658186771
+      ✓ should mint for amount=1
+[FEE] 338595298333903 158008 1653339729
+      ✓ should mint for amount=1
+[FEE] 328225074455274 154001 1644403790
+      ✓ should mint for amount=1
+[FEE] 317834630037960 150244 1632166018
+      ✓ should mint for amount=1
+[FEE] 307556959712074 146722 1617299958
+      ✓ should mint for amount=1
+[FEE] 297490239258157 143420 1600380523
+      ✓ should mint for amount=1
+[FEE] 287704602337120 140323 1581897001
+      ✓ should mint for amount=1
+[FEE] 278257824859924 137421 1562264398
+      ✓ should mint for amount=1
+[FEE] 269181243713696 134700 1541833417
+      ✓ should mint for amount=1
+[FEE] 260499748403408 132150 1520899073
+      ✓ should mint for amount=1
+[FEE] 252220672279258 129758 1499708284
+      ✓ should mint for amount=1
+[FEE] 244353917712478 127517 1478466451
+      ✓ should mint for amount=1
+[FEE] 236892372099576 125415 1457343233
+      ✓ should mint for amount=1
+[FEE] 229832840905561 123445 1436477526
+      ✓ should mint for amount=1
+[FEE] 223163859669521 121598 1415981850
+      ✓ should mint for amount=1
+[FEE] 216874273606842 119867 1395946120
+      ✓ should mint for amount=1
+[FEE] 210948501294042 118244 1376440954
+      ✓ should mint for amount=1
+[FEE] 205369124228959 116721 1357520529
+      ✓ should mint for amount=1
+[FEE] 200124389791285 115294 1339225063
+      ✓ should mint for amount=1
+[FEE] 195197921582477 113957 1321582977
+      ✓ should mint for amount=1
+[FEE] 190571011733095 112703 1304612747
+      ✓ should mint for amount=1
+[FEE] 186229694257275 111528 1288324514
+      ✓ should mint for amount=1
+[FEE] 182156410453301 110426 1272721478
+      ✓ should mint for amount=1
+[FEE] 178336913336002 109393 1257801092
+      ✓ should mint for amount=1
+[FEE] 174755378459078 108424 1243556094
+      ✓ should mint for amount=1
+[FEE] 171399387818161 107516 1229975391
+      ✓ should mint for amount=1
+[FEE] 168253529446006 106664 1217044818
+      ✓ should mint for amount=1
+[FEE] 165307434487079 105866 1204747784
+      ✓ should mint for amount=1
+[FEE] 162547854380063 105118 1193065827
+      ✓ should mint for amount=1
+[FEE] 159961912258097 104416 1181979079
+      ✓ should mint for amount=1
+[FEE] 157541675154271 103759 1171466668
+      ✓ should mint for amount=1
+[FEE] 155273428955218 103142 1161507049
+      ✓ should mint for amount=1
+[FEE] 153149889148141 102564 1152078286
+      ✓ should mint for amount=1
+[FEE] 151159585302314 102021 1143158290
+      ✓ should mint for amount=1
+[FEE] 149297327757390 101513 1134725008
+      ✓ should mint for amount=1
+[FEE] 147553764420680 101037 1126756587
+      ✓ should mint for amount=1
+[FEE] 145919885365753 100590 1119231504
+      ✓ should mint for amount=1
+[FEE] 144391333187761 100172 1112128668
+      ✓ should mint for amount=1
+[FEE] 142959661745840 99780 1105427506
+      ✓ should mint for amount=1
+[FEE] 141618156495558 99412 1099108028
+      ✓ should mint for amount=1
+[FEE] 140361778719814 99067 1093150873
+      ✓ should mint for amount=1
+[FEE] 139185707401375 98744 1087537346
+      ✓ should mint for amount=1
+[FEE] 138083928184980 98441 1082249443
+      ✓ should mint for amount=1
+[FEE] 137052049130616 98157 1077269865
+      ✓ should mint for amount=1
+[FEE] 136085867174312 97891 1072582025
+      ✓ should mint for amount=1
+[FEE] 135179974361486 97641 1068170047
+      ✓ should mint for amount=1
+[FEE] 134331913097033 97407 1064018763
+      ✓ should mint for amount=1
+[FEE] 133536616891648 97187 1060113701
+      ✓ should mint for amount=1
+[FEE] 132791929552203 96981 1056441074
+      ✓ should mint for amount=1
+[FEE] 132093089527675 96787 1052987762
+      ✓ should mint for amount=1
+[FEE] 131439569454707 96606 1049741295
+      ✓ should mint for amount=1
+[FEE] 130828223238141 96437 1046689834
+      ✓ should mint for amount=1
+[FEE] 130254672797631 96278 1043822146
+      ✓ should mint for amount=1
+[FEE] 129717366718365 96129 1041127586
+      ✓ should mint for amount=1
+[FEE] 129214845592525 95990 1038596072
+      ✓ should mint for amount=1
+[FEE] 128743051219167 95859 1036218062
+      ✓ should mint for amount=1
+[FEE] 128300711828643 95736 1033984533
+      ✓ should mint for amount=1
+[FEE] 127886631928517 95621 1031886957
+      ✓ should mint for amount=1
+[FEE] 127497018418279 95512 1029917278
+      ✓ should mint for amount=1
+[FEE] 127132162940810 95410 1028067889
+      ✓ should mint for amount=1
+[FEE] 126789750585876 95314 1026331613
+      ✓ should mint for amount=1
+[FEE] 126470191188834 95225 1024701680
+      ✓ should mint for amount=1
+[FEE] 126171290204042 95142 1023171706
+      ✓ should mint for amount=1
+[FEE] 125890914269495 95064 1021735676
+      ✓ should mint for amount=1
+[FEE] 125628309017432 94991 1020387921
+      ✓ should mint for amount=1
+[FEE] 125382766454422 94923 1019123103
+      ✓ should mint for amount=1
+[FEE] 125150983298175 94858 1017936195
+      ✓ should mint for amount=1
+[FEE] 124934980550770 94798 1016822466
+      ✓ should mint for amount=1
+[FEE] 124732856242965 94742 1015777464
+      ✓ should mint for amount=1
+[FEE] 124541434361779 94688 1014796999
+      ✓ should mint for amount=1
+[FEE] 124361524794163 94637 1013877133
+      ✓ should mint for amount=1
+[FEE] 124195276390655 94591 1013014160
+      ✓ should mint for amount=1
+[FEE] 124039611401124 94548 1012204596
+      ✓ should mint for amount=1
+[FEE] 123892799475052 94507 1011445167
+      ✓ should mint for amount=1
+[FEE] 123755759979714 94469 1010732796
+      ✓ should mint for amount=1
+[FEE] 123626814533849 94433 1010064591
+      ✓ should mint for amount=1
+[FEE] 123506927667480 94400 1009437835
+      ✓ should mint for amount=1
+[FEE] 123394466911008 94369 1008849975
+      ✓ should mint for amount=1
+[FEE] 123289129912644 94340 1008298614
+      ✓ should mint for amount=1
+[FEE] 123189326674255 94312 1007781499
+      ✓ should mint for amount=1
+[FEE] 123096098802183 94286 1007296517
+      ✓ should mint for amount=1
+[FEE] 123007891546776 94261 1006841681
+      ✓ should mint for amount=1
+[FEE] 122924472660523 94237 1006415128
+      ✓ should mint for amount=1
+[FEE] 122846927928830 94215 1006015107
+      ✓ should mint for amount=1
+[FEE] 122775051383164 94195 1005639975
+      ✓ should mint for amount=1
+[FEE] 122707347113688 94176 1005288191
+      ✓ should mint for amount=1
+[FEE] 122643635315861 94158 1004958307
+      ✓ should mint for amount=1
+[FEE] 122583747475818 94141 1004648965
+      ✓ should mint for amount=1
+[FEE] 122528827241553 94126 1004358890
+      ✓ should mint for amount=1
+[FEE] 122476122543768 94111 1004086886
+      ✓ should mint for amount=1
+[FEE] 122428097509719 94098 1003831830
+      ✓ should mint for amount=1
+[FEE] 122380718731044 94084 1003592670
+      ✓ should mint for amount=1
+[FEE] 122336466629332 94071 1003368417
+      ✓ should mint for amount=1
+[FEE] 122296526887209 94060 1003158145
+      ✓ should mint for amount=1
+[FEE] 122259491277186 94050 1002960984
+      ✓ should mint for amount=1
+[FEE] 122223959483206 94040 1002776119
+      ✓ should mint for amount=1
+[FEE] 122191137149893 94031 1002602784
+      ✓ should mint for amount=1
+[FEE] 122159636557087 94022 1002440262
+      ✓ should mint for amount=1
+[FEE] 122130674268102 94014 1002287879
+      ✓ should mint for amount=1
+[FEE] 122102873608385 94006 1002145004
+      ✓ should mint for amount=1
+[FEE] 122077460746507 93999 1002011044
+      ✓ should mint for amount=1
+[FEE] 122053068758832 93992 1001885444
+      ✓ should mint for amount=1
+[FEE] 122030932347346 93986 1001767683
+      ✓ should mint for amount=1
+[FEE] 122009693176744 93980 1001657273
+      ✓ should mint for amount=1
+[FEE] 121990593286817 93975 1001553755
+      ✓ should mint for amount=1
+[FEE] 121972281776997 93970 1001456699
+      ✓ should mint for amount=1
+[FEE] 121953411688945 93964 1001365703
+      ✓ should mint for amount=1
+[FEE] 121936532607638 93959 1001280388
+      ✓ should mint for amount=1
+[FEE] 121921600982398 93955 1001200400
+      ✓ should mint for amount=1
+[FEE] 121907278428875 93951 1001125407
+      ✓ should mint for amount=1
+[FEE] 121894824349885 93948 1001055097
+      ✓ should mint for amount=1
+[FEE] 121881608090872 93944 1000989178
+      ✓ should mint for amount=1
+[FEE] 121870191090393 93941 1000927376
+      ✓ should mint for amount=1
+[FEE] 121859244538603 93938 1000869434
+      ✓ should mint for amount=1
+[FEE] 121848739048845 93935 1000815111
+      ✓ should mint for amount=1
+[FEE] 121838647064396 93932 1000764181
+      ✓ should mint for amount=1
+[FEE] 121830239890429 93930 1000716433
+      ✓ should mint for amount=1
+[FEE] 121822195993962 93928 1000671667
+      ✓ should mint for amount=1
+[FEE] 121814492830304 93926 1000629698
+      ✓ should mint for amount=1
+[FEE] 121805812205195 93923 1000590351
+      ✓ should mint for amount=1
+[FEE] 121798727919585 93921 1000553462
+      ✓ should mint for amount=1
+[FEE] 121790627512087 93918 1000518877
+      ✓ should mint for amount=1
+[FEE] 121782790418195 93915 1000486453
+      ✓ should mint for amount=1
+[FEE] 121777793570103 93914 1000456055
+      ✓ should mint for amount=1
+[FEE] 121773027948960 93913 1000427556
+      ✓ should mint for amount=1
+[FEE] 121768479184458 93912 1000400838
+      ✓ should mint for amount=1
+[FEE] 121764133637214 93911 1000375789
+      ✓ should mint for amount=1
+[FEE] 121759978642159 93910 1000352305
+      ✓ should mint for amount=1
+[FEE] 121756002386775 93909 1000330289
+      ✓ should mint for amount=1
+[FEE] 121752193545905 93908 1000309648
+      ✓ should mint for amount=1
+[FEE] 121748541768580 93907 1000290297
+      ✓ should mint for amount=1
+[FEE] 121745037191120 93906 1000272155
+      ✓ should mint for amount=1
+[FEE] 121741670680526 93905 1000255147
+      ✓ should mint for amount=1
+[FEE] 121738433591029 93904 1000239202
+      ✓ should mint for amount=1
+[FEE] 121735317764057 93903 1000224253
+      ✓ should mint for amount=1
+[FEE] 121733612026095 93903 1000210238
+      ✓ should mint for amount=1
+[FEE] 121732012904363 93903 1000197099
+      ✓ should mint for amount=1
+[FEE] 121730513704918 93903 1000184781
+      ✓ should mint for amount=1
+[FEE] 121729108220653 93903 1000173233
+      ✓ should mint for amount=1
+[FEE] 121726494173693 93902 1000162406
+      ✓ should mint for amount=1
+[FEE] 121725258850401 93902 1000152256
+      ✓ should mint for amount=1
+[FEE] 121724100689174 93902 1000142740
+      ✓ should mint for amount=1
+[FEE] 121721718666323 93901 1000133819
+      ✓ should mint for amount=1
+[FEE] 121720700843794 93901 1000125456
+      ✓ should mint for amount=1
+[FEE] 121719746551500 93901 1000117615
+      ✓ should mint for amount=1
+[FEE] 121718851894868 93901 1000110264
+      ✓ should mint for amount=1
+[FEE] 121718013222735 93901 1000103373
+      ✓ should mint for amount=1
+[FEE] 121717226883938 93901 1000096912
+      ✓ should mint for amount=1
+[FEE] 121716489714135 93901 1000090855
+      ✓ should mint for amount=1
+[FEE] 121715798670691 93901 1000085177
+      ✓ should mint for amount=1
+[FEE] 121715150710971 93901 1000079853
+      ✓ should mint for amount=1
+[FEE] 121714543279159 93901 1000074862
+      ✓ should mint for amount=1
+[FEE] 121712677624792 93900 1000070183
+      ✓ should mint for amount=1
+[FEE] 121712143830451 93900 1000065797
+      ✓ should mint for amount=1
+[FEE] 121711643383043 93900 1000061685
+      ✓ should mint for amount=1
+[FEE] 121709878034960 93899 1000057830
+      ✓ should mint for amount=1
+[FEE] 121708142026941 93898 1000054216
+      ✓ should mint for amount=1
+[FEE] 121707729702110 93898 1000050828
+      ✓ should mint for amount=1
+[FEE] 121707343056306 93898 1000047651
+      ✓ should mint for amount=1
+[FEE] 121705684467522 93897 1000044673
+      ✓ should mint for amount=1
+[FEE] 121704048522462 93896 1000041881
+      ✓ should mint for amount=1
+[FEE] 121703729914607 93896 1000039263
+      ✓ should mint for amount=1
+[FEE] 121703431265380 93896 1000036809
+      ✓ should mint for amount=1
+[FEE] 121703151236092 93896 1000034508
+      ✓ should mint for amount=1
+[FEE] 121702888731453 93896 1000032351
+      ✓ should mint for amount=1
+[FEE] 121702642656173 93896 1000030329
+      ✓ should mint for amount=1
+[FEE] 121702411914961 93896 1000028433
+      ✓ should mint for amount=1
+[FEE] 121700899517689 93895 1000026656
+      ✓ should mint for amount=1
+[FEE] 121700696769395 93895 1000024990
+      ✓ should mint for amount=1
+[FEE] 121700506677657 93895 1000023428
+      ✓ should mint for amount=1
+[FEE] 121700328512289 93895 1000021964
+      ✓ should mint for amount=1
+[FEE] 121700161421408 93895 1000020591
+      ✓ should mint for amount=1
+[FEE] 121700004796526 93895 1000019304
+      ✓ should mint for amount=1
+[FEE] 121698561902011 93894 1000018098
+      ✓ should mint for amount=1
+[FEE] 121698424263428 93894 1000016967
+      ✓ should mint for amount=1
+[FEE] 121698295265287 93894 1000015907
+      ✓ should mint for amount=1
+[FEE] 121698174299106 93894 1000014913
+      ✓ should mint for amount=1
+[FEE] 121698060878099 93894 1000013981
+      ✓ should mint for amount=1
+[FEE] 121697954515481 93894 1000013107
+      ✓ should mint for amount=1
+[FEE] 121696558726550 93893 1000012288
+      ✓ should mint for amount=1
+[FEE] 121696465264742 93893 1000011520
+      ✓ should mint for amount=1
+[FEE] 121696377644296 93893 1000010800
+      ✓ should mint for amount=1
+[FEE] 121696295500128 93893 1000010125
+      ✓ should mint for amount=1
+[FEE] 121694922351165 93892 1000009492
+      ✓ should mint for amount=1
+[FEE] 121694850186761 93892 1000008899
+      ✓ should mint for amount=1
+[FEE] 121693486410528 93891 1000008343
+      ✓ should mint for amount=1
+[FEE] 121693423008750 93891 1000007822
+      ✓ should mint for amount=1
+[FEE] 121693363501132 93891 1000007333
+      ✓ should mint for amount=1
+[FEE] 121693307765980 93891 1000006875
+      ✓ should mint for amount=1
+[FEE] 121693255438218 93891 1000006445
+      ✓ should mint for amount=1
+[FEE] 121693206396152 93891 1000006042
+      ✓ should mint for amount=1
+[FEE] 121693160396398 93891 1000005664
+      ✓ should mint for amount=1
+[FEE] 121693117317263 93891 1000005310
+      ✓ should mint for amount=1
+[FEE] 121693076915362 93891 1000004978
+      ✓ should mint for amount=1
+[FEE] 121693039069004 93891 1000004667
+      ✓ should mint for amount=1
+[FEE] 121693003534802 93891 1000004375
+      ✓ should mint for amount=1
+[FEE] 121692970312758 93891 1000004102
+      ✓ should mint for amount=1
+[FEE] 121691643050815 93890 1000003846
+      ✓ should mint for amount=1
+[FEE] 121690317736574 93889 1000003606
+      ✓ should mint for amount=1
+[FEE] 121688994248283 93888 1000003381
+      ✓ should mint for amount=1
+[FEE] 121687672464198 93887 1000003170
+      ✓ should mint for amount=1
+[FEE] 121688944477653 93888 1000002972
+      ✓ should mint for amount=1
+[FEE] 121687625736280 93887 1000002786
+      ✓ should mint for amount=1
+[FEE] 121687604562692 93887 1000002612
+      ✓ should mint for amount=1
+[FEE] 121687584727665 93887 1000002449
+      ✓ should mint for amount=1
+[FEE] 121687566109510 93887 1000002296
+      ✓ should mint for amount=1
+[FEE] 121688844814704 93888 1000002153
+      ✓ should mint for amount=1
+[FEE] 121687532280444 93887 1000002018
+      ✓ should mint for amount=1
+[FEE] 121687516947846 93887 1000001892
+      ✓ should mint for amount=1
+[FEE] 121688798694731 93888 1000001774
+      ✓ should mint for amount=1
+[FEE] 121688785187298 93888 1000001663
+      ✓ should mint for amount=1
+[FEE] 121688772531685 93888 1000001559
+      ✓ should mint for amount=1
+[FEE] 121687464622313 93887 1000001462
+      ✓ should mint for amount=1
+[FEE] 121688749654232 93888 1000001371
+      ✓ should mint for amount=1
+[FEE] 121690035294365 93889 1000001285
+      ✓ should mint for amount=1
+[FEE] 121688729453927 93888 1000001205
+      ✓ should mint for amount=1
+[FEE] 121688720327283 93888 1000001130
+      ✓ should mint for amount=1
+[FEE] 121688711687394 93888 1000001059
+      ✓ should mint for amount=1
+[FEE] 121689999760920 93889 1000000993
+      ✓ should mint for amount=1
+[FEE] 121691288321040 93890 1000000931
+      ✓ should mint for amount=1
+[FEE] 121691281262952 93890 1000000873
+      ✓ should mint for amount=1
+[FEE] 121689978465191 93889 1000000818
+      ✓ should mint for amount=1
+[FEE] 121688676154328 93888 1000000767
+      ✓ should mint for amount=1
+[FEE] 121689966417893 93889 1000000719
+      ✓ should mint for amount=1
+[FEE] 121688664837290 93888 1000000674
+      ✓ should mint for amount=1
+[FEE] 121689955830874 93889 1000000632
+      ✓ should mint for amount=1
+[FEE] 121691247189423 93890 1000000593
+      ✓ should mint for amount=1
+[FEE] 121691242686849 93890 1000000556
+      ✓ should mint for amount=1
+[FEE] 121691238427658 93890 1000000521
+      ✓ should mint for amount=1
+[FEE] 121691234411849 93890 1000000488
+      ✓ should mint for amount=1
+[FEE] 121689934656835 93889 1000000458
+      ✓ should mint for amount=1
+[FEE] 121691227232070 93890 1000000429
+      ✓ should mint for amount=1
+[FEE] 121691223946408 93890 1000000402
+      ✓ should mint for amount=1
+[FEE] 121689924799955 93889 1000000377
+      ✓ should mint for amount=1
+[FEE] 121691217983541 93890 1000000353
+      ✓ should mint for amount=1
+[FEE] 121691215306335 93890 1000000331
+      ✓ should mint for amount=1
+[FEE] 121691212750820 93890 1000000310
+      ✓ should mint for amount=1
+[FEE] 121689914334625 93889 1000000291
+      ✓ should mint for amount=1
+[FEE] 121691208248247 93890 1000000273
+      ✓ should mint for amount=1
+[FEE] 121691206179497 93890 1000000256
+      ✓ should mint for amount=1
+[FEE] 121691204232438 93890 1000000240
+      ✓ should mint for amount=1
+[FEE] 121691202407070 93890 1000000225
+      ✓ should mint for amount=1
+[FEE] 121691200703394 93890 1000000211
+      ✓ should mint for amount=1
+[FEE] 121691199121408 93890 1000000198
+      ✓ should mint for amount=1
+[FEE] 121689901557188 93889 1000000186
+      ✓ should mint for amount=1
+[FEE] 121689900096909 93889 1000000174
+      ✓ should mint for amount=1
+[FEE] 121691194862217 93890 1000000163
+      ✓ should mint for amount=1
+[FEE] 121691193645306 93890 1000000153
+      ✓ should mint for amount=1
+[FEE] 121691192428394 93890 1000000143
+      ✓ should mint for amount=1
+[FEE] 121691191333173 93890 1000000134
+      ✓ should mint for amount=1
+[FEE] 121689894255795 93889 1000000126
+      ✓ should mint for amount=1
+[FEE] 121688597178438 93888 1000000118
+      ✓ should mint for amount=1
+[FEE] 121687300222788 93887 1000000111
+      ✓ should mint for amount=1
+[FEE] 121687299370977 93887 1000000104
+      ✓ should mint for amount=1
+[FEE] 121688594744666 93888 1000000098
+      ✓ should mint for amount=1
+[FEE] 121688594014534 93888 1000000092
+      ✓ should mint for amount=1
+[FEE] 121689889388200 93889 1000000086
+      ✓ should mint for amount=1
+[FEE] 121689888779750 93889 1000000081
+      ✓ should mint for amount=1
+[FEE] 121689888171301 93889 1000000076
+      ✓ should mint for amount=1
+[FEE] 121691183666629 93890 1000000071
+      ✓ should mint for amount=1
+[FEE] 121691183179864 93890 1000000067
+      ✓ should mint for amount=1
+[FEE] 121691182693100 93890 1000000063
+      ✓ should mint for amount=1
+[FEE] 121691182206335 93890 1000000059
+      ✓ should mint for amount=1
+[FEE] 121691181719570 93890 1000000055
+      ✓ should mint for amount=1
+[FEE] 121691181354497 93890 1000000052
+      ✓ should mint for amount=1
+[FEE] 121691180989423 93890 1000000049
+      ✓ should mint for amount=1
+[FEE] 121691180624350 93890 1000000046
+      ✓ should mint for amount=1
+[FEE] 121691180259276 93890 1000000043
+      ✓ should mint for amount=1
+[FEE] 121691179894203 93890 1000000040
+      ✓ should mint for amount=1
+[FEE] 121691179650820 93890 1000000038
+      ✓ should mint for amount=1
+[FEE] 121689883303706 93889 1000000036
+      ✓ should mint for amount=1
+[FEE] 121689883060326 93889 1000000034
+      ✓ should mint for amount=1
+[FEE] 121688586713220 93888 1000000032
+      ✓ should mint for amount=1
+[FEE] 121689882573567 93889 1000000030
+      ✓ should mint for amount=1
+[FEE] 121689882330187 93889 1000000028
+      ✓ should mint for amount=1
+[FEE] 121691178190526 93890 1000000026
+      ✓ should mint for amount=1
+[FEE] 121691177947144 93890 1000000024
+      ✓ should mint for amount=1
+[FEE] 121689881721738 93889 1000000023
+      ✓ should mint for amount=1
+[FEE] 121688585496334 93888 1000000022
+      ✓ should mint for amount=1
+[FEE] 121687289270932 93887 1000000021
+      ✓ should mint for amount=1
+[FEE] 121688585252957 93888 1000000020
+      ✓ should mint for amount=1
+[FEE] 121689881234978 93889 1000000019
+      ✓ should mint for amount=1
+[FEE] 121691177216997 93890 1000000018
+      ✓ should mint for amount=1
+[FEE] 121691177095306 93890 1000000017
+      ✓ should mint for amount=1
+[FEE] 121691176973615 93890 1000000016
+      ✓ should mint for amount=1
+[FEE] 121691176851923 93890 1000000015
+      ✓ should mint for amount=1
+[FEE] 121691176730232 93890 1000000014
+      ✓ should mint for amount=1
+[FEE] 121691176608541 93890 1000000013
+      ✓ should mint for amount=1
+[FEE] 121691176486850 93890 1000000012
+      ✓ should mint for amount=1
+[FEE] 121691176365159 93890 1000000011
+      ✓ should mint for amount=1
+[FEE] 121691176243468 93890 1000000010
+      ✓ should mint for amount=1
+[FEE] 121691176121776 93890 1000000009
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121688583792694 93888 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121688583792694 93888 1000000008
+      ✓ should mint for amount=1
+[FEE] 121689879896389 93889 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+[FEE] 121691176000085 93890 1000000008
+      ✓ should mint for amount=1
+
+·----------------------------------------|---------------------------|-------------|----------------------------·
+|          [90mSolc version: 0.8.17[39m          ·  [90mOptimizer enabled: true[39m  ·  [90mRuns: 200[39m  ·  [90mBlock limit: 8000000 gas[39m  │
+·········································|···························|·············|·····························
+|  [32m[1mMethods[22m[39m                                                                                                      │
+···················|·····················|·············|·············|·············|··············|··············
+|  [1mContract[22m        ·  [1mMethod[22m             ·  [32mMin[39m        ·  [32mMax[39m        ·  [32mAvg[39m        ·  [1m# calls[22m     ·  [1musd (avg)[22m  │
+···················|·····················|·············|·············|·············|··············|··············
+|  [90mXPowerThorTest[39m  ·  init               ·          -  ·          -  ·      67353  ·           [90m1[39m  ·          [32m[90m-[32m[39m  │
+···················|·····················|·············|·············|·············|··············|··············
+|  [90mXPowerThorTest[39m  ·  mint               ·     [36m121685[39m  ·     [31m229512[39m  ·     126082  ·         [90m347[39m  ·          [32m[90m-[32m[39m  │
+···················|·····················|·············|·············|·············|··············|··············
+|  [90mXPowerThorTest[39m  ·  transferOwnership  ·          -  ·          -  ·      28656  ·           [90m1[39m  ·          [32m[90m-[32m[39m  │
+···················|·····················|·············|·············|·············|··············|··············
+|  [32m[1mDeployments[22m[39m                           ·                                         ·  [1m% of limit[22m  ·             │
+·········································|·············|·············|·············|··············|··············
+|  XPowerThorTest                        ·          -  ·          -  ·    3331941  ·      [90m41.6 %[39m  ·          [32m[90m-[32m[39m  │
+·----------------------------------------|-------------|-------------|-------------|--------------|-------------·
+
+  347 passing (22s)
+
