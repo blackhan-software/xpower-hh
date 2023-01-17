@@ -164,14 +164,14 @@ async function loop(
   [minter, beneficiary],
   { block_hash, timestamp, level, cache, mint, refresh, json }
 ) {
-  let at_interval = Miner.interval();
   let nonce = large_random();
   const { start, now } = { start: nonce, now: performance.now() };
+  const { address } = await Token.contract(symbol, minter);
   const mine = await new Miner().init(level);
   const token = new Token(symbol);
   const threshold = token.threshold(level);
   while (true) {
-    const hash = mine(symbol, beneficiary, at_interval, block_hash, nonce);
+    const hash = mine(address, beneficiary, block_hash, nonce);
     const amount = token.amount_of(hash);
     if (amount >= threshold) {
       const hms = Number(nonce - start) / (performance.now() - now);
@@ -198,32 +198,17 @@ async function loop(
             json,
           });
         } catch (ex) {
-          if (ex.message?.match(/replacement fee too low/)) {
+          const result = ex.message?.match(/nonce has already been used/)
+            ? "NAU"
+            : ex.message?.match(/replacement fee too low/)
+            ? "FIL"
+            : ex.message?.match(/cannot estimate gas/)
+            ? "CEG"
+            : null;
+          if (result) {
             err_mint({
               worker: worker_id(),
-              result: "FIL",
-              block_hash,
-              nonce,
-              amount,
-              symbol,
-              hms,
-              json,
-            });
-          } else if (ex.message?.match(/cannot estimate gas/)) {
-            err_mint({
-              worker: worker_id(),
-              result: "CEG",
-              block_hash,
-              nonce,
-              amount,
-              symbol,
-              hms,
-              json,
-            });
-          } else if (ex.message?.match(/nonce has already been used/)) {
-            err_mint({
-              worker: worker_id(),
-              result: "NAU",
+              result,
               block_hash,
               nonce,
               amount,
@@ -254,7 +239,6 @@ async function loop(
           json,
         });
       }
-      at_interval = Miner.interval();
     }
     nonce++;
   }

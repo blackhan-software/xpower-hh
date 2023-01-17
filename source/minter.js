@@ -10,13 +10,15 @@ async function do_init(
   const xpower = await Token.contract(symbol, minter);
   const [signer] = await hre.ethers.getSigners();
   const gas_price = await signer.getGasPrice();
+  const gas_fee = gas_price.mul((gas_multiplier ?? 1) * 1000).div(1000);
+  const gas_fee_priority = parseUnits("2.00", "gwei"); // nAVAX
   return new Promise((resolve, reject) => {
     const tid = setTimeout(() => {
       reject(new Error("[INIT] block-hash timeout"));
     }, timeout_ms);
     const caching = xpower.init({
-      maxFeePerGas: gas_price.mul(gas_multiplier * 1000).div(1000),
-      maxPriorityFeePerGas: parseUnits("2.0", "gwei"), // nAVAX
+      maxFeePerGas: Math.max(gas_fee_priority, gas_fee),
+      maxPriorityFeePerGas: gas_fee_priority,
     });
     xpower.on("Init", async function listener(block_hash, timestamp, ev) {
       try {
@@ -41,6 +43,8 @@ async function do_mint(
   const xpower = await Token.contract(symbol, minter);
   const [signer] = await hre.ethers.getSigners();
   const gas_price = await signer.getGasPrice();
+  const gas_fee = gas_price.mul((gas_multiplier ?? 1) * 1000).div(1000);
+  const gas_fee_priority = parseUnits("1.25", "gwei"); // nAVAX
   return new Promise((resolve, reject) => {
     const tid = setTimeout(() => {
       reject(new Error("[MINT] transaction timeout"));
@@ -50,8 +54,8 @@ async function do_mint(
       block_hash,
       "0x" + nonce.toString(16),
       {
-        maxFeePerGas: gas_price.mul(gas_multiplier * 1000).div(1000),
-        maxPriorityFeePerGas: parseUnits("1.5", "gwei"), // nAVAX
+        maxFeePerGas: Math.max(gas_fee_priority, gas_fee),
+        maxPriorityFeePerGas: gas_fee_priority,
       }
     );
     xpower.on("Transfer", async function listener(from, to, amount, ev) {
