@@ -60,7 +60,7 @@
     "prettier-fix": "prettier '**/*.{json,sol,md}' --write --print-width 120",
     "solhint": "solhint 'contracts/**/*.sol'",
     "solhint-fix": "solhint 'contracts/**/*.sol' --fix",
-    "test": "hardhat test",
+    "test": "NODE_OPTIONS='--max-old-space-size=4096' hardhat test",
     "test-gas": "REPORT_GAS=true npm test"
   },
   "version": "6.0.0"
