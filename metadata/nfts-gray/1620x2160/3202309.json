@@ -1,0 +1,15 @@
+{
+  "name": "GIGA ODIN",
+  "description": "Stakeable GIGA ODIN NFT",
+  "external_url": "https://www.xpowermine.com/nfts?token=ODIN",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmVxu9ewzsEYAaajxwuD4CDuf1ZM4PZEByi8w1hQssUCm6/1620x2160/2023/Odin/4-Odin_GIGA.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr", "value": "3%" },
+    { "trait_type": "apr-bonus", "value": "0‱" },
+    { "trait_type": "issue", "value": "2023" },
+    { "trait_type": "label", "value": "GIGA" },
+    { "trait_type": "level", "max_value": 24, "value": 9 },
+    { "trait_type": "staked", "value": "false" },
+    { "trait_type": "token", "value": "ODIN" }
+  ]
+}

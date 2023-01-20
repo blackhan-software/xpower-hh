@@ -1,0 +1,15 @@
+{
+  "name": "MEGA LOKI",
+  "description": "Stakeable MEGA LOKI NFT",
+  "external_url": "https://www.xpowermine.com/nfts?token=LOKI",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmVxu9ewzsEYAaajxwuD4CDuf1ZM4PZEByi8w1hQssUCm6/1620x2160/2021/Loki/3-Loki_MEGA.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr", "value": "2%" },
+    { "trait_type": "apr-bonus", "value": "2‱" },
+    { "trait_type": "issue", "value": "2021" },
+    { "trait_type": "label", "value": "MEGA" },
+    { "trait_type": "level", "max_value": 24, "value": 6 },
+    { "trait_type": "staked", "value": "false" },
+    { "trait_type": "token", "value": "LOKI" }
+  ]
+}

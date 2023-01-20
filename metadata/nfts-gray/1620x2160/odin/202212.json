@@ -1,0 +1,15 @@
+{
+  "name": "TERA ODIN",
+  "description": "Stakeable TERA ODIN NFT",
+  "external_url": "https://www.xpowermine.com/nfts?token=ODIN",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmVxu9ewzsEYAaajxwuD4CDuf1ZM4PZEByi8w1hQssUCm6/1620x2160/2022/Odin/5-Odin_TERA.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr", "value": "4%" },
+    { "trait_type": "apr-bonus", "value": "1‱" },
+    { "trait_type": "issue", "value": "2022" },
+    { "trait_type": "label", "value": "TERA" },
+    { "trait_type": "level", "max_value": 24, "value": 12 },
+    { "trait_type": "staked", "value": "false" },
+    { "trait_type": "token", "value": "ODIN" }
+  ]
+}

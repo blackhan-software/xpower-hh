@@ -1,0 +1,15 @@
+{
+  "name": "KILO ODIN",
+  "description": "Staked KILO ODIN NFT",
+  "external_url": "https://www.xpowermine.com/staking?token=ODIN",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmPTVP3wnaJsqAX7fFQjXW7gsexTh8hevar6g9EEJ29JKb/1620x2160/2021/Odin/2-Odin_KILO.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr", "value": "1%" },
+    { "trait_type": "apr-bonus", "value": "2‱" },
+    { "trait_type": "issue", "value": "2021" },
+    { "trait_type": "label", "value": "KILO" },
+    { "trait_type": "level", "max_value": 24, "value": 3 },
+    { "trait_type": "staked", "value": "true" },
+    { "trait_type": "token", "value": "ODIN" }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "GIGA HELA",
+  "description": "Staked GIGA HELA NFT",
+  "external_url": "https://www.xpowermine.com/staking?token=HELA",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmPTVP3wnaJsqAX7fFQjXW7gsexTh8hevar6g9EEJ29JKb/1620x2160/2022/Hela/4-Hela_GIGA.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr", "value": "3%" },
+    { "trait_type": "apr-bonus", "value": "1‱" },
+    { "trait_type": "issue", "value": "2022" },
+    { "trait_type": "label", "value": "GIGA" },
+    { "trait_type": "level", "max_value": 24, "value": 9 },
+    { "trait_type": "staked", "value": "true" },
+    { "trait_type": "token", "value": "HELA" }
+  ]
+}
