@@ -48,7 +48,7 @@ describe("XPower", async function () {
     await xpower.connect(signer_1).transferOwnership(addresses[0]);
   });
   describe("mint", async function () {
-    it("should *not* mint for amount=0", async function () {
+    it("should *not* mint for amount=0 (empty nonce-hash)", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
       expect(nonce.gte(0)).to.eq(true);
       const tx = await xpower
@@ -72,7 +72,7 @@ describe("XPower", async function () {
         UNIT / 2n
       );
     });
-    it("should mint for amount=1 once", async function () {
+    it("should mint for amount=1 once (duplicate nonce-hash)", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
       const tx_1st = await xpower.mint(addresses[0], block_hash, nonce);
@@ -94,22 +94,7 @@ describe("XPower", async function () {
         UNIT / 2n
       );
     });
-    it("should *not* mint for amount=1 & invalid block-hash", async function () {
-      const [nonce] = table.getNonce({ amount: 1 });
-      expect(nonce.gte(0)).to.eq(true);
-      const block_hash =
-        "0x0000000000000000000000000000000000000000000000000000000000000000";
-      expect(block_hash).to.exist;
-      const tx = await xpower
-        .mint(addresses[0], block_hash, nonce)
-        .catch((ex) => {
-          const m = ex.message.match(/invalid block-hash/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        });
-      expect(tx).to.eq(undefined);
-    });
-    it("should *not* mint for amount=1 & expired block-hash", async function () {
+    it("should *not* mint for amount=1 (expired block-hash)", async function () {
       const [nonce] = table.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
       const block_hash =
@@ -136,7 +121,7 @@ describe("XPower", async function () {
         (3n * UNIT) / 2n
       );
     });
-    it("should mint for amount=3 once", async function () {
+    it("should mint for amount=3 once (duplicate nonce-hash)", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 3 });
       expect(nonce.gte(0)).to.eq(true);
       const tx_1 = await xpower.mint(addresses[0], block_hash, nonce);
@@ -162,22 +147,7 @@ describe("XPower", async function () {
         (3n * UNIT) / 2n
       );
     });
-    it("should *not* mint for amount=3 & invalid block-hash", async function () {
-      const [nonce] = table.getNonce({ amount: 3 });
-      expect(nonce.gte(0)).to.eq(true);
-      const block_hash =
-        "0x0000000000000000000000000000000000000000000000000000000000000000";
-      expect(block_hash).to.exist;
-      const tx = await xpower
-        .mint(addresses[0], block_hash, nonce)
-        .catch((ex) => {
-          const m = ex.message.match(/invalid block-hash/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        });
-      expect(tx).to.eq(undefined);
-    });
-    it("should *not* mint for amount=3 & expired block-hash", async function () {
+    it("should *not* mint for amount=3 (expired block-hash)", async function () {
       const [nonce] = table.getNonce({ amount: 3 });
       expect(nonce.gte(0)).to.eq(true);
       const block_hash =
@@ -194,7 +164,7 @@ describe("XPower", async function () {
     });
   });
   describe("mint & burn", async function () {
-    it("should *not* mint for amount=0 & *not* burn 1 token", async function () {
+    it("should *not* mint for amount=0 (empty nonce-hash) & *not* burn 1 token (burn amount exceeds balance)", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
       expect(nonce.gte(0)).to.eq(true);
       const tx_mint = await xpower
@@ -216,7 +186,7 @@ describe("XPower", async function () {
       expect((await xpower.balanceOf(addresses[0])).toBigInt()).to.eq(0n);
       expect((await xpower.balanceOf(addresses[1])).toBigInt()).to.eq(0n);
     });
-    it("should *not* mint for amount=0 & *not* burn 2 tokens", async function () {
+    it("should *not* mint for amount=0 (empty nonce-hash) & *not* burn 2 tokens (burn amount exceeds balance)", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
       expect(nonce.gte(0)).to.eq(true);
       const tx_mint = await xpower
