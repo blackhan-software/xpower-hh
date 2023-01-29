@@ -4,6 +4,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
@@ -15,7 +16,7 @@ import "../libs/Constants.sol";
 /**
  * Abstract base NFT class: publicly *not* minteable (nor burnable).
  */
-abstract contract NftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, NftMigratable, Ownable {
+abstract contract NftBase is ERC1155, ERC1155Burnable, ERC1155Supply, ERC2981, URIMalleable, NftMigratable, Ownable {
     /** contract name */
     string public name;
     /** contract symbol */
@@ -49,6 +50,7 @@ abstract contract NftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleab
     {
         name = nftName;
         symbol = nftSymbol;
+        _setDefaultRoyalty(msg.sender, 10);
     }
 
     /** @return nft-id composed of (year, level, prefix) */
@@ -115,7 +117,7 @@ abstract contract NftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleab
     /** @return true if this contract implements the interface defined by interfaceId */
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(ERC1155, URIMalleable, NftMigratable) returns (bool) {
+    ) public view virtual override(ERC1155, ERC2981, URIMalleable, NftMigratable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }
