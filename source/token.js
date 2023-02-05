@@ -52,18 +52,18 @@ const zeros = (hash) => {
 const contract = async (symbol) => {
   switch (symbol) {
     case "THOR": {
-      const address = process.env.THOR_MOE_V5a;
-      assert(address, "missing THOR_MOE_V5a");
+      const { address, env_name } = moe_latest(symbol);
+      assert(address, `missing ${env_name}`);
       return await hre.ethers.getContractAt("XPowerThor", address);
     }
     case "LOKI": {
-      const address = process.env.LOKI_MOE_V5a;
-      assert(address, "missing LOKI_MOE_V5a");
+      const { address, env_name } = moe_latest(symbol);
+      assert(address, `missing ${env_name}`);
       return await hre.ethers.getContractAt("XPowerLoki", address);
     }
     case "ODIN": {
-      const address = process.env.ODIN_MOE_V5a;
-      assert(address, "missing ODIN_MOE_V5a");
+      const { address, env_name } = moe_latest(symbol);
+      assert(address, `missing ${env_name}`);
       return await hre.ethers.getContractAt("XPowerOdin", address);
     }
     default:
@@ -94,4 +94,20 @@ const threshold_of = (symbol) => {
       throw new Error(`unknown ${symbol}`);
   }
 };
+function moe_latest(symbol) {
+  const names = Object.keys(process.env)
+    .filter((name) => name.startsWith(`${symbol}_MOE`))
+    .sort();
+  if (names.length) {
+    const name = names[names.length - 1];
+    return {
+      address: process.env[name],
+      env_name: name,
+    };
+  }
+  return {
+    address: undefined,
+    env_name: `${symbol}_MOE_V??`,
+  };
+}
 exports.Token = Token;
