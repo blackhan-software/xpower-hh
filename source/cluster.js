@@ -36,7 +36,7 @@ async function start(
       });
       initialized[symbol] = { block_hash, timestamp };
     }
-    for (const id in cluster.workers) {
+    for (const { id } of Object.values(cluster.workers)) {
       const symbol = symbols[(Number(id) - 1) % symbols.length];
       const { block_hash, timestamp } = initialized[symbol];
       const on_exit = exiter({ worker_id: id });
