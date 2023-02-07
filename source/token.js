@@ -1,20 +1,27 @@
+const { NonceManager } = require("./nonce-manager");
 const assert = require("assert");
 
 class Token {
   static async contract(symbol, address) {
-    const instance = await contract(symbol);
-    assert(instance, "missing contract instance");
     if (typeof address === "string") {
       const signers = await hre.ethers.getSigners();
-      assert(signers.length > 0, "missing signers");
-      const signer = signers.filter((s) =>
+      assert(signers.length, "missing signers");
+      const [signer] = signers.filter((s) =>
         s.address.match(new RegExp(address, "i"))
-      )[0];
+      );
       assert(signer, "missing signer for address");
-      const connect = instance.connect(signer);
-      assert(connect, "missing connection");
+      const manager = new NonceManager(signer);
+      assert(manager, "missing nonce-manager");
+      const instance = await contract(symbol);
+      assert(instance, "missing contract instance");
+      const connection = instance.connect(manager);
+      assert(connection, "missing connection");
+      return connection;
+    } else {
+      const instance = await contract(symbol);
+      assert(instance, "missing contract instance");
+      return instance;
     }
-    return instance;
   }
 
   static symbol(value) {
