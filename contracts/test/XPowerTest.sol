@@ -8,10 +8,6 @@ import "../XPower.sol";
 contract XPowerThorTest is XPowerThor {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerThor(_base, _deadlineIn) {}
 
-    function amountOf(uint256 _zeros) public view returns (uint256) {
-        return _amountOf(_zeros);
-    }
-
     function cache(bytes32 _blockHash) public {
         _timestamps[_blockHash] = block.timestamp;
     }
@@ -37,10 +33,6 @@ contract XPowerThorOldTest is XPowerThorTest {
 contract XPowerLokiTest is XPowerLoki {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerLoki(_base, _deadlineIn) {}
 
-    function amountOf(uint256 _zeros) public view returns (uint256) {
-        return _amountOf(_zeros);
-    }
-
     function cache(bytes32 _blockHash) public {
         _timestamps[_blockHash] = block.timestamp;
     }
@@ -65,10 +57,6 @@ contract XPowerLokiOldTest is XPowerLokiTest {
 /** Test class for XPowerOdin */
 contract XPowerOdinTest is XPowerOdin {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerOdin(_base, _deadlineIn) {}
-
-    function amountOf(uint256 _zeros) public view returns (uint256) {
-        return _amountOf(_zeros);
-    }
 
     function cache(bytes32 _blockHash) public {
         _timestamps[_blockHash] = block.timestamp;

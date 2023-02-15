@@ -11,8 +11,8 @@ import "./base/Migratable.sol";
 import "./base/FeeTracker.sol";
 
 import "./libs/Constants.sol";
+import "./libs/Integrator.sol";
 import "./libs/Polynomials.sol";
-import "./libs/Interpolator.sol";
 
 /**
  * Abstract base class for the XPower THOR, LOKI and ODIN proof-of-work tokens.
@@ -23,6 +23,7 @@ import "./libs/Interpolator.sol";
 abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSupervised, Ownable {
     using Integrator for Integrator.Item[];
     using Polynomials for Polynomial;
+
     /** set of nonce-hashes already minted for */
     mapping(bytes32 => bool) private _hashes;
     /** map from block-hashes to timestamps */
@@ -86,7 +87,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         _mint(to, amount);
     }
 
-    /** @return block-hash (for given interval) */
+    /** @return block-hash (for interval) */
     function blockHashOf(uint256 interval) public view returns (bytes32) {
         return _blockHashes[interval];
     }
@@ -106,7 +107,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         return keccak256(abi.encode(address(this), to, blockHash, nonce));
     }
 
-    /** @return leading-zeros (for given nonce-hash) */
+    /** @return leading-zeros (for nonce-hash) */
     function _zerosOf(bytes32 nonceHash) internal pure returns (uint8) {
         if (nonceHash > 0) {
             return uint8(63 - (Math.log2(uint256(nonceHash)) >> 2));
@@ -114,68 +115,68 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         return 64;
     }
 
-    /** @return amount (for given level) */
-    function _amountOf(uint256 level) internal view virtual returns (uint256);
+    /** @return amount (for level) */
+    function amountOf(uint256 level) public view virtual returns (uint256);
 
-    /** interpolation anchor of treasury-share: amount => value */
-    mapping(uint256 => uint256) private _shareSourceValue;
-    /** interpolation anchor of treasury-share: amount => timestamp */
-    mapping(uint256 => uint256) private _shareSourceStamp;
-    /** parametrization of treasury-share */
-    uint256[] private _share = [0, 0, 2, 1, 0, 0];
+    /** integrator of shares: [(stamp, value)] */
+    Integrator.Item[] public shares;
+    /** parametrization of share: coefficients */
+    uint256[] private _share;
 
-    /** @return interpolated share w/1-year lag (for amount) */
+    /** @return duration weighted mean of shares (for amount) */
     function shareOf(uint256 amount) public view returns (uint256) {
-        if (_shareSourceStamp[amount] == 0) {
+        if (shares.length == 0) {
             return shareTargetOf(amount);
         }
-        Integrator.Item memory last = _shareSource[amount].lastOf();
-        uint256 nextStamp = last.stamp + Constants.YEAR;
-        uint256 nextValue = shareTargetOf(amount);
-        uint256 currStamp = block.timestamp;
-        uint256 currValue = Interpolator.linear(last.stamp, last.value, nextStamp, nextValue, currStamp);
-        return _shareSource[amount].meanOf(currStamp, currValue);
+        uint256 stamp = block.timestamp;
+        uint256 value = shareTargetOf(amountOf(1));
+        uint256 share = shares.meanOf(stamp, value);
+        return (share * amount) / amountOf(1);
     }
 
-    /** @return treasury-share (for given amount) */
+    /** @return share (for amount) */
     function shareTargetOf(uint256 amount) public view returns (uint256) {
-        return shareTargetOf(amount, _share);
+        return shareTargetOf(amount, getShare());
     }
 
-    /** @return treasury-share (for given amount & parametrization) */
+    /** @return share (for amount & parametrization) */
     function shareTargetOf(uint256 amount, uint256[] memory array) private pure returns (uint256) {
         return Polynomial(array).evalClamped(amount);
     }
 
-    /** @return treasury-share parameters */
-    function getTreasuryShare() public view returns (uint256[] memory) {
-        return _share;
+    /** @return share parameters */
+    function getShare() public view returns (uint256[] memory) {
+        if (_share.length > 0) {
+            return _share;
+        }
+        uint256[] memory share = new uint256[](6);
+        share[3] = 1;
+        share[2] = 2;
+        return share;
     }
 
-    /** set treasury-share parameters */
-    function setTreasuryShare(uint256[] memory array) public onlyRole(TREASURY_SHARE_ROLE) {
+    /** set share parameters */
+    function setShare(uint256[] memory array) public onlyRole(SHARE_ROLE) {
         require(array.length == 6, "invalid array.length");
         // eliminate possibility of division-by-zero
         require(array[2] > 0, "invalid array[2] == 0");
         // eliminate possibility of all-zero values
         require(array[3] > 0, "invalid array[3] == 0");
-        for (uint256 zeros = 0; zeros <= 64; zeros++) {
-            uint256 amount = _amountOf(zeros);
-            // check share reparametrization of value
-            uint256 lastValue = shareTargetOf(amount);
-            uint256 nextValue = shareTargetOf(amount, array);
-            _checkShareValue(nextValue, lastValue);
-            _shareSourceValue[amount] = shareOf(amount);
-            // check share reparametrization of stamp
-            uint256 lastStamp = _shareSourceStamp[amount];
-            uint256 nextStamp = block.timestamp;
-            _checkShareStamp(nextStamp, lastStamp);
-            _shareSourceStamp[amount] = nextStamp;
-        }
+        // check share reparametrization of value
+        uint256 nextValue = shareTargetOf(amountOf(1), array);
+        uint256 currValue = shareTargetOf(amountOf(1));
+        _checkShareValue(nextValue, currValue);
+        // check share reparametrization of stamp
+        uint256 lastStamp = shares.lastOf().stamp;
+        uint256 currStamp = block.timestamp;
+        _checkShareStamp(currStamp, lastStamp);
+        // append (stamp, share-of) to integrator
+        shares.append(currStamp, currValue);
+        // all requirements true: use array
         _share = array;
     }
 
-    /** validate treasury-share change: 0.5 <= next / last <= 2.0 or next <= amountOf(1) */
+    /** validate share change: 0.5 <= next / last <= 2.0 or next <= amountOf(1) */
     function _checkShareValue(uint256 nextValue, uint256 lastValue) private view {
         if (nextValue < lastValue) {
             require(lastValue <= 2 * nextValue, "invalid change: too small");
@@ -184,11 +185,11 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
             require(nextValue <= 2 * lastValue, "invalid change: too large");
         }
         if (nextValue > lastValue && lastValue == 0) {
-            require(nextValue <= _amountOf(1), "invalid change: too large");
+            require(nextValue <= amountOf(1), "invalid change: too large");
         }
     }
 
-    /** validate treasury-share change: invocation frequency at most at once per month */
+    /** validate share change: invocation frequency at most at once per month */
     function _checkShareStamp(uint256 nextStamp, uint256 lastStamp) private pure {
         if (lastStamp > 0) {
             require(nextStamp - lastStamp > Constants.MONTH, "invalid change: too frequent");
@@ -215,8 +216,8 @@ contract XPowerThor is XPower {
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address[] memory moeBase, uint256 deadlineIn) XPower("THOR", moeBase, deadlineIn) {}
 
-    /** @return amount (for given level) */
-    function _amountOf(uint256 level) internal view override returns (uint256) {
+    /** @return amount (for level) */
+    function amountOf(uint256 level) public view override returns (uint256) {
         return level * 10 ** decimals();
     }
 
@@ -235,8 +236,8 @@ contract XPowerLoki is XPower {
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address[] memory moeBase, uint256 deadlineIn) XPower("LOKI", moeBase, deadlineIn) {}
 
-    /** @return amount (for given level) */
-    function _amountOf(uint256 level) internal view override returns (uint256) {
+    /** @return amount (for level) */
+    function amountOf(uint256 level) public view override returns (uint256) {
         return (2 ** level - 1) * 10 ** decimals();
     }
 
@@ -255,8 +256,8 @@ contract XPowerOdin is XPower {
     /** @param deadlineIn seconds to end-of-migration */
     constructor(address[] memory moeBase, uint256 deadlineIn) XPower("ODIN", moeBase, deadlineIn) {}
 
-    /** @return amount (for given level) */
-    function _amountOf(uint256 level) internal view override returns (uint256) {
+    /** @return amount (for level) */
+    function amountOf(uint256 level) public view override returns (uint256) {
         return (16 ** level - 1) * 10 ** decimals();
     }
 

@@ -16,12 +16,12 @@ abstract contract Supervised is AccessControlEnumerable {
 
 abstract contract XPowerSupervised is Supervised {
     /** role grants right to change treasury's share per mint */
-    bytes32 public constant TREASURY_SHARE_ROLE = keccak256("TREASURY_SHARE_ROLE");
-    bytes32 public constant TREASURY_SHARE_ADMIN_ROLE = keccak256("TREASURY_SHARE_ADMIN_ROLE");
+    bytes32 public constant SHARE_ROLE = keccak256("SHARE_ROLE");
+    bytes32 public constant SHARE_ADMIN_ROLE = keccak256("SHARE_ADMIN_ROLE");
 
     constructor() {
-        _setRoleAdmin(TREASURY_SHARE_ROLE, TREASURY_SHARE_ADMIN_ROLE);
-        _grantRole(TREASURY_SHARE_ADMIN_ROLE, msg.sender);
+        _setRoleAdmin(SHARE_ROLE, SHARE_ADMIN_ROLE);
+        _grantRole(SHARE_ADMIN_ROLE, msg.sender);
     }
 }
 

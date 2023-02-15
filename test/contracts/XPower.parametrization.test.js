@@ -28,61 +28,63 @@ describe("XPower", async function () {
     await xpower.deployed();
     await xpower.init();
   });
-  describe("parametrization of treasury-share", async function () {
+  describe("parametrization of share", async function () {
     it("should get array", async function () {
-      Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
+      const share = await xpower.getShare();
+      Expect(share).to.equal([0, 0, 2, 1, 0, 0]);
     });
     it("should set array", async function () {
-      await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
-      await xpower.setTreasuryShare([0, 0, 1, 1, 0, 0]);
-      Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 1, 1, 0, 0]);
+      await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
+      await xpower.setShare([0, 0, 1, 1, 0, 0]);
+      const share = await xpower.getShare();
+      Expect(share).to.equal([0, 0, 1, 1, 0, 0]);
     });
     it("should *not* set array (invalid array.length)", async function () {
-      await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
-      expect(
-        await xpower.setTreasuryShare([1, 3, 2]).catch((ex) => {
-          const m = ex.message.match(/invalid array.length/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        })
-      ).to.eq(undefined);
-      Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
+      await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
+      const tx = await xpower.setShare([1, 3, 2]).catch((ex) => {
+        const m = ex.message.match(/invalid array.length/);
+        if (m === null) console.debug(ex);
+        expect(m).to.be.not.null;
+      });
+      expect(tx).to.eq(undefined);
+      const share = await xpower.getShare();
+      Expect(share).to.equal([0, 0, 2, 1, 0, 0]);
     });
     it("should *not* set array (invalid array[2] == 0)", async function () {
-      await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
-      expect(
-        await xpower.setTreasuryShare([0, 0, 0, 0, 0, 0]).catch((ex) => {
-          const m = ex.message.match(/invalid array\[2\] == 0/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        })
-      ).to.eq(undefined);
-      Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
+      await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
+      const tx = await xpower.setShare([0, 0, 0, 0, 0, 0]).catch((ex) => {
+        const m = ex.message.match(/invalid array\[2\] == 0/);
+        if (m === null) console.debug(ex);
+        expect(m).to.be.not.null;
+      });
+      expect(tx).to.eq(undefined);
+      const share = await xpower.getShare();
+      Expect(share).to.equal([0, 0, 2, 1, 0, 0]);
     });
     it("should *not* set array (invalid array[3] == 0)", async function () {
-      await xpower.grantRole(xpower.TREASURY_SHARE_ROLE(), addresses[0]);
-      expect(
-        await xpower.setTreasuryShare([0, 0, 1, 0, 0, 0]).catch((ex) => {
-          const m = ex.message.match(/invalid array\[3\] == 0/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        })
-      ).to.eq(undefined);
-      Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
+      await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
+      const tx = await xpower.setShare([0, 0, 1, 0, 0, 0]).catch((ex) => {
+        const m = ex.message.match(/invalid array\[3\] == 0/);
+        if (m === null) console.debug(ex);
+        expect(m).to.be.not.null;
+      });
+      expect(tx).to.eq(undefined);
+      const share = await xpower.getShare();
+      Expect(share).to.equal([0, 0, 2, 1, 0, 0]);
     });
     it("should *not* set array (account is missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
-      expect(
-        await xpower
-          .connect(signer_1)
-          .setTreasuryShare([0, 0, 1, 1, 0, 0])
-          .catch((ex) => {
-            const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
-            if (m === null) console.debug(ex);
-            expect(m).to.be.not.null;
-          })
-      ).to.eq(undefined);
-      Expect(await xpower.getTreasuryShare()).to.equal([0, 0, 2, 1, 0, 0]);
+      const tx = await xpower
+        .connect(signer_1)
+        .setShare([0, 0, 1, 1, 0, 0])
+        .catch((ex) => {
+          const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        });
+      expect(tx).to.eq(undefined);
+      const share = await xpower.getShare();
+      Expect(share).to.equal([0, 0, 2, 1, 0, 0]);
     });
   });
 });

@@ -47,19 +47,19 @@ describe("XPower", async function () {
       await network.provider.send("evm_mine", []);
     });
   });
-  describe("set-share (monthly doubling for 24 months)", async function () {
-    for (let m = 1; m <= 24; m++) {
+  describe("set-share", async function () {
+    it(`should reparameterize at 100[%]`, async function () {
+      const tx = await xpower.setShare([0, 0, 2, 2, 0, 0]);
+      expect(tx).to.not.eq(undefined);
+    });
+    for (let m = 1; m <= 24 * 4; m++) {
       it("should print current & target values", async function () {
         const target = (await xpower.shareTargetOf(UNIT)).toString();
         const share = (await xpower.shareOf(UNIT)).toString();
         console.debug("[SHARE]", m, share, target);
       });
-      it(`should reparameterize at ${pct(m)}[%]`, async function () {
-        const tx = await xpower.setShare([0, 0, 2, 2 ** m, 0, 0]);
-        expect(tx).to.not.eq(undefined);
-      });
       it("should forward time by one month", async function () {
-        await network.provider.send("evm_increaseTime", [MONTH]);
+        await network.provider.send("evm_increaseTime", [MONTH / 4]);
         await network.provider.send("evm_mine", []);
       });
     }

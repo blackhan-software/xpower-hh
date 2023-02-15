@@ -38,13 +38,6 @@ describe("XPower", async function () {
       });
     }
   });
-  describe("set-share: **init** at 50[%]", async function () {
-    it("should reparameterize", async function () {
-      await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
-      const tx = await xpower.setShare([0, 0, 2, 1, 0, 0]);
-      expect(tx).to.not.eq(undefined);
-    });
-  });
   describe("set-share (double from 50[%] to 100[%])", async function () {
     it(`should forward time by one year`, async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS]);
@@ -110,15 +103,15 @@ describe("XPower", async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.25]);
       await network.provider.send("evm_mine", []);
     });
-    it(`should return 1.666:1 for zeros=0`, async function () {
+    it(`should return 1:1 for zeros=0`, async function () {
       expect(await xpower.shareOf(0)).to.eq(0);
     });
     for (let zeros = 1; zeros <= 64; zeros++) {
-      it(`should return 1.666:1 for zeros=${zeros}`, async function () {
+      it(`should return 1:1 for zeros=${zeros}`, async function () {
         const amount = await xpower.amountOf(zeros);
         const share = await xpower.shareOf(amount);
         const ratio = Number(`${amount}`) / Number(`${share}`);
-        expect(ratio).to.be.approximately(1.666, 0.01);
+        expect(ratio).to.be.approximately(1.0, 0.01);
       });
     }
   });
@@ -127,15 +120,15 @@ describe("XPower", async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.25]);
       await network.provider.send("evm_mine", []);
     });
-    it(`should return 1.500:1 for zeros=0`, async function () {
+    it(`should return 1:1 for zeros=0`, async function () {
       expect(await xpower.shareOf(0)).to.eq(0);
     });
     for (let zeros = 1; zeros <= 64; zeros++) {
-      it(`should return 1.500:1 for zeros=${zeros}`, async function () {
+      it(`should return 1:1 for zeros=${zeros}`, async function () {
         const amount = await xpower.amountOf(zeros);
         const share = await xpower.shareOf(amount);
         const ratio = Number(`${amount}`) / Number(`${share}`);
-        expect(ratio).to.be.approximately(1.5, 0.01);
+        expect(ratio).to.be.approximately(1.0, 0.01);
       });
     }
   });
@@ -144,15 +137,15 @@ describe("XPower", async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.25]);
       await network.provider.send("evm_mine", []);
     });
-    it(`should return 1.400:1 for zeros=0`, async function () {
+    it(`should return 1:1 for zeros=0`, async function () {
       expect(await xpower.shareOf(0)).to.eq(0);
     });
     for (let zeros = 1; zeros <= 64; zeros++) {
-      it(`should return 1.400:1 for zeros=${zeros}`, async function () {
+      it(`should return 1:1 for zeros=${zeros}`, async function () {
         const amount = await xpower.amountOf(zeros);
         const share = await xpower.shareOf(amount);
         const ratio = Number(`${amount}`) / Number(`${share}`);
-        expect(ratio).to.be.approximately(1.4, 0.01);
+        expect(ratio).to.be.approximately(1.0, 0.01);
       });
     }
   });
@@ -161,15 +154,15 @@ describe("XPower", async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.25]);
       await network.provider.send("evm_mine", []);
     });
-    it(`should return 1.333:1 for zeros=0`, async function () {
+    it(`should return 1:1 for zeros=0`, async function () {
       expect(await xpower.shareOf(0)).to.eq(0);
     });
     for (let zeros = 1; zeros <= 64; zeros++) {
-      it(`should return 1.333:1 for zeros=${zeros}`, async function () {
+      it(`should return 1:1 for zeros=${zeros}`, async function () {
         const amount = await xpower.amountOf(zeros);
         const share = await xpower.shareOf(amount);
         const ratio = Number(`${amount}`) / Number(`${share}`);
-        expect(ratio).to.be.approximately(1.333, 0.01);
+        expect(ratio).to.be.approximately(1.0, 0.01);
       });
     }
   });

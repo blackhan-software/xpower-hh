@@ -14,7 +14,7 @@ async function transferMoeRoles(factory_name, contract_name, { to: owner }) {
   const signer = await hre.ethers.getSigner();
   assert(signer?.address, "missing signer address");
   await transferRole(contract, {
-    role: contract.TREASURY_SHARE_ADMIN_ROLE(),
+    role: contract.SHARE_ADMIN_ROLE(),
     from: signer.address,
     to: owner,
   });
