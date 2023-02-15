@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
 
+#
+# Run single test file one (or more) times logging the output to /tmp/$RUN.log:
+#
+
 TEST_FILE="$1"
 DATA_PATH="$2"
 RUNS_INIT="$3"
 RUNS_DONE="$4"
+
+if [ -z "$TEST_FILE" ] ; then
+    echo "Usage: run-test:gas.sh ./path/to/file.test.js; to run all tests use \`npm run test-gas\`" ;
+    exit -1 ;
+fi
 
 if [ -z "$DATA_PATH" ] ; then
     DATA_PATH="/tmp"
