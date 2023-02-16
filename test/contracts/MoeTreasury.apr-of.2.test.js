@@ -77,25 +77,42 @@ describe("MoeTreasury", async function () {
     await apower.transferOwnership(mt.address);
     expect(await apower.owner()).to.eq(mt.address);
   });
-  describe("set-apr (monthly doubling for 24 months)", async function () {
+  describe("grant-role", async function () {
     it(`should grant reparametrization right`, async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
     });
+  });
+  describe("set-apr", async function () {
+    it("should reparameterize at 1[%] (pre nft.level)", async function () {
+      const array = [0, 0, 3, 1000, 0, 0];
+      const tx = await moe_treasury.setAPRBatch([1], array);
+      expect(tx).to.not.eq(undefined);
+    });
+    it("should forward time by one month", async function () {
+      await network.provider.send("evm_increaseTime", [MONTH]);
+      await network.provider.send("evm_mine", []);
+    });
+  });
+  describe("set-apr (monthly doubling for 24 months)", async function () {
     for (let m = 1; m <= 24; m++) {
       it("should print current & target values", async function () {
         const tgt = (await mt.aprTargetOf(1202103)).toString();
         const apr = (await mt.aprOf(1202103)).toString();
         console.debug("[APR]", m, apr, tgt);
       });
-      it("should reparameterize", async function () {
-        expect(
-          await moe_treasury.setAPR(1, 2021, [0, 0, 3, 1000 * 2 ** m, 0, 0])
-        ).to.not.eq(undefined);
+      const p = pct(m);
+      it(`should reparameterize at ${p}[%] (pre nft.level)`, async function () {
+        const array = [0, 0, 3, 1000 * 2 ** m, 0, 0];
+        const tx = await moe_treasury.setAPRBatch([1], array);
+        expect(tx).to.not.eq(undefined);
       });
-      it(`should forward time by one month`, async function () {
+      it("should forward time by one month", async function () {
         await network.provider.send("evm_increaseTime", [MONTH]);
         await network.provider.send("evm_mine", []);
       });
     }
   });
 });
+function pct(m) {
+  return 2 ** m;
+}
