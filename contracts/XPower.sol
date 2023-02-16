@@ -12,7 +12,7 @@ import "./base/FeeTracker.sol";
 
 import "./libs/Constants.sol";
 import "./libs/Polynomials.sol";
-import "./libs/Interpolators.sol";
+import "./libs/Interpolator.sol";
 
 /**
  * Abstract base class for the XPower THOR, LOKI and ODIN proof-of-work tokens.
@@ -129,12 +129,12 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         if (_shareSourceStamp[amount] == 0) {
             return shareTargetOf(amount);
         }
-        uint256 nowStamp = block.timestamp;
-        uint256 srcStamp = _shareSourceStamp[amount];
-        uint256 tgtStamp = srcStamp + Constants.YEAR;
-        uint256 srcValue = _shareSourceValue[amount];
-        uint256 tgtValue = shareTargetOf(amount);
-        return Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
+        Integrator.Item memory last = _shareSource[amount].lastOf();
+        uint256 nextStamp = last.stamp + Constants.YEAR;
+        uint256 nextValue = shareTargetOf(amount);
+        uint256 currStamp = block.timestamp;
+        uint256 currValue = Interpolator.linear(last.stamp, last.value, nextStamp, nextValue, currStamp);
+        return _shareSource[amount].meanOf(currStamp, currValue);
     }
 
     /** @return treasury-share (for given amount) */

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
-library Interpolators {
+library Interpolator {
     /** @return interpolate linearly v=t*(v1-v0)/(t1-t0) with v in [v0, v1] */
     function linear(uint256 t0, uint256 v0, uint256 t1, uint256 v1, uint256 t) internal pure returns (uint256) {
         require(t1 >= t0, "invalid timeline");

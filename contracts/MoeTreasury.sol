@@ -9,7 +9,8 @@ import "./XPower.sol";
 import "./XPowerPpt.sol";
 
 import "./libs/Constants.sol";
-import "./libs/Interpolators.sol";
+import "./libs/Integrator.sol";
+import "./libs/Interpolator.sol";
 
 /**
  * Treasury to claim (MoE) tokens for staked XPowerNft(s).
@@ -225,12 +226,12 @@ contract MoeTreasury is MoeTreasurySupervised {
         if (_aprSourceStamp[nftId] == 0) {
             return aprTargetOf(nftId);
         }
-        uint256 nowStamp = block.timestamp;
-        uint256 srcStamp = _aprSourceStamp[nftId];
-        uint256 tgtStamp = srcStamp + Constants.YEAR;
-        uint256 srcValue = _aprSourceValue[nftId];
-        uint256 tgtValue = aprTargetOf(nftId);
-        return Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
+        Integrator.Item memory last = _aprSource[nftId].lastOf();
+        uint256 nextStamp = last.stamp + Constants.YEAR;
+        uint256 nextValue = aprTargetOf(nftId);
+        uint256 currStamp = block.timestamp;
+        uint256 currValue = Interpolator.linear(last.stamp, last.value, nextStamp, nextValue, currStamp);
+        return _aprSource[nftId].meanOf(currStamp, currValue);
     }
 
     /** @return target for annualized percentage rate (per nft.level) */
@@ -311,12 +312,12 @@ contract MoeTreasury is MoeTreasurySupervised {
         if (_bonusSourceStamp[nftId] == 0) {
             return aprBonusTargetOf(nftId);
         }
-        uint256 nowStamp = block.timestamp;
-        uint256 srcStamp = _bonusSourceStamp[nftId];
-        uint256 tgtStamp = srcStamp + Constants.YEAR;
-        uint256 srcValue = _bonusSourceValue[nftId];
-        uint256 tgtValue = aprBonusTargetOf(nftId);
-        return Interpolators.linear(srcStamp, srcValue, tgtStamp, tgtValue, nowStamp);
+        Integrator.Item memory last = _bonusSource[nftId].lastOf();
+        uint256 nextStamp = last.stamp + Constants.YEAR;
+        uint256 nextValue = aprBonusTargetOf(nftId);
+        uint256 currStamp = block.timestamp;
+        uint256 currValue = Interpolator.linear(last.stamp, last.value, nextStamp, nextValue, currStamp);
+        return _bonusSource[nftId].meanOf(currStamp, currValue);
     }
 
     /** @return target for annualized percentage rate bonus (per nft.year) */
