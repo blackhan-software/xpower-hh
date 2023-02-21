@@ -111,7 +111,7 @@ contract XPowerPpt is NftBase {
 
     /** remember mint actions */
     function _pushMintBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) internal {
-        assert(nftIds.length == amounts.length);
+        assert(nftIds.length <= amounts.length);
         for (uint256 i = 0; i < nftIds.length; i++) {
             _pushMint(account, nftIds[i], amounts[i]);
         }
@@ -126,7 +126,7 @@ contract XPowerPpt is NftBase {
 
     /** remember burn actions */
     function _pushBurnBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) internal {
-        assert(nftIds.length == amounts.length);
+        assert(nftIds.length <= amounts.length);
         for (uint256 i = 0; i < nftIds.length; i++) {
             _pushBurn(account, nftIds[i], amounts[i]);
         }
