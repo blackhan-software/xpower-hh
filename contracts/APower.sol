@@ -2,11 +2,12 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 
-import "./XPower.sol";
+import {XPower} from "./XPower.sol";
+import {SovMigratable} from "./base/Migratable.sol";
 
 /**
  * Abstract base class for the APower aTHOR, aLOKI and aODIN tokens, where only

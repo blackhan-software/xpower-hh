@@ -3,8 +3,8 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
-import "./base/NftBase.sol";
-import "./XPower.sol";
+import {NftBase} from "./base/NftBase.sol";
+import {XPower} from "./XPower.sol";
 
 /**
  * Abstract base class for the THOR, LOKI & ODIN proof-of-work NFTs, where each

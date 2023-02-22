@@ -3,16 +3,18 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 
-import "./base/Migratable.sol";
-import "./base/FeeTracker.sol";
+import {FeeTracker} from "./base/FeeTracker.sol";
+import {Migratable, MoeMigratable} from "./base/Migratable.sol";
+import {Supervised, XPowerSupervised} from "./base/Supervised.sol";
 
-import "./libs/Constants.sol";
-import "./libs/Integrator.sol";
-import "./libs/Polynomials.sol";
+import {Constants} from "./libs/Constants.sol";
+import {Integrator} from "./libs/Integrator.sol";
+import {Polynomials, Polynomial} from "./libs/Polynomials.sol";
 
 /**
  * Abstract base class for the XPower THOR, LOKI and ODIN proof-of-work tokens.

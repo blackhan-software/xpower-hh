@@ -2,9 +2,9 @@
 // solhint-disable not-rely-on-time
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "./Supervised.sol";
+import {ERC20, IERC20, IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import {Supervised, MoeMigratableSupervised, SovMigratableSupervised} from "./Supervised.sol";
 
 /**
  * Allows migration of tokens from an old contract upto a certain deadline.

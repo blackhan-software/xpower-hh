@@ -3,7 +3,7 @@
 // solhint-disable not-rely-on-time
 pragma solidity ^0.8.0;
 
-import "./base/NftBase.sol";
+import {NftBase} from "./base/NftBase.sol";
 
 /**
  * Abstract base class for staked XPowerNft(s): Only the contract owner i.e.

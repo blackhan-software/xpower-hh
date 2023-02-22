@@ -4,12 +4,14 @@
 // solhint-disable reason-string
 pragma solidity ^0.8.0;
 
-import "./APower.sol";
-import "./XPower.sol";
-import "./XPowerPpt.sol";
+import {APower} from "./APower.sol";
+import {XPower} from "./XPower.sol";
+import {XPowerPpt} from "./XPowerPpt.sol";
 
-import "./libs/Constants.sol";
-import "./libs/Integrator.sol";
+import {Constants} from "./libs/Constants.sol";
+import {Integrator} from "./libs/Integrator.sol";
+import {Polynomial, Polynomials} from "./libs/Polynomials.sol";
+import {MoeTreasurySupervised} from "./base/Supervised.sol";
 
 /**
  * Treasury to claim (MoE) tokens for staked XPowerNft(s).

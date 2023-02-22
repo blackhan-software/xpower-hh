@@ -2,10 +2,10 @@
 // solhint-disable no-unused-vars
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import {ERC1155Holder} from "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
-import "./XPowerNft.sol";
-import "./XPowerPpt.sol";
+import {XPowerNft} from "./XPowerNft.sol";
+import {XPowerPpt} from "./XPowerPpt.sol";
 
 /**
  * NFT treasury to stake and unstake XPowerNft(s).

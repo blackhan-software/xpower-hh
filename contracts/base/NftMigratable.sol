@@ -3,9 +3,9 @@
 // solhint-disable reason-string
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
-import "./Supervised.sol";
+import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import {ERC1155Burnable} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
+import {Supervised, NftMigratableSupervised} from "./Supervised.sol";
 
 /**
  * Allows migration of NFTs from an old contract; batch migration is also

@@ -2,7 +2,9 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
-import "../APower.sol";
+import {APowerThor} from "../APower.sol";
+import {APowerLoki} from "../APower.sol";
+import {APowerOdin} from "../APower.sol";
 
 contract APowerThorTest is APowerThor {
     constructor(
