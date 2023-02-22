@@ -31,13 +31,13 @@ describe("XPower", async function () {
   describe("parametrization of share", async function () {
     it("should get array", async function () {
       const share = await xpower.getShare();
-      Expect(share).to.equal([0, 0, 2, 1, 0, 0]);
+      Expect(share).to.equal([0, 0, 2, 1]);
     });
     it("should set array", async function () {
       await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
-      await xpower.setShare([0, 0, 1, 1, 0, 0]);
+      await xpower.setShare([0, 0, 1, 1]);
       const share = await xpower.getShare();
-      Expect(share).to.equal([0, 0, 1, 1, 0, 0]);
+      Expect(share).to.equal([0, 0, 1, 1]);
     });
     it("should *not* set array (invalid array.length)", async function () {
       await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
@@ -48,35 +48,35 @@ describe("XPower", async function () {
       });
       expect(tx).to.eq(undefined);
       const share = await xpower.getShare();
-      Expect(share).to.equal([0, 0, 2, 1, 0, 0]);
+      Expect(share).to.equal([0, 0, 2, 1]);
     });
     it("should *not* set array (invalid array[2] == 0)", async function () {
       await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
-      const tx = await xpower.setShare([0, 0, 0, 0, 0, 0]).catch((ex) => {
+      const tx = await xpower.setShare([0, 0, 0, 0]).catch((ex) => {
         const m = ex.message.match(/invalid array\[2\] == 0/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
       });
       expect(tx).to.eq(undefined);
       const share = await xpower.getShare();
-      Expect(share).to.equal([0, 0, 2, 1, 0, 0]);
+      Expect(share).to.equal([0, 0, 2, 1]);
     });
     it("should *not* set array (invalid array[3] == 0)", async function () {
       await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
-      const tx = await xpower.setShare([0, 0, 1, 0, 0, 0]).catch((ex) => {
+      const tx = await xpower.setShare([0, 0, 1, 0]).catch((ex) => {
         const m = ex.message.match(/invalid array\[3\] == 0/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
       });
       expect(tx).to.eq(undefined);
       const share = await xpower.getShare();
-      Expect(share).to.equal([0, 0, 2, 1, 0, 0]);
+      Expect(share).to.equal([0, 0, 2, 1]);
     });
     it("should *not* set array (account is missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       const tx = await xpower
         .connect(signer_1)
-        .setShare([0, 0, 1, 1, 0, 0])
+        .setShare([0, 0, 1, 1])
         .catch((ex) => {
           const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
           if (m === null) console.debug(ex);
@@ -84,7 +84,7 @@ describe("XPower", async function () {
         });
       expect(tx).to.eq(undefined);
       const share = await xpower.getShare();
-      Expect(share).to.equal([0, 0, 2, 1, 0, 0]);
+      Expect(share).to.equal([0, 0, 2, 1]);
     });
   });
 });

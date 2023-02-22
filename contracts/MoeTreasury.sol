@@ -239,7 +239,7 @@ contract MoeTreasury is MoeTreasurySupervised {
 
     /** @return target for annualized percentage rate (per nft.level & parametrization) */
     function aprTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256) {
-        return Polynomial(array).evalClamped(_ppt.levelOf(nftId));
+        return Polynomial(array).eval4Clamped(_ppt.levelOf(nftId));
     }
 
     /** @return APR parameters (for nft-prefix) */
@@ -247,7 +247,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         if (_apr[nftPrefix].length > 0) {
             return _apr[nftPrefix];
         }
-        uint256[] memory apr = new uint256[](6);
+        uint256[] memory apr = new uint256[](4);
         apr[3] = 1_000;
         apr[2] = 3;
         return apr;
@@ -255,7 +255,7 @@ contract MoeTreasury is MoeTreasurySupervised {
 
     /** set APR parameters (for nft-prefix) */
     function setAPR(uint256 nftPrefix, uint256[] memory array) public onlyRole(APR_ROLE) {
-        require(array.length == 6, "invalid array.length");
+        require(array.length == 4, "invalid array.length");
         // eliminate possibility of division-by-zero
         require(array[2] > 0, "invalid array[2] == 0");
         // eliminate possibility of all-zero values
@@ -329,7 +329,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 nowYear = _ppt.year();
         uint256 nftYear = _ppt.yearOf(nftId);
         if (nowYear > nftYear || nowYear == nftYear) {
-            return Polynomial(array).evalClamped(nowYear - nftYear);
+            return Polynomial(array).eval4Clamped(nowYear - nftYear);
         }
         return 0;
     }
@@ -339,7 +339,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         if (_bonus[nftPrefix].length > 0) {
             return _bonus[nftPrefix];
         }
-        uint256[] memory bonus = new uint256[](6);
+        uint256[] memory bonus = new uint256[](4);
         bonus[3] = 10;
         bonus[2] = 1;
         return bonus;
@@ -347,7 +347,7 @@ contract MoeTreasury is MoeTreasurySupervised {
 
     /** set APR bonus parameters (for nft-prefix) */
     function setAPRBonus(uint256 nftPrefix, uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
-        require(array.length == 6, "invalid array.length");
+        require(array.length == 4, "invalid array.length");
         // eliminate possibility of division-by-zero
         require(array[2] > 0, "invalid array[2] == 0");
         // eliminate possibility of all-zero values

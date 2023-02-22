@@ -112,7 +112,7 @@ describe("MoeTreasury", async function () {
   describe("set-apr: **init** at 0.010[%]", async function () {
     it("should reparameterize", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
-      expect(await moe_treasury.setAPRBonus(1, [0, 0, 1, 10, 0, 0])).to.not.eq(
+      expect(await moe_treasury.setAPRBonus(1, [0, 0, 1, 10])).to.not.eq(
         undefined
       );
     });
@@ -125,7 +125,7 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (invalid change: too large)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(1, [0, 0, 1, 21, 0, 0]).catch((ex) => {
+        await moe_treasury.setAPRBonus(1, [0, 0, 1, 21]).catch((ex) => {
           const m = ex.message.match(/invalid change: too large/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -135,7 +135,7 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (invalid change: too large)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(1, [0, 31, 1, 10, 0, 0]).catch((ex) => {
+        await moe_treasury.setAPRBonus(1, [0, 31, 1, 10]).catch((ex) => {
           const m = ex.message.match(/invalid change: too large/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -145,7 +145,7 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (invalid change: too small)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(1, [0, 0, 1, 4, 0, 0]).catch((ex) => {
+        await moe_treasury.setAPRBonus(1, [0, 0, 1, 4]).catch((ex) => {
           const m = ex.message.match(/invalid change: too small/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -155,7 +155,7 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (invalid change: too small)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(1, [16, 0, 1, 10, 0, 0]).catch((ex) => {
+        await moe_treasury.setAPRBonus(1, [16, 0, 1, 10]).catch((ex) => {
           const m = ex.message.match(/invalid change: too small/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -164,14 +164,14 @@ describe("MoeTreasury", async function () {
     });
     it("should reparameterize", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
-      expect(await moe_treasury.setAPRBonus(1, [0, 0, 1, 20, 0, 0])).to.not.eq(
+      expect(await moe_treasury.setAPRBonus(1, [0, 0, 1, 20])).to.not.eq(
         undefined
       );
     });
     it("should *not* reparameterize (invalid change: too frequent)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(1, [0, 0, 1, 10, 0, 0]).catch((ex) => {
+        await moe_treasury.setAPRBonus(1, [0, 0, 1, 10]).catch((ex) => {
           const m = ex.message.match(/invalid change: too frequent/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;

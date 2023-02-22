@@ -12,9 +12,20 @@ library Polynomials {
      * Evaluates a `value` using a linear function -- defined by
      * the provided polynomial coefficients.
      */
-    function eval(Polynomial memory p, uint256 value) internal pure returns (uint256) {
+    function eval6(Polynomial memory p, uint256 value) internal pure returns (uint256) {
         uint256 delta = sub(value + p.array[5], p.array[4]);
         uint256 ratio = div(delta * p.array[3], p.array[2]);
+        return sub(ratio + p.array[1], p.array[0]);
+    }
+
+    /**
+     * @return value evaluated with (value)*[3/2]+[1-0]
+     *
+     * Evaluates a `value` using a linear function -- defined by
+     * the provided polynomial coefficients.
+     */
+    function eval4(Polynomial memory p, uint256 value) internal pure returns (uint256) {
+        uint256 ratio = div(value * p.array[3], p.array[2]);
         return sub(ratio + p.array[1], p.array[0]);
     }
 
@@ -26,9 +37,22 @@ library Polynomials {
      * are avoided by clamping at `0`. Further, division-by-zero
      * panics are prevented by clamping at `type(uint256).max`.
      */
-    function evalClamped(Polynomial memory p, uint256 value) internal pure returns (uint256) {
+    function eval6Clamped(Polynomial memory p, uint256 value) internal pure returns (uint256) {
         uint256 delta = subClamped(value + p.array[5], p.array[4]);
         uint256 ratio = divClamped(delta * p.array[3], p.array[2]);
+        return subClamped(ratio + p.array[1], p.array[0]);
+    }
+
+    /**
+     * @return value evaluated with (value)*[3/2]+[1-0]
+     *
+     * Evaluates a `value` using a linear function -- defined by
+     * the provided polynomial coefficients. Negative underflows
+     * are avoided by clamping at `0`. Further, division-by-zero
+     * panics are prevented by clamping at `type(uint256).max`.
+     */
+    function eval4Clamped(Polynomial memory p, uint256 value) internal pure returns (uint256) {
+        uint256 ratio = divClamped(value * p.array[3], p.array[2]);
         return subClamped(ratio + p.array[1], p.array[0]);
     }
 

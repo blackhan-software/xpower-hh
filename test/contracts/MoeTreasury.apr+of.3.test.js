@@ -84,7 +84,7 @@ describe("MoeTreasury", async function () {
   });
   describe("set-apr-bonus", async function () {
     it("should reparameterize at 0.010[%] (per nft.year)", async function () {
-      const array = [0, 0, 1, 10, 0, 0];
+      const array = [0, 0, 1, 10];
       expect(await moe_treasury.setAPRBonusBatch([1], array)).to.not.eq(
         undefined
       );
@@ -96,7 +96,7 @@ describe("MoeTreasury", async function () {
   });
   describe("set-apr-bonus", async function () {
     it("should reparameterize at 0.020[%] (per nft.year)", async function () {
-      const array = [0, 0, 1, 20, 0, 0];
+      const array = [0, 0, 1, 20];
       expect(await moe_treasury.setAPRBonusBatch([1], array)).to.not.eq(
         undefined
       );

@@ -39,7 +39,7 @@ describe("XPower", async function () {
   });
   describe("set-share", async function () {
     it(`should reparameterize at 50[%]`, async function () {
-      const tx = await xpower.setShare([0, 0, 2, 1, 0, 0]);
+      const tx = await xpower.setShare([0, 0, 2, 1]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one month", async function () {
@@ -55,7 +55,7 @@ describe("XPower", async function () {
         console.debug("[SHARE]", m, share, target);
       });
       it(`should reparameterize at ${pct(m)}[%]`, async function () {
-        const tx = await xpower.setShare([0, 0, 2, 2 ** m, 0, 0]);
+        const tx = await xpower.setShare([0, 0, 2, 2 ** m]);
         expect(tx).to.not.eq(undefined);
       });
       it("should forward time by one month", async function () {

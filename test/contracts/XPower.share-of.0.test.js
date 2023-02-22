@@ -45,7 +45,7 @@ describe("XPower", async function () {
     });
     it("should *not* reparameterize (invalid change: too large)", async function () {
       await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
-      const tx = await xpower.setShare([0, 0, 2, 3, 0, 0]).catch((ex) => {
+      const tx = await xpower.setShare([0, 0, 2, 3]).catch((ex) => {
         const m = ex.message.match(/invalid change: too large/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
@@ -55,7 +55,7 @@ describe("XPower", async function () {
     it("should *not* reparameterize (invalid change: too large)", async function () {
       await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
       const tx = await xpower
-        .setShare([0, 2n ** 128n - 1n, 2, 1, 0, 0])
+        .setShare([0, 2n ** 128n - 1n, 2, 1])
         .catch((ex) => {
           const m = ex.message.match(/invalid change: too large/);
           if (m === null) console.debug(ex);
@@ -65,7 +65,7 @@ describe("XPower", async function () {
     });
     it("should *not* reparameterize (invalid change: too small)", async function () {
       await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
-      const tx = await xpower.setShare([0, 0, 5, 1, 0, 0]).catch((ex) => {
+      const tx = await xpower.setShare([0, 0, 5, 1]).catch((ex) => {
         const m = ex.message.match(/invalid change: too small/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
@@ -75,7 +75,7 @@ describe("XPower", async function () {
     it("should *not* reparameterize (invalid change: too small)", async function () {
       await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
       const tx = await xpower
-        .setShare([2n ** 128n - 1n, 0, 2, 1, 0, 0])
+        .setShare([2n ** 128n - 1n, 0, 2, 1])
         .catch((ex) => {
           const m = ex.message.match(/invalid change: too small/);
           if (m === null) console.debug(ex);
@@ -85,12 +85,12 @@ describe("XPower", async function () {
     });
     it("should reparameterize share at 100[%]", async function () {
       await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
-      const tx = await xpower.setShare([0, 0, 2, 2, 0, 0]);
+      const tx = await xpower.setShare([0, 0, 2, 2]);
       expect(tx).to.not.eq(undefined);
     });
     it("should *not* reparameterize (invalid change: too frequent)", async function () {
       await xpower.grantRole(xpower.SHARE_ROLE(), addresses[0]);
-      const tx = await xpower.setShare([0, 0, 2, 1, 0, 0]).catch((ex) => {
+      const tx = await xpower.setShare([0, 0, 2, 1]).catch((ex) => {
         const m = ex.message.match(/invalid change: too frequent/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
