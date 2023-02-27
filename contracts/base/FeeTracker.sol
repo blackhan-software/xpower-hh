@@ -10,9 +10,9 @@ pragma solidity ^0.8.0;
 abstract contract FeeTracker {
     /** cumulative moving-averages: gas & gas-price */
     uint256[2] private _average;
-    /** cumulative moving-averages: overhead ~ 1.29 */
-    uint256 private constant MUL = 1_2962089748866155;
-    uint256 private constant DIV = 1_0000000000000000;
+    /** cumulative moving-averages: overhead ~ 1.52 */
+    uint256 private constant MUL = 1_522815194170197;
+    uint256 private constant DIV = 1_000000000000000;
 
     /** gas & gas-price tracker */
     modifier tracked() {
