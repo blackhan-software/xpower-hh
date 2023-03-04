@@ -33,7 +33,7 @@ contract XPowerNft is NftBase {
         }
     }
 
-    /** mint particular amount of NFTs for given to-address, level and token-index */
+    /** mint particular amount of NFTs (for to-address, level and token-index) */
     function mint(address to, uint256 level, uint256 amount, uint256 index) public {
         uint256 moeAmount = amount * denominationOf(level);
         require(moeAmount > 0, "non-positive amount");
@@ -41,7 +41,7 @@ contract XPowerNft is NftBase {
         _mint(to, idBy(year(), level, _moe[index].prefix()), amount, "");
     }
 
-    /** mint particular amounts of NFTs for given to-address, levels and token-index */
+    /** mint particular amounts of NFTs (for to-address, levels and token-index) */
     function mintBatch(address to, uint256[] memory levels, uint256[] memory amounts, uint256 index) public {
         uint256 sumAmount = 0;
         for (uint256 i = 0; i < levels.length; i++) {

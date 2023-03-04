@@ -26,7 +26,7 @@ contract NftTreasury is ERC1155Holder {
     /** emitted on staking an NFT */
     event Stake(address from, uint256 nftId, uint256 amount);
 
-    /** stake NFT for given address and amount */
+    /** stake NFT (for address and amount) */
     function stake(address from, uint256 nftId, uint256 amount) public {
         require(amount > 0, "non-positive amount");
         address self = (address)(this);
@@ -38,7 +38,7 @@ contract NftTreasury is ERC1155Holder {
     /** emitted on staking NFTs */
     event StakeBatch(address from, uint256[] nftIds, uint256[] amounts);
 
-    /** stake NFTs for given address and amounts */
+    /** stake NFTs (for address and amounts) */
     function stakeBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public {
         for (uint256 i = 0; i < amounts.length; i++) {
             require(amounts[i] > 0, "non-positive amount");
@@ -52,7 +52,7 @@ contract NftTreasury is ERC1155Holder {
     /** emitted on unstaking an NFT */
     event Unstake(address from, uint256 nftId, uint256 amount);
 
-    /** unstake NFT for given address and amount */
+    /** unstake NFT (for address and amount) */
     function unstake(address from, uint256 nftId, uint256 amount) public {
         require(amount > 0, "non-positive amount");
         address self = (address)(this);
@@ -64,7 +64,7 @@ contract NftTreasury is ERC1155Holder {
     /** emitted on unstaking NFTs */
     event UnstakeBatch(address from, uint256[] nftIds, uint256[] amounts);
 
-    /** unstake NFTs for given address and amounts */
+    /** unstake NFTs (for address and amounts) */
     function unstakeBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public {
         for (uint256 i = 0; i < amounts.length; i++) {
             require(amounts[i] > 0, "non-positive amount");

@@ -54,31 +54,31 @@ contract XPowerPpt is NftBase {
         super.safeBatchTransferFrom(from, to, nftIds, amounts, data);
     }
 
-    /** mint particular amount of staked NFTs for given address and nft-id */
+    /** mint particular amount of staked NFTs (for address and nft-id) */
     function mint(address to, uint256 nftId, uint256 amount) public onlyOwner {
         _pushMint(to, nftId, amount);
         _mint(to, nftId, amount, "");
     }
 
-    /** mint particular amounts of staked NFTs for given address and nft-ids */
+    /** mint particular amounts of staked NFTs (for address and nft-ids) */
     function mintBatch(address to, uint256[] memory nftIds, uint256[] memory amounts) public onlyOwner {
         _pushMintBatch(to, nftIds, amounts);
         _mintBatch(to, nftIds, amounts, "");
     }
 
-    /** burn particular amount of staked NFTs for given address and nft-id */
+    /** burn particular amount of staked NFTs (for address and nft-id) */
     function burn(address from, uint256 nftId, uint256 amount) public override onlyOwner {
         _pushBurn(from, nftId, amount);
         _burn(from, nftId, amount);
     }
 
-    /** burn particular amounts of staked NFTs for given address and nft-ids */
+    /** burn particular amounts of staked NFTs (for address and nft-ids) */
     function burnBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public override onlyOwner {
         _pushBurnBatch(from, nftIds, amounts);
         _burnBatch(from, nftIds, amounts);
     }
 
-    /** @return age seconds over all stakes for given address and nft-id */
+    /** @return age seconds over all stakes (for address and nft-id) */
     function ageOf(address account, uint256 nftId) public view returns (uint256) {
         uint256 mints = _mints[account][nftId];
         uint256 burns = _burns[account][nftId];
@@ -90,7 +90,7 @@ contract XPowerPpt is NftBase {
         return 0;
     }
 
-    /** @return age seconds totalled over all stakes for given nft-id */
+    /** @return age seconds totalled over all stakes (for nft-id) */
     function totalAgeOf(uint256 nftId) public view returns (uint256) {
         uint256 mintsTotal = _mintsTotal[nftId];
         uint256 burnsTotal = _burnsTotal[nftId];
