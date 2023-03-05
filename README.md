@@ -267,4 +267,4 @@ systemctl disable --user xpow-miner@7.timer
 
 ## Copyright
 
- © 2022 [XPowermine.com](https://www.xpowermine.com)
+ © 2023 [Blackhan Software Ltd](https://www.linkedin.com/company/blackhan)
