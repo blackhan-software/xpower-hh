@@ -211,11 +211,8 @@ describe("APower Migration", async function () {
     await network.provider.send("evm_increaseTime", [365.25 * DAYS * 1.0]);
     expect(await mt.claimFor(account, nft_id)).to.be.an("object");
     expect(await mt.rewardOf(account, nft_id)).to.eq(DECI_OLD);
-    expect(await mt.totalRewardOf(nft_id)).to.eq(DECI_OLD);
     expect(await mt.claimedFor(account, nft_id)).to.eq(DECI_OLD);
-    expect(await mt.totalClaimedFor(nft_id)).to.eq(DECI_OLD);
     expect(await mt.claimableFor(account, nft_id)).to.eq(0);
-    expect(await mt.totalClaimableFor(nft_id)).to.eq(0);
     expect(await mt.moeBalanceOf(2)).to.eq(100n * UNUM_OLD);
   });
   beforeEach(async function () {
@@ -278,7 +275,7 @@ describe("APower Migration", async function () {
     const new_migrated = await aodin_new.migrated();
     expect(new_migrated).to.eq(0);
   });
-  it("should *not* seal new (account is missing role)", async function () {
+  it("should *not* seal new (missing role)", async function () {
     const tx = await aodin_new.seal(0).catch((ex) => {
       const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
       if (m === null) console.debug(ex);

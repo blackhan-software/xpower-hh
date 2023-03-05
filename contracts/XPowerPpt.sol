@@ -12,8 +12,6 @@ import {NftBase} from "./base/NftBase.sol";
 contract XPowerPpt is NftBase {
     /** map of ages: account => nft-id => accumulator [seconds] */
     mapping(address => mapping(uint256 => int256)) private _age;
-    /** map of total ages: nft-id => accumulator [seconds] */
-    mapping(uint256 => int256) private _ageTotal;
 
     /** @param pptUri meta-data URI */
     /** @param pptBase addresses of old contracts */
@@ -84,22 +82,10 @@ contract XPowerPpt is NftBase {
         return 0;
     }
 
-    /** @return age seconds totalled over all stakes (for nft-id) */
-    function totalAgeOf(uint256 nftId) public view returns (uint256) {
-        int256 age = _ageTotal[nftId];
-        if (age > 0) {
-            uint256 supply = totalSupply(nftId);
-            return supply * block.timestamp - uint256(age);
-        }
-        return 0;
-    }
-
     /** remember mint action */
     function _pushMint(address account, uint256 nftId, uint256 amount) internal {
         require(amount > 0, "non-positive amount");
-        int256 delta = int256(amount * block.timestamp);
-        _age[account][nftId] += delta;
-        _ageTotal[nftId] += delta;
+        _age[account][nftId] += int256(amount * block.timestamp);
     }
 
     /** remember mint actions */
@@ -113,9 +99,7 @@ contract XPowerPpt is NftBase {
     /** remember burn action */
     function _pushBurn(address account, uint256 nftId, uint256 amount) internal {
         require(amount > 0, "non-positive amount");
-        int256 delta = int256(amount * block.timestamp);
-        _age[account][nftId] -= delta;
-        _ageTotal[nftId] -= delta;
+        _age[account][nftId] -= int256(amount * block.timestamp);
     }
 
     /** remember burn actions */

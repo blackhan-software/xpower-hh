@@ -114,7 +114,7 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS]);
       await network.provider.send("evm_mine", []);
     });
-    it("should *not* reparameterize (invalid change: too large)", async function () {
+    it("should *not* reparameterize (too large)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAPRBonus(1, [0, 0, 1, 21]).catch((ex) => {
@@ -124,7 +124,7 @@ describe("MoeTreasury", async function () {
         })
       ).to.eq(undefined);
     });
-    it("should *not* reparameterize (invalid change: too large)", async function () {
+    it("should *not* reparameterize (too large)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAPRBonus(1, [0, 31, 1, 10]).catch((ex) => {
@@ -134,7 +134,7 @@ describe("MoeTreasury", async function () {
         })
       ).to.eq(undefined);
     });
-    it("should *not* reparameterize (invalid change: too small)", async function () {
+    it("should *not* reparameterize (too small)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAPRBonus(1, [0, 0, 1, 4]).catch((ex) => {
@@ -144,7 +144,7 @@ describe("MoeTreasury", async function () {
         })
       ).to.eq(undefined);
     });
-    it("should *not* reparameterize (invalid change: too small)", async function () {
+    it("should *not* reparameterize (too small)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAPRBonus(1, [16, 0, 1, 10]).catch((ex) => {
@@ -160,7 +160,7 @@ describe("MoeTreasury", async function () {
         undefined
       );
     });
-    it("should *not* reparameterize (invalid change: too frequent)", async function () {
+    it("should *not* reparameterize (too frequent)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAPRBonus(1, [0, 0, 1, 10]).catch((ex) => {

@@ -34,8 +34,6 @@ contract MoeTreasury is MoeTreasurySupervised {
 
     /** map of rewards claimed: account => nft-id => amount */
     mapping(address => mapping(uint256 => uint256)) private _claimed;
-    /** map of rewards claimed total: nft-id => amount */
-    mapping(uint256 => uint256) private _claimedTotal;
 
     /** @param moeLink address of contract for XPower tokens */
     /** @param sovLink address of contract for APower tokens */
@@ -74,7 +72,6 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 amount = claimableFor(account, nftId);
         require(amount > 0, "nothing claimable");
         _claimed[account][nftId] += amount;
-        _claimedTotal[nftId] += amount;
         XPower moe = _moeOf(_ppt.prefixOf(nftId));
         APower sov = _sovOf(_ppt.prefixOf(nftId));
         moe.increaseAllowance((address)(sov), amount);
@@ -91,7 +88,6 @@ contract MoeTreasury is MoeTreasurySupervised {
         for (uint256 i = 0; i < nftIds.length; i++) {
             require(amounts[i] > 0, "nothing claimable");
             _claimed[account][nftIds[i]] += amounts[i];
-            _claimedTotal[nftIds[i]] += amounts[i];
         }
         for (uint256 i = 0; i < nftIds.length; i++) {
             XPower moe = _moeOf(_ppt.prefixOf(nftIds[i]));
@@ -107,11 +103,6 @@ contract MoeTreasury is MoeTreasurySupervised {
         return _claimed[account][nftId];
     }
 
-    /** @return claimed total amount (for nft-id) */
-    function totalClaimedFor(uint256 nftId) public view returns (uint256) {
-        return _claimedTotal[nftId];
-    }
-
     /** @return claimed amount (for account and nft-ids) */
     function claimedForBatch(address account, uint256[] memory nftIds) public view returns (uint256[] memory) {
         uint256[] memory claimed = new uint256[](nftIds.length);
@@ -121,31 +112,12 @@ contract MoeTreasury is MoeTreasurySupervised {
         return claimed;
     }
 
-    /** @return claimed total amount (for nft-ids) */
-    function totalClaimedForBatch(uint256[] memory nftIds) public view returns (uint256[] memory) {
-        uint256[] memory claimedTotal = new uint256[](nftIds.length);
-        for (uint256 i = 0; i < nftIds.length; i++) {
-            claimedTotal[i] = totalClaimedFor(nftIds[i]);
-        }
-        return claimedTotal;
-    }
-
     /** @return claimable amount (for account and nft-id) */
     function claimableFor(address account, uint256 nftId) public view returns (uint256) {
         uint256 claimed = claimedFor(account, nftId);
         uint256 reward = rewardOf(account, nftId);
         if (reward > claimed) {
             return reward - claimed;
-        }
-        return 0;
-    }
-
-    /** @return claimable total amount (for nft-id) */
-    function totalClaimableFor(uint256 nftId) public view returns (uint256) {
-        uint256 claimedTotal = totalClaimedFor(nftId);
-        uint256 rewardTotal = totalRewardOf(nftId);
-        if (rewardTotal > claimedTotal) {
-            return rewardTotal - claimedTotal;
         }
         return 0;
     }
@@ -163,32 +135,10 @@ contract MoeTreasury is MoeTreasurySupervised {
         return pending;
     }
 
-    /** @return claimable total amount (for nft-ids) */
-    function totalClaimableForBatch(uint256[] memory nftIds) public view returns (uint256[] memory) {
-        uint256[] memory claimedTotal = totalClaimedForBatch(nftIds);
-        uint256[] memory rewardsTotal = totalRewardOfBatch(nftIds);
-        uint256[] memory pendingTotal = new uint256[](nftIds.length);
-        for (uint256 i = 0; i < nftIds.length; i++) {
-            if (rewardsTotal[i] > claimedTotal[i]) {
-                pendingTotal[i] = rewardsTotal[i] - claimedTotal[i];
-            }
-        }
-        return pendingTotal;
-    }
-
     /** @return reward (for account and nft-id) */
     function rewardOf(address account, uint256 nftId) public view returns (uint256) {
         uint256 rate = rateOf(nftId);
         uint256 age = _ppt.ageOf(account, nftId);
-        uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
-        uint256 reward = (rate * age * denomination) / (1_000 * Constants.CENTURY);
-        return reward * 10 ** _moeOf(_ppt.prefixOf(nftId)).decimals();
-    }
-
-    /** @return reward total (for nft-id) */
-    function totalRewardOf(uint256 nftId) public view returns (uint256) {
-        uint256 rate = rateOf(nftId);
-        uint256 age = _ppt.totalAgeOf(nftId);
         uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
         uint256 reward = (rate * age * denomination) / (1_000 * Constants.CENTURY);
         return reward * 10 ** _moeOf(_ppt.prefixOf(nftId)).decimals();
@@ -201,15 +151,6 @@ contract MoeTreasury is MoeTreasurySupervised {
             rewards[i] = rewardOf(account, nftIds[i]);
         }
         return rewards;
-    }
-
-    /** @return reward total (for nft-ids) */
-    function totalRewardOfBatch(uint256[] memory nftIds) public view returns (uint256[] memory) {
-        uint256[] memory rewardsTotal = new uint256[](nftIds.length);
-        for (uint256 i = 0; i < nftIds.length; i++) {
-            rewardsTotal[i] = totalRewardOf(nftIds[i]);
-        }
-        return rewardsTotal;
     }
 
     /** @return sum of APR and APR bonus */

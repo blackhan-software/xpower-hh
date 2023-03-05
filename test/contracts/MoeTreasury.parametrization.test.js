@@ -147,7 +147,7 @@ describe("MoeTreasury", async function () {
       ).to.eq(undefined);
       Expect(await moe_treasury.getAPR(3)).to.equal([0, 0, 3, 1000]);
     });
-    it("should *not* set array (account is missing role)", async function () {
+    it("should *not* set array (missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await moe_treasury
@@ -204,7 +204,7 @@ describe("MoeTreasury", async function () {
       ).to.eq(undefined);
       Expect(await moe_treasury.getAPRBonus(3)).to.equal([0, 0, 1, 10]);
     });
-    it("should *not* set array (account is missing role)", async function () {
+    it("should *not* set array (missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await moe_treasury

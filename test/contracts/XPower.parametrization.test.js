@@ -72,7 +72,7 @@ describe("XPower", async function () {
       const share = await xpower.getShare();
       Expect(share).to.equal([0, 0, 2, 1]);
     });
-    it("should *not* set array (account is missing role)", async function () {
+    it("should *not* set array (missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       const tx = await xpower
         .connect(signer_1)

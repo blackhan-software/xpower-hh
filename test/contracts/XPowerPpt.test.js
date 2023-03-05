@@ -62,227 +62,178 @@ describe("XPowerPpt", async function () {
   describe("age [10×mint]", async function () {
     it("should mint nft-staked & check age", async function () {
       expect(await ageOf(addresses[0], 202100)).to.approximately(0, 5);
-      expect(await totalAgeOf(202100)).to.approximately(0, 5);
       // mint:
       await nft_staked.mint(addresses[0], 202100, 1);
       expect(await ageOf(addresses[0], 202100)).to.approximately(0, 5);
-      expect(await totalAgeOf(202100)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202100, 1);
       expect(await ageOf(addresses[0], 202100)).to.approximately(50, 5);
-      expect(await totalAgeOf(202100)).to.approximately(50, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202100, 1);
       expect(await ageOf(addresses[0], 202100)).to.approximately(100, 5);
-      expect(await totalAgeOf(202100)).to.approximately(100, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202100, 1);
       expect(await ageOf(addresses[0], 202100)).to.approximately(150, 5);
-      expect(await totalAgeOf(202100)).to.approximately(150, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202100, 1);
       expect(await ageOf(addresses[0], 202100)).to.approximately(200, 5);
-      expect(await totalAgeOf(202100)).to.approximately(200, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202100, 1);
       expect(await ageOf(addresses[0], 202100)).to.approximately(250, 5);
-      expect(await totalAgeOf(202100)).to.approximately(250, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202100, 1);
       expect(await ageOf(addresses[0], 202100)).to.approximately(300, 5);
-      expect(await totalAgeOf(202100)).to.approximately(300, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202100, 1);
       expect(await ageOf(addresses[0], 202100)).to.approximately(350, 5);
-      expect(await totalAgeOf(202100)).to.approximately(350, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202100, 1);
       expect(await ageOf(addresses[0], 202100)).to.approximately(400, 5);
-      expect(await totalAgeOf(202100)).to.approximately(400, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202100, 1);
       expect(await ageOf(addresses[0], 202100)).to.approximately(450, 5);
-      expect(await totalAgeOf(202100)).to.approximately(450, 5);
       await network.provider.send("evm_increaseTime", [100]);
     });
   });
   describe("age [5×mint, 5×burn]", async function () {
     it("should mint/burn nft-staked & check age", async function () {
       expect(await ageOf(addresses[0], 202103)).to.approximately(0, 5);
-      expect(await totalAgeOf(202103)).to.approximately(0, 5);
       // mint:
       await nft_staked.mint(addresses[0], 202103, 1);
       expect(await ageOf(addresses[0], 202103)).to.approximately(0, 5);
-      expect(await totalAgeOf(202103)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202103, 1);
       expect(await ageOf(addresses[0], 202103)).to.approximately(50, 5);
-      expect(await totalAgeOf(202103)).to.approximately(50, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202103, 1);
       expect(await ageOf(addresses[0], 202103)).to.approximately(100, 5);
-      expect(await totalAgeOf(202103)).to.approximately(100, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202103, 1);
       expect(await ageOf(addresses[0], 202103)).to.approximately(150, 5);
-      expect(await totalAgeOf(202103)).to.approximately(150, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202103, 1);
       expect(await ageOf(addresses[0], 202103)).to.approximately(200, 5);
-      expect(await totalAgeOf(202103)).to.approximately(200, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
       await nft_staked.burn(addresses[0], 202103, 1);
       expect(await ageOf(addresses[0], 202103)).to.approximately(375, 5);
-      expect(await totalAgeOf(202103)).to.approximately(375, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.burn(addresses[0], 202103, 1);
       expect(await ageOf(addresses[0], 202103)).to.approximately(634, 5);
-      expect(await totalAgeOf(202103)).to.approximately(634, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.burn(addresses[0], 202103, 1);
       expect(await ageOf(addresses[0], 202103)).to.approximately(1100, 5);
-      expect(await totalAgeOf(202103)).to.approximately(1100, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.burn(addresses[0], 202103, 1);
       expect(await ageOf(addresses[0], 202103)).to.approximately(2400, 5);
-      expect(await totalAgeOf(202103)).to.approximately(2400, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.burn(addresses[0], 202103, 1);
       expect(await ageOf(addresses[0], 202103)).to.approximately(0, 5);
-      expect(await totalAgeOf(202103)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
     });
   });
   describe("age [mint, burn, mint, burn, ...]", async function () {
     it("should mint/burn nft-staked & check age", async function () {
       expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
-      expect(await totalAgeOf(202106)).to.approximately(0, 5);
       // mint:
       await nft_staked.mint(addresses[0], 202106, 1);
       expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
-      expect(await totalAgeOf(202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
       await nft_staked.burn(addresses[0], 202106, 1);
       expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
-      expect(await totalAgeOf(202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
       await nft_staked.mint(addresses[0], 202106, 1);
       expect(await ageOf(addresses[0], 202106)).to.approximately(100, 5);
-      expect(await totalAgeOf(202106)).to.approximately(100, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
       await nft_staked.burn(addresses[0], 202106, 1);
       expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
-      expect(await totalAgeOf(202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
       await nft_staked.mint(addresses[0], 202106, 1);
       expect(await ageOf(addresses[0], 202106)).to.approximately(200, 5);
-      expect(await totalAgeOf(202106)).to.approximately(200, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
       await nft_staked.burn(addresses[0], 202106, 1);
       expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
-      expect(await totalAgeOf(202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
       await nft_staked.mint(addresses[0], 202106, 1);
       expect(await ageOf(addresses[0], 202106)).to.approximately(300, 5);
-      expect(await totalAgeOf(202106)).to.approximately(300, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
       await nft_staked.burn(addresses[0], 202106, 1);
       expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
-      expect(await totalAgeOf(202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
       await nft_staked.mint(addresses[0], 202106, 1);
       expect(await ageOf(addresses[0], 202106)).to.approximately(400, 5);
-      expect(await totalAgeOf(202106)).to.approximately(400, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
       await nft_staked.burn(addresses[0], 202106, 1);
       expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
-      expect(await totalAgeOf(202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
     });
   });
   describe("age [mint, mint, burn, burn, ...]", async function () {
     it("should mint/burn nft-staked & check age", async function () {
       expect(await ageOf(addresses[0], 202109)).to.approximately(0, 5);
-      expect(await totalAgeOf(202109)).to.approximately(0, 5);
       // mint:
       await nft_staked.mint(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(0, 5);
-      expect(await totalAgeOf(202109)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(50, 5);
-      expect(await totalAgeOf(202109)).to.approximately(50, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
       await nft_staked.burn(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(300, 5);
-      expect(await totalAgeOf(202109)).to.approximately(300, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.burn(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(0, 5);
-      expect(await totalAgeOf(202109)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
       await nft_staked.mint(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(400, 5);
-      expect(await totalAgeOf(202109)).to.approximately(400, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(250, 5);
-      expect(await totalAgeOf(202109)).to.approximately(250, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
       await nft_staked.burn(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(700, 5);
-      expect(await totalAgeOf(202109)).to.approximately(700, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.burn(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(0, 5);
-      expect(await totalAgeOf(202109)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
       await nft_staked.mint(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(800, 5);
-      expect(await totalAgeOf(202109)).to.approximately(800, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.mint(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(450, 5);
-      expect(await totalAgeOf(202109)).to.approximately(450, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
       await nft_staked.burn(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(1100, 5);
-      expect(await totalAgeOf(202109)).to.approximately(1100, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await nft_staked.burn(addresses[0], 202109, 1);
       expect(await ageOf(addresses[0], 202109)).to.approximately(0, 5);
-      expect(await totalAgeOf(202109)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
     });
   });
   describe("age [mint-batch, burn-batch]", async function () {
     it("should mint/burn nft-staked & check age", async function () {
       expect(await ageOf(addresses[0], 202112)).to.approximately(0, 5);
-      expect(await totalAgeOf(202112)).to.approximately(0, 5);
       // mint-batch:
       await nft_staked.mintBatch(addresses[0], [202100], [1]);
       expect(await ageOf(addresses[0], 202112)).to.approximately(0, 5);
-      expect(await totalAgeOf(202112)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn-batch:
       await nft_staked.burnBatch(addresses[0], [202100], [1]);
       expect(await ageOf(addresses[0], 202112)).to.approximately(0, 5);
-      expect(await totalAgeOf(202112)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
     });
   });
@@ -434,7 +385,7 @@ describe("XPowerPpt", async function () {
       const nft_url = await nft_staked.uri(nft_id);
       expect(nft_url).to.eq(NFT_LOKI_WWW);
     });
-    it("should *not* set new URI (account is missing role)", async function () {
+    it("should *not* set new URI (missing role)", async function () {
       await nft_staked.revokeRole(nft_staked.URI_DATA_ROLE(), addresses[0]);
       const nft_year = (await nft_staked.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
@@ -522,14 +473,6 @@ async function ageOf(account, nft_id) {
   const balance = await nft_staked.balanceOf(account, nft_id);
   if (balance.gt(0)) {
     return Number(age.toBigInt() / balance.toBigInt());
-  }
-  return 0;
-}
-async function totalAgeOf(nft_id) {
-  const age = await nft_staked.totalAgeOf(nft_id);
-  const supply = await nft_staked.totalSupply(nft_id);
-  if (supply.gt(0)) {
-    return Number(age.toBigInt() / supply.toBigInt());
   }
   return 0;
 }

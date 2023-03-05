@@ -119,7 +119,7 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_increaseTime", [365.25 * DAYS]);
       await network.provider.send("evm_mine", []);
     });
-    it("should *not* reparameterize (invalid change: too large)", async function () {
+    it("should *not* reparameterize (too large)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAPR(1, [0, 0, 3, 2001]).catch((ex) => {
@@ -129,7 +129,7 @@ describe("MoeTreasury", async function () {
         })
       ).to.eq(undefined);
     });
-    it("should *not* reparameterize (invalid change: too large)", async function () {
+    it("should *not* reparameterize (too large)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAPR(1, [0, 1001, 3, 1000]).catch((ex) => {
@@ -139,7 +139,7 @@ describe("MoeTreasury", async function () {
         })
       ).to.eq(undefined);
     });
-    it("should *not* reparameterize (invalid change: too small)", async function () {
+    it("should *not* reparameterize (too small)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAPR(1, [0, 0, 3, 499]).catch((ex) => {
@@ -149,7 +149,7 @@ describe("MoeTreasury", async function () {
         })
       ).to.eq(undefined);
     });
-    it("should *not* reparameterize (invalid change: too small)", async function () {
+    it("should *not* reparameterize (too small)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAPR(1, [501, 0, 3, 1000]).catch((ex) => {
@@ -165,7 +165,7 @@ describe("MoeTreasury", async function () {
         undefined
       );
     });
-    it("should *not* reparameterize (invalid change: too frequent)", async function () {
+    it("should *not* reparameterize (too frequent)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
         await moe_treasury.setAPR(1, [0, 0, 3, 1000]).catch((ex) => {

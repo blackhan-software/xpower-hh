@@ -313,7 +313,7 @@ describe("XPowerLoki Migration", async function () {
       const new_migrated = await xpower_new.migrated();
       expect(new_migrated).to.eq(0n);
     });
-    it("should *not* seal new (account is missing role)", async function () {
+    it("should *not* seal new (missing role)", async function () {
       const minter = accounts[2];
       expect(minter.address).to.match(/^0x/);
       // deploy xpower_new contract (w/o transferring ownership):
