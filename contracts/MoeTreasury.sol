@@ -8,6 +8,7 @@ import {APower} from "./APower.sol";
 import {XPower} from "./XPower.sol";
 import {XPowerPpt} from "./XPowerPpt.sol";
 
+import {Array} from "./libs/Array.sol";
 import {Constants} from "./libs/Constants.sol";
 import {Integrator} from "./libs/Integrator.sol";
 import {Polynomial, Polynomials} from "./libs/Polynomials.sol";
@@ -84,6 +85,7 @@ contract MoeTreasury is MoeTreasurySupervised {
 
     /** claim APower tokens (for account and nft-ids) */
     function claimForBatch(address account, uint256[] memory nftIds) public {
+        require(Array.unique(nftIds), "unsorted or duplicate ids");
         uint256[] memory amounts = claimableForBatch(account, nftIds);
         for (uint256 i = 0; i < nftIds.length; i++) {
             require(amounts[i] > 0, "nothing claimable");
@@ -214,7 +216,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         _checkAPRStamp(currStamp, lastStamp);
         // append (stamp, apr-of[nft-id]) to integrator
         aprs[nftPrefix].append(currStamp, currValue);
-        // all requirements true: use array
+        // all requirements satisfied: use array
         _apr[nftPrefix] = array;
     }
 
@@ -306,7 +308,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         _checkAPRBonusStamp(currStamp, lastStamp);
         // append (stamp, apr-bonus-of[nft-id]) to integrator
         bonuses[nftPrefix].append(currStamp, currValue);
-        // all requirements true: use array
+        // all requirements satisfied: use array
         _bonus[nftPrefix] = array;
     }
 

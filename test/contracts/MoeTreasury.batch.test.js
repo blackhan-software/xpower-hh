@@ -159,6 +159,13 @@ describe("MoeTreasury", async function () {
     it("should return 32 [ODIN] in 36 months", async function () {
       const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
       expect(
+        await mt.claimForBatch(account, [nft_id, nft_id]).catch((ex) => {
+          const m = ex.message.match(/unsorted or duplicate ids/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        })
+      ).to.eq(undefined);
+      expect(
         await mt.claimForBatch(account, [nft_id]).catch((ex) => {
           const m = ex.message.match(/nothing claimable/);
           if (m === null) console.debug(ex);
