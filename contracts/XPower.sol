@@ -227,6 +227,15 @@ contract XPowerThor is XPower {
     function prefix() public pure override returns (uint256) {
         return 1;
     }
+
+    /** @return fee-estimate and averages over gas & gas-price */
+    function fees() public view returns (uint256[] memory) {
+        return _fees(FEE_MUL, FEE_DIV);
+    }
+
+    /** fee-tracker estimate ~ 1.525 */
+    uint256 private constant FEE_MUL = 1_5250655526001398;
+    uint256 private constant FEE_DIV = 1_0000000000000000;
 }
 
 /**
@@ -247,6 +256,15 @@ contract XPowerLoki is XPower {
     function prefix() public pure override returns (uint256) {
         return 2;
     }
+
+    /** @return fee-estimate and averages over gas & gas-price */
+    function fees() public view returns (uint256[] memory) {
+        return _fees(FEE_MUL, FEE_DIV);
+    }
+
+    /** fee-tracker estimate ~ 1.522 */
+    uint256 private constant FEE_MUL = 1_5221486210054223;
+    uint256 private constant FEE_DIV = 1_0000000000000000;
 }
 
 /**
@@ -267,4 +285,13 @@ contract XPowerOdin is XPower {
     function prefix() public pure override returns (uint256) {
         return 3;
     }
+
+    /** @return fee-estimate and averages over gas & gas-price */
+    function fees() public view returns (uint256[] memory) {
+        return _fees(FEE_MUL, FEE_DIV);
+    }
+
+    /** fee-tracker estimate ~ 1.521 */
+    uint256 private constant FEE_MUL = 1_5213172364432791;
+    uint256 private constant FEE_DIV = 1_0000000000000000;
 }

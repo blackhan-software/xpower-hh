@@ -10,27 +10,12 @@ pragma solidity ^0.8.0;
 abstract contract FeeTracker {
     /** cumulative moving-averages: gas & gas-price */
     uint256[2] private _average;
-    /** cumulative moving-averages: overhead ~ 1.52 */
-    uint256 private constant MUL = 1_522815194170197;
-    uint256 private constant DIV = 1_000000000000000;
 
     /** gas & gas-price tracker */
     modifier tracked() {
         uint256 gas = gasleft();
         _;
         _update(gas - gasleft(), tx.gasprice);
-    }
-
-    /** @return fee-estimate and averages over gas & gas-price */
-    function fees() public view returns (uint256[] memory) {
-        uint256[] memory array = new uint256[](3);
-        uint256 gasPrice = _average[1];
-        array[2] = gasPrice;
-        uint256 gasValue = _average[0];
-        array[1] = gasValue;
-        uint256 feeValue = gasPrice * gasValue;
-        array[0] = (MUL * feeValue) / DIV;
-        return array;
     }
 
     /** update averages over gas & gas-price */
@@ -47,5 +32,17 @@ abstract contract FeeTracker {
         } else {
             _average[1] = (gasPrice);
         }
+    }
+
+    /** @return fee-estimate and averages over gas & gas-price */
+    function _fees(uint256 mul, uint256 div) internal view returns (uint256[] memory) {
+        uint256[] memory array = new uint256[](3);
+        uint256 gasPrice = _average[1];
+        array[2] = gasPrice;
+        uint256 gasValue = _average[0];
+        array[1] = gasValue;
+        uint256 feeValue = gasPrice * gasValue;
+        array[0] = (mul * feeValue) / div;
+        return array;
     }
 }
