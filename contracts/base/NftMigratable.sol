@@ -45,8 +45,7 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
 
     /** migrate amount of ERC1155 (for account) */
     function migrateFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) public {
-        uint256 timestamp = block.timestamp;
-        require(_deadlineBy >= timestamp, "deadline passed");
+        require(_deadlineBy >= block.timestamp, "deadline passed");
         _burnFrom(account, nftId, amount, index);
         _mint(account, nftId, amount, "");
     }
@@ -77,8 +76,8 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         uint256[] memory amounts,
         uint256[] memory index
     ) public {
-        uint256 timestamp = block.timestamp;
-        require(_deadlineBy >= timestamp, "deadline passed");
+        require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
+        require(_deadlineBy >= block.timestamp, "deadline passed");
         for (uint256 i = 0; i < nftIds.length; i++) {
             _burnFrom(account, nftIds[i], amounts[i], index);
         }
