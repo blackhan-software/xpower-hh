@@ -6,7 +6,7 @@ const { ethers, network } = require("hardhat");
 let accounts; // all accounts
 let addresses; // all addresses
 let XPower, Nft, Ppt; // contracts
-let xpower, nft, nft_staked; // instances
+let xpower, nft, ppt; // instances
 
 const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
@@ -42,40 +42,68 @@ describe("XPowerPptSupervised", async function () {
     await nft.deployed();
   });
   before(async function () {
-    nft_staked = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
-    expect(nft_staked).to.exist;
-    await nft_staked.deployed();
+    ppt = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
+    expect(ppt).to.exist;
+    await ppt.deployed();
   });
   it("should grant & revoke NFT_SEAL_ROLE", async function () {
-    const role = await has_role(nft_staked.NFT_SEAL_ROLE(), {
+    const role = await has_role(ppt.NFT_SEAL_ROLE(), {
       has: false,
     });
     await grant_role(role, { granted: true });
     await revoke_role(role, { revoked: true });
   });
   it("should revoke & grant NFT_SEAL_ADMIN_ROLE", async function () {
-    const role = await has_role(nft_staked.NFT_SEAL_ADMIN_ROLE(), {
+    const role = await has_role(ppt.NFT_SEAL_ADMIN_ROLE(), {
+      has: true,
+    });
+    await revoke_role(role, { revoked: true });
+    await grant_role(role, { granted: true });
+  });
+  it("should grant & revoke NFT_ROYALTY_ROLE", async function () {
+    const role = await has_role(ppt.NFT_ROYALTY_ROLE(), {
+      has: false,
+    });
+    await grant_role(role, { granted: true });
+    await revoke_role(role, { revoked: true });
+  });
+  it("should revoke & grant NFT_ROYALTY_ADMIN_ROLE", async function () {
+    const role = await has_role(ppt.NFT_ROYALTY_ADMIN_ROLE(), {
+      has: true,
+    });
+    await revoke_role(role, { revoked: true });
+    await grant_role(role, { granted: true });
+  });
+  it("should grant & revoke NFT_ROYAL_ROLE", async function () {
+    const role = await has_role(ppt.NFT_ROYAL_ROLE(), {
+      has: false,
+    });
+    await grant_role(role, { granted: true });
+    await revoke_role(role, { revoked: true });
+  });
+  it("should revoke & grant NFT_ROYAL_ADMIN_ROLE", async function () {
+    const role = await has_role(ppt.NFT_ROYAL_ADMIN_ROLE(), {
       has: true,
     });
     await revoke_role(role, { revoked: true });
     await grant_role(role, { granted: true });
   });
   it("should grant & revoke URI_DATA_ROLE", async function () {
-    const role = await has_role(nft_staked.URI_DATA_ROLE(), {
+    const role = await has_role(ppt.URI_DATA_ROLE(), {
       has: false,
     });
     await grant_role(role, { granted: true });
     await revoke_role(role, { revoked: true });
   });
   it("should revoke & grant URI_DATA_ADMIN_ROLE", async function () {
-    const role = await has_role(nft_staked.URI_DATA_ADMIN_ROLE(), {
+    const role = await has_role(ppt.URI_DATA_ADMIN_ROLE(), {
       has: true,
     });
     await revoke_role(role, { revoked: true });
     await grant_role(role, { granted: true });
   });
   it("should transfer DEFAULT_ADMIN_ROLE", async function () {
-    const role = await has_role(nft_staked.DEFAULT_ADMIN_ROLE(), {
+    const role = await has_role(ppt.DEFAULT_ADMIN_ROLE(), {
       has: true,
     });
     await grant_role(role, { granted: true, address: addresses[1] });
@@ -85,14 +113,14 @@ describe("XPowerPptSupervised", async function () {
   });
 });
 async function revoke_role(role, { revoked, address }) {
-  await nft_staked.revokeRole(role, address ?? addresses[0]);
+  await ppt.revokeRole(role, address ?? addresses[0]);
   await has_role(role, { has: !revoked });
 }
 async function grant_role(role, { granted, address }) {
   if (granted) {
-    await nft_staked.grantRole(role, address ?? addresses[0]);
+    await ppt.grantRole(role, address ?? addresses[0]);
   } else {
-    await nft_staked.grantRole(role, address ?? addresses[0]).catch((ex) => {
+    await ppt.grantRole(role, address ?? addresses[0]).catch((ex) => {
       const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
       if (m === null) console.debug(ex);
       expect(m).to.be.not.null;
@@ -102,7 +130,7 @@ async function grant_role(role, { granted, address }) {
 }
 async function has_role(role, { has, address }) {
   const my_role = await role;
-  const has_role = await nft_staked.hasRole(my_role, address ?? addresses[0]);
+  const has_role = await ppt.hasRole(my_role, address ?? addresses[0]);
   expect(has_role).to.eq(has);
   return my_role;
 }

@@ -74,6 +74,22 @@ abstract contract NftMigratableSupervised is Supervised {
     }
 }
 
+abstract contract NftRoyaltySupervised is Supervised {
+    /** role grants right to set the NFT's default royalty */
+    bytes32 public constant NFT_ROYALTY_ROLE = keccak256("NFT_ROYALTY_ROLE");
+    bytes32 public constant NFT_ROYALTY_ADMIN_ROLE = keccak256("NFT_ROYALTY_ADMIN_ROLE");
+    /** role grants right to set the NFT's default royalty beneficiary */
+    bytes32 public constant NFT_ROYAL_ROLE = keccak256("NFT_ROYAL_ROLE");
+    bytes32 public constant NFT_ROYAL_ADMIN_ROLE = keccak256("NFT_ROYAL_ADMIN_ROLE");
+
+    constructor() {
+        _setRoleAdmin(NFT_ROYALTY_ROLE, NFT_ROYALTY_ADMIN_ROLE);
+        _grantRole(NFT_ROYALTY_ADMIN_ROLE, msg.sender);
+        _setRoleAdmin(NFT_ROYAL_ROLE, NFT_ROYAL_ADMIN_ROLE);
+        _grantRole(NFT_ROYAL_ADMIN_ROLE, msg.sender);
+    }
+}
+
 abstract contract URIMalleableSupervised is Supervised {
     /** role grants right to change metadata URIs */
     bytes32 public constant URI_DATA_ROLE = keccak256("URI_DATA_ROLE");

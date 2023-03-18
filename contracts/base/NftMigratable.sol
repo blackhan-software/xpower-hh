@@ -5,6 +5,8 @@ pragma solidity ^0.8.0;
 
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {ERC1155Burnable} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
+
+import {Nft} from "../libs/Nft.sol";
 import {Supervised, NftMigratableSupervised} from "./Supervised.sol";
 
 /**
@@ -53,9 +55,9 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     /** burn amount of ERC1155 (for account) */
     function _burnFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) private {
         require(amount > 0, "non-positive amount");
-        uint256 tryId = nftId % _eonOf(_yearOf(nftId));
+        uint256 tryId = nftId % Nft.eonOf(Nft.yearOf(nftId));
         assert(tryId > 0); // cannot be zero
-        uint256 prefix = _prefixOf(nftId);
+        uint256 prefix = Nft.prefixOf(nftId);
         assert(prefix > 0); // cannot be zero
         uint256 tidx = prefix <= index.length ? prefix - 1 : index.length - 1;
         assert(tidx >= 0); // token index: zero *or* larger
@@ -104,27 +106,5 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     /** @return true if this contract implements the interface defined by interfaceId */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
-    }
-
-    function _prefixOf(uint256 nftId) internal pure returns (uint256) {
-        uint256 prefix = nftId / _eonOf(_yearOf(nftId));
-        require(prefix > 0, "invalid prefix");
-        return prefix;
-    }
-
-    /** @return eon the given year belongs to: 1M, 10M, 100M, ... */
-    function _eonOf(uint256 anno) internal pure returns (uint256) {
-        uint256 eon = 10_000;
-        while (anno / eon > 0) {
-            eon *= 10;
-        }
-        return 100 * eon;
-    }
-
-    /** @return year of nft-id (2021, 2022, ...) */
-    function _yearOf(uint256 nftId) internal pure returns (uint256) {
-        uint256 anno = (nftId / 100) % 10_000;
-        require(anno > 2020, "invalid year");
-        return anno;
     }
 }
