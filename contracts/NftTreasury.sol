@@ -28,9 +28,7 @@ contract NftTreasury is ERC1155Holder {
 
     /** stake NFT (for address and amount) */
     function stake(address from, uint256 nftId, uint256 amount) public {
-        require(amount > 0, "non-positive amount");
-        address self = (address)(this);
-        _nft.safeTransferFrom(from, self, nftId, amount, "");
+        _nft.safeTransferFrom(from, address(this), nftId, amount, "");
         _ppt.mint(from, nftId, amount);
         emit Stake(from, nftId, amount);
     }
@@ -40,11 +38,7 @@ contract NftTreasury is ERC1155Holder {
 
     /** stake NFTs (for address and amounts) */
     function stakeBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public {
-        for (uint256 i = 0; i < amounts.length; i++) {
-            require(amounts[i] > 0, "non-positive amount");
-        }
-        address self = (address)(this);
-        _nft.safeBatchTransferFrom(from, self, nftIds, amounts, "");
+        _nft.safeBatchTransferFrom(from, address(this), nftIds, amounts, "");
         _ppt.mintBatch(from, nftIds, amounts);
         emit StakeBatch(from, nftIds, amounts);
     }
@@ -54,10 +48,8 @@ contract NftTreasury is ERC1155Holder {
 
     /** unstake NFT (for address and amount) */
     function unstake(address from, uint256 nftId, uint256 amount) public {
-        require(amount > 0, "non-positive amount");
-        address self = (address)(this);
         _ppt.burn(from, nftId, amount);
-        _nft.safeTransferFrom(self, from, nftId, amount, "");
+        _nft.safeTransferFrom(address(this), from, nftId, amount, "");
         emit Unstake(from, nftId, amount);
     }
 
@@ -66,12 +58,8 @@ contract NftTreasury is ERC1155Holder {
 
     /** unstake NFTs (for address and amounts) */
     function unstakeBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public {
-        for (uint256 i = 0; i < amounts.length; i++) {
-            require(amounts[i] > 0, "non-positive amount");
-        }
-        address self = (address)(this);
         _ppt.burnBatch(from, nftIds, amounts);
-        _nft.safeBatchTransferFrom(self, from, nftIds, amounts, "");
+        _nft.safeBatchTransferFrom(address(this), from, nftIds, amounts, "");
         emit UnstakeBatch(from, nftIds, amounts);
     }
 }
