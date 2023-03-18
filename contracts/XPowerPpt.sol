@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
-// solhint-disable no-empty-blocks
 // solhint-disable not-rely-on-time
+// solhint-disable no-empty-blocks
+// solhint-disable reason-string
 pragma solidity ^0.8.0;
 
 import {NftBase} from "./base/NftBase.sol";
@@ -89,8 +90,8 @@ contract XPowerPpt is NftBase {
     }
 
     /** remember mint actions */
-    function _pushMintBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) internal {
-        assert(nftIds.length <= amounts.length);
+    function _pushMintBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) private {
+        require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
         for (uint256 i = 0; i < nftIds.length; i++) {
             _pushMint(account, nftIds[i], amounts[i]);
         }
@@ -103,8 +104,8 @@ contract XPowerPpt is NftBase {
     }
 
     /** remember burn actions */
-    function _pushBurnBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) internal {
-        assert(nftIds.length <= amounts.length);
+    function _pushBurnBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) private {
+        require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
         for (uint256 i = 0; i < nftIds.length; i++) {
             _pushBurn(account, nftIds[i], amounts[i]);
         }
