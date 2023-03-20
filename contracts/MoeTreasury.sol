@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
 // solhint-disable not-rely-on-time
-// solhint-disable no-empty-blocks
 // solhint-disable reason-string
 pragma solidity ^0.8.0;
 
@@ -12,6 +11,7 @@ import {Array} from "./libs/Array.sol";
 import {Constants} from "./libs/Constants.sol";
 import {Integrator} from "./libs/Integrator.sol";
 import {Polynomial, Polynomials} from "./libs/Polynomials.sol";
+import {Rpp} from "./libs/Rpp.sol";
 import {MoeTreasurySupervised} from "./base/Supervised.sol";
 
 /**
@@ -187,33 +187,34 @@ contract MoeTreasury is MoeTreasurySupervised {
         return Polynomial(array).eval4Clamped(_ppt.levelOf(nftId));
     }
 
+    /** annual percentage rate: 1.000[%] (per nft.level) */
+    uint256 private constant APR_MUL = 1_000;
+    uint256 private constant APR_DIV = 3;
+
     /** @return APR parameters (for nft-prefix) */
     function getAPR(uint256 nftPrefix) public view returns (uint256[] memory) {
         if (_apr[nftPrefix].length > 0) {
             return _apr[nftPrefix];
         }
-        uint256[] memory apr = new uint256[](4);
-        apr[3] = 1_000;
-        apr[2] = 3;
-        return apr;
+        uint256[] memory array = new uint256[](4);
+        array[3] = APR_MUL;
+        array[2] = APR_DIV;
+        return array;
     }
 
     /** set APR parameters (for nft-prefix) */
     function setAPR(uint256 nftPrefix, uint256[] memory array) public onlyRole(APR_ROLE) {
-        require(array.length == 4, "invalid array.length");
-        // eliminate possibility of division-by-zero
-        require(array[2] > 0, "invalid array[2] == 0");
-        // eliminate possibility of all-zero values
-        require(array[3] > 0, "invalid array[3] == 0");
+        Rpp.checkArray(array);
+        // fixed nft-id as anchor
         uint256 nftId = _ppt.idBy(2021, 3, nftPrefix);
         // check APR reparametrization of value
         uint256 nextValue = aprTargetOf(nftId, array);
         uint256 currValue = aprTargetOf(nftId);
-        _checkAPRValue(nextValue, currValue);
+        Rpp.checkValue(nextValue, currValue);
         // check APR reparametrization of stamp
         uint256 lastStamp = aprs[nftPrefix].lastOf().stamp;
         uint256 currStamp = block.timestamp;
-        _checkAPRStamp(currStamp, lastStamp);
+        Rpp.checkStamp(currStamp, lastStamp);
         // append (stamp, apr-of[nft-id]) to integrator
         aprs[nftPrefix].append(currStamp, currValue);
         // all requirements satisfied: use array
@@ -224,26 +225,6 @@ contract MoeTreasury is MoeTreasurySupervised {
     function setAPRBatch(uint256[] memory nftPrefixes, uint256[] memory array) public onlyRole(APR_ROLE) {
         for (uint256 p = 0; p < nftPrefixes.length; p++) {
             setAPR(nftPrefixes[p], array);
-        }
-    }
-
-    /** validate APR change: 0.5 <= next / last <= 2.0 or next <= 1.000[%] */
-    function _checkAPRValue(uint256 nextValue, uint256 lastValue) private pure {
-        if (nextValue < lastValue) {
-            require(lastValue <= 2 * nextValue, "invalid change: too small");
-        }
-        if (nextValue > lastValue && lastValue > 0) {
-            require(nextValue <= 2 * lastValue, "invalid change: too large");
-        }
-        if (nextValue > lastValue && lastValue == 0) {
-            require(nextValue <= 1_000, "invalid change: too large");
-        }
-    }
-
-    /** validate APR change: invocation frequency at most at once per month */
-    function _checkAPRStamp(uint256 nextStamp, uint256 lastStamp) private pure {
-        if (lastStamp > 0) {
-            require(nextStamp - lastStamp > Constants.MONTH, "invalid change: too frequent");
         }
     }
 
@@ -279,33 +260,34 @@ contract MoeTreasury is MoeTreasurySupervised {
         return 0;
     }
 
+    /** annual percentage bonus: 1.0[‱] (per nft.year) */
+    uint256 private constant APR_BONUS_MUL = 10;
+    uint256 private constant APR_BONUS_DIV = 1;
+
     /** @return APR bonus parameters (for nft-prefix) */
     function getAPRBonus(uint256 nftPrefix) public view returns (uint256[] memory) {
         if (_bonus[nftPrefix].length > 0) {
             return _bonus[nftPrefix];
         }
-        uint256[] memory bonus = new uint256[](4);
-        bonus[3] = 10;
-        bonus[2] = 1;
-        return bonus;
+        uint256[] memory array = new uint256[](4);
+        array[3] = APR_BONUS_MUL;
+        array[2] = APR_BONUS_DIV;
+        return array;
     }
 
     /** set APR bonus parameters (for nft-prefix) */
     function setAPRBonus(uint256 nftPrefix, uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
-        require(array.length == 4, "invalid array.length");
-        // eliminate possibility of division-by-zero
-        require(array[2] > 0, "invalid array[2] == 0");
-        // eliminate possibility of all-zero values
-        require(array[3] > 0, "invalid array[3] == 0");
+        Rpp.checkArray(array);
+        // fixed nft-id as anchor
         uint256 nftId = _ppt.idBy(2021, 3, nftPrefix);
         // check APR bonus reparametrization of value
         uint256 nextValue = aprBonusTargetOf(nftId, array);
         uint256 currValue = aprBonusTargetOf(nftId);
-        _checkAPRBonusValue(nextValue, currValue);
+        Rpp.checkValue(nextValue, currValue);
         // check APR bonus reparametrization of stamp
         uint256 lastStamp = bonuses[nftPrefix].lastOf().stamp;
         uint256 currStamp = block.timestamp;
-        _checkAPRBonusStamp(currStamp, lastStamp);
+        Rpp.checkStamp(currStamp, lastStamp);
         // append (stamp, apr-bonus-of[nft-id]) to integrator
         bonuses[nftPrefix].append(currStamp, currValue);
         // all requirements satisfied: use array
@@ -316,26 +298,6 @@ contract MoeTreasury is MoeTreasurySupervised {
     function setAPRBonusBatch(uint256[] memory nftPrefixes, uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
         for (uint256 p = 0; p < nftPrefixes.length; p++) {
             setAPRBonus(nftPrefixes[p], array);
-        }
-    }
-
-    /** validate APR bonus change: 0.5 <= next / last <= 2.0 or next <= 0.010[%] */
-    function _checkAPRBonusValue(uint256 nextValue, uint256 lastValue) private pure {
-        if (nextValue < lastValue) {
-            require(lastValue <= 2 * nextValue, "invalid change: too small");
-        }
-        if (nextValue > lastValue && lastValue > 0) {
-            require(nextValue <= 2 * lastValue, "invalid change: too large");
-        }
-        if (nextValue > lastValue && lastValue == 0) {
-            require(nextValue <= 10, "invalid change: too large");
-        }
-    }
-
-    /** validate APR bonus change: invocation frequency at most at once per month */
-    function _checkAPRBonusStamp(uint256 nextStamp, uint256 lastStamp) private pure {
-        if (lastStamp > 0) {
-            require(nextStamp - lastStamp > Constants.MONTH, "invalid change: too frequent");
         }
     }
 

@@ -12,15 +12,7 @@ contract XPowerThorTest is XPowerThor {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerThor(_base, _deadlineIn) {}
 
     function cache(bytes32 _blockHash) public {
-        _timestamps[_blockHash] = block.timestamp;
-    }
-
-    function hashOf(address _to, bytes32 _blockHash, uint256 _nonce) public view returns (bytes32) {
-        return _hashOf(_to, _blockHash, _nonce);
-    }
-
-    function zerosOf(bytes32 _nonceHash) public pure returns (uint8) {
-        return _zerosOf(_nonceHash);
+        _cache(_blockHash, block.timestamp);
     }
 }
 
@@ -37,15 +29,7 @@ contract XPowerLokiTest is XPowerLoki {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerLoki(_base, _deadlineIn) {}
 
     function cache(bytes32 _blockHash) public {
-        _timestamps[_blockHash] = block.timestamp;
-    }
-
-    function hashOf(address _to, bytes32 _blockHash, uint256 _nonce) public view returns (bytes32) {
-        return _hashOf(_to, _blockHash, _nonce);
-    }
-
-    function zerosOf(bytes32 _nonceHash) public pure returns (uint8) {
-        return _zerosOf(_nonceHash);
+        _cache(_blockHash, block.timestamp);
     }
 }
 
@@ -62,15 +46,7 @@ contract XPowerOdinTest is XPowerOdin {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerOdin(_base, _deadlineIn) {}
 
     function cache(bytes32 _blockHash) public {
-        _timestamps[_blockHash] = block.timestamp;
-    }
-
-    function hashOf(address _to, bytes32 _blockHash, uint256 _nonce) public view returns (bytes32) {
-        return _hashOf(_to, _blockHash, _nonce);
-    }
-
-    function zerosOf(bytes32 _nonceHash) public pure returns (uint8) {
-        return _zerosOf(_nonceHash);
+        _cache(_blockHash, block.timestamp);
     }
 }
 

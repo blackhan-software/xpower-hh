@@ -15,6 +15,7 @@ import {Supervised, XPowerSupervised} from "./base/Supervised.sol";
 import {Constants} from "./libs/Constants.sol";
 import {Integrator} from "./libs/Integrator.sol";
 import {Polynomials, Polynomial} from "./libs/Polynomials.sol";
+import {Rpp} from "./libs/Rpp.sol";
 
 /**
  * Abstract base class for the XPower THOR, LOKI and ODIN proof-of-work tokens.
@@ -29,9 +30,9 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     /** set of nonce-hashes already minted for */
     mapping(bytes32 => bool) private _hashes;
     /** map from block-hashes to timestamps */
-    mapping(bytes32 => uint256) internal _timestamps;
+    mapping(bytes32 => uint256) private _timestamps;
     /** map from intervals to block-hashes */
-    mapping(uint256 => bytes32) internal _blockHashes;
+    mapping(uint256 => bytes32) private _blockHashes;
 
     /** @param symbol short token symbol */
     /** @param moeBase addresses of old contracts */
@@ -47,6 +48,11 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         Migratable(moeBase, deadlineIn)
     {}
 
+    /** @return number of decimals of representation */
+    function decimals() public view virtual override returns (uint8) {
+        return Constants.DECIMALS;
+    }
+
     /** emitted on caching most recent block-hash */
     event Init(bytes32 blockHash, uint256 timestamp);
 
@@ -59,7 +65,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
             assert(blockHash > 0);
             uint256 timestamp = block.timestamp;
             assert(timestamp > 0);
-            _timestamps[blockHash] = timestamp;
+            _cache(blockHash, timestamp);
             _blockHashes[interval] = blockHash;
             emit Init(blockHash, timestamp);
         } else {
@@ -69,15 +75,20 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         }
     }
 
+    /** cache block-hash at timestamp */
+    function _cache(bytes32 blockHash, uint256 timestamp) internal {
+        _timestamps[blockHash] = timestamp;
+    }
+
     /** mint tokens for to-beneficiary, block-hash & nonce */
     function mint(address to, bytes32 blockHash, uint256 nonce) public tracked {
         // check block-hash to be in current interval
-        require(_current(blockHash), "expired block-hash");
+        require(recent(blockHash), "expired block-hash");
         // calculate nonce-hash for to, block-hash & nonce
-        bytes32 nonceHash = _hashOf(to, blockHash, nonce);
-        require(!_hashes[nonceHash], "duplicate nonce-hash");
+        bytes32 nonceHash = hashOf(to, blockHash, nonce);
+        require(unique(nonceHash), "duplicate nonce-hash");
         // calculate number of zeros of nonce-hash
-        uint256 zeros = _zerosOf(nonceHash);
+        uint256 zeros = zerosOf(nonceHash);
         require(zeros > 0, "empty nonce-hash");
         // calculate amount of tokens of zeros
         uint256 amount = amountOf(zeros);
@@ -100,17 +111,22 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     }
 
     /** check whether block-hash has recently been cached */
-    function _current(bytes32 blockHash) internal view returns (bool) {
+    function recent(bytes32 blockHash) public view returns (bool) {
         return _timestamps[blockHash] > currentInterval();
     }
 
     /** @return hash of contract, to-beneficiary, block-hash & nonce */
-    function _hashOf(address to, bytes32 blockHash, uint256 nonce) internal view virtual returns (bytes32) {
+    function hashOf(address to, bytes32 blockHash, uint256 nonce) public view returns (bytes32) {
         return keccak256(abi.encode(address(this), to, blockHash, nonce));
     }
 
+    /** check whether nonce-hash is unique */
+    function unique(bytes32 nonceHash) public view returns (bool) {
+        return !_hashes[nonceHash];
+    }
+
     /** @return leading-zeros (for nonce-hash) */
-    function _zerosOf(bytes32 nonceHash) internal pure returns (uint8) {
+    function zerosOf(bytes32 nonceHash) public pure returns (uint8) {
         if (nonceHash > 0) {
             return uint8(63 - (Math.log2(uint256(nonceHash)) >> 2));
         }
@@ -132,70 +148,50 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         }
         uint256 stamp = block.timestamp;
         uint256 value = shareTargetOf(amountOf(1));
-        uint256 share = shares.meanOf(stamp, value);
-        return (share * amount) / amountOf(1);
+        uint256 point = shares.meanOf(stamp, value);
+        return (point * amount) / amountOf(1);
     }
 
-    /** @return share (for amount) */
+    /** @return share target (for amount) */
     function shareTargetOf(uint256 amount) public view returns (uint256) {
         return shareTargetOf(amount, getShare());
     }
 
-    /** @return share (for amount & parametrization) */
+    /** @return share target (for amount & parametrization) */
     function shareTargetOf(uint256 amount, uint256[] memory array) private pure returns (uint256) {
         return Polynomial(array).eval4Clamped(amount);
     }
+
+    /** fractional treasury share: 50[%] */
+    uint256 private constant SHARE_MUL = 1;
+    uint256 private constant SHARE_DIV = 2;
 
     /** @return share parameters */
     function getShare() public view returns (uint256[] memory) {
         if (_share.length > 0) {
             return _share;
         }
-        uint256[] memory share = new uint256[](4);
-        share[3] = 1;
-        share[2] = 2;
-        return share;
+        uint256[] memory array = new uint256[](4);
+        array[3] = SHARE_MUL;
+        array[2] = SHARE_DIV;
+        return array;
     }
 
     /** set share parameters */
     function setShare(uint256[] memory array) public onlyRole(SHARE_ROLE) {
-        require(array.length == 4, "invalid array.length");
-        // eliminate possibility of division-by-zero
-        require(array[2] > 0, "invalid array[2] == 0");
-        // eliminate possibility of all-zero values
-        require(array[3] > 0, "invalid array[3] == 0");
+        Rpp.checkArray(array);
         // check share reparametrization of value
         uint256 nextValue = shareTargetOf(amountOf(1), array);
         uint256 currValue = shareTargetOf(amountOf(1));
-        _checkShareValue(nextValue, currValue);
+        Rpp.checkValue(nextValue, currValue);
         // check share reparametrization of stamp
         uint256 lastStamp = shares.lastOf().stamp;
         uint256 currStamp = block.timestamp;
-        _checkShareStamp(currStamp, lastStamp);
+        Rpp.checkStamp(currStamp, lastStamp);
         // append (stamp, share-of) to integrator
         shares.append(currStamp, currValue);
         // all requirements true: use array
         _share = array;
-    }
-
-    /** validate share change: 0.5 <= next / last <= 2.0 or next <= amountOf(1) */
-    function _checkShareValue(uint256 nextValue, uint256 lastValue) private view {
-        if (nextValue < lastValue) {
-            require(lastValue <= 2 * nextValue, "invalid change: too small");
-        }
-        if (nextValue > lastValue && lastValue > 0) {
-            require(nextValue <= 2 * lastValue, "invalid change: too large");
-        }
-        if (nextValue > lastValue && lastValue == 0) {
-            require(nextValue <= amountOf(1), "invalid change: too large");
-        }
-    }
-
-    /** validate share change: invocation frequency at most at once per month */
-    function _checkShareStamp(uint256 nextStamp, uint256 lastStamp) private pure {
-        if (lastStamp > 0) {
-            require(nextStamp - lastStamp > Constants.MONTH, "invalid change: too frequent");
-        }
     }
 
     /** @return true if this contract implements the interface defined by interfaceId */

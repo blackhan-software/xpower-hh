@@ -84,7 +84,7 @@ contract XPowerPpt is NftBase {
     }
 
     /** remember mint action */
-    function _pushMint(address account, uint256 nftId, uint256 amount) internal {
+    function _pushMint(address account, uint256 nftId, uint256 amount) private {
         require(amount > 0, "non-positive amount");
         _age[account][nftId] += int256(amount * block.timestamp);
     }
@@ -98,7 +98,7 @@ contract XPowerPpt is NftBase {
     }
 
     /** remember burn action */
-    function _pushBurn(address account, uint256 nftId, uint256 amount) internal {
+    function _pushBurn(address account, uint256 nftId, uint256 amount) private {
         require(amount > 0, "non-positive amount");
         _age[account][nftId] -= int256(amount * block.timestamp);
     }

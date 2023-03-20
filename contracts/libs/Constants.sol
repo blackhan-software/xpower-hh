@@ -8,4 +8,6 @@ library Constants {
     uint256 internal constant YEAR = CENTURY / 100;
     /** a month [seconds] (approximation) */
     uint256 internal constant MONTH = YEAR / 12;
+    /** number of decimals of representation */
+    uint8 internal constant DECIMALS = 18;
 }

@@ -8,6 +8,7 @@ import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC2
 
 import {XPower} from "./XPower.sol";
 import {SovMigratable} from "./base/Migratable.sol";
+import {Constants} from "./libs/Constants.sol";
 
 /**
  * Abstract base class for the APower aTHOR, aLOKI and aODIN tokens, where only
@@ -33,6 +34,11 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
         SovMigratable(moeLink, sovBase, deadlineIn)
     {
         _moe = XPower(moeLink);
+    }
+
+    /** @return number of decimals of representation */
+    function decimals() public view virtual override returns (uint8) {
+        return _moe.decimals();
     }
 
     /** mint amount of tokens for beneficiary (after wrapping XPower) */

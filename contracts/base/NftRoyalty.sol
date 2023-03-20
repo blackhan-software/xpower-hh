@@ -9,6 +9,7 @@ import {Constants} from "../libs/Constants.sol";
 import {Integrator} from "../libs/Integrator.sol";
 import {Nft} from "../libs/Nft.sol";
 import {Polynomials, Polynomial} from "../libs/Polynomials.sol";
+import {Rpp} from "../libs/Rpp.sol";
 import {Supervised, NftRoyaltySupervised} from "./Supervised.sol";
 
 /**
@@ -22,7 +23,7 @@ abstract contract NftRoyalty is IERC2981, NftRoyaltySupervised {
 
     /** @return royalty beneficiary and amount (for nft-id and sale price) */
     function royaltyInfo(uint256 nftId, uint256 price) public view override returns (address, uint256) {
-        uint256 amount = (royaltyOf(nftId) * price) / 1_000_000;
+        uint256 amount = (royaltyOf(nftId) * price) / (ROYALTY_MUL * 1_000);
         address beneficiary = getRoyal(Nft.prefixOf(nftId));
         return (beneficiary, amount);
     }
@@ -56,33 +57,34 @@ abstract contract NftRoyalty is IERC2981, NftRoyaltySupervised {
         return Polynomial(array).eval4Clamped(Nft.levelOf(nftId));
     }
 
+    /** royalty fraction: 10.000[‱] (per nft.level) */
+    uint256 private constant ROYALTY_MUL = 10_000;
+    uint256 private constant ROYALTY_DIV = 3;
+
     /** @return royalty parameters (for nft-prefix) */
     function getRoyalty(uint256 nftPrefix) public view returns (uint256[] memory) {
         if (_royalty[nftPrefix].length > 0) {
             return _royalty[nftPrefix];
         }
-        uint256[] memory royalty = new uint256[](4);
-        royalty[3] = 10_000;
-        royalty[2] = 3;
-        return royalty;
+        uint256[] memory array = new uint256[](4);
+        array[3] = ROYALTY_MUL;
+        array[2] = ROYALTY_DIV;
+        return array;
     }
 
     /** set royalty parameters (for nft-prefix) */
     function setRoyalty(uint256 nftPrefix, uint256[] memory array) public onlyRole(NFT_ROYALTY_ROLE) {
-        require(array.length == 4, "invalid array.length");
-        // eliminate possibility of division-by-zero
-        require(array[2] > 0, "invalid array[2] == 0");
-        // eliminate possibility of all-zero values
-        require(array[3] > 0, "invalid array[3] == 0");
+        Rpp.checkArray(array);
+        // fixed nft-id as anchor
         uint256 nftId = Nft.idBy(2021, 3, nftPrefix);
-        // check Royalty reparametrization of value
+        // check royalty reparametrization of value
         uint256 nextValue = royaltyTargetOf(nftId, array);
         uint256 currValue = royaltyTargetOf(nftId);
-        _checkRoyaltyStamp(nextValue, currValue);
+        Rpp.checkValue(nextValue, currValue);
         // check royalty reparametrization of stamp
         uint256 lastStamp = royalties[nftPrefix].lastOf().stamp;
         uint256 currStamp = block.timestamp;
-        _checkRoyaltyStamp(currStamp, lastStamp);
+        Rpp.checkStamp(currStamp, lastStamp);
         // append (stamp, royalty-of[nft-id]) to integrator
         royalties[nftPrefix].append(currStamp, currValue);
         // all requirements satisfied: use array
@@ -96,40 +98,20 @@ abstract contract NftRoyalty is IERC2981, NftRoyaltySupervised {
         }
     }
 
-    /** validate royalty change: 0.5 <= next / last <= 2.0 or next <= 0.100[%] */
-    function _checkRoyaltyValue(uint256 nextValue, uint256 lastValue) private pure {
-        if (nextValue < lastValue) {
-            require(lastValue <= 2 * nextValue, "invalid change: too small");
-        }
-        if (nextValue > lastValue && lastValue > 0) {
-            require(nextValue <= 2 * lastValue, "invalid change: too large");
-        }
-        if (nextValue > lastValue && lastValue == 0) {
-            require(nextValue <= 10_000, "invalid change: too large");
-        }
-    }
-
-    /** validate royalty change: invocation frequency at most at once per month */
-    function _checkRoyaltyStamp(uint256 nextStamp, uint256 lastStamp) private pure {
-        if (lastStamp > 0) {
-            require(nextStamp - lastStamp > Constants.MONTH, "invalid change: too frequent");
-        }
-    }
-
     /** @return default royalty beneficiary (for nft-prefix) */
     function getRoyal(uint256 nftPrefix) public view returns (address) {
         return _royals[nftPrefix];
     }
 
     /** set default royalty beneficiary (for nft-prefix) */
-    function setRoyal(uint256 nftPrefix, address receiver) public onlyRole(NFT_ROYAL_ROLE) {
-        _royals[nftPrefix] = receiver;
+    function setRoyal(uint256 nftPrefix, address beneficiary) public onlyRole(NFT_ROYAL_ROLE) {
+        _royals[nftPrefix] = beneficiary;
     }
 
     /** batch-set royalty beneficiaries (for nft-prefixes) */
-    function setRoyalBatch(uint256[] memory nftPrefixes, address receiver) public onlyRole(NFT_ROYAL_ROLE) {
+    function setRoyalBatch(uint256[] memory nftPrefixes, address beneficiary) public onlyRole(NFT_ROYAL_ROLE) {
         for (uint256 p = 0; p < nftPrefixes.length; p++) {
-            setRoyal(nftPrefixes[p], receiver);
+            setRoyal(nftPrefixes[p], beneficiary);
         }
     }
 
