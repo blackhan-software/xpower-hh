@@ -135,6 +135,6 @@ abstract contract NftRoyalty is IERC2981, NftRoyaltySupervised {
 
     /** @return true if this contract implements the interface defined by interfaceId */
     function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, Supervised) returns (bool) {
-        return super.supportsInterface(interfaceId);
+        return interfaceId == type(IERC2981).interfaceId || super.supportsInterface(interfaceId);
     }
 }

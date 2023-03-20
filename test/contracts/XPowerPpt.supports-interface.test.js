@@ -50,6 +50,9 @@ describe("XPowerPpt", async function () {
     it("should support IERC165 interface", async function () {
       expect(await ppt.supportsInterface(0x01ffc9a7)).to.eq(true);
     });
+    it("should support IERC2981 interface", async function () {
+      expect(await nft.supportsInterface(0x2a55205a)).to.eq(true);
+    });
     it("should support IERC1155 interface", async function () {
       expect(await ppt.supportsInterface(0xd9b67a26)).to.eq(true);
     });
