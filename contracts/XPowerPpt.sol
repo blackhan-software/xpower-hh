@@ -57,6 +57,8 @@ contract XPowerPpt is NftBase {
 
     /** mint particular amounts of staked NFTs (for address and nft-ids) */
     function mintBatch(address to, uint256[] memory nftIds, uint256[] memory amounts) public onlyOwner {
+        require(nftIds.length > 0, "empty ids");
+        require(amounts.length > 0, "empty amounts");
         _pushMintBatch(to, nftIds, amounts);
         _mintBatch(to, nftIds, amounts, "");
     }
@@ -69,6 +71,8 @@ contract XPowerPpt is NftBase {
 
     /** burn particular amounts of staked NFTs (for address and nft-ids) */
     function burnBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public override onlyOwner {
+        require(nftIds.length > 0, "empty ids");
+        require(amounts.length > 0, "empty amounts");
         _pushBurnBatch(from, nftIds, amounts);
         _burnBatch(from, nftIds, amounts);
     }
