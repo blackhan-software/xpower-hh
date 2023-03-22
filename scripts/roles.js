@@ -43,6 +43,16 @@ async function transferNftRoles(factory_name, contract_name, { to: owner }) {
   const signer = await hre.ethers.getSigner();
   assert(signer?.address, "missing signer address");
   await transferRole(contract, {
+    role: contract.NFT_ROYALTY_ADMIN_ROLE(),
+    from: signer.address,
+    to: owner,
+  });
+  await transferRole(contract, {
+    role: contract.NFT_ROYAL_ADMIN_ROLE(),
+    from: signer.address,
+    to: owner,
+  });
+  await transferRole(contract, {
     role: contract.NFT_SEAL_ADMIN_ROLE(),
     from: signer.address,
     to: owner,
