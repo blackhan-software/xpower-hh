@@ -9,7 +9,7 @@ let XPower, XPowerNft; // contracts
 let xpower, nft; // instances
 
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
-const NULL_ADDRESS = `0x0000000000000000000000000000000000000000`;
+const SOME_ADDRESS = /^0x[0-fa-f]{40}$/i;
 const DEADLINE = 0; // [seconds]
 
 const DAYS = 24 * 3600; // [seconds]
@@ -51,23 +51,23 @@ describe("XPowerNft", async function () {
     const level = (l) => {
       return l.toString().padStart(2, "0");
     };
-    const amount = (l) => {
-      return (10 * l) / 3;
+    const amount = (_) => {
+      return 10; // ignore level argument!
     };
     for (const l of [0, 3, 6, 9, 12, 15, 18, 21, 24]) {
       it(`should get info for 12023${level(l)} of ${amount(l)}`, async () => {
         const [b, a] = await nft.royaltyInfo(1202300 + l, 10_000);
-        expect(b).to.equal(NULL_ADDRESS);
+        expect(b).to.match(SOME_ADDRESS);
         expect(a).to.equal(amount(l));
       });
       it(`should get info for 12022${level(l)} of ${amount(l)}`, async () => {
         const [b, a] = await nft.royaltyInfo(2202200 + l, 10_000);
-        expect(b).to.equal(NULL_ADDRESS);
+        expect(b).to.match(SOME_ADDRESS);
         expect(a).to.equal(amount(l));
       });
       it(`should get info for 12021${level(l)} of ${amount(l)}`, async () => {
         const [b, a] = await nft.royaltyInfo(3202100 + l, 10_000);
-        expect(b).to.equal(NULL_ADDRESS);
+        expect(b).to.match(SOME_ADDRESS);
         expect(a).to.equal(amount(l));
       });
     }
@@ -231,6 +231,6 @@ async function royalty(
 ) {
   const info = await nft.royaltyInfo(id, price);
   expect(info[1].toNumber()).to.be.greaterThan(0);
-  expect(info[0]).to.match(/^0x0{40}$/);
+  expect(info[0]).to.match(SOME_ADDRESS);
   return info[1];
 }

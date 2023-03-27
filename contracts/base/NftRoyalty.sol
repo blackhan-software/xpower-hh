@@ -15,11 +15,15 @@ import {Supervised, NftRoyaltySupervised} from "./Supervised.sol";
 /**
  * Allows changing of the NFT's default royalty *and* beneficiary (by
  * the NFT_ROYALTY_ROLE and NFT_ROYAL_ROLE) while the default royalty
- * fraction is set to a small value of 0.1% (per nft.level).
+ * fraction is set to a flat value of 0.1%.
  */
 abstract contract NftRoyalty is IERC2981, NftRoyaltySupervised {
     using Integrator for Integrator.Item[];
     using Polynomials for Polynomial;
+
+    constructor() {
+        _royals[0] = msg.sender; // fallback beneficiary
+    }
 
     /** @return royalty beneficiary and amount (for nft-id and sale price) */
     function royaltyInfo(uint256 nftId, uint256 price) public view override returns (address, uint256) {
@@ -35,21 +39,23 @@ abstract contract NftRoyalty is IERC2981, NftRoyaltySupervised {
     /** look-up map of royals: nft-prefix => address */
     mapping(uint256 => address) private _royals;
 
-    /** @return duration weighted mean of royalties (per nft.level) */
+    /** @return duration weighted mean of royalties (for nft.prefix) */
     function royaltyOf(uint256 nftId) public view returns (uint256) {
         uint256 nftPrefix = Nft.prefixOf(nftId);
         if (royalties[nftPrefix].length == 0) {
             return royaltyTargetOf(nftId);
         }
         uint256 stamp = block.timestamp;
-        uint256 value = royaltyTargetOf(Nft.idBy(2021, 3, nftPrefix));
+        uint256 value = royaltyTargetOf(nftId);
         uint256 point = royalties[nftPrefix].meanOf(stamp, value);
-        return (point * Nft.levelOf(nftId)) / 3;
+        return (point);
     }
 
-    /** @return target for annualized percentage rate (per nft.level) */
+    /** @return target for annualized percentage rate (for nft.prefix) */
     function royaltyTargetOf(uint256 nftId) public view returns (uint256) {
-        return royaltyTargetOf(nftId, getRoyalty(Nft.prefixOf(nftId)));
+        uint256 nftPrefix = Nft.prefixOf(nftId);
+        uint256 fixId = Nft.idBy(2021, 3, nftPrefix);
+        return royaltyTargetOf(fixId, getRoyalty(nftPrefix));
     }
 
     /** @return target for annualized percentage rate (per nft.level & parametrization) */
@@ -100,7 +106,10 @@ abstract contract NftRoyalty is IERC2981, NftRoyaltySupervised {
 
     /** @return default royalty beneficiary (for nft-prefix) */
     function getRoyal(uint256 nftPrefix) public view returns (address) {
-        return _royals[nftPrefix];
+        if (_royals[nftPrefix] != address(0)) {
+            return _royals[nftPrefix];
+        }
+        return _royals[0];
     }
 
     /** set default royalty beneficiary (for nft-prefix) */
