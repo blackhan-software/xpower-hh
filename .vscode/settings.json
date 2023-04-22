@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    ".env-avalanche-test": "properties",
+    ".env-avalanche-main": "properties",
+    ".env-hardhat": "properties",
+    "*.sol": "solidity"
+  },
+  "files.exclude": {
+    "cache/": true,
+    "coverage/": true
+  }
+}
