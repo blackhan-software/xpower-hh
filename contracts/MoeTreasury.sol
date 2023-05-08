@@ -160,6 +160,11 @@ contract MoeTreasury is MoeTreasurySupervised {
         return aprOf(nftId) + aprBonusOf(nftId);
     }
 
+    /** @return sum of APR and APR bonus targets */
+    function rateTargetOf(uint256 nftId) public view returns (uint256) {
+        return aprTargetOf(nftId) + aprBonusTargetOf(nftId);
+    }
+
     /** integrator for APRs: nft-prefix => [(stamp, value)] */
     mapping(uint256 => Integrator.Item[]) public aprs;
     /** parametrization of APR: nft-prefix => coefficients */
