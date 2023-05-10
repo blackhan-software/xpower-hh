@@ -1,4 +1,4 @@
-const { defaultAbiCoder: abi } = require("ethers/lib/utils");
+const { solidityPack } = require("ethers/lib/utils");
 const { InitializeKeccak } = require("keccak-wasm");
 const { keccak256 } = require("keccak-wasm");
 const { block } = require("./block");
@@ -39,18 +39,21 @@ class Miner {
     return (contract, address, block_hash, nonce) => {
       let value = this.abi_encoded[block_hash];
       if (value === undefined) {
-        const template = abi.encode(
-          ["address", "address", "bytes32", "uint256"],
-          [contract, address, block_hash, 0]
+        const template = solidityPack(
+          ["uint160", "bytes28", "uint256"],
+          [BigInt(contract) ^ BigInt(address), bytes28(block_hash), 0n]
         );
         this.abi_encoded[block_hash] = value = this.arrayify(template.slice(2));
         this.array_cache[level] = this.arrayify(nonce.toString(16));
         this.nonce_cache[level] = nonce;
       }
       const array = lazy_arrayify(nonce, nonce.toString(16));
-      value.set(array, 96);
+      value.set(array, 48);
       return value;
     };
+    function bytes28(block_hash) {
+      return "0x" + block_hash.slice(2).slice(0, -8);
+    }
   }
 
   arrayifier(level) {

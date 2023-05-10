@@ -117,7 +117,12 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
 
     /** @return hash of contract, to-beneficiary, block-hash & nonce */
     function hashOf(address to, bytes32 blockHash, uint256 nonce) public view returns (bytes32) {
-        return keccak256(abi.encode(address(this), to, blockHash, nonce));
+        bytes memory data = bytes.concat(
+            bytes20(uint160(address(this)) ^ uint160(to)),
+            bytes28(blockHash),
+            bytes32(nonce)
+        );
+        return keccak256(data);
     }
 
     /** check whether nonce-hash is unique */
