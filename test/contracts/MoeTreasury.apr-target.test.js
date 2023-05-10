@@ -78,41 +78,41 @@ describe("MoeTreasury", async function () {
     expect(await apower.owner()).to.eq(mt.address);
   });
   describe("apr-target (i.e rewards ~ nft-level)", async function () {
-    it("should return 0.000[%] for nft-level=00", async function () {
-      expect(await mt.aprTargetOf(1202100)).to.eq(0);
-      expect(await mt.aprTargetOf(1202200)).to.eq(0);
+    it("should return 0.000000[%] for nft-level=00", async function () {
+      expect(await mt.aprTargetOf(1202100)).to.eq(0x000_000);
+      expect(await mt.aprTargetOf(1202200)).to.eq(0x000_000);
     });
-    it("should return 1.000[%] for nft-level=03", async function () {
-      expect(await mt.aprTargetOf(1202103)).to.eq(1_000);
-      expect(await mt.aprTargetOf(1202203)).to.eq(1_000);
+    it("should return 1.000000[%] for nft-level=03", async function () {
+      expect(await mt.aprTargetOf(1202103)).to.eq(1_000_000);
+      expect(await mt.aprTargetOf(1202203)).to.eq(1_000_000);
     });
-    it("should return 2.000[%] for nft-level=06", async function () {
-      expect(await mt.aprTargetOf(1202106)).to.eq(2_000);
-      expect(await mt.aprTargetOf(1202206)).to.eq(2_000);
+    it("should return 2.000000[%] for nft-level=06", async function () {
+      expect(await mt.aprTargetOf(1202106)).to.eq(2_000_000);
+      expect(await mt.aprTargetOf(1202206)).to.eq(2_000_000);
     });
-    it("should return 3.000[%] for nft-level=09", async function () {
-      expect(await mt.aprTargetOf(1202109)).to.eq(3_000);
-      expect(await mt.aprTargetOf(1202209)).to.eq(3_000);
+    it("should return 3.000000[%] for nft-level=09", async function () {
+      expect(await mt.aprTargetOf(1202109)).to.eq(3_000_000);
+      expect(await mt.aprTargetOf(1202209)).to.eq(3_000_000);
     });
-    it("should return 4.000[%] for nft-level=12", async function () {
-      expect(await mt.aprTargetOf(1202112)).to.eq(4_000);
-      expect(await mt.aprTargetOf(1202212)).to.eq(4_000);
+    it("should return 4.000000[%] for nft-level=12", async function () {
+      expect(await mt.aprTargetOf(1202112)).to.eq(4_000_000);
+      expect(await mt.aprTargetOf(1202212)).to.eq(4_000_000);
     });
-    it("should return 5.000[%] for nft-level=15", async function () {
-      expect(await mt.aprTargetOf(1202115)).to.eq(5_000);
-      expect(await mt.aprTargetOf(1202215)).to.eq(5_000);
+    it("should return 5.000000[%] for nft-level=15", async function () {
+      expect(await mt.aprTargetOf(1202115)).to.eq(5_000_000);
+      expect(await mt.aprTargetOf(1202215)).to.eq(5_000_000);
     });
-    it("should return 6.000[%] for nft-level=18", async function () {
-      expect(await mt.aprTargetOf(1202118)).to.eq(6_000);
-      expect(await mt.aprTargetOf(1202218)).to.eq(6_000);
+    it("should return 6.000000[%] for nft-level=18", async function () {
+      expect(await mt.aprTargetOf(1202118)).to.eq(6_000_000);
+      expect(await mt.aprTargetOf(1202218)).to.eq(6_000_000);
     });
-    it("should return 7.000[%] for nft-level=21", async function () {
-      expect(await mt.aprTargetOf(1202121)).to.eq(7_000);
-      expect(await mt.aprTargetOf(1202221)).to.eq(7_000);
+    it("should return 7.000000[%] for nft-level=21", async function () {
+      expect(await mt.aprTargetOf(1202121)).to.eq(7_000_000);
+      expect(await mt.aprTargetOf(1202221)).to.eq(7_000_000);
     });
-    it("should return 8.000[%] for nft-level=24", async function () {
-      expect(await mt.aprTargetOf(1202124)).to.eq(8_000);
-      expect(await mt.aprTargetOf(1202224)).to.eq(8_000);
+    it("should return 8.000000[%] for nft-level=24", async function () {
+      expect(await mt.aprTargetOf(1202124)).to.eq(8_000_000);
+      expect(await mt.aprTargetOf(1202224)).to.eq(8_000_000);
     });
   });
 });

@@ -83,8 +83,8 @@ describe("MoeTreasury", async function () {
     for (let dy = 0; dy < 10; dy++) {
       for (let y = 2021; y < 2031; y++) {
         const now_year = dy + full_year;
-        const rate = positive(now_year - y) * 10;
-        const rate_padded = String(rate).padStart(3, "0");
+        const rate = positive(now_year - y) * 10_000;
+        const rate_padded = String(rate).padStart(6, "0");
         it(`should return 0.${rate_padded}[%] for nft-year=${y} & now-year=${now_year}`, async () => {
           expect(await mt.aprBonusTargetOf(ppt.idBy(y, 0, 1))).to.eq(rate);
           expect(await mt.aprBonusTargetOf(ppt.idBy(y, 3, 1))).to.eq(rate);

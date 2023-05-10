@@ -173,7 +173,7 @@ describe("MoeTreasury", async function () {
       expect(claimed).to.eq(undefined);
     });
     it("should reparameterize (pre nft.level)", async function () {
-      const tx = await moe_treasury.setAPRBatch([3], [0, 0, 3, 2000]);
+      const tx = await moe_treasury.setAPRBatch([3], [0, 0, 3, 2_000_000]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -188,7 +188,7 @@ describe("MoeTreasury", async function () {
       expect(await mt.claimFor(account, nft_id)).to.be.an("object");
     });
     it("should reparameterize (pre nft.level)", async function () {
-      const tx = await moe_treasury.setAPRBatch([3], [0, 0, 3, 1000]);
+      const tx = await moe_treasury.setAPRBatch([3], [0, 0, 3, 1_000_000]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -203,7 +203,7 @@ describe("MoeTreasury", async function () {
       expect(await mt.claimFor(account, nft_id)).to.be.an("object");
     });
     it("should reparameterize (pre nft.level)", async function () {
-      const tx = await moe_treasury.setAPRBatch([3], [0, 0, 3, 1000]);
+      const tx = await moe_treasury.setAPRBatch([3], [0, 0, 3, 1_000_000]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -214,11 +214,11 @@ describe("MoeTreasury", async function () {
       console.log(
         `[APR] ${await mt.aprOf(nft_id)} & ${await mt.aprBonusOf(nft_id)}`
       );
-      expect(await mt.claimableFor(account, nft_id)).to.eq(20_480n * UNIT);
+      expect(await mt.claimableFor(account, nft_id)).to.eq(20_499n * UNIT);
       expect(await mt.claimFor(account, nft_id)).to.be.an("object");
     });
     it("should reparameterize (pre nft.level)", async function () {
-      const tx = await moe_treasury.setAPRBatch([3], [0, 0, 3, 1000]);
+      const tx = await moe_treasury.setAPRBatch([3], [0, 0, 3, 1_000_000]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -229,7 +229,7 @@ describe("MoeTreasury", async function () {
       console.log(
         `[APR] ${await mt.aprOf(nft_id)} & ${await mt.aprBonusOf(nft_id)}`
       );
-      expect(await mt.claimableFor(account, nft_id)).to.eq(20_720n * UNIT);
+      expect(await mt.claimableFor(account, nft_id)).to.eq(20_701n * UNIT);
       expect(await mt.claimFor(account, nft_id)).to.be.an("object");
     });
   });

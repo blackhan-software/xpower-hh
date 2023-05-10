@@ -142,7 +142,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 rate = rateOf(nftId);
         uint256 age = _ppt.ageOf(account, nftId);
         uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
-        uint256 reward = (rate * age * denomination) / (1_000 * Constants.CENTURY);
+        uint256 reward = (rate * age * denomination) / (1_000_000 * Constants.CENTURY);
         return reward * 10 ** _moeOf(_ppt.prefixOf(nftId)).decimals();
     }
 
@@ -192,8 +192,8 @@ contract MoeTreasury is MoeTreasurySupervised {
         return Polynomial(array).eval4Clamped(_ppt.levelOf(nftId));
     }
 
-    /** annual percentage rate: 1.000[%] (per nft.level) */
-    uint256 private constant APR_MUL = 1_000;
+    /** annual percentage rate: 1.000000[%] (per nft.level) */
+    uint256 private constant APR_MUL = 1_000_000;
     uint256 private constant APR_DIV = 3;
 
     /** @return APR parameters (for nft-prefix) */
@@ -265,8 +265,8 @@ contract MoeTreasury is MoeTreasurySupervised {
         return 0;
     }
 
-    /** annual percentage bonus: 1.0[‱] (per nft.year) */
-    uint256 private constant APR_BONUS_MUL = 10;
+    /** annual percentage bonus: 1.0000[‱] (per nft.year) */
+    uint256 private constant APR_BONUS_MUL = 10_000;
     uint256 private constant APR_BONUS_DIV = 1;
 
     /** @return APR bonus parameters (for nft-prefix) */
