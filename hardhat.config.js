@@ -114,7 +114,7 @@ module.exports = {
   },
   networks: {
     /* avalanche */ hardhat: {
-      blockGasLimit: 8_000_000,
+      blockGasLimit: 15_000_000,
     },
     /* avalanche */ local: {
       url: "http://127.0.0.1:9650/ext/bc/C/rpc",
