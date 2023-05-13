@@ -235,7 +235,7 @@ contract XPowerThor is XPower {
     }
 
     /** fee-tracker estimate ~ 1.525 */
-    uint256 private constant FEE_MUL = 1_5250655526001398;
+    uint256 private constant FEE_MUL = 1_5252519411441514;
     uint256 private constant FEE_DIV = 1_0000000000000000;
 }
 
@@ -264,7 +264,7 @@ contract XPowerLoki is XPower {
     }
 
     /** fee-tracker estimate ~ 1.522 */
-    uint256 private constant FEE_MUL = 1_5221486210054223;
+    uint256 private constant FEE_MUL = 1_5222760077895132;
     uint256 private constant FEE_DIV = 1_0000000000000000;
 }
 
@@ -293,6 +293,6 @@ contract XPowerOdin is XPower {
     }
 
     /** fee-tracker estimate ~ 1.521 */
-    uint256 private constant FEE_MUL = 1_5213172364432791;
+    uint256 private constant FEE_MUL = 1_5212763842396897;
     uint256 private constant FEE_DIV = 1_0000000000000000;
 }
