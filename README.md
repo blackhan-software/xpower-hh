@@ -265,6 +265,27 @@ systemctl disable --user xpow-miner@7.timer
 
 ..to ensure that mining does *not* start upon a reboot.
 
+## Docker Integration
+
+Build docker image:
+
+```sh
+docker build -t xpower-hh .
+```
+
+Set minting address and private-key (can also be for a different address):
+
+```sh
+export MINT_ADDRESS=0x..
+export MINT_ADDRESS_PK=0x..
+```
+
+Run docker image to start mining:
+
+```sh
+docker run -ti -e MINT_ADDRESS="$MINT_ADDRESS" -e MINT_ADDRESS_PK="$MINT_ADDRESS_PK" -e MINE_LEVEL=7 -e MINE_WORKERS=3 -e TOKEN="thor loki odin" xpower-hh
+```
+
 ## Copyright
 
  © 2023 [Blackhan Software Ltd](https://www.linkedin.com/company/blackhan)
