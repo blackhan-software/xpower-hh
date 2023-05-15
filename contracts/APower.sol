@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 import {XPower} from "./XPower.sol";
 import {SovMigratable} from "./base/Migratable.sol";
@@ -43,14 +44,25 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
 
     /** mint amount of tokens for beneficiary (after wrapping XPower) */
     function mint(address to, uint256 amount) public onlyOwner {
-        _moe.transferFrom(owner(), (address)(this), amount);
+        _moe.transferFrom(owner(), (address)(this), _wrapped(amount));
         _mint(to, amount);
+    }
+
+    /** @return wrapped XPower maintaining collateralization (if possible) */
+    function _wrapped(uint256 amount) private view returns (uint256) {
+        uint256 balance = _moe.balanceOf((address)(this));
+        uint256 supply = amount + this.totalSupply();
+        if (supply > balance) {
+            uint256 treasury = _moe.balanceOf(owner());
+            return Math.min(treasury, supply - balance);
+        }
+        return 0;
     }
 
     /** burn amount of tokens from caller (and then unwrap XPower) */
     function burn(uint256 amount) public override {
         super.burn(amount);
-        _moe.transfer(msg.sender, amount);
+        _moe.transfer(msg.sender, _unwrapped(amount));
     }
 
     /**
@@ -59,7 +71,27 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
      */
     function burnFrom(address account, uint256 amount) public override {
         super.burnFrom(account, amount);
-        _moe.transfer(account, amount);
+        _moe.transfer(account, _unwrapped(amount));
+    }
+
+    /** @return unwrapped XPower proportional to burned APower amount */
+    function _unwrapped(uint256 amount) private view returns (uint256) {
+        uint256 balance = _moe.balanceOf((address)(this));
+        uint256 supply = amount + this.totalSupply();
+        if (supply > 0) {
+            return (amount * balance) / supply;
+        }
+        return 0;
+    }
+
+    /** @return collateralization ratio with 1'000'000 ~ 100% */
+    function collateralization() public view returns (uint256) {
+        uint256 balance = _moe.balanceOf((address)(this));
+        uint256 supply = this.totalSupply();
+        if (supply > 0) {
+            return (1e6 * balance) / supply;
+        }
+        return 0;
     }
 
     /** @return prefix of token */

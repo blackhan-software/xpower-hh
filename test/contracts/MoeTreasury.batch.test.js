@@ -10,7 +10,7 @@ let AThor, XThor, ALoki, XLoki, AOdin, XOdin; // contracts
 let athor, xthor, aloki, xloki, aodin, xodin; // instances
 let Nft, Ppt, NftTreasury, MoeTreasury; // contracts
 let nft, ppt, nft_treasury, moe_treasury, mt; // instances
-let UNUM, UNUM_BN; // decimals
+let UNIT, UNIT_BN; // decimals
 const ZERO = BigNumber.from(0);
 
 const { HashTable } = require("../hash-table");
@@ -71,9 +71,9 @@ describe("MoeTreasury", async function () {
   before(async function () {
     const decimals = await xodin.decimals();
     expect(decimals).to.greaterThan(0);
-    UNUM = 10n ** BigInt(decimals);
-    expect(UNUM >= 1n).to.be.true;
-    UNUM_BN = BigNumber.from(UNUM);
+    UNIT = 10n ** BigInt(decimals);
+    expect(UNIT >= 1n).to.be.true;
+    UNIT_BN = BigNumber.from(UNIT);
   });
   before(async function () {
     athor = await AThor.deploy(xthor.address, [], DEADLINE);
@@ -147,12 +147,12 @@ describe("MoeTreasury", async function () {
     await increaseAllowanceBy(supply, nft.address);
   });
   before(async function () {
-    await xodin.transfer(moe_treasury.address, 32n * UNUM);
+    await xodin.transfer(moe_treasury.address, 32n * UNIT);
   });
   describe("moeBalance", async function () {
     it("should return 32 [ODIN]", async function () {
       const moe_index = await moe_treasury.moeIndexOf(xodin.address);
-      expect(await moe_treasury.moeBalanceOf(moe_index)).to.eq(32n * UNUM);
+      expect(await moe_treasury.moeBalanceOf(moe_index)).to.eq(32n * UNIT);
     });
   });
   describe("claimForBatch", async function () {
@@ -175,81 +175,75 @@ describe("MoeTreasury", async function () {
       Expect(await mt.rewardOfBatch(account, [nft_id])).to.eq([ZERO]);
       Expect(await mt.claimedForBatch(account, [nft_id])).to.eq([ZERO]);
       Expect(await mt.claimableForBatch(account, [nft_id])).to.eq([ZERO]);
-      expect(await mt.moeBalanceOf(2)).to.eq(32n * UNUM);
+      expect(await mt.moeBalanceOf(2)).to.eq(32n * UNIT);
       // wait for +6 months:
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       expect(await mt.claimForBatch(account, [nft_id])).to.be.an("object");
-      Expect(await mt.rewardOfBatch(account, [nft_id])).to.eq([UNUM_BN.mul(5)]);
+      Expect(await mt.rewardOfBatch(account, [nft_id])).to.eq([UNIT_BN.mul(5)]);
       Expect(await mt.claimedForBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(5),
+        UNIT_BN.mul(5),
       ]);
       Expect(await mt.claimableForBatch(account, [nft_id])).to.eq([ZERO]);
-      expect(await mt.moeBalanceOf(2)).to.eq(27n * UNUM);
+      expect(await mt.moeBalanceOf(2)).to.eq(27n * UNIT);
       // wait for +6 months:
       await network.provider.send("evm_increaseTime", [465.25 * DAYS * 0.5]);
       expect(await mt.claimForBatch(account, [nft_id])).to.be.an("object");
       Expect(await mt.rewardOfBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(11),
+        UNIT_BN.mul(11),
       ]);
       Expect(await mt.claimedForBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(11),
+        UNIT_BN.mul(11),
       ]);
       Expect(await mt.claimableForBatch(account, [nft_id])).to.eq([ZERO]);
-      expect(await mt.moeBalanceOf(2)).to.eq(21n * UNUM);
+      expect(await mt.moeBalanceOf(2)).to.eq(21n * UNIT);
       // wait for +4 months:
       await network.provider.send("evm_increaseTime", [
         Math.round(365.25 * DAYS * 0.334),
       ]);
       expect(await mt.claimForBatch(account, [nft_id])).to.be.an("object");
       Expect(await mt.rewardOfBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(14),
+        UNIT_BN.mul(14),
       ]);
       Expect(await mt.claimedForBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(14),
+        UNIT_BN.mul(14),
       ]);
       Expect(await mt.claimableForBatch(account, [nft_id])).to.eq([ZERO]);
-      expect(await mt.moeBalanceOf(2)).to.eq(18n * UNUM);
+      expect(await mt.moeBalanceOf(2)).to.eq(18n * UNIT);
       // wait for +8 months:
       await network.provider.send("evm_increaseTime", [
         Math.round(365.25 * DAYS * 0.667),
       ]);
       expect(await mt.claimForBatch(account, [nft_id])).to.be.an("object");
       Expect(await mt.rewardOfBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(21),
+        UNIT_BN.mul(21),
       ]);
       Expect(await mt.claimedForBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(21),
+        UNIT_BN.mul(21),
       ]);
       Expect(await mt.claimableForBatch(account, [nft_id])).to.eq([ZERO]);
-      expect(await mt.moeBalanceOf(2)).to.eq(11n * UNUM);
+      expect(await mt.moeBalanceOf(2)).to.eq(11n * UNIT);
       // wait for +12 months:
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 1.0]);
       expect(await mt.claimForBatch(account, [nft_id])).to.be.an("object");
       Expect(await mt.rewardOfBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(32),
+        UNIT_BN.mul(32),
       ]);
       Expect(await mt.claimedForBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(32),
+        UNIT_BN.mul(32),
       ]);
       Expect(await mt.claimableForBatch(account, [nft_id])).to.eq([ZERO]);
       expect(await mt.moeBalanceOf(2)).to.eq(0);
       // wait for +12 months: (empty treasury)
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 1.0]);
-      expect(
-        await mt.claimForBatch(account, [nft_id]).catch((ex) => {
-          const m = ex.message.match(/transfer amount exceeds balance/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        })
-      ).to.eq(undefined);
+      expect(await mt.claimForBatch(account, [nft_id])).to.be.an("object");
       Expect(await mt.rewardOfBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(43),
+        UNIT_BN.mul(43),
       ]);
       Expect(await mt.claimedForBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(32),
+        UNIT_BN.mul(43),
       ]);
       Expect(await mt.claimableForBatch(account, [nft_id])).to.eq([
-        UNUM_BN.mul(11),
+        UNIT_BN.mul(0),
       ]);
       expect(await mt.moeBalanceOf(2)).to.eq(0);
     });

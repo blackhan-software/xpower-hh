@@ -9,7 +9,7 @@ let Nft, Ppt, NftTreasury, MoeTreasury; // contracts
 let nft, ppt, nft_treasury, moe_treasury, mt; // instances
 let AThor, XThor, ALoki, XLoki, AOdin, XOdin; // contracts
 let athor, xthor, aloki, xloki, aodin, xodin; // instances
-let UNUM; // decimals
+let UNIT; // decimals
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
@@ -69,8 +69,8 @@ describe("MoeTreasury", async function () {
   before(async function () {
     const decimals = await xodin.decimals();
     expect(decimals).to.greaterThan(0);
-    UNUM = 10n ** BigInt(decimals);
-    expect(UNUM >= 1n).to.be.true;
+    UNIT = 10n ** BigInt(decimals);
+    expect(UNIT >= 1n).to.be.true;
   });
   before(async function () {
     athor = await AThor.deploy(xthor.address, [], DEADLINE);
@@ -135,10 +135,10 @@ describe("MoeTreasury", async function () {
   });
   before(async function () {
     const supply = await xodin.totalSupply();
-    expect(supply).to.be.gte(2n * UNUM);
+    expect(supply).to.be.gte(2n * UNIT);
   });
   before(async function () {
-    await increaseAllowanceBy(1n * UNUM, nft.address);
+    await increaseAllowanceBy(1n * UNIT, nft.address);
   });
   before(async function () {
     await xodin.transfer(moe_treasury.address, 0);
@@ -146,7 +146,7 @@ describe("MoeTreasury", async function () {
   describe("moeBalance", async function () {
     it("should return 0 [ODIN]", async function () {
       const moe_index = await moe_treasury.moeIndexOf(xodin.address);
-      expect(await moe_treasury.moeBalanceOf(moe_index)).to.eq(0n * UNUM);
+      expect(await moe_treasury.moeBalanceOf(moe_index)).to.eq(0n * UNIT);
     });
   });
   describe("claimFor", async function () {
