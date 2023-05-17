@@ -80,6 +80,14 @@ describe("MoeTreasury", async function () {
     await apower.transferOwnership(mt.address);
     expect(await apower.owner()).to.eq(mt.address);
   });
+  describe("bonuses-length", async function () {
+    it("should return a list of length=0", async function () {
+      expect(await mt.bonusesLength(1)).to.eq(0);
+      expect(await mt.bonusesLength(2)).to.eq(0);
+      expect(await mt.bonusesLength(3)).to.eq(0);
+      expect(await mt.bonusesLength(4)).to.eq(0);
+    });
+  });
   describe("apr-bonus-of (i.e rewards ~ nft-level)", async function () {
     it("should return 0.020000[%] for nft-level=00", async function () {
       expect(await mt.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(20_000);
@@ -305,6 +313,16 @@ describe("MoeTreasury", async function () {
     });
     it("should return 20.060000[%] for nft-level=24", async function () {
       expect(await mt.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(20_060_000);
+    });
+  });
+  describe("bonuses-length", async function () {
+    it("should return a list of length=1", async function () {
+      expect(await mt.bonusesLength(1)).to.eq(1);
+    });
+    it("should return a list of length=0", async function () {
+      expect(await mt.bonusesLength(2)).to.eq(0);
+      expect(await mt.bonusesLength(3)).to.eq(0);
+      expect(await mt.bonusesLength(4)).to.eq(0);
     });
   });
 });

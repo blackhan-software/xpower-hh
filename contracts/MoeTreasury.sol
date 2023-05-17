@@ -170,6 +170,11 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** parametrization of APR: nft-prefix => coefficients */
     mapping(uint256 => uint256[]) private _apr;
 
+    /** @return length of APRs (for nft-prefix) */
+    function aprsLength(uint256 nftPrefix) public view returns (uint256) {
+        return aprs[nftPrefix].length;
+    }
+
     /** @return duration weighted mean of APRs (per nft.level) */
     function aprOf(uint256 nftId) public view returns (uint256) {
         uint256 nftPrefix = _ppt.prefixOf(nftId);
@@ -237,6 +242,11 @@ contract MoeTreasury is MoeTreasurySupervised {
     mapping(uint256 => Integrator.Item[]) public bonuses;
     /** parametrization of APR bonus: nft-prefix => coefficients */
     mapping(uint256 => uint256[]) private _bonus;
+
+    /** @return length fo APR bonuses (for nft-prefix) */
+    function bonusesLength(uint256 nftPrefix) public view returns (uint256) {
+        return bonuses[nftPrefix].length;
+    }
 
     /** @return duration weighted mean of APR bonuses (per nft.level) */
     function aprBonusOf(uint256 nftId) public view returns (uint256) {
