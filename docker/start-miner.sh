@@ -3,6 +3,11 @@
 # shellcheck disable=SC2086,SC2155
 
 #######################################################################
+# Start cron (to restart each hour):
+
+/usr/sbin/cron
+
+#######################################################################
 # MINT_ADDRESS=0x..
 
 if [ -z "$MINT_ADDRESS" ] ; then
