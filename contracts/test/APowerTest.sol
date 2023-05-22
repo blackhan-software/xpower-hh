@@ -26,6 +26,18 @@ contract APowerThorOldTest is APowerThorTest {
     }
 }
 
+contract APowerThorOldTest36 is APowerThorTest {
+    constructor(
+        address moeLink,
+        address[] memory sovBase,
+        uint256 deadlineIn
+    ) APowerThorTest(moeLink, sovBase, deadlineIn) {}
+
+    function decimals() public pure override returns (uint8) {
+        return 36;
+    }
+}
+
 contract APowerLokiTest is APowerLoki {
     constructor(
         address moeLink,
@@ -46,6 +58,18 @@ contract APowerLokiOldTest is APowerLokiTest {
     }
 }
 
+contract APowerLokiOldTest36 is APowerLokiTest {
+    constructor(
+        address moeLink,
+        address[] memory sovBase,
+        uint256 deadlineIn
+    ) APowerLokiTest(moeLink, sovBase, deadlineIn) {}
+
+    function decimals() public pure override returns (uint8) {
+        return 36;
+    }
+}
+
 contract APowerOdinTest is APowerOdin {
     constructor(
         address moeLink,
@@ -63,5 +87,17 @@ contract APowerOdinOldTest is APowerOdinTest {
 
     function decimals() public pure override returns (uint8) {
         return 0;
+    }
+}
+
+contract APowerOdinOldTest36 is APowerOdinTest {
+    constructor(
+        address moeLink,
+        address[] memory sovBase,
+        uint256 deadlineIn
+    ) APowerOdinTest(moeLink, sovBase, deadlineIn) {}
+
+    function decimals() public pure override returns (uint8) {
+        return 36;
     }
 }

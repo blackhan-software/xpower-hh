@@ -149,7 +149,7 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
 
     /** migrate old amount of SOV tokens (for account) */
     ///
-    /// @dev assumes old (XPower/APower) == new (XPower/APower) w.r.t. decimals
+    /// @dev assumes old (XPower:APower) == new (XPower:APower) w.r.t. decimals
     ///
     function migrateFrom(address account, uint256 oldAmount, uint256[] memory index) public override returns (uint256) {
         uint256[] memory moeIndex = _shift(index);

@@ -104,7 +104,7 @@ describe("APower Migration", async function () {
   });
   beforeEach(async function () {
     const decimals = await xodin_new.decimals();
-    expect(decimals).to.greaterThan(0);
+    expect(decimals).to.eq(18);
     UNIT_NEW = 10n ** BigInt(decimals);
     expect(UNIT_NEW >= 1n).to.be.true;
     DECI_NEW = 10n * UNIT_NEW;
@@ -185,9 +185,10 @@ describe("APower Migration", async function () {
     expect(await aodin_old.owner()).to.eq(moe_treasury.address);
   });
   beforeEach(async function () {
+    const [n, bh] = await cacheBlockHash(4095);
     while (true)
       try {
-        await mintToken(4095);
+        await mintToken(4095, [n, bh]);
       } catch (ex) {
         break;
       }
@@ -297,52 +298,19 @@ describe("APower Migration", async function () {
       expect(index).to.eq(0);
     });
   });
-  describe("newUnits", async function () {
-    it("should convert old moe-amount => new moe-amount", async function () {
-      expect(await xodin_new.newUnits(UNIT_OLD, 0)).to.eq(UNIT_NEW);
-      expect(await xodin_new.newUnits(DECI_OLD, 0)).to.eq(DECI_NEW);
-    });
-    it("should convert old sov-amount => new sov-amount", async function () {
-      expect(await aodin_new.newUnits(UNIT_OLD, 0)).to.eq(UNIT_NEW);
-      expect(await aodin_new.newUnits(DECI_OLD, 0)).to.eq(DECI_NEW);
-    });
-  });
-  describe("oldUnits", async function () {
-    it("should convert new moe-amount => old moe-amount", async function () {
-      expect(await xodin_new.oldUnits(UNIT_NEW, 0)).to.eq(UNIT_OLD);
-      expect(await xodin_new.oldUnits(DECI_NEW, 0)).to.eq(DECI_OLD);
-    });
-    it("should convert new sov-amount => old sov-amount", async function () {
-      expect(await aodin_new.oldUnits(UNIT_NEW, 0)).to.eq(UNIT_OLD);
-      expect(await aodin_new.oldUnits(DECI_NEW, 0)).to.eq(DECI_OLD);
-    });
-  });
-  describe("moeUnits", async function () {
-    it("should convert old sov-amount => moe-units", async function () {
-      expect(await aodin_old.moeUnits(UNIT_OLD)).to.eq(UNIT_OLD);
-      expect(await aodin_old.moeUnits(DECI_OLD)).to.eq(DECI_OLD);
-    });
-    it("should convert new sov-amount => moe-units", async function () {
-      expect(await aodin_new.moeUnits(UNIT_NEW)).to.eq(UNIT_NEW);
-      expect(await aodin_new.moeUnits(DECI_NEW)).to.eq(DECI_NEW);
-    });
-  });
-  describe("sovUnits", async function () {
-    it("should convert old moe-amount => sov-units", async function () {
-      expect(await aodin_old.sovUnits(UNIT_OLD)).to.eq(UNIT_OLD);
-      expect(await aodin_old.sovUnits(DECI_OLD)).to.eq(DECI_OLD);
-    });
-    it("should convert new moe-amount => sov-units", async function () {
-      expect(await aodin_new.sovUnits(UNIT_NEW)).to.eq(UNIT_NEW);
-      expect(await aodin_new.sovUnits(DECI_NEW)).to.eq(DECI_NEW);
-    });
-  });
 });
-async function mintToken(amount) {
+async function cacheBlockHash(amount) {
   const [nonce, block_hash] = table.nextNonce({ amount });
   expect(nonce).to.gte(0);
-  const tx_cache = await xodin_old.cache(block_hash);
-  expect(tx_cache).to.be.an("object");
+  const t1_cache = await xthor_old.cache(block_hash);
+  expect(t1_cache).to.be.an("object");
+  const t2_cache = await xloki_old.cache(block_hash);
+  expect(t2_cache).to.be.an("object");
+  const t3_cache = await xodin_old.cache(block_hash);
+  expect(t3_cache).to.be.an("object");
+  return [nonce, block_hash];
+}
+async function mintToken(amount, [nonce, block_hash]) {
   const tx_mint = await xodin_old.mint(A0, block_hash, nonce);
   expect(tx_mint).to.be.an("object");
   const balance_0 = await xodin_old.balanceOf(A0);
