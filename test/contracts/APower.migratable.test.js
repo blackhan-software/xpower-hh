@@ -22,7 +22,7 @@ let Nft, Ppt, NftTreasury; // contracts
 let nft, ppt, nft_treasury; // instances
 let MoeTreasury; // contracts
 let moe_treasury, mt; // instances
-let UNUM_OLD, UNUM_NEW; // decimals
+let UNIT_OLD, UNIT_NEW; // decimals
 let DECI_OLD, DECI_NEW; // 10 units
 
 const { HashTable } = require("../hash-table");
@@ -98,16 +98,16 @@ describe("APower Migration", async function () {
   beforeEach(async function () {
     const decimals = await xodin_old.decimals();
     expect(decimals).to.eq(0);
-    UNUM_OLD = 10n ** BigInt(decimals);
-    expect(UNUM_OLD >= 1n).to.be.true;
-    DECI_OLD = 10n * UNUM_OLD;
+    UNIT_OLD = 10n ** BigInt(decimals);
+    expect(UNIT_OLD >= 1n).to.be.true;
+    DECI_OLD = 10n * UNIT_OLD;
   });
   beforeEach(async function () {
     const decimals = await xodin_new.decimals();
     expect(decimals).to.greaterThan(0);
-    UNUM_NEW = 10n ** BigInt(decimals);
-    expect(UNUM_NEW >= 1n).to.be.true;
-    DECI_NEW = 10n * UNUM_NEW;
+    UNIT_NEW = 10n ** BigInt(decimals);
+    expect(UNIT_NEW >= 1n).to.be.true;
+    DECI_NEW = 10n * UNIT_NEW;
   });
   beforeEach(async function () {
     // deploy old apower contracts:
@@ -200,10 +200,10 @@ describe("APower Migration", async function () {
     expect(new_supply).to.be.eq(0);
   });
   beforeEach(async function () {
-    await increaseAllowanceBy(1000n * UNUM_OLD, nft.address);
+    await increaseAllowanceBy(1000n * UNIT_OLD, nft.address);
   });
   beforeEach(async function () {
-    await xodin_old.transfer(moe_treasury.address, 110n * UNUM_OLD);
+    await xodin_old.transfer(moe_treasury.address, 110n * UNIT_OLD);
   });
   beforeEach(async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
@@ -213,19 +213,13 @@ describe("APower Migration", async function () {
     expect(await mt.rewardOf(account, nft_id)).to.eq(DECI_OLD);
     expect(await mt.claimedFor(account, nft_id)).to.eq(DECI_OLD);
     expect(await mt.claimableFor(account, nft_id)).to.eq(0);
-    expect(await mt.moeBalanceOf(2)).to.eq(100n * UNUM_OLD);
+    expect(await mt.moeBalanceOf(2)).to.eq(100n * UNIT_OLD);
   });
   beforeEach(async function () {
     const old_supply = await aodin_old.totalSupply();
     expect(old_supply).to.be.gt(0);
     const new_supply = await aodin_new.totalSupply();
     expect(new_supply).to.be.eq(0);
-  });
-  describe("oldIndexOf", async function () {
-    it("should return index=0", async function () {
-      const index = await aodin_new.oldIndexOf(aodin_old.address);
-      expect(index).to.eq(0);
-    });
   });
   it("should *not* migrate old => new (insufficient allowance)", async function () {
     const tx = await aodin_new.migrate(DECI_OLD, [0, 0]).catch((ex) => {
@@ -238,8 +232,8 @@ describe("APower Migration", async function () {
     expect(new_migrated).to.eq(0);
   });
   it("should *not* migrate old => new (burn amount exceeds balance)", async function () {
-    await aodin_old.increaseAllowance(aodin_new.address, 51n * UNUM_OLD);
-    const tx = await aodin_new.migrate(51n * UNUM_OLD, [0, 0]).catch((ex) => {
+    await aodin_old.increaseAllowance(aodin_new.address, 51n * UNIT_OLD);
+    const tx = await aodin_new.migrate(51n * UNIT_OLD, [0, 0]).catch((ex) => {
       const m = ex.message.match(/burn amount exceeds balance/);
       if (m === null) console.debug(ex);
       expect(m).to.be.not.null;
@@ -296,6 +290,32 @@ describe("APower Migration", async function () {
     expect(tx).to.eq(undefined);
     const new_migrated = await aodin_new.migrated();
     expect(new_migrated).to.eq(0);
+  });
+  describe("oldIndexOf", async function () {
+    it("should return index=0", async function () {
+      const index = await aodin_new.oldIndexOf(aodin_old.address);
+      expect(index).to.eq(0);
+    });
+  });
+  describe("moeUnits", async function () {
+    it("should convert old sov-amount => moe-units", async function () {
+      expect(await aodin_old.moeUnits(UNIT_OLD)).to.eq(UNIT_OLD);
+      expect(await aodin_old.moeUnits(DECI_OLD)).to.eq(DECI_OLD);
+    });
+    it("should convert new sov-amount => moe-units", async function () {
+      expect(await aodin_new.moeUnits(UNIT_NEW)).to.eq(UNIT_NEW);
+      expect(await aodin_new.moeUnits(DECI_NEW)).to.eq(DECI_NEW);
+    });
+  });
+  describe("sovUnits", async function () {
+    it("should convert old moe-amount => sov-units", async function () {
+      expect(await aodin_old.sovUnits(UNIT_OLD)).to.eq(UNIT_OLD);
+      expect(await aodin_old.sovUnits(DECI_OLD)).to.eq(DECI_OLD);
+    });
+    it("should convert new moe-amount => sov-units", async function () {
+      expect(await aodin_new.sovUnits(UNIT_NEW)).to.eq(UNIT_NEW);
+      expect(await aodin_new.sovUnits(DECI_NEW)).to.eq(DECI_NEW);
+    });
   });
 });
 async function mintToken(amount) {
