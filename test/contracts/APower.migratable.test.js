@@ -297,6 +297,26 @@ describe("APower Migration", async function () {
       expect(index).to.eq(0);
     });
   });
+  describe("newUnits", async function () {
+    it("should convert old moe-amount => new moe-amount", async function () {
+      expect(await xodin_new.newUnits(UNIT_OLD, 0)).to.eq(UNIT_NEW);
+      expect(await xodin_new.newUnits(DECI_OLD, 0)).to.eq(DECI_NEW);
+    });
+    it("should convert old sov-amount => new sov-amount", async function () {
+      expect(await aodin_new.newUnits(UNIT_OLD, 0)).to.eq(UNIT_NEW);
+      expect(await aodin_new.newUnits(DECI_OLD, 0)).to.eq(DECI_NEW);
+    });
+  });
+  describe("oldUnits", async function () {
+    it("should convert new moe-amount => old moe-amount", async function () {
+      expect(await xodin_new.oldUnits(UNIT_NEW, 0)).to.eq(UNIT_OLD);
+      expect(await xodin_new.oldUnits(DECI_NEW, 0)).to.eq(DECI_OLD);
+    });
+    it("should convert new sov-amount => old sov-amount", async function () {
+      expect(await aodin_new.oldUnits(UNIT_NEW, 0)).to.eq(UNIT_OLD);
+      expect(await aodin_new.oldUnits(DECI_NEW, 0)).to.eq(DECI_OLD);
+    });
+  });
   describe("moeUnits", async function () {
     it("should convert old sov-amount => moe-units", async function () {
       expect(await aodin_old.moeUnits(UNIT_OLD)).to.eq(UNIT_OLD);
