@@ -2,6 +2,7 @@
 // solhint-disable not-rely-on-time
 pragma solidity ^0.8.0;
 
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {Constants} from "./Constants.sol";
 
 library Nft {
@@ -46,7 +47,7 @@ library Nft {
 
     /** @return year of nft-id (2021, 2022, ...) */
     function yearOf(uint256 nftId) internal pure returns (uint256) {
-        uint256 anno = (nftId / 100) % 10_000;
+        uint256 anno = (nftId / 100) % 10 ** Math.log10(nftId / 100);
         require(anno > 2020, "invalid year");
         return anno;
     }
@@ -60,10 +61,6 @@ library Nft {
 
     /** @return eon the given year belongs to: 1M, 10M, 100M, ... */
     function eonOf(uint256 anno) internal pure returns (uint256) {
-        uint256 eon = 10_000;
-        while (anno / eon > 0) {
-            eon *= 10;
-        }
-        return 100 * eon;
+        return 10 ** (3 + Math.log10(anno));
     }
 }
