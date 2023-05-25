@@ -30,9 +30,9 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     /** set of nonce-hashes already minted for */
     mapping(bytes32 => bool) private _hashes;
     /** map from block-hashes to timestamps */
-    mapping(bytes32 => uint256) private _timestamps;
+    mapping(bytes16 => uint256) private _timestamps;
     /** map from intervals to block-hashes */
-    mapping(uint256 => bytes32) private _blockHashes;
+    mapping(uint256 => bytes16) private _blockHashes;
 
     /** @param symbol short token symbol */
     /** @param moeBase addresses of old contracts */
@@ -54,14 +54,14 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     }
 
     /** emitted on caching most recent block-hash */
-    event Init(bytes32 blockHash, uint256 timestamp);
+    event Init(bytes16 blockHash, uint256 timestamp);
 
     /** cache most recent block-hash */
     function init() public {
         uint256 interval = currentInterval();
         assert(interval > 0);
-        if (uint256(_blockHashes[interval]) == 0) {
-            bytes32 blockHash = blockhash(block.number - 1);
+        if (uint128(_blockHashes[interval]) == 0) {
+            bytes16 blockHash = bytes16(blockhash(block.number - 1));
             assert(blockHash > 0);
             uint256 timestamp = block.timestamp;
             assert(timestamp > 0);
@@ -69,23 +69,23 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
             _blockHashes[interval] = blockHash;
             emit Init(blockHash, timestamp);
         } else {
-            bytes32 blockHash = _blockHashes[interval];
+            bytes16 blockHash = _blockHashes[interval];
             uint256 timestamp = _timestamps[blockHash];
             emit Init(blockHash, timestamp);
         }
     }
 
     /** cache block-hash at timestamp */
-    function _cache(bytes32 blockHash, uint256 timestamp) internal {
+    function _cache(bytes16 blockHash, uint256 timestamp) internal {
         _timestamps[blockHash] = timestamp;
     }
 
-    /** mint tokens for to-beneficiary, block-hash & nonce */
-    function mint(address to, bytes32 blockHash, uint256 nonce) public tracked {
+    /** mint tokens for to-beneficiary, block-hash & data (incl. nonce) */
+    function mint(address to, bytes16 blockHash, bytes memory data) public tracked {
         // check block-hash to be in current interval
         require(recent(blockHash), "expired block-hash");
-        // calculate nonce-hash for to, block-hash & nonce
-        bytes32 nonceHash = hashOf(to, blockHash, nonce);
+        // calculate nonce-hash for to, block-hash & data
+        bytes32 nonceHash = hashOf(to, blockHash, data);
         require(unique(nonceHash), "duplicate nonce-hash");
         // calculate number of zeros of nonce-hash
         uint256 zeros = zerosOf(nonceHash);
@@ -101,7 +101,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     }
 
     /** @return block-hash (for interval) */
-    function blockHashOf(uint256 interval) public view returns (bytes32) {
+    function blockHashOf(uint256 interval) public view returns (bytes16) {
         return _blockHashes[interval];
     }
 
@@ -111,18 +111,15 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     }
 
     /** check whether block-hash has recently been cached */
-    function recent(bytes32 blockHash) public view returns (bool) {
+    function recent(bytes16 blockHash) public view returns (bool) {
         return _timestamps[blockHash] > currentInterval();
     }
 
-    /** @return hash of contract, to-beneficiary, block-hash & nonce */
-    function hashOf(address to, bytes32 blockHash, uint256 nonce) public view returns (bytes32) {
-        bytes memory data = bytes.concat(
-            bytes20(uint160(address(this)) ^ uint160(to)),
-            bytes28(blockHash),
-            bytes32(nonce)
-        );
-        return keccak256(data);
+    /** @return hash of contract, to-beneficiary, block-hash & data (incl. nonce) */
+    function hashOf(address to, bytes16 blockHash, bytes memory data) public view returns (bytes32) {
+        bytes32 hash1 = sha256(bytes.concat(bytes20(uint160(address(this)) ^ uint160(to)), bytes16(blockHash), data));
+        bytes32 hash2 = sha256(bytes.concat(hash1));
+        return hash2;
     }
 
     /** check whether nonce-hash is unique */
