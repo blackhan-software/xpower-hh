@@ -30,7 +30,7 @@
     "ethers": "=5.7.2",
     "hardhat": "^2.15.0",
     "hardhat-gas-reporter": "^1.0.9",
-    "keccak-wasm": "^0.10.3",
+    "hash-wasm": "^4.9.0",
     "moment": "^2.29.4",
     "prettier": "^2.8.8",
     "prettier-plugin-solidity": "^1.1.3",
