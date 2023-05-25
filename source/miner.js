@@ -1,6 +1,5 @@
 const { solidityPack } = require("ethers/lib/utils");
-const { InitializeKeccak } = require("keccak-wasm");
-const { keccak256 } = require("keccak-wasm");
+const { createSHA256 } = require("hash-wasm");
 const { block } = require("./block");
 
 class Miner {
@@ -17,67 +16,45 @@ class Miner {
   }
 
   constructor() {
-    // cache: (block-hash) => abi.encode(token, ...)
-    this.abi_encoded = {};
-    // cache: (level) => arrayify(nonce)
-    this.array_cache = {};
-    // cache: (level) => nonce
-    this.nonce_cache = {};
+    this.abi_encoded = {}; // cache: block-hash => abi.encode(...)
   }
 
-  async init(level) {
-    await InitializeKeccak();
-    const abi_encode = this.abi_encoder(level);
+  async init(nonce_length) {
+    const hasher = await createSHA256();
+    const abi_encode = this.abi_encoder(nonce_length);
     return (contract, address, block_hash, nonce) => {
-      const data = abi_encode(contract, address, block_hash, nonce);
-      return "0x" + keccak256(data);
+      const data1 = abi_encode(contract, address, block_hash, nonce);
+      const data2 = hasher.init().update(data1).digest("binary");
+      return "0x" + hasher.init().update(data2).digest("hex");
     };
   }
 
-  abi_encoder(level) {
-    const lazy_arrayify = this.arrayifier(level);
+  abi_encoder(nonce_length) {
     return (contract, address, block_hash, nonce) => {
       let value = this.abi_encoded[block_hash];
       if (value === undefined) {
         const template = solidityPack(
-          ["uint160", "bytes28", "uint256"],
-          [BigInt(contract) ^ BigInt(address), bytes28(block_hash), 0n]
+          ["uint160", "bytes16", "bytes"],
+          [
+            BigInt(contract) ^ BigInt(address),
+            block_hash,
+            new Uint8Array(nonce_length),
+          ]
         );
-        this.abi_encoded[block_hash] = value = this.arrayify(template.slice(2));
-        this.array_cache[level] = this.arrayify(nonce.toString(16));
-        this.nonce_cache[level] = nonce;
+        value = arrayify(template.slice(2));
+        this.abi_encoded[block_hash] = value;
       }
-      const array = lazy_arrayify(nonce, nonce.toString(16));
-      value.set(array, 48);
+      const array = arrayify(nonce.toString(16));
+      value.set(array, 36);
       return value;
     };
-    function bytes28(block_hash) {
-      return "0x" + block_hash.slice(2).slice(0, -8);
-    }
   }
-
-  arrayifier(level) {
-    const diff_max = 16n ** BigInt(level) - 1n;
-    const offset_2 = 64 - Math.max(64, level * 2);
-    const offset_1 = 32 - Math.max(32, level);
-    return (nonce, hex_nonce) => {
-      if (nonce - this.nonce_cache[level] > diff_max) {
-        this.array_cache[level] = this.arrayify(hex_nonce);
-        this.nonce_cache[level] = nonce;
-      }
-      const nonce_rhs = hex_nonce.slice(offset_2);
-      const array_rhs = this.arrayify(nonce_rhs);
-      this.array_cache[level].set(array_rhs, offset_1);
-      return this.array_cache[level];
-    };
+}
+function arrayify(data, list = []) {
+  for (let i = 0; i < data.length; i += 2) {
+    list.push(parseInt(data.substring(i, i + 2), 16));
   }
-
-  arrayify(data, list = []) {
-    for (let i = 0; i < data.length; i += 2) {
-      list.push(parseInt(data.substring(i, i + 2), 16));
-    }
-    return new Uint8Array(list);
-  }
+  return new Uint8Array(list);
 }
 module.exports = {
   Miner,

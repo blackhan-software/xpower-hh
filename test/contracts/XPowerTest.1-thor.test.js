@@ -6,7 +6,7 @@ let accounts; // all accounts
 let addresses; // all addresses
 let XPower; // contract
 let xpower; // instance
-let UNUM; // decimals
+let UNIT; // decimals
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
@@ -37,8 +37,8 @@ describe("XPowerThorTest", async function () {
   before(async function () {
     const decimals = await xpower.decimals();
     expect(decimals).to.greaterThan(0);
-    UNUM = 10n ** BigInt(decimals);
-    expect(UNUM >= 1n).to.be.true;
+    UNIT = 10n ** BigInt(decimals);
+    expect(UNIT >= 1n).to.be.true;
   });
   describe("current-interval", async function () {
     it("should return interval>0", async function () {
@@ -92,7 +92,7 @@ describe("XPowerThorTest", async function () {
       const zeros = await xpower.zerosOf(hash);
       expect(zeros).to.eq(1);
       const amount = await xpower.amountOf(zeros);
-      expect(amount).to.equal(UNUM);
+      expect(amount).to.equal(UNIT);
     });
     it("should return amount=2", async function () {
       const hash = table.getHash({ amount: 2 });
@@ -100,7 +100,7 @@ describe("XPowerThorTest", async function () {
       const zeros = await xpower.zerosOf(hash);
       expect(zeros).to.eq(2);
       const amount = await xpower.amountOf(zeros);
-      expect(amount).to.equal(2n * UNUM);
+      expect(amount).to.equal(2n * UNIT);
     });
   });
   describe("zeros (for amounts={0,1,2})", async function () {
@@ -120,7 +120,7 @@ describe("XPowerThorTest", async function () {
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       const zeros = await xpower.zerosOf(hash);
       expect(zeros).to.eq(1);
-      expect(await xpower.amountOf(zeros)).to.eq(UNUM);
+      expect(await xpower.amountOf(zeros)).to.eq(UNIT);
     });
     it("should return zeros=1", async function () {
       const hash = table.getHash({ amount: 1 });
@@ -131,7 +131,7 @@ describe("XPowerThorTest", async function () {
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       const zeros = await xpower.zerosOf(hash);
       expect(zeros).to.eq(2);
-      expect(await xpower.amountOf(zeros)).to.eq(2n * UNUM);
+      expect(await xpower.amountOf(zeros)).to.eq(2n * UNIT);
     });
     it("should return zeros=2", async function () {
       const hash = table.getHash({ amount: 2 });

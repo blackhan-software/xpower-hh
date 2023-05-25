@@ -1,9 +1,11 @@
 const { ethers } = require("hardhat");
+const { hexlify } = ethers.utils;
+
 const fs = require("fs").promises;
 const { tmpdir } = require("os");
 const { join } = require("path");
 
-const { large_random } = require("../source/cluster");
+const { large_random, increment } = require("../source/cluster");
 const { Miner } = require("../source/miner");
 const { Token } = require("../source/token");
 
@@ -28,8 +30,8 @@ class HashTable {
     length = 4n,
     min_level = 0,
     max_level = 2,
+    nonce_length = 8,
     use_cache = false,
-    start = large_random(),
   } = {}) {
     const address = this.address;
     const at_interval = await this.contract.currentInterval();
@@ -74,13 +76,17 @@ class HashTable {
     //
     // try writing { nonce: [hash, amount] }
     //
-    const mine = await new Miner().init(max_level);
+    const mine = await new Miner().init(nonce_length);
     const token = new Token(symbol);
     const min_threshold = token.threshold(min_level);
     const max_threshold = token.threshold(max_level);
     try {
-      for (let nonce = start; length > 0; nonce++) {
-        const x = "0x" + nonce.toString(16); // hexadecimal nonce
+      for (
+        let [nonce] = large_random(nonce_length);
+        length > 0;
+        increment(nonce)
+      ) {
+        const x = hexlify(nonce);
         const h = mine(contract_address, address, block_hash, nonce);
         const a = token.amount_of(h);
         if (a < min_threshold) {
@@ -172,7 +178,7 @@ class HashTable {
       this._NBH2H = {};
     }
     const nbh = this.get_nonce(amount);
-    this._NBH2H[nbh.join(":")] = hash;
+    this._NBH2H[nbh.join(":")] = hexlify(Object.values(hash));
   }
 
   /** @returns hash-cache[amount] => hash */

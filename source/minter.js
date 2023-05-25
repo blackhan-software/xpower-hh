@@ -47,7 +47,7 @@ async function do_init(
 async function do_mint(
   symbol,
   [minter, beneficiary],
-  { nonce, block_hash, timeout_ms = 60_000 }
+  { block_hash, nonce, timeout_ms = 60_000 }
 ) {
   const { gasMultiplier: gas_multiplier } = hre.network.config;
   const xpower = await Token.contract(symbol, minter);

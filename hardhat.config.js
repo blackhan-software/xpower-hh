@@ -69,6 +69,7 @@ task("mine", "Mines for XPower tokens")
   .addParam("json", "json logs", false, types.boolean)
   .addParam("level", "minimum minting threshold", 7, types.int)
   .addParam("mint", "auto-mint if possible", true, types.boolean)
+  .addParam("nonceBytes", "number of nonce bytes", 8, types.int)
   .addParam("refresh", "refresh block-hash", false, types.boolean)
   .addParam("workers", "number of mining processes", workers(), types.int)
   .addVariadicPositionalParam(
@@ -91,8 +92,9 @@ task("mine", "Mines for XPower tokens")
       json: args.json,
       level: args.level,
       mint: args.mint,
-      refresh: args.refresh,
+      nonce_length: args.nonceBytes,
       n_workers: args.workers,
+      refresh: args.refresh,
     });
   });
 

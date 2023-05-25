@@ -17,7 +17,7 @@ const { assert } = require("console");
 async function start(
   symbols,
   [minter, beneficiary],
-  { cache, json, level, mint, refresh, n_workers }
+  { cache, json, level, mint, nonce_length, n_workers, refresh }
 ) {
   if (cluster.isPrimary) {
     const { counter } = await fork(n_workers);
@@ -59,6 +59,7 @@ async function start(
         cache,
         level,
         mint,
+        nonce_length,
         refresh,
         timestamp,
         json,
@@ -162,12 +163,12 @@ async function init(
 async function loop(
   symbol,
   [minter, beneficiary],
-  { block_hash, timestamp, level, cache, mint, refresh, json }
+  { block_hash, cache, json, level, mint, nonce_length, refresh, timestamp }
 ) {
-  let nonce = large_random();
+  let nonce = large_random(nonce_length);
   const { start, now } = { start: nonce, now: performance.now() };
   const { address } = await Token.contract(symbol, minter);
-  const mine = await new Miner().init(level);
+  const mine = await new Miner().init(nonce_length);
   const token = new Token(symbol);
   const threshold = token.threshold(level);
   while (true) {
@@ -186,7 +187,10 @@ async function loop(
             hms,
             json,
           });
-          await do_mint(symbol, [minter, beneficiary], { nonce, block_hash });
+          await do_mint(symbol, [minter, beneficiary], {
+            block_hash,
+            nonce,
+          });
           log_mint({
             worker: worker_id(),
             result: "ACK",
@@ -243,12 +247,12 @@ async function loop(
     nonce++;
   }
 }
-function large_random() {
-  const bytes = crypto.randomBytes(32);
+function large_random(length) {
+  const bytes = crypto.randomBytes(length);
   if (bytes[0] > 15) {
     return BigNumber.from(bytes).toBigInt();
   }
-  return large_random();
+  return large_random(length);
 }
 exports.start = start;
 exports.workers = workers;
