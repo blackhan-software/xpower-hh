@@ -35,14 +35,14 @@ abstract contract FeeTracker {
     }
 
     /** @return fee-estimate and averages over gas & gas-price */
-    function _fees(uint256 mul, uint256 div) internal view returns (uint256[] memory) {
+    function _fees(uint256 add, uint256 mul, uint256 div) internal view returns (uint256[] memory) {
         uint256[] memory array = new uint256[](3);
         uint256 gasPrice = _average[1];
         array[2] = gasPrice;
         uint256 gasValue = _average[0];
         array[1] = gasValue;
         uint256 feeValue = gasPrice * gasValue;
-        array[0] = (mul * feeValue) / div;
+        array[0] = ((feeValue + add) * mul) / div;
         return array;
     }
 }

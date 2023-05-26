@@ -117,7 +117,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
 
     /** @return hash of contract, to-beneficiary, block-hash & data (incl. nonce) */
     function hashOf(address to, bytes16 blockHash, bytes memory data) public view returns (bytes32) {
-        bytes32 hash1 = sha256(bytes.concat(bytes20(uint160(address(this)) ^ uint160(to)), bytes16(blockHash), data));
+        bytes32 hash1 = sha256(bytes.concat(bytes20(uint160(address(this)) ^ uint160(to)), blockHash, data));
         bytes32 hash2 = sha256(bytes.concat(hash1));
         return hash2;
     }
@@ -228,11 +228,12 @@ contract XPowerThor is XPower {
 
     /** @return fee-estimate and averages over gas & gas-price */
     function fees() public view returns (uint256[] memory) {
-        return _fees(FEE_MUL, FEE_DIV);
+        return _fees(FEE_ADD, FEE_MUL, FEE_DIV);
     }
 
-    /** fee-tracker estimate ~ 1.525 */
-    uint256 private constant FEE_MUL = 1_5252519411441514;
+    /** fee-tracker estimate: 21_000+700+1360+1088+68*8 */
+    uint256 private constant FEE_ADD = 24_692_000_000_000;
+    uint256 private constant FEE_MUL = 1_0428468600436929;
     uint256 private constant FEE_DIV = 1_0000000000000000;
 }
 
@@ -257,11 +258,12 @@ contract XPowerLoki is XPower {
 
     /** @return fee-estimate and averages over gas & gas-price */
     function fees() public view returns (uint256[] memory) {
-        return _fees(FEE_MUL, FEE_DIV);
+        return _fees(FEE_ADD, FEE_MUL, FEE_DIV);
     }
 
-    /** fee-tracker estimate ~ 1.522 */
-    uint256 private constant FEE_MUL = 1_5222760077895132;
+    /** fee-tracker estimate: 21_000+700+1360+1088+68*8 */
+    uint256 private constant FEE_ADD = 24_692_000_000_000;
+    uint256 private constant FEE_MUL = 1_0428235353319326;
     uint256 private constant FEE_DIV = 1_0000000000000000;
 }
 
@@ -286,10 +288,11 @@ contract XPowerOdin is XPower {
 
     /** @return fee-estimate and averages over gas & gas-price */
     function fees() public view returns (uint256[] memory) {
-        return _fees(FEE_MUL, FEE_DIV);
+        return _fees(FEE_ADD, FEE_MUL, FEE_DIV);
     }
 
-    /** fee-tracker estimate ~ 1.521 */
-    uint256 private constant FEE_MUL = 1_5212763842396897;
+    /** fee-tracker estimate: 21_000+700+1360+1088+68*8 */
+    uint256 private constant FEE_ADD = 24_692_000_000_000;
+    uint256 private constant FEE_MUL = 1_0427908964095862;
     uint256 private constant FEE_DIV = 1_0000000000000000;
 }
