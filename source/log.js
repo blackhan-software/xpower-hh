@@ -32,7 +32,7 @@ const log_mint = (logger) => {
     hms,
     json = false,
   }) => {
-    nonce = "0x" + nonce.toString(16);
+    nonce = "0x" + Buffer.from(nonce).toString("hex");
     hms = ("000" + hms.toFixed(3)).slice(-7);
     if (json) {
       logger({

@@ -62,7 +62,7 @@ async function do_mint(
     const minting = xpower.mint(
       beneficiary,
       block_hash,
-      "0x" + nonce.toString(16),
+      "0x" + Buffer.from(nonce).toString("hex"),
       {
         maxFeePerGas: Math.max(gas_fee_priority, gas_fee),
         maxPriorityFeePerGas: gas_fee_priority,

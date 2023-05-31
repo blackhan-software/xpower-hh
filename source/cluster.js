@@ -165,8 +165,8 @@ async function loop(
   [minter, beneficiary],
   { block_hash, cache, json, level, mint, nonce_length, refresh, timestamp }
 ) {
-  let nonce = large_random(nonce_length);
-  const { start, now } = { start: nonce, now: performance.now() };
+  let [nonce, counter] = large_random(nonce_length);
+  const { start, now } = { start: counter, now: performance.now() };
   const { address } = await Token.contract(symbol, minter);
   const mine = await new Miner().init(nonce_length);
   const token = new Token(symbol);
@@ -175,7 +175,7 @@ async function loop(
     const hash = mine(address, beneficiary, block_hash, nonce);
     const amount = token.amount_of(hash);
     if (amount >= threshold) {
-      const hms = Number(nonce - start) / (performance.now() - now);
+      const hms = Number(counter - start) / (performance.now() - now);
       if (mint) {
         try {
           dbg_mint({
@@ -244,16 +244,24 @@ async function loop(
         });
       }
     }
-    nonce++;
+    increment(nonce);
+    counter++;
   }
 }
 function large_random(length) {
   const bytes = crypto.randomBytes(length);
   if (bytes[0] > 15) {
-    return BigNumber.from(bytes).toBigInt();
+    return [bytes, BigNumber.from(bytes).toBigInt()];
   }
   return large_random(length);
 }
+function increment(nonce, index = 0) {
+  if (nonce[index]++) {
+    return;
+  }
+  increment(nonce, (index + 1) % nonce.length);
+}
 exports.start = start;
 exports.workers = workers;
+exports.increment = increment;
 exports.large_random = large_random;

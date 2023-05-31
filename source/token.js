@@ -49,12 +49,15 @@ const amount_of = (symbol) => {
       throw new Error(`unknown ${symbol}`);
   }
 };
-const zeros = (hash) => {
-  let counter = 2;
-  while (hash[counter] === "0") {
+const zeros = (hash, counter = 0) => {
+  while (hash[counter] === 0) {
     counter++;
   }
-  return counter - 2;
+  if (hash[counter] < 16) {
+    return 2 * counter + 1;
+  } else {
+    return 2 * counter;
+  }
 };
 const contract = async (symbol) => {
   switch (symbol) {

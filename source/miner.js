@@ -23,9 +23,9 @@ class Miner {
     const hasher = await createSHA256();
     const abi_encode = this.abi_encoder(nonce_length);
     return (contract, address, block_hash, nonce) => {
-      const data1 = abi_encode(contract, address, block_hash, nonce);
-      const data2 = hasher.init().update(data1).digest("binary");
-      return "0x" + hasher.init().update(data2).digest("hex");
+      const data = abi_encode(contract, address, block_hash, nonce);
+      const hash = hasher.init().update(data).digest("binary");
+      return hasher.init().update(hash).digest("binary");
     };
   }
 
@@ -44,8 +44,7 @@ class Miner {
         value = arrayify(template.slice(2));
         this.abi_encoded[block_hash] = value;
       }
-      const array = arrayify(nonce.toString(16));
-      value.set(array, 36);
+      value.set(nonce, 36);
       return value;
     };
   }
