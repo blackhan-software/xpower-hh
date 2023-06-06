@@ -44,7 +44,7 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
 
     /** mint amount of tokens for beneficiary (after wrapping XPower) */
     function mint(address to, uint256 amount) public onlyOwner {
-        _moe.transferFrom(owner(), (address)(this), _wrapped(amount));
+        assert(_moe.transferFrom(owner(), (address)(this), _wrapped(amount)));
         _mint(to, amount);
     }
 

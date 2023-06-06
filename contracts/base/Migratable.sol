@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import {ERC20, IERC20, IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import {Supervised, MoeMigratableSupervised, SovMigratableSupervised} from "./Supervised.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 /**
  * Allows migration of tokens from an old contract upto a certain deadline.
@@ -58,7 +59,6 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         uint256 timestamp = block.timestamp;
         require(_deadlineBy >= timestamp, "deadline passed");
         _base[index].burnFrom(account, oldAmount);
-        require(oldAmount > 0, "non-positive amount");
         uint256 newAmount = newUnits(oldAmount, index);
         _migrated += newAmount;
         return newAmount;
@@ -160,8 +160,8 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
         uint256 newAmountMoe = moeUnits(newAmountSov);
         uint256 oldAmountMoe = _moe.oldUnits(newAmountMoe, moeIndex[0]);
         uint256 migAmountMoe = _moe.migrateFrom(account, oldAmountMoe, moeIndex);
-        assert(migAmountMoe == newAmountMoe);
-        _moe.transferFrom(account, (address)(this), migAmountMoe);
+        assert(migAmountMoe <= newAmountMoe); // allow under-collateralization!
+        assert(_moe.transferFrom(account, (address)(this), migAmountMoe));
         _mint(account, newAmountSov);
         return newAmountSov;
     }
