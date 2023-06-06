@@ -87,17 +87,28 @@ contract MoeTreasury is MoeTreasurySupervised {
     function claimForBatch(address account, uint256[] memory nftIds) public {
         require(Array.unique(nftIds), "unsorted or duplicate ids");
         uint256[] memory amounts = claimableForBatch(account, nftIds);
+        uint256[] memory subsums = new uint256[](_lastPrefix(nftIds));
         for (uint256 i = 0; i < nftIds.length; i++) {
             require(amounts[i] > 0, "nothing claimable");
             _claimed[account][nftIds[i]] += amounts[i];
+            uint256 prefix = _ppt.prefixOf(nftIds[i]);
+            subsums[prefix - 1] += amounts[i];
         }
-        for (uint256 i = 0; i < nftIds.length; i++) {
-            XPower moe = _moeOf(_ppt.prefixOf(nftIds[i]));
-            APower sov = _sovOf(_ppt.prefixOf(nftIds[i]));
-            moe.increaseAllowance((address)(sov), amounts[i]);
-            sov.mint(account, amounts[i]);
+        for (uint256 i = 0; i < subsums.length; i++) {
+            if (subsums[i] == 0) {
+                continue;
+            }
+            XPower moe = _moeOf(i + 1);
+            APower sov = _sovOf(i + 1);
+            moe.increaseAllowance((address)(sov), subsums[i]);
+            sov.mint(account, subsums[i]);
         }
         emit ClaimBatch(account, nftIds, amounts);
+    }
+
+    /** @return last prefix (for nft-ids) */
+    function _lastPrefix(uint256[] memory nftIds) private view returns (uint256) {
+        return nftIds.length > 0 ? _ppt.prefixOf(nftIds[nftIds.length - 1]) : 0;
     }
 
     /** @return claimed amount (for account and nft-id) */
