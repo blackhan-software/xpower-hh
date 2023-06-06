@@ -175,21 +175,21 @@ describe("APower Migration", async function () {
     });
   });
   describe("moeUnits", async function () {
-    it("should convert old sov-amount => moe-units", async function () {
+    it("should convert old sov-amount => old moe-units", async function () {
       expect(await aodin_old.moeUnits(UNIT_OLD)).to.eq(UNIT_OLD);
       expect(await aodin_old.moeUnits(DECI_OLD)).to.eq(DECI_OLD);
     });
-    it("should convert new sov-amount => moe-units", async function () {
+    it("should convert new sov-amount => new moe-units", async function () {
       expect(await aodin_new.moeUnits(UNIT_NEW)).to.eq(UNIT_NEW);
       expect(await aodin_new.moeUnits(DECI_NEW)).to.eq(DECI_NEW);
     });
   });
   describe("sovUnits", async function () {
-    it("should convert old moe-amount => sov-units", async function () {
+    it("should convert old moe-amount => old sov-units", async function () {
       expect(await aodin_old.sovUnits(UNIT_OLD)).to.eq(UNIT_OLD);
       expect(await aodin_old.sovUnits(DECI_OLD)).to.eq(DECI_OLD);
     });
-    it("should convert new moe-amount => sov-units", async function () {
+    it("should convert new moe-amount => new sov-units", async function () {
       expect(await aodin_new.sovUnits(UNIT_NEW)).to.eq(UNIT_NEW);
       expect(await aodin_new.sovUnits(DECI_NEW)).to.eq(DECI_NEW);
     });

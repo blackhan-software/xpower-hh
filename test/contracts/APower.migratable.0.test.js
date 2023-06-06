@@ -222,7 +222,7 @@ describe("APower Migration", async function () {
     const new_supply = await aodin_new.totalSupply();
     expect(new_supply).to.be.eq(0);
   });
-  it("should *not* migrate old => new (insufficient allowance)", async function () {
+  it("should *not* migrate old (insufficient allowance)", async function () {
     const tx = await aodin_new.migrate(DECI_OLD, [0, 0]).catch((ex) => {
       const m = ex.message.match(/insufficient allowance/);
       if (m === null) console.debug(ex);
@@ -232,7 +232,7 @@ describe("APower Migration", async function () {
     const new_migrated = await aodin_new.migrated();
     expect(new_migrated).to.eq(0);
   });
-  it("should *not* migrate old => new (burn amount exceeds balance)", async function () {
+  it("should *not* migrate old (burn amount exceeds balance)", async function () {
     await aodin_old.increaseAllowance(aodin_new.address, 51n * UNIT_OLD);
     const tx = await aodin_new.migrate(51n * UNIT_OLD, [0, 0]).catch((ex) => {
       const m = ex.message.match(/burn amount exceeds balance/);
@@ -243,7 +243,7 @@ describe("APower Migration", async function () {
     const new_migrated = await aodin_new.migrated();
     expect(new_migrated).to.eq(0);
   });
-  it("should migrate old => new", async function () {
+  it("should migrate old", async function () {
     await xodin_old.increaseAllowance(xodin_new.address, DECI_OLD);
     await xodin_new.increaseAllowance(aodin_new.address, DECI_NEW);
     await aodin_old.increaseAllowance(aodin_new.address, DECI_OLD);
@@ -253,7 +253,7 @@ describe("APower Migration", async function () {
     expect(await aodin_old.balanceOf(A0)).to.eq(0);
     expect(await aodin_new.balanceOf(A0)).to.eq(DECI_NEW);
   });
-  it("should *not* migrate old => new (migration sealed)", async function () {
+  it("should *not* migrate old (migration sealed)", async function () {
     await aodin_new.grantRole(aodin_new.SOV_SEAL_ROLE(), A0);
     expect(await aodin_new.seals()).to.deep.eq([false]);
     await aodin_new.seal(0);
@@ -280,7 +280,7 @@ describe("APower Migration", async function () {
     const new_migrated = await aodin_new.migrated();
     expect(new_migrated).to.eq(0);
   });
-  it("should *not* migrate old => new (deadline passed)", async function () {
+  it("should *not* migrate old (deadline passed)", async function () {
     await network.provider.send("evm_increaseTime", [126_230_400]);
     await aodin_old.increaseAllowance(aodin_new.address, DECI_OLD);
     const tx = await aodin_new.migrate(DECI_OLD, [0, 0]).catch((ex) => {

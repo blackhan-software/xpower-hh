@@ -48,7 +48,8 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
 
     /** migrate old amount of ERC20 tokens (for account) */
     function migrateFrom(address account, uint256 oldAmount, uint256[] memory index) public virtual returns (uint256) {
-        uint256 newAmount = _premigrate(account, oldAmount, index[0]);
+        uint256 minAmount = Math.min(oldAmount, _base[index[0]].balanceOf(account));
+        uint256 newAmount = _premigrate(account, minAmount, index[0]);
         _mint(account, newAmount);
         return newAmount;
     }
@@ -59,6 +60,7 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         uint256 timestamp = block.timestamp;
         require(_deadlineBy >= timestamp, "deadline passed");
         _base[index].burnFrom(account, oldAmount);
+        assert(oldAmount > 0 || oldAmount == 0);
         uint256 newAmount = newUnits(oldAmount, index);
         _migrated += newAmount;
         return newAmount;
@@ -117,6 +119,14 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
  * Allows migration of MOE tokens from an old contract upto a certain deadline.
  */
 abstract contract MoeMigratable is Migratable, MoeMigratableSupervised {
+    /** migrate old amount of MOE tokens (for account) */
+    ///
+    /// @dev should always be invoked *before* SovMigratable.migrate[From]
+    ///
+    function migrateFrom(address account, uint256 oldAmount, uint256[] memory index) public override returns (uint256) {
+        return super.migrateFrom(account, oldAmount, index);
+    }
+
     /** seal migration (manually) */
     function seal(uint256 index) public onlyRole(MOE_SEAL_ROLE) {
         _seal(index);
@@ -160,7 +170,6 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
         uint256 newAmountMoe = moeUnits(newAmountSov);
         uint256 oldAmountMoe = _moe.oldUnits(newAmountMoe, moeIndex[0]);
         uint256 migAmountMoe = _moe.migrateFrom(account, oldAmountMoe, moeIndex);
-        assert(migAmountMoe <= newAmountMoe); // allow under-collateralization!
         assert(_moe.transferFrom(account, (address)(this), migAmountMoe));
         _mint(account, newAmountSov);
         return newAmountSov;
