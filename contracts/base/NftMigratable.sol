@@ -60,7 +60,6 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         uint256 prefix = Nft.prefixOf(nftId);
         assert(prefix > 0); // cannot be zero
         uint256 tidx = prefix <= index.length ? prefix - 1 : index.length - 1;
-        assert(tidx >= 0); // token index: zero *or* larger
         require(!_sealed[index[tidx]], "migration sealed");
         uint256 tryBalance = _base[index[tidx]].balanceOf(account, tryId);
         _base[index[tidx]].burn(account, tryBalance > 0 ? tryId : nftId, amount);
