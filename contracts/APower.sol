@@ -95,7 +95,7 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     }
 
     /** @return prefix of token */
-    function prefix() public view returns (uint256) {
+    function prefix() external view returns (uint256) {
         return _moe.prefix();
     }
 }

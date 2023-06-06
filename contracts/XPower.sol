@@ -204,7 +204,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     }
 
     /** @return prefix of token */
-    function prefix() public pure virtual returns (uint256);
+    function prefix() external pure virtual returns (uint256);
 }
 
 /**
@@ -222,7 +222,7 @@ contract XPowerThor is XPower {
     }
 
     /** @return prefix of token */
-    function prefix() public pure override returns (uint256) {
+    function prefix() external pure override returns (uint256) {
         return 1;
     }
 
@@ -252,7 +252,7 @@ contract XPowerLoki is XPower {
     }
 
     /** @return prefix of token */
-    function prefix() public pure override returns (uint256) {
+    function prefix() external pure override returns (uint256) {
         return 2;
     }
 
@@ -282,7 +282,7 @@ contract XPowerOdin is XPower {
     }
 
     /** @return prefix of token */
-    function prefix() public pure override returns (uint256) {
+    function prefix() external pure override returns (uint256) {
         return 3;
     }
 
