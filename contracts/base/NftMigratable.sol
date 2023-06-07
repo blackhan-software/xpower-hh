@@ -41,12 +41,17 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     }
 
     /** migrate amount of ERC1155 */
-    function migrate(uint256 nftId, uint256 amount, uint256[] memory index) public {
-        migrateFrom(msg.sender, nftId, amount, index);
+    function migrate(uint256 nftId, uint256 amount, uint256[] memory index) external {
+        _migrateFrom(msg.sender, nftId, amount, index);
     }
 
     /** migrate amount of ERC1155 (for account) */
-    function migrateFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) public {
+    function migrateFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) external {
+        _migrateFrom(account, nftId, amount, index);
+    }
+
+    /** migrate amount of ERC1155 (for account) */
+    function _migrateFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) internal {
         require(_deadlineBy >= block.timestamp, "deadline passed");
         _burnFrom(account, nftId, amount, index);
         _mint(account, nftId, amount, "");
@@ -66,8 +71,8 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     }
 
     /** batch migrate amounts of ERC1155 */
-    function migrateBatch(uint256[] memory nftIds, uint256[] memory amounts, uint256[] memory index) public {
-        migrateFromBatch(msg.sender, nftIds, amounts, index);
+    function migrateBatch(uint256[] memory nftIds, uint256[] memory amounts, uint256[] memory index) external {
+        _migrateFromBatch(msg.sender, nftIds, amounts, index);
     }
 
     /** batch migrate amounts of ERC1155 (for account) */
@@ -76,7 +81,17 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         uint256[] memory nftIds,
         uint256[] memory amounts,
         uint256[] memory index
-    ) public {
+    ) external {
+        _migrateFromBatch(account, nftIds, amounts, index);
+    }
+
+    /** batch migrate amounts of ERC1155 (for account) */
+    function _migrateFromBatch(
+        address account,
+        uint256[] memory nftIds,
+        uint256[] memory amounts,
+        uint256[] memory index
+    ) internal {
         require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
         require(_deadlineBy >= block.timestamp, "deadline passed");
         for (uint256 i = 0; i < nftIds.length; i++) {
@@ -86,14 +101,14 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     }
 
     /** seal migration (manually) */
-    function seal(uint256 index) public onlyRole(NFT_SEAL_ROLE) {
+    function seal(uint256 index) external onlyRole(NFT_SEAL_ROLE) {
         _sealed[index] = true;
     }
 
     /** seal-all migration (manually) */
-    function sealAll() public onlyRole(NFT_SEAL_ROLE) {
+    function sealAll() external onlyRole(NFT_SEAL_ROLE) {
         for (uint256 i = 0; i < _sealed.length; i++) {
-            seal(i);
+            _sealed[i] = true;
         }
     }
 
