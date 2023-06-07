@@ -104,7 +104,7 @@ task("mine", "Mines for XPower tokens")
  */
 module.exports = {
   solidity: {
-    version: "0.8.17",
+    version: "0.8.18",
     settings: {
       optimizer: {
         enabled: true,
