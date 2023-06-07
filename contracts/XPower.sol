@@ -205,6 +205,9 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
 
     /** @return prefix of token */
     function prefix() external pure virtual returns (uint256);
+
+    /** @return fee-estimate plus averages over gas and gas-price */
+    function fees() external view virtual returns (uint256[] memory);
 }
 
 /**
@@ -226,15 +229,15 @@ contract XPowerThor is XPower {
         return 1;
     }
 
-    /** @return fee-estimate and averages over gas & gas-price */
-    function fees() public view returns (uint256[] memory) {
+    /** @return fee-estimate plus averages over gas and gas-price */
+    function fees() external view override returns (uint256[] memory) {
         return _fees(FEE_ADD, FEE_MUL, FEE_DIV);
     }
 
     /** fee-tracker estimate: 21_000+700+1360+1088+68*8 */
     uint256 private constant FEE_ADD = 24_692_000_000_000;
-    uint256 private constant FEE_MUL = 1_0428468600436929;
-    uint256 private constant FEE_DIV = 1_0000000000000000;
+    uint256 private constant FEE_MUL = 10428468600436929;
+    uint256 private constant FEE_DIV = 10000000000000000;
 }
 
 /**
@@ -256,15 +259,15 @@ contract XPowerLoki is XPower {
         return 2;
     }
 
-    /** @return fee-estimate and averages over gas & gas-price */
-    function fees() public view returns (uint256[] memory) {
+    /** @return fee-estimate plus averages over gas and gas-price */
+    function fees() external view override returns (uint256[] memory) {
         return _fees(FEE_ADD, FEE_MUL, FEE_DIV);
     }
 
     /** fee-tracker estimate: 21_000+700+1360+1088+68*8 */
     uint256 private constant FEE_ADD = 24_692_000_000_000;
-    uint256 private constant FEE_MUL = 1_0428235353319326;
-    uint256 private constant FEE_DIV = 1_0000000000000000;
+    uint256 private constant FEE_MUL = 10428235353319326;
+    uint256 private constant FEE_DIV = 10000000000000000;
 }
 
 /**
@@ -286,13 +289,13 @@ contract XPowerOdin is XPower {
         return 3;
     }
 
-    /** @return fee-estimate and averages over gas & gas-price */
-    function fees() public view returns (uint256[] memory) {
+    /** @return fee-estimate plus averages over gas and gas-price */
+    function fees() external view override returns (uint256[] memory) {
         return _fees(FEE_ADD, FEE_MUL, FEE_DIV);
     }
 
     /** fee-tracker estimate: 21_000+700+1360+1088+68*8 */
     uint256 private constant FEE_ADD = 24_692_000_000_000;
-    uint256 private constant FEE_MUL = 1_0427908964095862;
-    uint256 private constant FEE_DIV = 1_0000000000000000;
+    uint256 private constant FEE_MUL = 10427908964095862;
+    uint256 private constant FEE_DIV = 10000000000000000;
 }
