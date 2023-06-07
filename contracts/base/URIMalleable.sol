@@ -30,7 +30,7 @@ abstract contract URIMalleable is ERC1155, URIMalleableSupervised {
         _setURI(uri);
     }
 
-    /** @return true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
     }

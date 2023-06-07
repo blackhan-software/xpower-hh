@@ -196,7 +196,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         _share = array;
     }
 
-    /** @return true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(MoeMigratable, Supervised) returns (bool) {

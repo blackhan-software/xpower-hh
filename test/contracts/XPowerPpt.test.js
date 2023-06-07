@@ -34,20 +34,20 @@ describe("XPowerPpt", async function () {
   });
   describe("mint", async function () {
     it("should mint nft-staked for amount=1", async function () {
-      await mintPpt(1202100, 1);
+      await pptMint(1202100, 1);
     });
   });
   describe("mint-batch", async function () {
     it("should mint nft-staked for amount=1", async function () {
-      await mintBatchPpt(1202100, 1);
+      await pptMintBatch(1202100, 1);
     });
   });
   describe("sharesBy", async function () {
     for (const p of [1, 2, 3]) {
       it(`should mint and return shares-by nft-prefix=${p}`, async function () {
-        await mintPpt(ppt.idBy(2021, 0, p), 1);
-        await mintPpt(ppt.idBy(2021, 3, p), 2);
-        await mintPpt(ppt.idBy(2021, 6, p), 3);
+        await pptMint(ppt.idBy(2021, 0, p), 1);
+        await pptMint(ppt.idBy(2021, 3, p), 2);
+        await pptMint(ppt.idBy(2021, 6, p), 3);
         const shares = await ppt.sharesBy(p);
         expect(shares.length).to.eq(34);
         expect(shares[0]).to.eq(1);
@@ -56,12 +56,12 @@ describe("XPowerPpt", async function () {
         expect(shares[3]).to.eq(0);
       });
       it(`should burn and return shares-by nft-prefix=${p}`, async function () {
-        await mintPpt(ppt.idBy(2021, 0, p), 1);
-        await burnPpt(ppt.idBy(2021, 0, p), 1);
-        await mintPpt(ppt.idBy(2021, 3, p), 2);
-        await burnPpt(ppt.idBy(2021, 3, p), 2);
-        await mintPpt(ppt.idBy(2021, 6, p), 3);
-        await burnPpt(ppt.idBy(2021, 6, p), 3);
+        await pptMint(ppt.idBy(2021, 0, p), 1);
+        await pptBurn(ppt.idBy(2021, 0, p), 1);
+        await pptMint(ppt.idBy(2021, 3, p), 2);
+        await pptBurn(ppt.idBy(2021, 3, p), 2);
+        await pptMint(ppt.idBy(2021, 6, p), 3);
+        await pptBurn(ppt.idBy(2021, 6, p), 3);
         const shares = await ppt.sharesBy(p);
         expect(shares.length).to.eq(34);
         expect(shares[0]).to.eq(0);
@@ -73,19 +73,19 @@ describe("XPowerPpt", async function () {
   });
   describe("burn", async function () {
     it("should burn nft-staked for amount=3", async function () {
-      await mintPpt(1202100, 5);
-      await burnPpt(1202100, 5);
+      await pptMint(1202100, 5);
+      await pptBurn(1202100, 5);
     });
   });
   describe("mint-batch", async function () {
     it("should mint nft-staked for amount=1", async function () {
-      await mintBatchPpt(1202100, 1);
+      await pptMintBatch(1202100, 1);
     });
   });
   describe("burn-batch", async function () {
     it("should burn nft-staked for amount=3", async function () {
-      await mintBatchPpt(1202100, 5);
-      await burnBatchPpt(1202100, 5);
+      await pptMintBatch(1202100, 5);
+      await pptBurnBatch(1202100, 5);
     });
   });
   describe("age [10×mint]", async function () {
@@ -284,7 +284,7 @@ describe("XPowerPpt", async function () {
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // transfer:
-      await transferPpt(from, to, 1202200, 1);
+      await pptTransfer(from, to, 1202200, 1);
       expect(await ageOf(from, 1202200)).to.approximately(0, 5);
       expect(await ageOf(to, 1202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
@@ -351,7 +351,7 @@ describe("XPowerPpt", async function () {
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // transfer:
-      await batchTransferPpt(from, to, [1202200], [1]);
+      await pptTransferBatch(from, to, [1202200], [1]);
       expect(await ageOf(from, 1202200)).to.approximately(0, 5);
       expect(await ageOf(to, 1202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
@@ -406,7 +406,7 @@ describe("XPowerPpt", async function () {
       await ppt.grantRole(ppt.URI_DATA_ROLE(), addresses[0]);
       const nft_year = (await ppt.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
-      const nft_id = (await ppt.idBy(nft_year, ppt.UNIT(), 0)).toNumber();
+      const nft_id = (await ppt.idBy(nft_year, 0, 0)).toNumber();
       expect(nft_id).to.be.greaterThan(0);
       await ppt.setURI(NFT_LOKI_WWW);
       const nft_url = await ppt.uri(nft_id);
@@ -416,7 +416,7 @@ describe("XPowerPpt", async function () {
       await ppt.revokeRole(ppt.URI_DATA_ROLE(), addresses[0]);
       const nft_year = (await ppt.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
-      const nft_id = (await ppt.idBy(nft_year, ppt.UNIT(), 0)).toNumber();
+      const nft_id = (await ppt.idBy(nft_year, 0, 0)).toNumber();
       expect(nft_id).to.be.greaterThan(0);
       await ppt.transferOwnership(addresses[1]);
       expect(
@@ -429,7 +429,7 @@ describe("XPowerPpt", async function () {
     });
   });
 });
-async function mintPpt(nft_id, amount) {
+async function pptMint(nft_id, amount) {
   await ppt.mint(addresses[0], nft_id, amount);
   const nft_balance = await ppt.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(amount);
@@ -438,7 +438,7 @@ async function mintPpt(nft_id, amount) {
   const nft_exists = await ppt.exists(nft_id);
   expect(nft_exists).to.eq(nft_balance.gt(0));
 }
-async function burnPpt(nft_id, amount) {
+async function pptBurn(nft_id, amount) {
   const nft_balance_old = await ppt.balanceOf(addresses[0], nft_id);
   expect(nft_balance_old.gte(amount)).be.eq(true);
   const nft_supply_old = await ppt.totalSupply(nft_id);
@@ -451,7 +451,7 @@ async function burnPpt(nft_id, amount) {
   const nft_exists = await ppt.exists(nft_id);
   expect(nft_exists).to.eq(nft_balance_old.sub(amount).gt(0));
 }
-async function mintBatchPpt(nft_id, amount) {
+async function pptMintBatch(nft_id, amount) {
   await ppt.mintBatch(addresses[0], [nft_id], [amount]);
   const nft_balance = await ppt.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(amount);
@@ -460,7 +460,7 @@ async function mintBatchPpt(nft_id, amount) {
   const nft_exists = await ppt.exists(nft_id);
   expect(nft_exists).to.eq(nft_balance.gt(0));
 }
-async function burnBatchPpt(nft_id, amount) {
+async function pptBurnBatch(nft_id, amount) {
   const nft_balance_old = await ppt.balanceOf(addresses[0], nft_id);
   expect(nft_balance_old.gte(amount)).be.eq(true);
   const nft_supply_old = await ppt.totalSupply(nft_id);
@@ -473,7 +473,7 @@ async function burnBatchPpt(nft_id, amount) {
   const nft_exists = await ppt.exists(nft_id);
   expect(nft_exists).to.eq(nft_balance_old.sub(amount).gt(0));
 }
-async function transferPpt(from, to, nft_id, amount) {
+async function pptTransfer(from, to, nft_id, amount) {
   const from_old = await ppt.balanceOf(from, nft_id);
   const to_old = await ppt.balanceOf(to, nft_id);
   await ppt.safeTransferFrom(from, to, nft_id, amount, DATA);
@@ -482,7 +482,7 @@ async function transferPpt(from, to, nft_id, amount) {
   expect(from_old.sub(amount)).to.eq(from_new);
   expect(to_old.add(amount)).to.eq(to_new);
 }
-async function batchTransferPpt(from, to, nft_ids, amounts) {
+async function pptTransferBatch(from, to, nft_ids, amounts) {
   const from_olds = await ppt.balanceOfBatch([from], nft_ids);
   const to_olds = await ppt.balanceOfBatch([to], nft_ids);
   await ppt.safeBatchTransferFrom(from, to, nft_ids, amounts, DATA);

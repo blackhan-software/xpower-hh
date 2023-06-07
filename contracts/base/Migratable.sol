@@ -37,40 +37,36 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
     }
 
     /** @return index of base address */
-    function oldIndexOf(address base) public view returns (uint256) {
+    function oldIndexOf(address base) external view returns (uint256) {
         return _index[base];
     }
 
-    /** migrate old amount of ERC20 tokens */
-    function migrate(uint256 oldAmount, uint256[] memory index) external returns (uint256) {
-        return _migrateFrom(msg.sender, oldAmount, index);
+    /** migrate amount of ERC20 tokens */
+    function migrate(uint256 amount, uint256[] memory index) external returns (uint256) {
+        return _migrateFrom(msg.sender, amount, index);
     }
 
-    /** migrate old amount of ERC20 tokens (for account) */
-    function migrateFrom(address account, uint256 oldAmount, uint256[] memory index) external returns (uint256) {
-        return _migrateFrom(account, oldAmount, index);
+    /** migrate amount of ERC20 tokens */
+    function migrateFrom(address account, uint256 amount, uint256[] memory index) external returns (uint256) {
+        return _migrateFrom(account, amount, index);
     }
 
-    /** migrate old amount of ERC20 tokens (for account) */
-    function _migrateFrom(
-        address account,
-        uint256 oldAmount,
-        uint256[] memory index
-    ) internal virtual returns (uint256) {
-        uint256 minAmount = Math.min(oldAmount, _base[index[0]].balanceOf(account));
+    /** migrate amount of ERC20 tokens */
+    function _migrateFrom(address account, uint256 amount, uint256[] memory index) internal virtual returns (uint256) {
+        uint256 minAmount = Math.min(amount, _base[index[0]].balanceOf(account));
         uint256 newAmount = _premigrate(account, minAmount, index[0]);
         _mint(account, newAmount);
         return newAmount;
     }
 
-    /** migrate old amount of ERC20 tokens (w/o minting new ones) */
-    function _premigrate(address account, uint256 oldAmount, uint256 index) internal returns (uint256) {
+    /** migrate amount of ERC20 tokens */
+    function _premigrate(address account, uint256 amount, uint256 index) internal returns (uint256) {
         require(!_sealed[index], "migration sealed");
         uint256 timestamp = block.timestamp;
         require(_deadlineBy >= timestamp, "deadline passed");
-        _base[index].burnFrom(account, oldAmount);
-        assert(oldAmount > 0 || oldAmount == 0);
-        uint256 newAmount = newUnits(oldAmount, index);
+        _base[index].burnFrom(account, amount);
+        assert(amount > 0 || amount == 0);
+        uint256 newAmount = newUnits(amount, index);
         _migrated += newAmount;
         return newAmount;
     }
@@ -98,24 +94,24 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         return _migrated;
     }
 
-    /** seal migration (manually) */
+    /** seal migration */
     function _seal(uint256 index) internal {
         _sealed[index] = true;
     }
 
-    /** seal-all migration (manually) */
+    /** seal-all migration */
     function _sealAll() internal {
         for (uint256 i = 0; i < _sealed.length; i++) {
             _sealed[i] = true;
         }
     }
 
-    /** @return seal flags (for all bases) */
+    /** @return seal flags (of all bases) */
     function seals() public view returns (bool[] memory) {
         return _sealed;
     }
 
-    /** @return true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return
             interfaceId == type(IERC20).interfaceId ||
@@ -128,17 +124,17 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
  * Allows migration of MOE tokens from an old contract upto a certain deadline.
  */
 abstract contract MoeMigratable is Migratable, MoeMigratableSupervised {
-    /** seal migration (manually) */
+    /** seal migration */
     function seal(uint256 index) external onlyRole(MOE_SEAL_ROLE) {
         _seal(index);
     }
 
-    /** seal-all migration (manually) */
+    /** seal-all migration */
     function sealAll() external onlyRole(MOE_SEAL_ROLE) {
         _sealAll();
     }
 
-    /** @return true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(bytes4 interfaceId) public view virtual override(Migratable, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
@@ -158,19 +154,15 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
         _moe = MoeMigratable(moe);
     }
 
-    /** migrate old amount of SOV tokens (for account) */
+    /** migrate amount of SOV tokens */
     ///
     /// @dev assumes old (XPower:APower) == new (XPower:APower) w.r.t. decimals
     ///
-    function _migrateFrom(
-        address account,
-        uint256 oldAmount,
-        uint256[] memory index
-    ) internal override returns (uint256) {
-        uint256[] memory moeIndex = _shift(index);
-        assert(moeIndex.length + 1 == index.length);
-        uint256 newAmountSov = newUnits(oldAmount, index[0]);
-        uint256 migAmountSov = _premigrate(account, oldAmount, index[0]);
+    function _migrateFrom(address account, uint256 amount, uint256[] memory index) internal override returns (uint256) {
+        uint256[] memory moeIndex = new uint256[](1);
+        moeIndex[0] = index[1]; // drop sov-index
+        uint256 newAmountSov = newUnits(amount, index[0]);
+        uint256 migAmountSov = _premigrate(account, amount, index[0]);
         assert(migAmountSov == newAmountSov);
         uint256 newAmountMoe = moeUnits(newAmountSov);
         uint256 oldAmountMoe = _moe.oldUnits(newAmountMoe, moeIndex[0]);
@@ -198,27 +190,18 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
         }
     }
 
-    /** seal migration (manually) */
+    /** seal migration */
     function seal(uint256 index) external onlyRole(SOV_SEAL_ROLE) {
         _seal(index);
     }
 
-    /** seal-all migration (manually) */
+    /** seal-all migration */
     function sealAll() external onlyRole(SOV_SEAL_ROLE) {
         _sealAll();
     }
 
-    /** @return true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(bytes4 interfaceId) public view virtual override(Migratable, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
-    }
-
-    /** @return shifted array (by a single position to the left) */
-    function _shift(uint256[] memory source) private pure returns (uint256[] memory) {
-        uint256[] memory target = new uint256[](source.length - 1);
-        for (uint256 i = 0; i < target.length; i++) {
-            target[i] = source[i + 1];
-        }
-        return target;
     }
 }

@@ -5,8 +5,8 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let XPower, XPowerNft; // contracts
-let xpower, nft; // instances
+let Moe, Nft; // contracts
+let moe, nft; // instances
 
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const SOME_ADDRESS = /^0x[0-fa-f]{40}$/i;
@@ -26,26 +26,26 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerNft");
-    expect(XPowerNft).to.exist;
-    XPower = await ethers.getContractFactory("XPowerLoki");
-    expect(XPower).to.exist;
+    Nft = await ethers.getContractFactory("XPowerNft");
+    expect(Nft).to.exist;
+    Moe = await ethers.getContractFactory("XPowerLoki");
+    expect(Moe).to.exist;
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy([], DEADLINE);
-    expect(xpower).to.exist;
-    await xpower.deployed();
-    await xpower.transferOwnership(addresses[1]);
-    await xpower.init();
+    moe = await Moe.deploy([], DEADLINE);
+    expect(moe).to.exist;
+    await moe.deployed();
+    await moe.transferOwnership(addresses[1]);
+    await moe.init();
   });
   beforeEach(async function () {
-    nft = await XPowerNft.deploy(NFT_LOKI_URL, [xpower.address], [], DEADLINE);
+    nft = await Nft.deploy(NFT_LOKI_URL, [moe.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });
   after(async function () {
     const [owner, signer_1] = await ethers.getSigners();
-    await xpower.connect(signer_1).transferOwnership(owner.address);
+    await moe.connect(signer_1).transferOwnership(owner.address);
   });
   describe("royaltyInfo", function () {
     const level = (l) => {

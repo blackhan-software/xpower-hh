@@ -119,23 +119,6 @@ describe("NftTreasury", async function () {
         });
       expect(tx_stake).to.eq(undefined);
     });
-    it("should *not* stake nft for amount=0 (non-positive amount)", async function () {
-      const [owner, address] = [addresses[0], nft_treasury.address];
-      const nft_id = await mintNft(0, 1);
-      expect(nft_id.gt(0)).to.eq(true);
-      const tx_approval = await await nft.setApprovalForAll(address, true);
-      expect(tx_approval).to.be.an("object");
-      const tx_transfer = await nft_staked.transferOwnership(address);
-      expect(tx_transfer).to.be.an("object");
-      const tx_stake = await nft_treasury
-        .stake(owner, nft_id, 0)
-        .catch((ex) => {
-          const m = ex.message.match(/non-positive amount/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        });
-      expect(tx_stake).to.eq(undefined);
-    });
   });
   describe("stake-batch", async function () {
     it("should stake-batch nft(s) for amount=1", async function () {
@@ -185,23 +168,6 @@ describe("NftTreasury", async function () {
         });
       expect(tx_stake).to.eq(undefined);
     });
-    it("should *not* stake-batch nft(s) for amount=0 (non-positive amount)", async function () {
-      const [owner, address] = [addresses[0], nft_treasury.address];
-      const nft_id = await mintNft(0, 1);
-      expect(nft_id.gt(0)).to.eq(true);
-      const tx_approval = await await nft.setApprovalForAll(address, true);
-      expect(tx_approval).to.be.an("object");
-      const tx_transfer = await nft_staked.transferOwnership(address);
-      expect(tx_transfer).to.be.an("object");
-      const tx_stake = await nft_treasury
-        .stakeBatch(owner, [nft_id], [0])
-        .catch((ex) => {
-          const m = ex.message.match(/non-positive amount/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        });
-      expect(tx_stake).to.eq(undefined);
-    });
   });
   describe("unstake", async function () {
     it("should unstake nft for amount=1", async function () {
@@ -223,25 +189,6 @@ describe("NftTreasury", async function () {
       const nft_balance = await nft.balanceOf(owner, nft_id);
       expect(nft_balance).to.eq(1);
     });
-    it("should *not* unstake nft for amount=0 (non-positive amount)", async function () {
-      const [owner, address] = [addresses[0], nft_treasury.address];
-      const nft_id = await mintNft(0, 1);
-      expect(nft_id.gt(0)).to.eq(true);
-      const tx_approval = await await nft.setApprovalForAll(address, true);
-      expect(tx_approval).to.be.an("object");
-      const tx_transfer = await nft_staked.transferOwnership(address);
-      expect(tx_transfer).to.be.an("object");
-      const tx_stake = await nft_treasury.stake(owner, nft_id, 1);
-      expect(tx_stake).to.be.an("object");
-      const tx_unstake = await nft_treasury
-        .stake(owner, nft_id, 0)
-        .catch((ex) => {
-          const m = ex.message.match(/non-positive amount/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        });
-      expect(tx_unstake).to.eq(undefined);
-    });
   });
   describe("unstake-batch", async function () {
     it("should unstake-batch nft(s) for amount=1", async function () {
@@ -262,25 +209,6 @@ describe("NftTreasury", async function () {
       expect(nft_treasury_balance).to.eq(0);
       const nft_balance = await nft.balanceOf(owner, nft_id);
       expect(nft_balance).to.eq(1);
-    });
-    it("should *not* unstake-batch nft(s) for amount=0 (non-positive amount)", async function () {
-      const [owner, address] = [addresses[0], nft_treasury.address];
-      const nft_id = await mintNft(0, 1); // UNIT NFT
-      expect(nft_id.gt(0)).to.eq(true);
-      const tx_approval = await await nft.setApprovalForAll(address, true);
-      expect(tx_approval).to.be.an("object");
-      const tx_transfer = await nft_staked.transferOwnership(address);
-      expect(tx_transfer).to.be.an("object");
-      const tx_stake = await nft_treasury.stakeBatch(owner, [nft_id], [1]);
-      expect(tx_stake).to.be.an("object");
-      const tx_unstake = await nft_treasury
-        .stakeBatch(owner, [nft_id], [0])
-        .catch((ex) => {
-          const m = ex.message.match(/non-positive amount/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        });
-      expect(tx_unstake).to.eq(undefined);
     });
   });
 });

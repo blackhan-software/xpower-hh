@@ -8,7 +8,7 @@ abstract contract Supervised is AccessControlEnumerable {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    /** @return true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return super.supportsInterface(interfaceId);
     }

@@ -5,8 +5,8 @@ pragma solidity ^0.8.0;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC2981} from "@openzeppelin/contracts/token/common/ERC2981.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import {ERC1155Burnable} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import {ERC1155Supply} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
+import {ERC1155Burnable} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 
 import {Constants} from "../libs/Constants.sol";
 import {Nft} from "../libs/Nft.sol";
@@ -17,22 +17,11 @@ import {URIMalleable} from "./URIMalleable.sol";
 /**
  * Abstract base NFT class: publicly *not* minteable (nor burnable).
  */
-abstract contract NftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleable, NftRoyalty, NftMigratable, Ownable {
+abstract contract NftBase is ERC1155, ERC1155Supply, ERC1155Burnable, URIMalleable, NftRoyalty, NftMigratable, Ownable {
     /** contract name */
     string public name;
     /** contract symbol */
     string public symbol;
-
-    /** NFT levels: UNIT, ..., YOTTA *or* higher! */
-    uint256 public constant UNIT = 0;
-    uint256 public constant KILO = 3;
-    uint256 public constant MEGA = 6;
-    uint256 public constant GIGA = 9;
-    uint256 public constant TERA = 12;
-    uint256 public constant PETA = 15;
-    uint256 public constant EXA = 18;
-    uint256 public constant ZETTA = 21;
-    uint256 public constant YOTTA = 24;
 
     /** @param nftBase address of old contract */
     /** @param uri meta-data URI */
@@ -100,7 +89,7 @@ abstract contract NftBase is ERC1155, ERC1155Burnable, ERC1155Supply, URIMalleab
         ERC1155Supply._beforeTokenTransfer(operator, from, to, nftIds, amounts, data);
     }
 
-    /** @return true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(ERC1155, URIMalleable, NftRoyalty, NftMigratable) returns (bool) {

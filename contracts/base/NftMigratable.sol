@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
 // solhint-disable not-rely-on-time
-// solhint-disable reason-string
 pragma solidity ^0.8.0;
 
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
@@ -36,7 +35,7 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     }
 
     /** @return index of base address */
-    function oldIndexOf(address base) public view returns (uint256) {
+    function oldIndexOf(address base) external view returns (uint256) {
         return _index[base];
     }
 
@@ -45,21 +44,20 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         _migrateFrom(msg.sender, nftId, amount, index);
     }
 
-    /** migrate amount of ERC1155 (for account) */
+    /** migrate amount of ERC1155 */
     function migrateFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) external {
         _migrateFrom(account, nftId, amount, index);
     }
 
-    /** migrate amount of ERC1155 (for account) */
+    /** migrate amount of ERC1155 */
     function _migrateFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) internal {
         require(_deadlineBy >= block.timestamp, "deadline passed");
         _burnFrom(account, nftId, amount, index);
         _mint(account, nftId, amount, "");
     }
 
-    /** burn amount of ERC1155 (for account) */
-    function _burnFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) private {
-        require(amount > 0, "non-positive amount");
+    /** burn amount of ERC1155 */
+    function _burnFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) internal virtual {
         uint256 tryId = nftId % Nft.eonOf(Nft.yearOf(nftId));
         assert(tryId > 0); // cannot be zero
         uint256 prefix = Nft.prefixOf(nftId);
@@ -70,12 +68,12 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         _base[index[tidx]].burn(account, tryBalance > 0 ? tryId : nftId, amount);
     }
 
-    /** batch migrate amounts of ERC1155 */
+    /** batch-migrate amounts of ERC1155 */
     function migrateBatch(uint256[] memory nftIds, uint256[] memory amounts, uint256[] memory index) external {
         _migrateFromBatch(msg.sender, nftIds, amounts, index);
     }
 
-    /** batch migrate amounts of ERC1155 (for account) */
+    /** batch-migrate amounts of ERC1155 */
     function migrateFromBatch(
         address account,
         uint256[] memory nftIds,
@@ -85,14 +83,13 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         _migrateFromBatch(account, nftIds, amounts, index);
     }
 
-    /** batch migrate amounts of ERC1155 (for account) */
+    /** batch-migrate amounts of ERC1155 */
     function _migrateFromBatch(
         address account,
         uint256[] memory nftIds,
         uint256[] memory amounts,
         uint256[] memory index
     ) internal {
-        require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
         require(_deadlineBy >= block.timestamp, "deadline passed");
         for (uint256 i = 0; i < nftIds.length; i++) {
             _burnFrom(account, nftIds[i], amounts[i], index);
@@ -100,24 +97,24 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         _mintBatch(account, nftIds, amounts, "");
     }
 
-    /** seal migration (manually) */
+    /** seal migration */
     function seal(uint256 index) external onlyRole(NFT_SEAL_ROLE) {
         _sealed[index] = true;
     }
 
-    /** seal-all migration (manually) */
+    /** seal-all migration */
     function sealAll() external onlyRole(NFT_SEAL_ROLE) {
         for (uint256 i = 0; i < _sealed.length; i++) {
             _sealed[i] = true;
         }
     }
 
-    /** @return seal flags (for all bases) */
+    /** @return seal flags (of all bases) */
     function seals() public view returns (bool[] memory) {
         return _sealed;
     }
 
-    /** @return true if this contract implements the interface defined by interfaceId */
+    /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, Supervised) returns (bool) {
         return super.supportsInterface(interfaceId);
     }

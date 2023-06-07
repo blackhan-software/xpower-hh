@@ -51,13 +51,13 @@ contract XPowerPpt is NftBase {
         super.safeBatchTransferFrom(from, to, nftIds, amounts, data);
     }
 
-    /** mint particular amount of staked NFTs (for address and nft-id) */
+    /** mint particular amount of staked NFTs */
     function mint(address to, uint256 nftId, uint256 amount) external onlyOwner {
         _memoMint(to, nftId, amount);
         _mint(to, nftId, amount, "");
     }
 
-    /** mint particular amounts of staked NFTs (for address and nft-ids) */
+    /** mint particular amounts of staked NFTs */
     function mintBatch(address to, uint256[] memory nftIds, uint256[] memory amounts) external onlyOwner {
         require(nftIds.length > 0, "empty ids");
         require(amounts.length > 0, "empty amounts");
@@ -65,13 +65,13 @@ contract XPowerPpt is NftBase {
         _mintBatch(to, nftIds, amounts, "");
     }
 
-    /** burn particular amount of staked NFTs (for address and nft-id) */
+    /** burn particular amount of staked NFTs */
     function burn(address from, uint256 nftId, uint256 amount) public override onlyOwner {
         _memoBurn(from, nftId, amount);
         _burn(from, nftId, amount);
     }
 
-    /** burn particular amounts of staked NFTs (for address and nft-ids) */
+    /** burn particular amounts of staked NFTs */
     function burnBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public override onlyOwner {
         require(nftIds.length > 0, "empty ids");
         require(amounts.length > 0, "empty amounts");
@@ -79,8 +79,8 @@ contract XPowerPpt is NftBase {
         _burnBatch(from, nftIds, amounts);
     }
 
-    /** @return age seconds over all stakes (for address and nft-id) */
-    function ageOf(address account, uint256 nftId) public view returns (uint256) {
+    /** @return age seconds over all stakes */
+    function ageOf(address account, uint256 nftId) external view returns (uint256) {
         int256 age = _age[account][nftId];
         if (age > 0) {
             uint256 balance = balanceOf(account, nftId);
@@ -89,60 +89,58 @@ contract XPowerPpt is NftBase {
         return 0;
     }
 
-    /** @return share accumulators (for nft-prefix) */
+    /** @return share accumulators */
     function sharesBy(uint256 nftPrefix) external view returns (int256[34] memory) {
         return _shares[nftPrefix];
     }
 
     /** remember mint action */
-    function _pushMint(address account, uint256 nftId, uint256 amount) private {
-        require(amount > 0, "non-positive amount");
-        _age[account][nftId] += int256(amount * block.timestamp);
+    function _pushMint(address to, uint256 nftId, uint256 amount) private {
+        _age[to][nftId] += int256(amount * block.timestamp);
     }
 
     /** remember mint actions */
-    function _pushMintBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) private {
+    function _pushMintBatch(address to, uint256[] memory nftIds, uint256[] memory amounts) private {
         require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
-        for (uint256 i = 0; i < nftIds.length; i++) _pushMint(account, nftIds[i], amounts[i]);
+        for (uint256 i = 0; i < nftIds.length; i++) _pushMint(to, nftIds[i], amounts[i]);
     }
 
     /** remember burn action */
-    function _pushBurn(address account, uint256 nftId, uint256 amount) private {
-        require(amount > 0, "non-positive amount");
-        _age[account][nftId] -= int256(amount * block.timestamp);
+    function _pushBurn(address from, uint256 nftId, uint256 amount) private {
+        _age[from][nftId] -= int256(amount * block.timestamp);
     }
 
     /** remember burn actions */
-    function _pushBurnBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) private {
+    function _pushBurnBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) private {
         require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
-        for (uint256 i = 0; i < nftIds.length; i++) _pushBurn(account, nftIds[i], amounts[i]);
+        for (uint256 i = 0; i < nftIds.length; i++) _pushBurn(from, nftIds[i], amounts[i]);
     }
 
     /** remember mint action (incl. accumulators) */
-    function _memoMint(address account, uint256 nftId, uint256 amount) private {
-        _pushMint(account, nftId, amount);
+    function _memoMint(address to, uint256 nftId, uint256 amount) private {
+        _pushMint(to, nftId, amount);
         uint256 level = levelOf(nftId);
         uint256 prefix = prefixOf(nftId);
         _shares[prefix][level / 3] += int256(amount * 10 ** level);
     }
 
     /** remember mint actions (incl. accumulators) */
-    function _memoMintBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) private {
+    function _memoMintBatch(address to, uint256[] memory nftIds, uint256[] memory amounts) private {
         require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
-        for (uint256 i = 0; i < nftIds.length; i++) _memoMint(account, nftIds[i], amounts[i]);
+        for (uint256 i = 0; i < nftIds.length; i++) _memoMint(to, nftIds[i], amounts[i]);
     }
 
     /** remember burn action (incl. accumulators) */
-    function _memoBurn(address account, uint256 nftId, uint256 amount) private {
-        _pushBurn(account, nftId, amount);
+    function _memoBurn(address from, uint256 nftId, uint256 amount) private {
+        _pushBurn(from, nftId, amount);
         uint256 level = levelOf(nftId);
         uint256 prefix = prefixOf(nftId);
         _shares[prefix][level / 3] -= int256(amount * 10 ** level);
     }
 
     /** remember burn actions (incl. accumulators) */
-    function _memoBurnBatch(address account, uint256[] memory nftIds, uint256[] memory amounts) private {
+    function _memoBurnBatch(address form, uint256[] memory nftIds, uint256[] memory amounts) private {
         require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
-        for (uint256 i = 0; i < nftIds.length; i++) _memoBurn(account, nftIds[i], amounts[i]);
+        for (uint256 i = 0; i < nftIds.length; i++) _memoBurn(form, nftIds[i], amounts[i]);
     }
 }

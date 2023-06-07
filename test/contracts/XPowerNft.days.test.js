@@ -5,8 +5,8 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let XPower, XPowerNft; // contracts
-let xpower, xpower_nft; // instances
+let Moe, Nft; // contracts
+let moe, nft; // instances
 
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const DEADLINE = 0; // [seconds]
@@ -24,31 +24,26 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPowerNft = await ethers.getContractFactory("XPowerNft");
-    expect(XPowerNft).to.exist;
-    XPower = await ethers.getContractFactory("XPowerLoki");
-    expect(XPower).to.exist;
+    Nft = await ethers.getContractFactory("XPowerNft");
+    expect(Nft).to.exist;
+    Moe = await ethers.getContractFactory("XPowerLoki");
+    expect(Moe).to.exist;
   });
   before(async function () {
-    xpower = await XPower.deploy([], DEADLINE);
-    expect(xpower).to.exist;
-    await xpower.deployed();
-    await xpower.transferOwnership(addresses[1]);
-    await xpower.init();
+    moe = await Moe.deploy([], DEADLINE);
+    expect(moe).to.exist;
+    await moe.deployed();
+    await moe.transferOwnership(addresses[1]);
+    await moe.init();
   });
   before(async function () {
-    xpower_nft = await XPowerNft.deploy(
-      NFT_LOKI_URL,
-      [xpower.address],
-      [],
-      DEADLINE
-    );
-    expect(xpower_nft).to.exist;
-    await xpower_nft.deployed();
+    nft = await Nft.deploy(NFT_LOKI_URL, [moe.address], [], DEADLINE);
+    expect(nft).to.exist;
+    await nft.deployed();
   });
   after(async function () {
     const [owner, signer_1] = await ethers.getSigners();
-    await xpower.connect(signer_1).transferOwnership(owner.address);
+    await moe.connect(signer_1).transferOwnership(owner.address);
   });
   describe("year (by days)", async function () {
     beforeEach(async () => {
@@ -66,7 +61,7 @@ describe("XPowerNft", async function () {
   });
 });
 async function check_day(utc_date) {
-  const nft_year = (await xpower_nft.year()).toNumber();
+  const nft_year = (await nft.year()).toNumber();
   expect(nft_year).to.be.greaterThan(0);
   if (utc_date.dayOfYear() === 1 || utc_date.dayOfYear() === 365) {
     expect(nft_year).to.approximately(utc_date.year(), 1);
