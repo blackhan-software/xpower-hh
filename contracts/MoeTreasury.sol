@@ -56,12 +56,12 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return MOE balance of available tokens */
-    function moeBalanceOf(uint256 index) public view returns (uint256) {
+    function moeBalanceOf(uint256 index) external view returns (uint256) {
         return _moe[index].balanceOf((address)(this));
     }
 
     /** @return index of MOE token address */
-    function moeIndexOf(address moe) public view returns (uint256) {
+    function moeIndexOf(address moe) external view returns (uint256) {
         return _moeIndex[XPower(moe).prefix()];
     }
 
@@ -69,7 +69,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     event Claim(address account, uint256 nftId, uint256 amount);
 
     /** claim APower tokens (for account and nft-id) */
-    function claimFor(address account, uint256 nftId) public {
+    function claimFor(address account, uint256 nftId) external {
         uint256 amount = claimableFor(account, nftId);
         require(amount > 0, "nothing claimable");
         _claimed[account][nftId] += amount;
@@ -84,7 +84,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     event ClaimBatch(address account, uint256[] nftIds, uint256[] amounts);
 
     /** claim APower tokens (for account and nft-ids) */
-    function claimForBatch(address account, uint256[] memory nftIds) public {
+    function claimForBatch(address account, uint256[] memory nftIds) external {
         require(Array.unique(nftIds), "unsorted or duplicate ids");
         uint256[] memory amounts = claimableForBatch(account, nftIds);
         uint256[] memory subsums = new uint256[](_lastPrefix(nftIds));
@@ -172,7 +172,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return sum of APR and APR bonus targets */
-    function rateTargetOf(uint256 nftId) public view returns (uint256) {
+    function rateTargetOf(uint256 nftId) external view returns (uint256) {
         return aprTargetOf(nftId) + aprBonusTargetOf(nftId);
     }
 
@@ -182,7 +182,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     mapping(uint256 => uint256[]) private _apr;
 
     /** @return length of APRs (for nft-prefix) */
-    function aprsLength(uint256 nftPrefix) public view returns (uint256) {
+    function aprsLength(uint256 nftPrefix) external view returns (uint256) {
         return aprs[nftPrefix].length;
     }
 
@@ -243,7 +243,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** batch-set APR parameters (for nft-prefixes) */
-    function setAPRBatch(uint256[] memory nftPrefixes, uint256[] memory array) public onlyRole(APR_ROLE) {
+    function setAPRBatch(uint256[] memory nftPrefixes, uint256[] memory array) external onlyRole(APR_ROLE) {
         for (uint256 p = 0; p < nftPrefixes.length; p++) {
             setAPR(nftPrefixes[p], array);
         }
@@ -255,7 +255,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     mapping(uint256 => uint256[]) private _bonus;
 
     /** @return length fo APR bonuses (for nft-prefix) */
-    function bonusesLength(uint256 nftPrefix) public view returns (uint256) {
+    function bonusesLength(uint256 nftPrefix) external view returns (uint256) {
         return bonuses[nftPrefix].length;
     }
 
@@ -321,7 +321,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** batch-set APR bonus parameters (for nft-prefixes) */
-    function setAPRBonusBatch(uint256[] memory nftPrefixes, uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
+    function setAPRBonusBatch(uint256[] memory nftPrefixes, uint256[] memory array) external onlyRole(APR_BONUS_ROLE) {
         for (uint256 p = 0; p < nftPrefixes.length; p++) {
             setAPRBonus(nftPrefixes[p], array);
         }
