@@ -57,7 +57,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     event Init(bytes16 blockHash, uint256 timestamp);
 
     /** cache most recent block-hash */
-    function init() public {
+    function init() external {
         uint256 interval = currentInterval();
         assert(interval > 0);
         if (uint128(_blockHashes[interval]) == 0) {
@@ -81,7 +81,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     }
 
     /** mint tokens for to-beneficiary, block-hash & data (incl. nonce) */
-    function mint(address to, bytes16 blockHash, bytes memory data) public tracked {
+    function mint(address to, bytes16 blockHash, bytes memory data) external tracked {
         // check block-hash to be in current interval
         require(recent(blockHash), "expired block-hash");
         // calculate nonce-hash for to, block-hash & data
