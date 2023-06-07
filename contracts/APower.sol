@@ -43,7 +43,7 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     }
 
     /** mint amount of tokens for beneficiary (after wrapping XPower) */
-    function mint(address to, uint256 amount) public onlyOwner {
+    function mint(address to, uint256 amount) external onlyOwner {
         assert(_moe.transferFrom(owner(), (address)(this), _wrapped(amount)));
         _mint(to, amount);
     }
@@ -85,7 +85,7 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     }
 
     /** @return collateralization ratio with 1'000'000 ~ 100% */
-    function collateralization() public view returns (uint256) {
+    function collateralization() external view returns (uint256) {
         uint256 balance = _moe.balanceOf((address)(this));
         uint256 supply = this.totalSupply();
         if (supply > 0) {
