@@ -32,7 +32,7 @@ contract XPowerNft is NftBase {
     }
 
     /** mint NFTs (for to, level, amount and token-index) */
-    function mint(address to, uint256 level, uint256 amount, uint256 index) public {
+    function mint(address to, uint256 level, uint256 amount, uint256 index) external {
         uint256 moeAmount = amount * denominationOf(level);
         require(moeAmount > 0, "non-positive amount");
         _moe[index].burnFrom(to, moeAmount * (10 ** _moe[index].decimals()));
@@ -40,7 +40,7 @@ contract XPowerNft is NftBase {
     }
 
     /** mint NFTs (for to, levels, amounts and token-index) */
-    function mintBatch(address to, uint256[] memory levels, uint256[] memory amounts, uint256 index) public {
+    function mintBatch(address to, uint256[] memory levels, uint256[] memory amounts, uint256 index) external {
         require(levels.length > 0, "empty levels");
         require(amounts.length > 0, "empty amounts");
         uint256 sumAmount = 0;
@@ -54,7 +54,7 @@ contract XPowerNft is NftBase {
     }
 
     /** upgrade NFTs (for to, anno, level, amount and token-index) */
-    function upgrade(address to, uint256 anno, uint256 level, uint256 amount, uint256 index) public {
+    function upgrade(address to, uint256 anno, uint256 level, uint256 amount, uint256 index) external {
         require(level > 0, "non-positive level");
         require(level > 2, "non-ternary level");
         require(amount > 0, "non-positive amount");
@@ -69,7 +69,7 @@ contract XPowerNft is NftBase {
         uint256[][] memory levels,
         uint256[][] memory amounts,
         uint256 index
-    ) public {
+    ) external {
         uint256[][] memory levelz = new uint256[][](annos.length);
         for (uint256 i = 0; i < annos.length; i++) {
             require(levels[i].length > 0, "empty levels");
@@ -97,7 +97,7 @@ contract XPowerNft is NftBase {
     }
 
     /** @return index of MOE token address */
-    function moeIndexOf(address moe) public view returns (uint256) {
+    function moeIndexOf(address moe) external view returns (uint256) {
         return _moeIndex[moe];
     }
 }
