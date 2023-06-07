@@ -26,7 +26,7 @@ contract NftTreasury is ERC1155Holder {
     event Stake(address from, uint256 nftId, uint256 amount);
 
     /** stake NFT (for address and amount) */
-    function stake(address from, uint256 nftId, uint256 amount) public {
+    function stake(address from, uint256 nftId, uint256 amount) external {
         _nft.safeTransferFrom(from, address(this), nftId, amount, "");
         _ppt.mint(from, nftId, amount);
         emit Stake(from, nftId, amount);
@@ -36,7 +36,7 @@ contract NftTreasury is ERC1155Holder {
     event StakeBatch(address from, uint256[] nftIds, uint256[] amounts);
 
     /** stake NFTs (for address and amounts) */
-    function stakeBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public {
+    function stakeBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) external {
         _nft.safeBatchTransferFrom(from, address(this), nftIds, amounts, "");
         _ppt.mintBatch(from, nftIds, amounts);
         emit StakeBatch(from, nftIds, amounts);
@@ -46,7 +46,7 @@ contract NftTreasury is ERC1155Holder {
     event Unstake(address from, uint256 nftId, uint256 amount);
 
     /** unstake NFT (for address and amount) */
-    function unstake(address from, uint256 nftId, uint256 amount) public {
+    function unstake(address from, uint256 nftId, uint256 amount) external {
         _ppt.burn(from, nftId, amount);
         _nft.safeTransferFrom(address(this), from, nftId, amount, "");
         emit Unstake(from, nftId, amount);
@@ -56,7 +56,7 @@ contract NftTreasury is ERC1155Holder {
     event UnstakeBatch(address from, uint256[] nftIds, uint256[] amounts);
 
     /** unstake NFTs (for address and amounts) */
-    function unstakeBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public {
+    function unstakeBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) external {
         _ppt.burnBatch(from, nftIds, amounts);
         _nft.safeBatchTransferFrom(address(this), from, nftIds, amounts, "");
         emit UnstakeBatch(from, nftIds, amounts);
