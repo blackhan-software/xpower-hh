@@ -42,12 +42,21 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
     }
 
     /** migrate old amount of ERC20 tokens */
-    function migrate(uint256 oldAmount, uint256[] memory index) public returns (uint256) {
-        return migrateFrom(msg.sender, oldAmount, index);
+    function migrate(uint256 oldAmount, uint256[] memory index) external returns (uint256) {
+        return _migrateFrom(msg.sender, oldAmount, index);
     }
 
     /** migrate old amount of ERC20 tokens (for account) */
-    function migrateFrom(address account, uint256 oldAmount, uint256[] memory index) public virtual returns (uint256) {
+    function migrateFrom(address account, uint256 oldAmount, uint256[] memory index) external returns (uint256) {
+        return _migrateFrom(account, oldAmount, index);
+    }
+
+    /** migrate old amount of ERC20 tokens (for account) */
+    function _migrateFrom(
+        address account,
+        uint256 oldAmount,
+        uint256[] memory index
+    ) internal virtual returns (uint256) {
         uint256 minAmount = Math.min(oldAmount, _base[index[0]].balanceOf(account));
         uint256 newAmount = _premigrate(account, minAmount, index[0]);
         _mint(account, newAmount);
@@ -97,7 +106,7 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
     /** seal-all migration (manually) */
     function _sealAll() internal {
         for (uint256 i = 0; i < _sealed.length; i++) {
-            _seal(i);
+            _sealed[i] = true;
         }
     }
 
@@ -119,21 +128,13 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
  * Allows migration of MOE tokens from an old contract upto a certain deadline.
  */
 abstract contract MoeMigratable is Migratable, MoeMigratableSupervised {
-    /** migrate old amount of MOE tokens (for account) */
-    ///
-    /// @dev should always be invoked *before* SovMigratable.migrate[From]
-    ///
-    function migrateFrom(address account, uint256 oldAmount, uint256[] memory index) public override returns (uint256) {
-        return super.migrateFrom(account, oldAmount, index);
-    }
-
     /** seal migration (manually) */
-    function seal(uint256 index) public onlyRole(MOE_SEAL_ROLE) {
+    function seal(uint256 index) external onlyRole(MOE_SEAL_ROLE) {
         _seal(index);
     }
 
     /** seal-all migration (manually) */
-    function sealAll() public onlyRole(MOE_SEAL_ROLE) {
+    function sealAll() external onlyRole(MOE_SEAL_ROLE) {
         _sealAll();
     }
 
@@ -161,7 +162,11 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
     ///
     /// @dev assumes old (XPower:APower) == new (XPower:APower) w.r.t. decimals
     ///
-    function migrateFrom(address account, uint256 oldAmount, uint256[] memory index) public override returns (uint256) {
+    function _migrateFrom(
+        address account,
+        uint256 oldAmount,
+        uint256[] memory index
+    ) internal override returns (uint256) {
         uint256[] memory moeIndex = _shift(index);
         assert(moeIndex.length + 1 == index.length);
         uint256 newAmountSov = newUnits(oldAmount, index[0]);
@@ -194,12 +199,12 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
     }
 
     /** seal migration (manually) */
-    function seal(uint256 index) public onlyRole(SOV_SEAL_ROLE) {
+    function seal(uint256 index) external onlyRole(SOV_SEAL_ROLE) {
         _seal(index);
     }
 
     /** seal-all migration (manually) */
-    function sealAll() public onlyRole(SOV_SEAL_ROLE) {
+    function sealAll() external onlyRole(SOV_SEAL_ROLE) {
         _sealAll();
     }
 
