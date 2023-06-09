@@ -218,8 +218,8 @@ contract MoeTreasury is MoeTreasurySupervised {
             return _apr[id];
         }
         uint256[] memory array = new uint256[](4);
-        array[3] = APR_MUL;
         array[2] = APR_DIV;
+        array[3] = APR_MUL;
         return array;
     }
 
@@ -233,11 +233,10 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 currValue = aprTargetOf(id);
         Rpp.checkValue(nextValue, currValue);
         // check APR reparametrization of stamp
-        uint256 lastStamp = aprs[id].lastOf().stamp;
-        uint256 currStamp = block.timestamp;
-        Rpp.checkStamp(currStamp, lastStamp);
+        Integrator.Item memory last = aprs[id].lastOf();
+        Rpp.checkStamp(block.timestamp, last.stamp, last.meta);
         // append (stamp, apr-of[nft-id]) to integrator
-        aprs[id].append(currStamp, currValue);
+        aprs[id].append(block.timestamp, currValue);
         // all requirements satisfied: use array
         _apr[id] = array;
     }
@@ -247,6 +246,88 @@ contract MoeTreasury is MoeTreasurySupervised {
         for (uint256 i = 0; i < nftIds.length; i++) {
             setAPR(nftIds[i], array);
         }
+    }
+
+    /** emitted on rebalancing APR parameters */
+    event Rebalance(uint256 nftPrefix, bool allLevels);
+
+    /** rebalance APR parameters (for nft-prefix & all-levels) */
+    function rebalance(uint256 nftPrefix, bool allLevels) external {
+        int256[34] memory shares = _ppt.sharesBy(nftPrefix);
+        (uint256 bins, uint256 sum, uint256 max) = _moments(shares);
+        uint256 maxLength = allLevels ? shares.length : max;
+        for (uint256 i = 0; i < maxLength; i++) {
+            uint256 id = _ppt.idBy(2021, 3 * i, nftPrefix);
+            Integrator.Item memory item = aprs[id].lastOf();
+            uint256 target = aprTargetOf(id);
+            if (item.stamp == 0 || item.value != target) {
+                // R-tag required for setAPR's Rpp.checkStamp:
+                aprs[id].append(block.timestamp, target, "R");
+            }
+            if (shares[i] > 0) {
+                if (_apr[id].length == 0) {
+                    _apr[id] = [_scalar(APR_MUL, sum, bins, shares[i]), type(uint256).max, APR_MUL];
+                } else {
+                    _apr[id][0] = _scalar(_apr[id][2], sum, bins, shares[i]);
+                    _apr[id][1] = type(uint256).max; // div-by-infinity
+                }
+            } else if (_apr[id].length > 0) {
+                _apr[id][0] = 0; // clear
+                _apr[id][1] = APR_DIV;
+            }
+        }
+        emit Rebalance(nftPrefix, allLevels);
+    }
+
+    /** @return rebalanceable flag (for nft-prefix) */
+    function rebalanceable(uint256 nftPrefix) external view returns (bool) {
+        int256[34] memory shares = _ppt.sharesBy(nftPrefix);
+        (uint256 bins, uint256 sum, ) = _moments(shares);
+        for (uint256 i = 0; i < shares.length; i++) {
+            uint256 id = _ppt.idBy(2021, 3 * i, nftPrefix);
+            Integrator.Item memory item = aprs[id].lastOf();
+            if (item.stamp == 0) {
+                return true;
+            }
+            if (shares[i] > 0) {
+                if (_apr[id].length == 0) {
+                    return true;
+                }
+                if (_apr[id][0] != _scalar(_apr[id][2], sum, bins, shares[i])) {
+                    return true;
+                }
+                if (_apr[id][1] != type(uint256).max) {
+                    return true;
+                }
+            } else if (_apr[id].length > 0) {
+                if (_apr[id][0] != 0) {
+                    return true;
+                }
+                if (_apr[id][1] != APR_DIV) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /** @return moments of (bins, sum, max) (for shares) */
+    function _moments(int256[34] memory shares) private pure returns (uint256, uint256, uint256) {
+        (uint256 bins, uint256 sum, uint256 max) = (0, 0, 0);
+        for (uint256 i = 0; i < shares.length; i++) {
+            if (shares[i] > 0) {
+                sum += uint256(shares[i]);
+                max = i + 1;
+                bins++;
+            }
+        }
+        return (bins, sum, max);
+    }
+
+    /** @return additive scalar (for mul, sum, bins & share) */
+    function _scalar(uint256 mul, uint256 sum, uint256 bins, int256 share) private pure returns (uint256) {
+        assert(bins > 0 && share > 0); // no div-by-zero
+        return (mul * sum) / (bins * uint256(share));
     }
 
     /** @return apr-id (for nft-id: i.e. for nft-{prefix, level} */
@@ -303,8 +384,8 @@ contract MoeTreasury is MoeTreasurySupervised {
             return _bonus[id];
         }
         uint256[] memory array = new uint256[](4);
-        array[3] = APR_BONUS_MUL;
         array[2] = APR_BONUS_DIV;
+        array[3] = APR_BONUS_MUL;
         return array;
     }
 
@@ -318,11 +399,10 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 currValue = aprBonusTargetOf(id);
         Rpp.checkValue(nextValue, currValue);
         // check APR bonus reparametrization of stamp
-        uint256 lastStamp = bonuses[id].lastOf().stamp;
-        uint256 currStamp = block.timestamp;
-        Rpp.checkStamp(currStamp, lastStamp);
+        Integrator.Item memory last = bonuses[id].lastOf();
+        Rpp.checkStamp(block.timestamp, last.stamp, last.meta);
         // append (stamp, apr-bonus-of[nft-id]) to integrator
-        bonuses[id].append(currStamp, currValue);
+        bonuses[id].append(block.timestamp, currValue);
         // all requirements satisfied: use array
         _bonus[id] = array;
     }

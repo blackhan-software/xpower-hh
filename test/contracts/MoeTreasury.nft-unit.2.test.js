@@ -85,10 +85,8 @@ describe("MoeTreasury", async function () {
   });
   before(async function () {
     table = await new HashTable(xodin, addresses[0]).init({
-      length: 2n,
       min_level: 1,
       max_level: 1,
-      use_cache: true,
     });
   });
   before(async function () {

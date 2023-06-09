@@ -35,4 +35,9 @@ library Rpp {
             require(nextStamp - lastStamp > Constants.MONTH, "invalid change: too frequent");
         }
     }
+
+    /** validate change: invocation frequency at most once per month (if empty meta) */
+    function checkStamp(uint256 nextStamp, uint256 lastStamp, bytes memory meta) internal pure {
+        if (meta.length == 0) checkStamp(nextStamp, lastStamp);
+    }
 }
