@@ -85,7 +85,9 @@ describe("MoeTreasury", async function () {
   describe("set-apr", async function () {
     it("should reparameterize at 1[%] (per nft.level)", async function () {
       const array = [0, 0, 3, 1000000];
-      expect(await moe_treasury.setAPRBatch([1], array)).to.not.eq(undefined);
+      expect(await moe_treasury.setAPRBatch([1202103], array)).to.not.eq(
+        undefined
+      );
     });
     it("should forward time by one month", async function () {
       await network.provider.send("evm_increaseTime", [MONTH]);
@@ -95,7 +97,9 @@ describe("MoeTreasury", async function () {
   describe("set-apr", async function () {
     it("should reparameterize at 2[%] (per nft.level)", async function () {
       const array = [0, 0, 3, 2000000];
-      expect(await moe_treasury.setAPRBatch([1], array)).to.not.eq(undefined);
+      expect(await moe_treasury.setAPRBatch([1202103], array)).to.not.eq(
+        undefined
+      );
     });
     for (let m = 1; m <= 24 * 4; m++) {
       it("should print current & target values", async function () {

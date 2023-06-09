@@ -176,34 +176,33 @@ contract MoeTreasury is MoeTreasurySupervised {
         return aprTargetOf(nftId) + aprBonusTargetOf(nftId);
     }
 
-    /** integrator for APRs: nft-prefix => [(stamp, value)] */
+    /** integrator for APRs: nft-id => [(stamp, value)] */
     mapping(uint256 => Integrator.Item[]) public aprs;
-    /** parametrization of APR: nft-prefix => coefficients */
+    /** parametrization of APR: nft-id => coefficients */
     mapping(uint256 => uint256[]) private _apr;
 
-    /** @return length of APRs (for nft-prefix) */
-    function aprsLength(uint256 nftPrefix) external view returns (uint256) {
-        return aprs[nftPrefix].length;
+    /** @return length of APRs (for nft-id) */
+    function aprsLength(uint256 nftId) external view returns (uint256) {
+        uint256 id = _aprId(nftId);
+        return aprs[id].length;
     }
 
-    /** @return duration weighted mean of APRs (per nft.level) */
+    /** @return duration weighted mean of APRs (for nft-id) */
     function aprOf(uint256 nftId) public view returns (uint256) {
-        uint256 nftPrefix = _ppt.prefixOf(nftId);
-        if (aprs[nftPrefix].length == 0) {
-            return aprTargetOf(nftId);
+        uint256 value = aprTargetOf(nftId);
+        uint256 id = _aprId(nftId);
+        if (aprs[id].length > 0) {
+            return aprs[id].meanOf(block.timestamp, value);
         }
-        uint256 stamp = block.timestamp;
-        uint256 value = aprTargetOf(_ppt.idBy(2021, 3, nftPrefix));
-        uint256 point = aprs[nftPrefix].meanOf(stamp, value);
-        return (point * _ppt.levelOf(nftId)) / 3;
+        return value;
     }
 
-    /** @return target for annualized percentage rate (per nft.level) */
+    /** @return target for annualized percentage rate (for nft-id) */
     function aprTargetOf(uint256 nftId) public view returns (uint256) {
-        return aprTargetOf(nftId, getAPR(_ppt.prefixOf(nftId)));
+        return aprTargetOf(nftId, getAPR(nftId));
     }
 
-    /** @return target for annualized percentage rate (per nft.level & parametrization) */
+    /** @return target for annualized percentage rate (for nft-id and array) */
     function aprTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256) {
         return Polynomial(array).eval4Clamped(_ppt.levelOf(nftId));
     }
@@ -212,10 +211,11 @@ contract MoeTreasury is MoeTreasurySupervised {
     uint256 private constant APR_MUL = 1_000_000;
     uint256 private constant APR_DIV = 3;
 
-    /** @return APR parameters (for nft-prefix) */
-    function getAPR(uint256 nftPrefix) public view returns (uint256[] memory) {
-        if (_apr[nftPrefix].length > 0) {
-            return _apr[nftPrefix];
+    /** @return APR parameters (for nft-id) */
+    function getAPR(uint256 nftId) public view returns (uint256[] memory) {
+        uint256 id = _aprId(nftId);
+        if (_apr[id].length > 0) {
+            return _apr[id];
         }
         uint256[] memory array = new uint256[](4);
         array[3] = APR_MUL;
@@ -223,60 +223,66 @@ contract MoeTreasury is MoeTreasurySupervised {
         return array;
     }
 
-    /** set APR parameters (for nft-prefix) */
-    function setAPR(uint256 nftPrefix, uint256[] memory array) public onlyRole(APR_ROLE) {
+    /** set APR parameters (for nft-id) */
+    function setAPR(uint256 nftId, uint256[] memory array) public onlyRole(APR_ROLE) {
         Rpp.checkArray(array);
         // fixed nft-id as anchor
-        uint256 nftId = _ppt.idBy(2021, 3, nftPrefix);
+        uint256 id = _aprId(nftId);
         // check APR reparametrization of value
-        uint256 nextValue = aprTargetOf(nftId, array);
-        uint256 currValue = aprTargetOf(nftId);
+        uint256 nextValue = aprTargetOf(id, array);
+        uint256 currValue = aprTargetOf(id);
         Rpp.checkValue(nextValue, currValue);
         // check APR reparametrization of stamp
-        uint256 lastStamp = aprs[nftPrefix].lastOf().stamp;
+        uint256 lastStamp = aprs[id].lastOf().stamp;
         uint256 currStamp = block.timestamp;
         Rpp.checkStamp(currStamp, lastStamp);
         // append (stamp, apr-of[nft-id]) to integrator
-        aprs[nftPrefix].append(currStamp, currValue);
+        aprs[id].append(currStamp, currValue);
         // all requirements satisfied: use array
-        _apr[nftPrefix] = array;
+        _apr[id] = array;
     }
 
-    /** batch-set APR parameters (for nft-prefixes) */
-    function setAPRBatch(uint256[] memory nftPrefixes, uint256[] memory array) external onlyRole(APR_ROLE) {
-        for (uint256 p = 0; p < nftPrefixes.length; p++) {
-            setAPR(nftPrefixes[p], array);
+    /** batch-set APR parameters (for nft-ids) */
+    function setAPRBatch(uint256[] memory nftIds, uint256[] memory array) external onlyRole(APR_ROLE) {
+        for (uint256 i = 0; i < nftIds.length; i++) {
+            setAPR(nftIds[i], array);
         }
     }
 
-    /** integrator for APR bonuses: nft-prefix => [(stamp, value)] */
+    /** @return apr-id (for nft-id: i.e. for nft-{prefix, level} */
+    function _aprId(uint256 nftId) private view returns (uint256) {
+        return _ppt.idBy(2021, _ppt.levelOf(nftId), _ppt.prefixOf(nftId));
+    }
+
+    /** integrator for APR bonuses: nft-id => [(stamp, value)] */
     mapping(uint256 => Integrator.Item[]) public bonuses;
-    /** parametrization of APR bonus: nft-prefix => coefficients */
+    /** parametrization of APR bonus: nft-id => coefficients */
     mapping(uint256 => uint256[]) private _bonus;
 
-    /** @return length fo APR bonuses (for nft-prefix) */
-    function bonusesLength(uint256 nftPrefix) external view returns (uint256) {
-        return bonuses[nftPrefix].length;
+    /** @return length fo APR bonuses (for nft-id) */
+    function bonusesLength(uint256 nftId) external view returns (uint256) {
+        uint256 id = _aprBonusId(nftId);
+        return bonuses[id].length;
     }
 
     /** @return duration weighted mean of APR bonuses (per nft.level) */
     function aprBonusOf(uint256 nftId) public view returns (uint256) {
-        uint256 nftPrefix = _ppt.prefixOf(nftId);
-        if (bonuses[nftPrefix].length == 0) {
-            return aprBonusTargetOf(nftId);
+        uint256 value = aprBonusTargetOf(nftId);
+        uint256 id = _aprBonusId(nftId);
+        if (bonuses[id].length > 0) {
+            uint256 stamp = block.timestamp;
+            uint256 point = bonuses[id].meanOf(stamp, value);
+            return (point * aprBonusTargetOf(nftId)) / value;
         }
-        uint256 stamp = block.timestamp;
-        uint256 value = aprBonusTargetOf(_ppt.idBy(2021, 3, nftPrefix));
-        uint256 point = bonuses[nftPrefix].meanOf(stamp, value);
-        return (point * aprBonusTargetOf(nftId)) / value;
+        return value;
     }
 
-    /** @return target for annualized percentage rate bonus (per nft.year) */
+    /** @return target for annualized percentage rate bonus (for nft-id) */
     function aprBonusTargetOf(uint256 nftId) public view returns (uint256) {
-        return aprBonusTargetOf(nftId, getAPRBonus(_ppt.prefixOf(nftId)));
+        return aprBonusTargetOf(nftId, getAPRBonus(nftId));
     }
 
-    /** @return target for annualized percentage rate bonus (per nft.year & parametrization) */
+    /** @return target for annualized percentage rate bonus (for nft-id and array) */
     function aprBonusTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256) {
         uint256 nowYear = _ppt.year();
         uint256 nftYear = _ppt.yearOf(nftId);
@@ -290,10 +296,11 @@ contract MoeTreasury is MoeTreasurySupervised {
     uint256 private constant APR_BONUS_MUL = 10_000;
     uint256 private constant APR_BONUS_DIV = 1;
 
-    /** @return APR bonus parameters (for nft-prefix) */
-    function getAPRBonus(uint256 nftPrefix) public view returns (uint256[] memory) {
-        if (_bonus[nftPrefix].length > 0) {
-            return _bonus[nftPrefix];
+    /** @return APR bonus parameters (for nft-id) */
+    function getAPRBonus(uint256 nftId) public view returns (uint256[] memory) {
+        uint256 id = _aprBonusId(nftId);
+        if (_bonus[id].length > 0) {
+            return _bonus[id];
         }
         uint256[] memory array = new uint256[](4);
         array[3] = APR_BONUS_MUL;
@@ -301,30 +308,35 @@ contract MoeTreasury is MoeTreasurySupervised {
         return array;
     }
 
-    /** set APR bonus parameters (for nft-prefix) */
-    function setAPRBonus(uint256 nftPrefix, uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
+    /** set APR bonus parameters (for nft-id) */
+    function setAPRBonus(uint256 nftId, uint256[] memory array) public onlyRole(APR_BONUS_ROLE) {
         Rpp.checkArray(array);
         // fixed nft-id as anchor
-        uint256 nftId = _ppt.idBy(2021, 3, nftPrefix);
+        uint256 id = _aprBonusId(nftId);
         // check APR bonus reparametrization of value
-        uint256 nextValue = aprBonusTargetOf(nftId, array);
-        uint256 currValue = aprBonusTargetOf(nftId);
+        uint256 nextValue = aprBonusTargetOf(id, array);
+        uint256 currValue = aprBonusTargetOf(id);
         Rpp.checkValue(nextValue, currValue);
         // check APR bonus reparametrization of stamp
-        uint256 lastStamp = bonuses[nftPrefix].lastOf().stamp;
+        uint256 lastStamp = bonuses[id].lastOf().stamp;
         uint256 currStamp = block.timestamp;
         Rpp.checkStamp(currStamp, lastStamp);
         // append (stamp, apr-bonus-of[nft-id]) to integrator
-        bonuses[nftPrefix].append(currStamp, currValue);
+        bonuses[id].append(currStamp, currValue);
         // all requirements satisfied: use array
-        _bonus[nftPrefix] = array;
+        _bonus[id] = array;
     }
 
-    /** batch-set APR bonus parameters (for nft-prefixes) */
-    function setAPRBonusBatch(uint256[] memory nftPrefixes, uint256[] memory array) external onlyRole(APR_BONUS_ROLE) {
-        for (uint256 p = 0; p < nftPrefixes.length; p++) {
-            setAPRBonus(nftPrefixes[p], array);
+    /** batch-set APR bonus parameters (for nft-ids) */
+    function setAPRBonusBatch(uint256[] memory nftIds, uint256[] memory array) external onlyRole(APR_BONUS_ROLE) {
+        for (uint256 i = 0; i < nftIds.length; i++) {
+            setAPRBonus(nftIds[i], array);
         }
+    }
+
+    /** @return apr-bonus-id (for nft-id: i.e. for nft-prefix *only*) */
+    function _aprBonusId(uint256 nftId) private view returns (uint256) {
+        return _ppt.idBy(2021, 3, _ppt.prefixOf(nftId));
     }
 
     /** @return MOE token for prefix */

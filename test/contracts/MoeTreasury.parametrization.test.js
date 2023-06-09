@@ -107,116 +107,128 @@ describe("MoeTreasury", async function () {
   });
   describe("parametrization of APR", async function () {
     it("should get array", async function () {
-      Expect(await moe_treasury.getAPR(3)).to.equal([0, 0, 3, 1000000]);
+      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 0, 3, 1000000]);
     });
     it("should set array", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
-      await moe_treasury.setAPR(3, [0, 0, 3, 2000000]);
-      Expect(await moe_treasury.getAPR(3)).to.equal([0, 0, 3, 2000000]);
+      await moe_treasury.setAPR(3202103, [0, 0, 3, 2000000]);
+      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 0, 3, 2000000]);
     });
     it("should *not* set array (invalid array.length)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(3, [1, 2, 3]).catch((ex) => {
+        await moe_treasury.setAPR(3202103, [1, 2, 3]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPR(3)).to.equal([0, 0, 3, 1000000]);
+      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 0, 3, 1000000]);
     });
     it("should *not* set array (invalid array[2] == 0)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(3, [0, 0, 0, 0]).catch((ex) => {
+        await moe_treasury.setAPR(3202103, [0, 0, 0, 0]).catch((ex) => {
           const m = ex.message.match(/invalid array\[2\] == 0/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPR(3)).to.equal([0, 0, 3, 1000000]);
+      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 0, 3, 1000000]);
     });
     it("should *not* set array (invalid array[3] == 0)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(3, [0, 0, 1, 0]).catch((ex) => {
+        await moe_treasury.setAPR(3202103, [0, 0, 1, 0]).catch((ex) => {
           const m = ex.message.match(/invalid array\[3\] == 0/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPR(3)).to.equal([0, 0, 3, 1000000]);
+      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 0, 3, 1000000]);
     });
     it("should *not* set array (missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await moe_treasury
           .connect(signer_1)
-          .setAPR(3, [0, 0, 3, 2000000])
+          .setAPR(3202103, [0, 0, 3, 2000000])
           .catch((ex) => {
             const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPR(3)).to.equal([0, 0, 3, 1000000]);
+      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 0, 3, 1000000]);
     });
   });
   describe("parametrization of APR bonus", async function () {
     it("should get array", async function () {
-      Expect(await moe_treasury.getAPRBonus(3)).to.equal([0, 0, 1, 10000]);
+      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([
+        0, 0, 1, 10000,
+      ]);
     });
     it("should set array", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
-      await moe_treasury.setAPRBonus(3, [0, 0, 1, 20000]);
-      Expect(await moe_treasury.getAPRBonus(3)).to.equal([0, 0, 1, 20000]);
+      await moe_treasury.setAPRBonus(3202103, [0, 0, 1, 20000]);
+      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([
+        0, 0, 1, 20000,
+      ]);
     });
     it("should *not* set array (invalid array.length)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(3, [1, 2, 3]).catch((ex) => {
+        await moe_treasury.setAPRBonus(3202103, [1, 2, 3]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonus(3)).to.equal([0, 0, 1, 10000]);
+      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([
+        0, 0, 1, 10000,
+      ]);
     });
     it("should *not* set array (invalid array[2] == 0)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(3, [0, 0, 0, 0]).catch((ex) => {
+        await moe_treasury.setAPRBonus(3202103, [0, 0, 0, 0]).catch((ex) => {
           const m = ex.message.match(/invalid array\[2\] == 0/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonus(3)).to.equal([0, 0, 1, 10000]);
+      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([
+        0, 0, 1, 10000,
+      ]);
     });
     it("should *not* set array (invalid array[3] == 0)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(3, [0, 0, 1, 0]).catch((ex) => {
+        await moe_treasury.setAPRBonus(3202103, [0, 0, 1, 0]).catch((ex) => {
           const m = ex.message.match(/invalid array\[3\] == 0/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonus(3)).to.equal([0, 0, 1, 10000]);
+      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([
+        0, 0, 1, 10000,
+      ]);
     });
     it("should *not* set array (missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
         await moe_treasury
           .connect(signer_1)
-          .setAPRBonus(3, [0, 0, 1, 20000])
+          .setAPRBonus(3202103, [0, 0, 1, 20000])
           .catch((ex) => {
             const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonus(3)).to.equal([0, 0, 1, 10000]);
+      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([
+        0, 0, 1, 10000,
+      ]);
     });
   });
 });

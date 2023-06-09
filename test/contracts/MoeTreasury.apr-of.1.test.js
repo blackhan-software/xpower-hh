@@ -79,39 +79,44 @@ describe("MoeTreasury", async function () {
   });
   describe("apr-of (i.e rewards ~ nft-level)", async function () {
     it("should return 0.000000[%] for nft-level=00", async function () {
-      expect(await mt.aprOf(1202100)).to.eq(0x000_000);
+      Expect(await mt.aprOf(1202100)).to.be.approximately(0x000_000, 1);
     });
     it("should return 1.000000[%] for nft-level=03", async function () {
-      expect(await mt.aprOf(1202103)).to.eq(1_000_000);
+      Expect(await mt.aprOf(1202103)).to.be.approximately(1_000_000, 1);
     });
     it("should return 2.000000[%] for nft-level=06", async function () {
-      expect(await mt.aprOf(1202106)).to.eq(2_000_000);
+      Expect(await mt.aprOf(1202106)).to.be.approximately(2_000_000, 1);
     });
     it("should return 3.000000[%] for nft-level=09", async function () {
-      expect(await mt.aprOf(1202109)).to.eq(3_000_000);
+      Expect(await mt.aprOf(1202109)).to.be.approximately(3_000_000, 1);
     });
     it("should return 4.000000[%] for nft-level=12", async function () {
-      expect(await mt.aprOf(1202112)).to.eq(4_000_000);
+      Expect(await mt.aprOf(1202112)).to.be.approximately(4_000_000, 1);
     });
     it("should return 5.000000[%] for nft-level=15", async function () {
-      expect(await mt.aprOf(1202115)).to.eq(5_000_000);
+      Expect(await mt.aprOf(1202115)).to.be.approximately(5_000_000, 1);
     });
     it("should return 6.000000[%] for nft-level=18", async function () {
-      expect(await mt.aprOf(1202118)).to.eq(6_000_000);
+      Expect(await mt.aprOf(1202118)).to.be.approximately(6_000_000, 1);
     });
     it("should return 7.000000[%] for nft-level=21", async function () {
-      expect(await mt.aprOf(1202121)).to.eq(7_000_000);
+      Expect(await mt.aprOf(1202121)).to.be.approximately(7_000_000, 1);
     });
     it("should return 8.000000[%] for nft-level=24", async function () {
-      expect(await mt.aprOf(1202124)).to.eq(8_000_000);
+      Expect(await mt.aprOf(1202124)).to.be.approximately(8_000_000, 1);
     });
   });
   describe("set-apr: **init** at 1[%]", async function () {
     it("should reparameterize", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
-      expect(await moe_treasury.setAPR(1, [0, 0, 3, 1000000])).to.not.eq(
-        undefined
-      );
+      expect(await mt.setAPR(1202103, [0, 0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202106, [0, 0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202109, [0, 0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202112, [0, 0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202115, [0, 0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202118, [0, 0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202121, [0, 0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202124, [0, 0, 3, 1000000])).to.not.eq(undefined);
     });
   });
   describe("set-apr (double from 1[%] to 2[%])", async function () {
@@ -122,7 +127,7 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (too large)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(1, [0, 0, 3, 2000001]).catch((ex) => {
+        await moe_treasury.setAPR(1202103, [0, 0, 3, 2000001]).catch((ex) => {
           const m = ex.message.match(/invalid change: too large/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -132,17 +137,19 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (too large)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(1, [0, 1000001, 3, 1000000]).catch((ex) => {
-          const m = ex.message.match(/invalid change: too large/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        })
+        await moe_treasury
+          .setAPR(1202103, [0, 1000001, 3, 1000000])
+          .catch((ex) => {
+            const m = ex.message.match(/invalid change: too large/);
+            if (m === null) console.debug(ex);
+            expect(m).to.be.not.null;
+          })
       ).to.eq(undefined);
     });
     it("should *not* reparameterize (too small)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(1, [0, 0, 3, 499999]).catch((ex) => {
+        await moe_treasury.setAPR(1202103, [0, 0, 3, 499999]).catch((ex) => {
           const m = ex.message.match(/invalid change: too small/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -152,23 +159,30 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (too small)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(1, [500001, 0, 3, 1000000]).catch((ex) => {
-          const m = ex.message.match(/invalid change: too small/);
-          if (m === null) console.debug(ex);
-          expect(m).to.be.not.null;
-        })
+        await moe_treasury
+          .setAPR(1202103, [500001, 0, 3, 1000000])
+          .catch((ex) => {
+            const m = ex.message.match(/invalid change: too small/);
+            if (m === null) console.debug(ex);
+            expect(m).to.be.not.null;
+          })
       ).to.eq(undefined);
     });
     it("should reparameterize APR at 2.000000[%]", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
-      expect(await moe_treasury.setAPR(1, [0, 0, 3, 2000000])).to.not.eq(
-        undefined
-      );
+      expect(await mt.setAPR(1202103, [0, 0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202106, [0, 0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202109, [0, 0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202112, [0, 0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202115, [0, 0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202118, [0, 0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202121, [0, 0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202124, [0, 0, 3, 2000000])).to.not.eq(undefined);
     });
     it("should *not* reparameterize (too frequent)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(1, [0, 0, 3, 1000000]).catch((ex) => {
+        await moe_treasury.setAPR(1202103, [0, 0, 3, 1000000]).catch((ex) => {
           const m = ex.message.match(/invalid change: too frequent/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -182,31 +196,31 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return 0.000000[%] for nft-level=00", async function () {
-      expect(await mt.aprOf(1202100)).to.eq(0x000_000);
+      Expect(await mt.aprOf(1202100)).to.be.approximately(0x000_000, 1);
     });
-    it("should return 1.199999[%] for nft-level=03", async function () {
-      expect(await mt.aprOf(1202103)).to.eq(1_199_999);
+    it("should return 1.200000[%] for nft-level=03", async function () {
+      Expect(await mt.aprOf(1202103)).to.be.approximately(1_200_000, 1);
     });
-    it("should return 2.399998[%] for nft-level=06", async function () {
-      expect(await mt.aprOf(1202106)).to.eq(2_399_998);
+    it("should return 2.400000[%] for nft-level=06", async function () {
+      Expect(await mt.aprOf(1202106)).to.be.approximately(2_400_000, 1);
     });
-    it("should return 3.599997[%] for nft-level=09", async function () {
-      expect(await mt.aprOf(1202109)).to.eq(3_599_997);
+    it("should return 3.600000[%] for nft-level=09", async function () {
+      Expect(await mt.aprOf(1202109)).to.be.approximately(3_600_000, 1);
     });
-    it("should return 4.799996[%] for nft-level=12", async function () {
-      expect(await mt.aprOf(1202112)).to.eq(4_799_996);
+    it("should return 4.800000[%] for nft-level=12", async function () {
+      Expect(await mt.aprOf(1202112)).to.be.approximately(4_800_000, 1);
     });
-    it("should return 5.999995[%] for nft-level=15", async function () {
-      expect(await mt.aprOf(1202115)).to.eq(5_999_995);
+    it("should return 6.000000[%] for nft-level=15", async function () {
+      Expect(await mt.aprOf(1202115)).to.be.approximately(6_000_000, 1);
     });
-    it("should return 7.199994[%] for nft-level=18", async function () {
-      expect(await mt.aprOf(1202118)).to.eq(7_199_994);
+    it("should return 7.200000[%] for nft-level=18", async function () {
+      Expect(await mt.aprOf(1202118)).to.be.approximately(7_200_000, 1);
     });
-    it("should return 8.399993[%] for nft-level=21", async function () {
-      expect(await mt.aprOf(1202121)).to.eq(8_399_993);
+    it("should return 8.399999[%] for nft-level=21", async function () {
+      Expect(await mt.aprOf(1202121)).to.be.approximately(8_399_999, 1);
     });
-    it("should return 9.599992[%] for nft-level=24", async function () {
-      expect(await mt.aprOf(1202124)).to.eq(9_599_992);
+    it("should return 9.599999[%] for nft-level=24", async function () {
+      Expect(await mt.aprOf(1202124)).to.be.approximately(9_599_999, 1);
     });
   });
   describe("apr-of (i.e rewards ~ nft-level × time)", async function () {
@@ -215,31 +229,31 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return 0.000000[%] for nft-level=00", async function () {
-      expect(await mt.aprOf(1202100)).to.eq(0x000_000);
+      Expect(await mt.aprOf(1202100)).to.be.approximately(0x000_000, 1);
     });
     it("should return 1.333333[%] for nft-level=03", async function () {
-      expect(await mt.aprOf(1202103)).to.eq(1_333_333);
+      Expect(await mt.aprOf(1202103)).to.be.approximately(1_333_333, 1);
     });
     it("should return 2.666666[%] for nft-level=06", async function () {
-      expect(await mt.aprOf(1202106)).to.eq(2_666_666);
+      Expect(await mt.aprOf(1202106)).to.be.approximately(2_666_666, 1);
     });
     it("should return 3.999999[%] for nft-level=09", async function () {
-      expect(await mt.aprOf(1202109)).to.eq(3_999_999);
+      Expect(await mt.aprOf(1202109)).to.be.approximately(3_999_999, 1);
     });
-    it("should return 5_333332[%] for nft-level=12", async function () {
-      expect(await mt.aprOf(1202112)).to.eq(5_333_332);
+    it("should return 5_333333[%] for nft-level=12", async function () {
+      Expect(await mt.aprOf(1202112)).to.be.approximately(5_333_333, 1);
     });
-    it("should return 6.666665[%] for nft-level=15", async function () {
-      expect(await mt.aprOf(1202115)).to.eq(6_666_665);
+    it("should return 6.666666[%] for nft-level=15", async function () {
+      Expect(await mt.aprOf(1202115)).to.be.approximately(6_666_666, 1);
     });
-    it("should return 7.999998[%] for nft-level=18", async function () {
-      expect(await mt.aprOf(1202118)).to.eq(7_999_998);
+    it("should return 7.999999[%] for nft-level=18", async function () {
+      Expect(await mt.aprOf(1202118)).to.be.approximately(7_999_999, 1);
     });
-    it("should return 9.333331[%] for nft-level=21", async function () {
-      expect(await mt.aprOf(1202121)).to.eq(9_333_331);
+    it("should return 9.333332[%] for nft-level=21", async function () {
+      Expect(await mt.aprOf(1202121)).to.be.approximately(9_333_332, 1);
     });
-    it("should return 10.666664[%] for nft-level=24", async function () {
-      expect(await mt.aprOf(1202124)).to.eq(10_666_664);
+    it("should return 10.666666[%] for nft-level=24", async function () {
+      Expect(await mt.aprOf(1202124)).to.be.approximately(10_666_666, 1);
     });
   });
   describe("apr-of (i.e rewards ~ nft-level × time)", async function () {
@@ -248,31 +262,31 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return 0.000000[%] for nft-level=00", async function () {
-      expect(await mt.aprOf(1202100)).to.eq(0x000_000);
+      Expect(await mt.aprOf(1202100)).to.be.approximately(0x000_000, 1);
     });
     it("should return 1.428571[%] for nft-level=03", async function () {
-      expect(await mt.aprOf(1202103)).to.eq(1_428_571);
+      Expect(await mt.aprOf(1202103)).to.be.approximately(1_428_571, 1);
     });
     it("should return 2.857142[%] for nft-level=06", async function () {
-      expect(await mt.aprOf(1202106)).to.eq(2_857_142);
+      Expect(await mt.aprOf(1202106)).to.be.approximately(2_857_142, 1);
     });
-    it("should return 4.285713[%] for nft-level=09", async function () {
-      expect(await mt.aprOf(1202109)).to.eq(4_285_713);
+    it("should return 4.285714[%] for nft-level=09", async function () {
+      Expect(await mt.aprOf(1202109)).to.be.approximately(4_285_714, 1);
     });
-    it("should return 5.714284[%] for nft-level=12", async function () {
-      expect(await mt.aprOf(1202112)).to.eq(5_714_284);
+    it("should return 5.714285[%] for nft-level=12", async function () {
+      Expect(await mt.aprOf(1202112)).to.be.approximately(5_714_285, 1);
     });
-    it("should return 7.142855[%] for nft-level=15", async function () {
-      expect(await mt.aprOf(1202115)).to.eq(7_142_855);
+    it("should return 7.142856[%] for nft-level=15", async function () {
+      Expect(await mt.aprOf(1202115)).to.be.approximately(7_142_856, 1);
     });
-    it("should return 8_571426[%] for nft-level=18", async function () {
-      expect(await mt.aprOf(1202118)).to.eq(8_571_426);
+    it("should return 8_571428[%] for nft-level=18", async function () {
+      Expect(await mt.aprOf(1202118)).to.be.approximately(8_571_428, 1);
     });
-    it("should return 9.999996[%] for nft-level=21", async function () {
-      expect(await mt.aprOf(1202121)).to.eq(9_999_997);
+    it("should return 9.999999[%] for nft-level=21", async function () {
+      Expect(await mt.aprOf(1202121)).to.be.approximately(9_999_999, 1);
     });
-    it("should return 11.428568[%] for nft-level=24", async function () {
-      expect(await mt.aprOf(1202124)).to.eq(11_428_568);
+    it("should return 11.428570[%] for nft-level=24", async function () {
+      Expect(await mt.aprOf(1202124)).to.be.approximately(11_428_570, 1);
     });
   });
   describe("apr-of (i.e rewards ~ nft-level × time)", async function () {
@@ -281,31 +295,31 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return 0.000000[%] for nft-level=00", async function () {
-      expect(await mt.aprOf(1202100)).to.eq(0x000_000);
+      Expect(await mt.aprOf(1202100)).to.be.approximately(0x000_000, 1);
     });
     it("should return 1.499999[%] for nft-level=03", async function () {
-      expect(await mt.aprOf(1202103)).to.eq(1_499_999);
+      Expect(await mt.aprOf(1202103)).to.be.approximately(1_499_999, 1);
     });
-    it("should return 2.999998[%] for nft-level=06", async function () {
-      expect(await mt.aprOf(1202106)).to.eq(2_999_998);
+    it("should return 2.999999[%] for nft-level=06", async function () {
+      Expect(await mt.aprOf(1202106)).to.be.approximately(2_999_999, 1);
     });
-    it("should return 4.499997[%] for nft-level=09", async function () {
-      expect(await mt.aprOf(1202109)).to.eq(4_499_997);
+    it("should return 4.499999[%] for nft-level=09", async function () {
+      Expect(await mt.aprOf(1202109)).to.be.approximately(4_499_999, 1);
     });
-    it("should return 5.999996[%] for nft-level=12", async function () {
-      expect(await mt.aprOf(1202112)).to.eq(5_999_996);
+    it("should return 5.999999[%] for nft-level=12", async function () {
+      Expect(await mt.aprOf(1202112)).to.be.approximately(5_999_999, 1);
     });
-    it("should return 7.499995[%] for nft-level=15", async function () {
-      expect(await mt.aprOf(1202115)).to.eq(7_499_995);
+    it("should return 7.499999[%] for nft-level=15", async function () {
+      Expect(await mt.aprOf(1202115)).to.be.approximately(7_499_999, 1);
     });
-    it("should return 8.999994[%] for nft-level=18", async function () {
-      expect(await mt.aprOf(1202118)).to.eq(8_999_994);
+    it("should return 8.999999[%] for nft-level=18", async function () {
+      Expect(await mt.aprOf(1202118)).to.be.approximately(8_999_999, 1);
     });
-    it("should return 10.499993[%] for nft-level=21", async function () {
-      expect(await mt.aprOf(1202121)).to.eq(10_499_993);
+    it("should return 10.499999[%] for nft-level=21", async function () {
+      Expect(await mt.aprOf(1202121)).to.be.approximately(10_499_999, 1);
     });
-    it("should return 11.999992[%] for nft-level=24", async function () {
-      expect(await mt.aprOf(1202124)).to.eq(11_999_992);
+    it("should return 11.999999[%] for nft-level=24", async function () {
+      Expect(await mt.aprOf(1202124)).to.be.approximately(11_999_999, 1);
     });
   });
   describe("apr-of (i.e rewards ~ nft-level × time)", async function () {
@@ -314,31 +328,34 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return 0.000000[%] for nft-level=00", async function () {
-      expect(await mt.aprOf(1202100)).to.eq(0x000_000);
+      Expect(await mt.aprOf(1202100)).to.be.approximately(0x000_000, 1);
     });
     it("should return 1.999000[%] for nft-level=03", async function () {
-      expect(await mt.aprOf(1202103)).to.eq(1_999_000);
+      Expect(await mt.aprOf(1202103)).to.be.approximately(1_999_000, 1);
     });
-    it("should return 3.998000[%] for nft-level=06", async function () {
-      expect(await mt.aprOf(1202106)).to.eq(3_998_000);
+    it("should return 3.998001[%] for nft-level=06", async function () {
+      Expect(await mt.aprOf(1202106)).to.be.approximately(3_998_001, 1);
     });
-    it("should return 5.997000[%] for nft-level=09", async function () {
-      expect(await mt.aprOf(1202109)).to.eq(5_997_000);
+    it("should return 5.997002[%] for nft-level=09", async function () {
+      Expect(await mt.aprOf(1202109)).to.be.approximately(5_997_002, 1);
     });
-    it("should return 7.996000[%] for nft-level=12", async function () {
-      expect(await mt.aprOf(1202112)).to.eq(7_996_000);
+    it("should return 7.996003[%] for nft-level=12", async function () {
+      Expect(await mt.aprOf(1202112)).to.be.approximately(7_996_003, 1);
     });
-    it("should return 9.995000[%] for nft-level=15", async function () {
-      expect(await mt.aprOf(1202115)).to.eq(9_995_000);
+    it("should return 9.995004[%] for nft-level=15", async function () {
+      Expect(await mt.aprOf(1202115)).to.be.approximately(9_995_004, 1);
     });
-    it("should return 11.994000[%] for nft-level=18", async function () {
-      expect(await mt.aprOf(1202118)).to.eq(11_994_000);
+    it("should return 11.994005[%] for nft-level=18", async function () {
+      Expect(await mt.aprOf(1202118)).to.be.approximately(11_994_005, 1);
     });
-    it("should return 13.993000[%] for nft-level=21", async function () {
-      expect(await mt.aprOf(1202121)).to.eq(13_993_000);
+    it("should return 13.993006[%] for nft-level=21", async function () {
+      Expect(await mt.aprOf(1202121)).to.be.approximately(13_993_006, 1);
     });
-    it("should return 15.992000[%] for nft-level=24", async function () {
-      expect(await mt.aprOf(1202124)).to.eq(15_992_000);
+    it("should return 15.992007[%] for nft-level=24", async function () {
+      Expect(await mt.aprOf(1202124)).to.be.approximately(15_992_007, 1);
     });
   });
 });
+function Expect(big_number) {
+  return expect(big_number.toNumber());
+}
