@@ -7,13 +7,13 @@ import {Constants} from "../libs/Constants.sol";
  * @title Rug pull protection
  */
 library Rpp {
-    /** validate params: w.r.t. Polynomial.eval4Clamped */
+    /** validate params: w.r.t. Polynomial.eval3 */
     function checkArray(uint256[] memory array) internal pure {
-        require(array.length == 4, "invalid array.length");
+        require(array.length == 3, "invalid array.length");
         // eliminate possibility of division-by-zero
-        require(array[2] > 0, "invalid array[2] == 0");
+        require(array[1] > 0, "invalid array[1] == 0");
         // eliminate possibility of all-zero values
-        require(array[3] > 0, "invalid array[3] == 0");
+        require(array[2] > 0, "invalid array[2] == 0");
     }
 
     /** validate change: 0.5 <= next / last <= 2.0 or next <= unit */

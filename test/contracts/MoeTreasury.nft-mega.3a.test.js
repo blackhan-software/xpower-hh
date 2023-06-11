@@ -171,10 +171,7 @@ describe("MoeTreasury", async function () {
       expect(claimed).to.eq(undefined);
     });
     it("should reparameterize (pre nft.level)", async function () {
-      const tx = await moe_treasury.setAPRBatch(
-        [3202106],
-        [0, 0, 3, 2_000_000]
-      );
+      const tx = await moe_treasury.setAPRBatch([3202106], [0, 3, 2_000_000]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -189,10 +186,7 @@ describe("MoeTreasury", async function () {
       expect(await mt.claimFor(account, nft_id)).to.be.an("object");
     });
     it("should reparameterize (pre nft.level)", async function () {
-      const tx = await moe_treasury.setAPRBatch(
-        [3202106],
-        [0, 0, 3, 1_000_000]
-      );
+      const tx = await moe_treasury.setAPRBatch([3202106], [0, 3, 1_000_000]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -207,10 +201,7 @@ describe("MoeTreasury", async function () {
       expect(await mt.claimFor(account, nft_id)).to.be.an("object");
     });
     it("should reparameterize (pre nft.level)", async function () {
-      const tx = await moe_treasury.setAPRBatch(
-        [3202106],
-        [0, 0, 3, 1_000_000]
-      );
+      const tx = await moe_treasury.setAPRBatch([3202106], [0, 3, 1_000_000]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -225,10 +216,7 @@ describe("MoeTreasury", async function () {
       expect(await mt.claimFor(account, nft_id)).to.be.an("object");
     });
     it("should reparameterize (pre nft.level)", async function () {
-      const tx = await moe_treasury.setAPRBatch(
-        [3202106],
-        [0, 0, 3, 1_000_000]
-      );
+      const tx = await moe_treasury.setAPRBatch([3202106], [0, 3, 1_000_000]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {

@@ -109,14 +109,14 @@ describe("MoeTreasury", async function () {
   describe("set-apr: **init** at 1[%]", async function () {
     it("should reparameterize", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
-      expect(await mt.setAPR(1202103, [0, 0, 3, 1000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202106, [0, 0, 3, 1000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202109, [0, 0, 3, 1000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202112, [0, 0, 3, 1000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202115, [0, 0, 3, 1000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202118, [0, 0, 3, 1000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202121, [0, 0, 3, 1000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202124, [0, 0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202103, [0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202106, [0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202109, [0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202112, [0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202115, [0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202118, [0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202121, [0, 3, 1000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202124, [0, 3, 1000000])).to.not.eq(undefined);
     });
   });
   describe("set-apr (double from 1[%] to 2[%])", async function () {
@@ -127,7 +127,7 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (too large)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(1202103, [0, 0, 3, 2000001]).catch((ex) => {
+        await moe_treasury.setAPR(1202103, [0, 3, 2000001]).catch((ex) => {
           const m = ex.message.match(/invalid change: too large/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -138,7 +138,7 @@ describe("MoeTreasury", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
         await moe_treasury
-          .setAPR(1202103, [0, 1000001, 3, 1000000])
+          .setAPR(1202103, [1000001, 3, 1000000])
           .catch((ex) => {
             const m = ex.message.match(/invalid change: too large/);
             if (m === null) console.debug(ex);
@@ -149,40 +149,28 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (too small)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(1202103, [0, 0, 3, 499999]).catch((ex) => {
+        await moe_treasury.setAPR(1202103, [0, 3, 499999]).catch((ex) => {
           const m = ex.message.match(/invalid change: too small/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
     });
-    it("should *not* reparameterize (too small)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
-      expect(
-        await moe_treasury
-          .setAPR(1202103, [500001, 0, 3, 1000000])
-          .catch((ex) => {
-            const m = ex.message.match(/invalid change: too small/);
-            if (m === null) console.debug(ex);
-            expect(m).to.be.not.null;
-          })
-      ).to.eq(undefined);
-    });
     it("should reparameterize APR at 2.000000[%]", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
-      expect(await mt.setAPR(1202103, [0, 0, 3, 2000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202106, [0, 0, 3, 2000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202109, [0, 0, 3, 2000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202112, [0, 0, 3, 2000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202115, [0, 0, 3, 2000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202118, [0, 0, 3, 2000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202121, [0, 0, 3, 2000000])).to.not.eq(undefined);
-      expect(await mt.setAPR(1202124, [0, 0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202103, [0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202106, [0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202109, [0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202112, [0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202115, [0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202118, [0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202121, [0, 3, 2000000])).to.not.eq(undefined);
+      expect(await mt.setAPR(1202124, [0, 3, 2000000])).to.not.eq(undefined);
     });
     it("should *not* reparameterize (too frequent)", async function () {
       await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(1202103, [0, 0, 3, 1000000]).catch((ex) => {
+        await moe_treasury.setAPR(1202103, [0, 3, 1000000]).catch((ex) => {
           const m = ex.message.match(/invalid change: too frequent/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;

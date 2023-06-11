@@ -204,7 +204,7 @@ contract MoeTreasury is MoeTreasurySupervised {
 
     /** @return target for annualized percentage rate (for nft-id and array) */
     function aprTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256) {
-        return Polynomial(array).eval4Clamped(_ppt.levelOf(nftId));
+        return Polynomial(array).eval3(_ppt.levelOf(nftId));
     }
 
     /** annual percentage rate: 1.000000[%] (per nft.level) */
@@ -217,9 +217,9 @@ contract MoeTreasury is MoeTreasurySupervised {
         if (_apr[id].length > 0) {
             return _apr[id];
         }
-        uint256[] memory array = new uint256[](4);
-        array[2] = APR_DIV;
-        array[3] = APR_MUL;
+        uint256[] memory array = new uint256[](3);
+        array[1] = APR_DIV;
+        array[2] = APR_MUL;
         return array;
     }
 
@@ -368,7 +368,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 nowYear = _ppt.year();
         uint256 nftYear = _ppt.yearOf(nftId);
         if (nowYear > nftYear || nowYear == nftYear) {
-            return Polynomial(array).eval4Clamped(nowYear - nftYear);
+            return Polynomial(array).eval3(nowYear - nftYear);
         }
         return 0;
     }
@@ -383,9 +383,9 @@ contract MoeTreasury is MoeTreasurySupervised {
         if (_bonus[id].length > 0) {
             return _bonus[id];
         }
-        uint256[] memory array = new uint256[](4);
-        array[2] = APR_BONUS_DIV;
-        array[3] = APR_BONUS_MUL;
+        uint256[] memory array = new uint256[](3);
+        array[1] = APR_BONUS_DIV;
+        array[2] = APR_BONUS_MUL;
         return array;
     }
 
