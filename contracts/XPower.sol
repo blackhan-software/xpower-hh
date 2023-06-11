@@ -161,7 +161,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
 
     /** @return share target (for amount & parametrization) */
     function shareTargetOf(uint256 amount, uint256[] memory array) private pure returns (uint256) {
-        return Polynomial(array).eval4Clamped(amount);
+        return Polynomial(array).eval3(amount);
     }
 
     /** fractional treasury share: 50[%] */
@@ -173,9 +173,9 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         if (_share.length > 0) {
             return _share;
         }
-        uint256[] memory array = new uint256[](4);
-        array[3] = SHARE_MUL;
-        array[2] = SHARE_DIV;
+        uint256[] memory array = new uint256[](3);
+        array[1] = SHARE_DIV;
+        array[2] = SHARE_MUL;
         return array;
     }
 
