@@ -76,27 +76,27 @@ describe("XPowerNft", async function () {
     it("should *not* set new royalty to 0.04% (too small)", async function () {
       await nft.grantRole(nft.NFT_ROYALTY_ROLE(), addresses[0]);
       expect(
-        await nft.setRoyaltyBatch([1], [0, 0, 3, 4]).catch((ex) => {
+        await nft.setRoyaltyBatch([1], [0, 3, 4]).catch((ex) => {
           const m = ex.message.match(/invalid change: too small/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
       const array = (await nft.getRoyalty(1)).map((bn) => bn.toNumber());
-      expect(array).to.deep.eq([0, 0, 3, 10_000]);
+      expect(array).to.deep.eq([0, 3, 10_000]);
     });
     it("should set new royalty to 0.05%", async function () {
       await nft.grantRole(nft.NFT_ROYALTY_ROLE(), addresses[0]);
       expect(await royalty(nft)).to.equal(10_000);
-      await nft.setRoyaltyBatch([1], [0, 0, 3, 10_000]);
+      await nft.setRoyaltyBatch([1], [0, 3, 10_000]);
       expect(await royalty(nft)).to.equal(10_000);
       await network.provider.send("evm_increaseTime", [MONTH]);
       await network.provider.send("evm_mine", []);
       expect(await royalty(nft)).to.equal(10_000);
       {
-        await nft.setRoyaltyBatch([1], [0, 0, 3, 5_000]);
+        await nft.setRoyaltyBatch([1], [0, 3, 5_000]);
         const array = (await nft.getRoyalty(1)).map((bn) => bn.toNumber());
-        expect(array).to.deep.eq([0, 0, 3, 5_000]);
+        expect(array).to.deep.eq([0, 3, 5_000]);
       }
       expect(await royalty(nft)).to.equal(10_000);
       await network.provider.send("evm_increaseTime", [MONTH * 2 ** 0]);
@@ -117,29 +117,29 @@ describe("XPowerNft", async function () {
     });
     it("should *not* set new royalty to 0.10% (too frequent)", async function () {
       await nft.grantRole(nft.NFT_ROYALTY_ROLE(), addresses[0]);
-      await nft.setRoyaltyBatch([1], [0, 0, 3, 10_000]);
+      await nft.setRoyaltyBatch([1], [0, 3, 10_000]);
       expect(
-        await nft.setRoyaltyBatch([1], [0, 0, 3, 10_000]).catch((ex) => {
+        await nft.setRoyaltyBatch([1], [0, 3, 10_000]).catch((ex) => {
           const m = ex.message.match(/invalid change: too frequent/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
       const array = (await nft.getRoyalty(1)).map((bn) => bn.toNumber());
-      expect(array).to.deep.eq([0, 0, 3, 10_000]);
+      expect(array).to.deep.eq([0, 3, 10_000]);
     });
     it("should set new royalty to 0.20%", async function () {
       await nft.grantRole(nft.NFT_ROYALTY_ROLE(), addresses[0]);
       expect(await royalty(nft)).to.equal(10_000);
-      await nft.setRoyaltyBatch([1], [0, 0, 3, 10_000]);
+      await nft.setRoyaltyBatch([1], [0, 3, 10_000]);
       expect(await royalty(nft)).to.equal(10_000);
       await network.provider.send("evm_increaseTime", [MONTH]);
       await network.provider.send("evm_mine", []);
       expect(await royalty(nft)).to.equal(10_000);
       {
-        await nft.setRoyaltyBatch([1], [0, 0, 3, 20_000]);
+        await nft.setRoyaltyBatch([1], [0, 3, 20_000]);
         const array = (await nft.getRoyalty(1)).map((bn) => bn.toNumber());
-        expect(array).to.deep.eq([0, 0, 3, 20_000]);
+        expect(array).to.deep.eq([0, 3, 20_000]);
       }
       expect(await royalty(nft)).to.equal(10_000);
       await network.provider.send("evm_increaseTime", [MONTH * 2 ** 0]);
@@ -161,20 +161,20 @@ describe("XPowerNft", async function () {
     it("should *not* set new royalty to 0.21% (too large)", async function () {
       await nft.grantRole(nft.NFT_ROYALTY_ROLE(), addresses[0]);
       expect(
-        await nft.setRoyaltyBatch([1], [0, 0, 3, 21_000]).catch((ex) => {
+        await nft.setRoyaltyBatch([1], [0, 3, 21_000]).catch((ex) => {
           const m = ex.message.match(/invalid change: too large/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
       const array = (await nft.getRoyalty(1)).map((bn) => bn.toNumber());
-      expect(array).to.deep.eq([0, 0, 3, 10_000]);
+      expect(array).to.deep.eq([0, 3, 10_000]);
     });
     it("should *not* set new royalty (missing role)", async function () {
       await nft.revokeRole(nft.NFT_ROYALTY_ROLE(), addresses[0]);
       await nft.transferOwnership(addresses[1]);
       expect(
-        await nft.setRoyaltyBatch([1], [0, 0, 20, 3]).catch((ex) => {
+        await nft.setRoyaltyBatch([1], [0, 20, 3]).catch((ex) => {
           const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;

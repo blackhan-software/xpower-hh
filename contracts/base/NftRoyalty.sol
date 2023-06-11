@@ -60,7 +60,7 @@ abstract contract NftRoyalty is IERC2981, NftRoyaltySupervised {
 
     /** @return target for annualized percentage rate (per nft.level & parametrization) */
     function royaltyTargetOf(uint256 nftId, uint256[] memory array) private pure returns (uint256) {
-        return Polynomial(array).eval4Clamped(Nft.levelOf(nftId));
+        return Polynomial(array).eval3(Nft.levelOf(nftId));
     }
 
     /** royalty fraction: 10.000[‱] (per nft.level) */
@@ -72,9 +72,9 @@ abstract contract NftRoyalty is IERC2981, NftRoyaltySupervised {
         if (_royalty[nftPrefix].length > 0) {
             return _royalty[nftPrefix];
         }
-        uint256[] memory array = new uint256[](4);
-        array[3] = ROYALTY_MUL;
-        array[2] = ROYALTY_DIV;
+        uint256[] memory array = new uint256[](3);
+        array[1] = ROYALTY_DIV;
+        array[2] = ROYALTY_MUL;
         return array;
     }
 
