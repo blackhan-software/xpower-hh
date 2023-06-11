@@ -9,15 +9,31 @@ contract PolynomialsTest {
         return Polynomials.eval6(p, value);
     }
 
+    function eval5(Polynomial memory p, uint256 value) public pure returns (uint256) {
+        return Polynomials.eval5(p, value);
+    }
+
     function eval4(Polynomial memory p, uint256 value) public pure returns (uint256) {
         return Polynomials.eval4(p, value);
+    }
+
+    function eval3(Polynomial memory p, uint256 value) public pure returns (uint256) {
+        return Polynomials.eval3(p, value);
     }
 
     function eval6Clamped(Polynomial memory p, uint256 value) public pure returns (uint256) {
         return Polynomials.eval6Clamped(p, value);
     }
 
+    function eval5Clamped(Polynomial memory p, uint256 value) public pure returns (uint256) {
+        return Polynomials.eval5Clamped(p, value);
+    }
+
     function eval4Clamped(Polynomial memory p, uint256 value) public pure returns (uint256) {
         return Polynomials.eval4Clamped(p, value);
+    }
+
+    function eval3Clamped(Polynomial memory p, uint256 value) public pure returns (uint256) {
+        return Polynomials.eval3Clamped(p, value);
     }
 }
