@@ -145,10 +145,8 @@ describe("APower Migration", async function () {
   });
   beforeEach(async function () {
     table = await new HashTable(xodin_old, A0).init({
-      length: 2n,
       min_level: 3,
       max_level: 3,
-      use_cache: true,
     });
   });
   beforeEach(async function () {

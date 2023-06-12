@@ -87,10 +87,8 @@ describe("APower", async function () {
   });
   beforeEach(async function () {
     table = await new HashTable(xodin, addresses[0]).init({
-      length: 2n,
       min_level: 3,
       max_level: 3,
-      use_cache: true,
     });
   });
   beforeEach(async function () {
