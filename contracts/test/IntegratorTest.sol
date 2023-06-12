@@ -23,6 +23,6 @@ contract IntegratorTest {
     }
 
     function append(uint256 stamp, uint256 value) public {
-        Integrator.append(items, stamp, value);
+        Integrator.append(items, stamp, value, "");
     }
 }
