@@ -42,7 +42,7 @@ describe("XPowerLoki", async function () {
   });
   before(async function () {
     table = await new HashTable(xpower, addresses[0]).init({
-      length: LENGTH,
+      length: LENGTH * 2n,
       min_level: 2,
       max_level: 2,
     });

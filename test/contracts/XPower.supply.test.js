@@ -2,7 +2,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const PRECISION = 1_000_000_000_000;
-let UNUM; // decimals, decimals - 3
+let UNIT; // decimals, decimals - 3
 
 async function supplyOf(contract, delta = 0, log = undefined) {
   const HEXA = ethers.BigNumber.from(16);
@@ -84,8 +84,8 @@ describe("THOR Supply", async () => {
   beforeEach(async function () {
     const decimals = await xpower.decimals();
     expect(decimals).to.greaterThan(0);
-    UNUM = 10n ** BigInt(decimals);
-    expect(UNUM >= 1n).to.be.true;
+    UNIT = 10n ** BigInt(decimals);
+    expect(UNIT >= 1n).to.be.true;
   });
   before(async () => {
     supply = await supplyOf(xpower);
@@ -94,21 +94,21 @@ describe("THOR Supply", async () => {
     it("should count maximum supply as 1.157920892373162e+76 tokens", async () => {
       expect(supply.total).to.eq(
         11579208923731619542357098500868790785326998466564056403945758400791312963993n *
-          UNUM +
-          UNUM / 2n
+          UNIT +
+          UNIT / 2n
       );
     });
     it("should count other's supply as 7.719472615821079e+75 tokens", async () => {
       expect(supply.others).to.eq(
         7719472615821079694904732333912527190217998977709370935963838933860875309329n *
-          UNUM
+          UNIT
       );
     });
     it("should count owner's supply as 3.859736307910540e+75 tokens", async () => {
       expect(supply.owners).to.eq(
         3859736307910539847452366166956263595108999488854685467981919466930437654664n *
-          UNUM +
-          UNUM / 2n
+          UNIT +
+          UNIT / 2n
       );
     });
     it("should count fund's supply share as 33.33%", async () => {
@@ -126,8 +126,8 @@ describe("LOKI Supply", async () => {
   beforeEach(async function () {
     const decimals = await xpower.decimals();
     expect(decimals).to.greaterThan(0);
-    UNUM = 10n ** BigInt(decimals);
-    expect(UNUM >= 1n).to.be.true;
+    UNIT = 10n ** BigInt(decimals);
+    expect(UNIT >= 1n).to.be.true;
   });
   before(async () => {
     supply = await supplyOf(xpower);
@@ -136,19 +136,19 @@ describe("LOKI Supply", async () => {
     it("should count maximum supply as 1.240629527542673e+76 tokens", async () => {
       expect(supply.total).to.eq(
         12406295275426735223954034108073704412850355499890060432797050421125652152320n *
-          UNUM
+          UNIT
       );
     });
     it("should count other's supply as 8.270863516951157e+75 tokens", async () => {
       expect(supply.others).to.eq(
         8270863516951156815969356072049136275233570333260040288531366947417101434880n *
-          UNUM
+          UNIT
       );
     });
     it("should count owner's supply as 4.135431758475579e+75 tokens", async () => {
       expect(supply.owners).to.eq(
         4135431758475578407984678036024568137616785166630020144265683473708550717440n *
-          UNUM
+          UNIT
       );
     });
     it("should count fund's supply share as 33.33%", async () => {
@@ -166,8 +166,8 @@ describe("ODIN Supply", async () => {
   beforeEach(async function () {
     const decimals = await xpower.decimals();
     expect(decimals).to.greaterThan(0);
-    UNUM = 10n ** BigInt(decimals);
-    expect(UNUM >= 1n).to.be.true;
+    UNIT = 10n ** BigInt(decimals);
+    expect(UNIT >= 1n).to.be.true;
   });
   before(async () => {
     supply = await supplyOf(xpower, -15);
@@ -176,19 +176,19 @@ describe("ODIN Supply", async () => {
     it("should count maximum supply as 7.967943140642821e+78 tokens", async () => {
       expect(supply.total).to.eq(
         7967943140642820697584478405910336659153140819804391312965175107630913290240000n *
-          UNUM
+          UNIT
       );
     });
     it("should count other's supply as 5.311962093761881e+78 tokens", async () => {
       expect(supply.others).to.eq(
         5311962093761880465056318937273557772768760546536260875310116738420608860160000n *
-          UNUM
+          UNIT
       );
     });
     it("should count owner's supply as 2.655981046880940e+78 tokens", async () => {
       expect(supply.owners).to.eq(
         2655981046880940232528159468636778886384380273268130437655058369210304430080000n *
-          UNUM
+          UNIT
       );
     });
     it("should count fund's supply share as 33.33%", async () => {

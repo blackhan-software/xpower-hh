@@ -9,7 +9,6 @@ let XPower; // contract
 let xpower; // instance
 
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
-const UNIT = 10n ** 18n; // decimals
 const DAYS = 86_400; // [seconds]
 
 describe("XPower", async function () {
