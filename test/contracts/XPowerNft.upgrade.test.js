@@ -41,7 +41,6 @@ describe("XPowerNft", async function () {
   });
   beforeEach(async function () {
     table = await new HashTable(xpower, addresses[0]).init({
-      length: 1n,
       min_level: 3,
       max_level: 3,
     });
