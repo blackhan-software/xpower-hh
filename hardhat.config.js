@@ -110,7 +110,7 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: Number(process.env.OPTIMIZER_RUNS || 100),
       },
     },
   },
