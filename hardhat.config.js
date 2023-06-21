@@ -116,6 +116,7 @@ module.exports = {
   },
   networks: {
     /* avalanche */ hardhat: {
+      allowBlocksWithSameTimestamp: Boolean(process.env.NO_TIMETRAVEL),
       blockGasLimit: 15_000_000,
     },
     /* avalanche */ local: {
