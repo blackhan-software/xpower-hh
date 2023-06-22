@@ -127,83 +127,83 @@ describe("MoeTreasury", async function () {
   beforeEach(async function () {
     await xodin.transfer(moe_treasury.address, 110n * UNIT);
   });
-  it("should fast rebalance []", async function () {
-    await mt.rebalance(3, false);
+  it("should fast refresh-rates []", async function () {
+    await mt.refreshRates(3, false);
   });
-  it("should fast rebalance [1E0×UNITs]", async function () {
+  it("should fast refresh-rates [1E0×UNITs]", async function () {
     const nft_unit = await stakeNft(await mintNft(0, 1), 1);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 0);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 1_000_000);
   });
-  it("should fast rebalance [2E0×UNITs]", async function () {
+  it("should fast refresh-rates [2E0×UNITs]", async function () {
     const nft_unit = await stakeNft(await mintNft(0, 2), 2);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 0);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 1_000_000);
   });
-  it("should fast rebalance [1E3×UNITs]", async function () {
+  it("should fast refresh-rates [1E3×UNITs]", async function () {
     const nft_unit = await stakeNft(await mintNft(0, 1e3), 1e3);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 0);
-    await mt.rebalance(3, false);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 1_000_000);
   });
-  it("should fast rebalance [2E3×UNITs]", async function () {
+  it("should fast refresh-rates [2E3×UNITs]", async function () {
     const nft_unit = await stakeNft(await mintNft(0, 2e3), 2e3);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 0);
-    await mt.rebalance(3, false);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 1_000_000);
   });
-  it("should fast rebalance [1E0×UNITs,1E0×KILOs]", async function () {
+  it("should fast refresh-rates [1E0×UNITs,1E0×KILOs]", async function () {
     const nft_unit = await stakeNft(await mintNft(0, 1), 1);
     const nft_kilo = await stakeNft(await mintNft(3, 1), 1);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 0);
     expect(await mt.aprTargetOf(nft_kilo)).to.eq(APR * 1_000_000);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 500_500_000);
     expect(await mt.aprTargetOf(nft_kilo)).to.eq(APR * 500_500);
   });
-  it("should fast rebalance [2E0×UNITs,2E0×KILOs]", async function () {
+  it("should fast refresh-rates [2E0×UNITs,2E0×KILOs]", async function () {
     const nft_unit = await stakeNft(await mintNft(0, 2), 2);
     const nft_kilo = await stakeNft(await mintNft(3, 2), 2);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 0);
     expect(await mt.aprTargetOf(nft_kilo)).to.eq(APR * 1_000_000);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 500_500_000);
     expect(await mt.aprTargetOf(nft_kilo)).to.eq(APR * 500_500);
   });
-  it("should fast rebalance [1E3×UNITs,1E0×KILOs]", async function () {
+  it("should fast refresh-rates [1E3×UNITs,1E0×KILOs]", async function () {
     const nft_unit = await stakeNft(await mintNft(0, 1e3), 1e3);
     const nft_kilo = await stakeNft(await mintNft(3, 1), 1);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 0);
     expect(await mt.aprTargetOf(nft_kilo)).to.eq(APR * 1_000_000);
-    await mt.rebalance(3, false);
-    await mt.rebalance(3, false);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
+    await mt.refreshRates(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit)).to.eq(APR * 1_000_000);
     expect(await mt.aprTargetOf(nft_kilo)).to.eq(APR * 1_000_000);
   });
-  it("should fast rebalance [2E3×UNITs,2E0×KILOs]", async function () {
+  it("should fast refresh-rates [2E3×UNITs,2E0×KILOs]", async function () {
     const nft_unit1 = await stakeNft(await mintNft(0, 1e3), 1e3);
     expect(await mt.aprTargetOf(nft_unit1)).to.eq(APR * 0);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit1)).to.eq(APR * 1_000_000);
     const nft_unit2 = await stakeNft(await mintNft(0, 1e3), 1e3);
     expect(await mt.aprTargetOf(nft_unit2)).to.eq(APR * 1_000_000);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit2)).to.eq(APR * 1_000_000);
     const nft_kilo1 = await stakeNft(await mintNft(3, 1), 1);
     expect(await mt.aprTargetOf(nft_unit1)).to.eq(APR * 1_000_000);
     expect(await mt.aprTargetOf(nft_kilo1)).to.eq(APR * 1_000_000);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit1)).to.eq(APR * 750_000);
     expect(await mt.aprTargetOf(nft_kilo1)).to.eq(APR * 1_500_000);
     const nft_kilo2 = await stakeNft(await mintNft(3, 1), 1);
     expect(await mt.aprTargetOf(nft_unit2)).to.eq(APR * 750_000);
     expect(await mt.aprTargetOf(nft_kilo2)).to.eq(APR * 1_500_000);
-    await mt.rebalance(3, false);
+    await mt.refreshRates(3, false);
     expect(await mt.aprTargetOf(nft_unit2)).to.eq(APR * 1_000_000);
     expect(await mt.aprTargetOf(nft_kilo2)).to.eq(APR * 1_000_000);
   });

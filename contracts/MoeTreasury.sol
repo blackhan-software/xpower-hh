@@ -248,11 +248,11 @@ contract MoeTreasury is MoeTreasurySupervised {
         }
     }
 
-    /** emitted on rebalancing APR parameters */
-    event Rebalance(uint256 nftPrefix, bool allLevels);
+    /** emitted on refreshing APR parameters */
+    event RefreshRates(uint256 nftPrefix, bool allLevels);
 
-    /** rebalance APR parameters (for nft-prefix & all-levels) */
-    function rebalance(uint256 nftPrefix, bool allLevels) external {
+    /** refresh APR parameters (for nft-prefix & all-levels) */
+    function refreshRates(uint256 nftPrefix, bool allLevels) external {
         int256[34] memory shares = _ppt.sharesBy(nftPrefix);
         (uint256 bins, uint256 sum, uint256 max) = _moments(shares);
         uint256 maxLength = allLevels ? shares.length : max;
@@ -276,11 +276,11 @@ contract MoeTreasury is MoeTreasurySupervised {
                 _apr[id][1] = APR_DIV;
             }
         }
-        emit Rebalance(nftPrefix, allLevels);
+        emit RefreshRates(nftPrefix, allLevels);
     }
 
-    /** @return rebalanceable flag (for nft-prefix) */
-    function rebalanceable(uint256 nftPrefix) external view returns (bool) {
+    /** @return refreshable flag (for nft-prefix) */
+    function refreshable(uint256 nftPrefix) external view returns (bool) {
         int256[34] memory shares = _ppt.sharesBy(nftPrefix);
         (uint256 bins, uint256 sum, ) = _moments(shares);
         for (uint256 i = 0; i < shares.length; i++) {

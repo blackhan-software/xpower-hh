@@ -28,7 +28,7 @@ jobs:
           - MoeTreasury.batch.*
           - MoeTreasury.nft-*
           - MoeTreasury.{par,sup}*
-          - MoeTreasury.rebalance.*
+          - MoeTreasury.refresh-rates.*
 
     steps:
       - uses: actions/checkout@v3
