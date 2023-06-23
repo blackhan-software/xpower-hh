@@ -60,14 +60,6 @@ describe("XPowerNft", async function () {
     await moe.connect(signer_1).transferOwnership(owner.address);
   });
   describe("upgrade", async function () {
-    it("should *not* upgrade NFTs (non-positive level)", async function () {
-      const tx = await nftUpgrade(1).catch((ex) => {
-        const m = ex.message.match(/non-positive level/);
-        if (m === null) console.debug(ex);
-        expect(m).to.be.not.null;
-      });
-      expect(tx).to.eq(undefined);
-    });
     it("should *not* upgrade NFTs (non-ternary level)", async function () {
       const tx = await nftUpgrade(1, 1).catch((ex) => {
         const m = ex.message.match(/non-ternary level/);
@@ -92,14 +84,6 @@ describe("XPowerNft", async function () {
     });
   });
   describe("upgradeBatch", async function () {
-    it("should *not* upgrade NFTs (non-positive level)", async function () {
-      const tx = await nftUpgradeBatch(1).catch((ex) => {
-        const m = ex.message.match(/non-positive level/);
-        if (m === null) console.debug(ex);
-        expect(m).to.be.not.null;
-      });
-      expect(tx).to.eq(undefined);
-    });
     it("should *not* upgrade NFTs (non-ternary level)", async function () {
       const tx = await nftUpgradeBatch(1, 1).catch((ex) => {
         const m = ex.message.match(/non-ternary level/);

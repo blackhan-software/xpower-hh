@@ -15,6 +15,7 @@ let table; // pre-hashed nonces
 
 const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
+const DAYS = 86_400; // [seconds]
 
 describe("XPowerNft", async function () {
   before(async function () {
@@ -265,12 +266,20 @@ async function nftMigrate(n, l = 0) {
   const nft_id = await nft_new.idBy(year, l, moe_prefix);
   const nft_index = await nft_new.oldIndexOf(nft_old.address);
   const moe_index = await moe_new.oldIndexOf(moe_old.address);
-  const tx = await nft_new.migrate(nft_id, n, [nft_index, moe_index]);
+  const tx0 = await nft_old.grantRole(nft_old.NFT_OPEN_ROLE(), addresses[0]);
+  expect(tx0).to.be.an("object");
+  const tx1 = await nft_old["migratable(bool)"](true);
+  expect(tx1).to.be.an("object");
+  expect(await nft_old["migratable()"]()).to.eq(false);
+  await network.provider.send("evm_increaseTime", [7 * DAYS]);
+  await network.provider.send("evm_mine", []);
+  expect(await nft_old["migratable()"]()).to.eq(true);
+  const tx2 = await nft_new.migrate(nft_id, n, [nft_index, moe_index]);
   const nft_balance_old = await nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance_old.toNumber()).to.eq(0);
   const nft_balance_new = await nft_new.balanceOf(addresses[0], nft_id);
   expect(nft_balance_new.toNumber()).to.eq(n);
-  return tx;
+  return tx2;
 }
 async function nftMigrateBatch(n, l = 0) {
   const year = await nft_new.year();
@@ -278,12 +287,20 @@ async function nftMigrateBatch(n, l = 0) {
   const nft_id = await nft_new.idBy(year, l, moe_prefix);
   const nft_index = await nft_new.oldIndexOf(nft_old.address);
   const moe_index = await moe_new.oldIndexOf(moe_old.address);
-  const tx = await nft_new.migrateBatch([nft_id], [n], [nft_index, moe_index]);
+  const tx0 = await nft_old.grantRole(nft_old.NFT_OPEN_ROLE(), addresses[0]);
+  expect(tx0).to.be.an("object");
+  const tx1 = await nft_old["migratable(bool)"](true);
+  expect(tx1).to.be.an("object");
+  expect(await nft_old["migratable()"]()).to.eq(false);
+  await network.provider.send("evm_increaseTime", [7 * DAYS]);
+  await network.provider.send("evm_mine", []);
+  expect(await nft_old["migratable()"]()).to.eq(true);
+  const tx2 = await nft_new.migrateBatch([nft_id], [n], [nft_index, moe_index]);
   const nft_balance_old = await nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance_old.toNumber()).to.eq(0);
   const nft_balance_new = await nft_new.balanceOf(addresses[0], nft_id);
   expect(nft_balance_new.toNumber()).to.eq(n);
-  return tx;
+  return tx2;
 }
 async function checkBalances([n_oo, n_on, n_no, n_nn]) {
   // check old balances

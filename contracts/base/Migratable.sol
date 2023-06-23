@@ -17,11 +17,11 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
     ERC20Burnable[] private _base;
     /** base address to index map */
     mapping(address => uint) private _index;
-    /** timestamp of migration deadline */
+    /** timestamp of immigration deadline */
     uint256 private _deadlineBy;
-    /** flag to seal migrations */
+    /** flag to seal immigration */
     bool[] private _sealed;
-    /** number of migrated tokens */
+    /** number of immigrated tokens */
     uint256 private _migrated;
 
     /** @param base addresses of old contracts */
@@ -94,12 +94,12 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         return _migrated;
     }
 
-    /** seal migration */
+    /** seal immigration */
     function _seal(uint256 index) internal {
         _sealed[index] = true;
     }
 
-    /** seal-all migration */
+    /** seal-all immigration */
     function _sealAll() internal {
         for (uint256 i = 0; i < _sealed.length; i++) {
             _sealed[i] = true;

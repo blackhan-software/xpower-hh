@@ -53,9 +53,14 @@ contract XPowerNft is NftBase {
     }
 
     function _redeemTo(address to, uint256 id, uint256 amount) private {
+        require(_redeemable(id), "irredeemable issue");
         XPower moe = _moe[_moeP2Index[prefixOf(id)]];
         uint256 moeAmount = amount * denominationOf(levelOf(id));
         moe.transfer(to, moeAmount * 10 ** moe.decimals());
+    }
+
+    function _redeemable(uint256 id) private view returns (bool) {
+        return yearOf(id) + levelOf(id) / 3 <= year() || migratable();
     }
 
     /** burn NFTs during migration */
@@ -80,8 +85,6 @@ contract XPowerNft is NftBase {
 
     /** batch-mint NFTs */
     function mintBatch(address to, uint256[] memory levels, uint256[] memory amounts, uint256 index) external {
-        require(levels.length > 0, "empty levels");
-        require(amounts.length > 0, "empty amounts");
         _depositFromBatch(to, levels, amounts, index); // MOE transfer to vault
         _mintBatch(to, idsBy(year(), levels, _moe[index].prefix()), amounts, "");
     }
@@ -103,6 +106,7 @@ contract XPowerNft is NftBase {
 
     function _redeemToBatch(address to, uint256[] memory ids, uint256[] memory amounts) private {
         for (uint256 i = 0; i < ids.length; i++) {
+            require(_redeemable(ids[i]), "irredeemable issue");
             XPower moe = _moe[_moeP2Index[prefixOf(ids[i])]];
             uint256 moeAmount = amounts[i] * denominationOf(levelOf(ids[i]));
             moe.transfer(to, moeAmount * 10 ** moe.decimals());
@@ -111,7 +115,6 @@ contract XPowerNft is NftBase {
 
     /** upgrade NFTs */
     function upgrade(address from, uint256 anno, uint256 level, uint256 amount, uint256 index) external {
-        require(level > 0, "non-positive level");
         require(level > 2, "non-ternary level");
         _burn(from, idBy(anno, level - 3, _moe[index].prefix()), amount * 1000);
         _mint(from, idBy(anno, level, _moe[index].prefix()), amount, "");
@@ -127,17 +130,14 @@ contract XPowerNft is NftBase {
     ) external {
         uint256[][] memory levelz = new uint256[][](annos.length);
         for (uint256 i = 0; i < annos.length; i++) {
-            require(levels[i].length > 0, "empty levels");
             levelz[i] = new uint256[](levels[i].length);
             for (uint256 j = 0; j < levels[i].length; j++) {
-                require(levels[i][j] > 0, "non-positive level");
                 require(levels[i][j] > 2, "non-ternary level");
                 levelz[i][j] = levels[i][j] - 3;
             }
         }
         uint256[][] memory amountz = new uint256[][](annos.length);
         for (uint256 i = 0; i < annos.length; i++) {
-            require(amounts[i].length > 0, "empty amounts");
             amountz[i] = new uint256[](amounts[i].length);
             for (uint256 j = 0; j < amounts[i].length; j++) {
                 amountz[i][j] = amounts[i][j] * 1000;

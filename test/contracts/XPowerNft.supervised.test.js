@@ -39,6 +39,20 @@ describe("XPowerNftSupervised", async function () {
     expect(nft).to.exist;
     await nft.deployed();
   });
+  it("should grant & revoke NFT_OPEN_ROLE", async function () {
+    const role = await has_role(nft.NFT_OPEN_ROLE(), {
+      has: false,
+    });
+    await grant_role(role, { granted: true });
+    await revoke_role(role, { revoked: true });
+  });
+  it("should revoke & grant NFT_OPEN_ADMIN_ROLE", async function () {
+    const role = await has_role(nft.NFT_OPEN_ADMIN_ROLE(), {
+      has: true,
+    });
+    await revoke_role(role, { revoked: true });
+    await grant_role(role, { granted: true });
+  });
   it("should grant & revoke NFT_SEAL_ROLE", async function () {
     const role = await has_role(nft.NFT_SEAL_ROLE(), {
       has: false,

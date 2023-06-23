@@ -64,13 +64,18 @@ abstract contract SovMigratableSupervised is Supervised {
 }
 
 abstract contract NftMigratableSupervised is Supervised {
-    /** role grants right to seal NFT migration */
+    /** role grants right to seal NFT immigration */
     bytes32 public constant NFT_SEAL_ROLE = keccak256("NFT_SEAL_ROLE");
     bytes32 public constant NFT_SEAL_ADMIN_ROLE = keccak256("NFT_SEAL_ADMIN_ROLE");
+    /** role grants right to open NFT emigration */
+    bytes32 public constant NFT_OPEN_ROLE = keccak256("NFT_OPEN_ROLE");
+    bytes32 public constant NFT_OPEN_ADMIN_ROLE = keccak256("NFT_OPEN_ADMIN_ROLE");
 
     constructor() {
         _setRoleAdmin(NFT_SEAL_ROLE, NFT_SEAL_ADMIN_ROLE);
         _grantRole(NFT_SEAL_ADMIN_ROLE, msg.sender);
+        _setRoleAdmin(NFT_OPEN_ROLE, NFT_OPEN_ADMIN_ROLE);
+        _grantRole(NFT_OPEN_ADMIN_ROLE, msg.sender);
     }
 }
 

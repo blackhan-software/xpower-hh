@@ -17,10 +17,12 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     ERC1155Burnable[] private _base;
     /** base address to index map */
     mapping(address => uint) private _index;
-    /** timestamp of migration deadline */
+    /** timestamp of immigration deadline */
     uint256 private _deadlineBy;
-    /** flag to seal migrations */
+    /** flag to seal immigration */
     bool[] private _sealed;
+    /** flag to open emigration */
+    uint256 private _migratable;
 
     /** @param base addresses of old contracts */
     /** @param deadlineIn seconds to end-of-migration */
@@ -97,12 +99,12 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         _mintBatch(account, nftIds, amounts, "");
     }
 
-    /** seal migration */
+    /** seal immigration */
     function seal(uint256 index) external onlyRole(NFT_SEAL_ROLE) {
         _sealed[index] = true;
     }
 
-    /** seal-all migration */
+    /** seal-all immigration */
     function sealAll() external onlyRole(NFT_SEAL_ROLE) {
         for (uint256 i = 0; i < _sealed.length; i++) {
             _sealed[i] = true;
@@ -112,6 +114,25 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     /** @return seal flags (of all bases) */
     function seals() public view returns (bool[] memory) {
         return _sealed;
+    }
+
+    /** emitted on opening emigration */
+    event Migratable(uint256 timestamp);
+
+    /** open emigration for *all* nft-years (deferred by a week) */
+    function migratable(bool flag) external onlyRole(NFT_OPEN_ROLE) {
+        if (flag) {
+            _migratable = block.timestamp + 7 days;
+            emit Migratable(_migratable);
+        }
+    }
+
+    /** @return emigration flag */
+    function migratable() public view returns (bool) {
+        if (_migratable > 0) {
+            return block.timestamp >= _migratable;
+        }
+        return false;
     }
 
     /** @return true if this contract implements the interface defined by interface-id */
