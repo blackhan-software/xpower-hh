@@ -60,7 +60,8 @@ describe("XPowerOdinTest", async function () {
       expect(interval.toNumber()).to.be.greaterThan(0);
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
       expect(nonce.gte(0)).to.eq(true);
-      const hash = await xpower.hashOf(addresses[0], block_hash, nonce);
+      const [hash, pair] = await xpower.hashOf(addresses[0], block_hash, nonce);
+      expect(pair).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 0 }));
     });
@@ -69,7 +70,8 @@ describe("XPowerOdinTest", async function () {
       expect(interval.toNumber()).to.be.greaterThan(0);
       const [nonce, block_hash] = table.getNonce({ amount: 15 });
       expect(nonce.gte(0)).to.eq(true);
-      const hash = await xpower.hashOf(addresses[0], block_hash, nonce);
+      const [hash, pair] = await xpower.hashOf(addresses[0], block_hash, nonce);
+      expect(pair).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 15 }));
     });
@@ -78,7 +80,8 @@ describe("XPowerOdinTest", async function () {
       expect(interval.toNumber()).to.be.greaterThan(0);
       const [nonce, block_hash] = table.getNonce({ amount: 255 });
       expect(nonce.gte(0)).to.eq(true);
-      const hash = await xpower.hashOf(addresses[0], block_hash, nonce);
+      const [hash, pair] = await xpower.hashOf(addresses[0], block_hash, nonce);
+      expect(pair).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 255 }));
     });

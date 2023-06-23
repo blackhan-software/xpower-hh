@@ -97,7 +97,8 @@ describe("XPower", async function () {
     it("should *not* mint for amount=1 (expired block-hash)", async function () {
       const [nonce] = table.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
-      const block_hash = "0x00000000000000000000000000000001";
+      const block_hash =
+        "0x0000000000000000000000000000000000000000000000000000000000000001";
       expect(block_hash).to.exist;
       const tx = await xpower
         .mint(addresses[0], block_hash, nonce)
@@ -149,7 +150,8 @@ describe("XPower", async function () {
     it("should *not* mint for amount=3 (expired block-hash)", async function () {
       const [nonce] = table.getNonce({ amount: 3 });
       expect(nonce.gte(0)).to.eq(true);
-      const block_hash = "0x00000000000000000000000000000001";
+      const block_hash =
+        "0x0000000000000000000000000000000000000000000000000000000000000001";
       expect(block_hash).to.exist;
       const tx = await xpower
         .mint(addresses[0], block_hash, nonce)

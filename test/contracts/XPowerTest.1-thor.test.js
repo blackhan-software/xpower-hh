@@ -58,21 +58,24 @@ describe("XPowerThorTest", async function () {
     it("should hash for amount=0", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 0 });
       expect(nonce.gte(0)).to.eq(true);
-      const hash = await xpower.hashOf(addresses[0], block_hash, nonce);
+      const [hash, pair] = await xpower.hashOf(addresses[0], block_hash, nonce);
+      expect(pair).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 0 }));
     });
     it("should hash for amount=1", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
       expect(nonce.gte(0)).to.eq(true);
-      const hash = await xpower.hashOf(addresses[0], block_hash, nonce);
+      const [hash, pair] = await xpower.hashOf(addresses[0], block_hash, nonce);
+      expect(pair).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 1 }));
     });
     it("should hash for amount=2", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 2 });
       expect(nonce.gte(0)).to.eq(true);
-      const hash = await xpower.hashOf(addresses[0], block_hash, nonce);
+      const [hash, pair] = await xpower.hashOf(addresses[0], block_hash, nonce);
+      expect(pair).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.be.a("string").and.to.match(/^0x/);
       expect(hash).to.equal(table.getHash({ amount: 2 }));
     });

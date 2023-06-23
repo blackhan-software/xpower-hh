@@ -11,7 +11,7 @@ import {XPowerOdin} from "../XPower.sol";
 contract XPowerThorTest is XPowerThor {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerThor(_base, _deadlineIn) {}
 
-    function cache(bytes16 _blockHash) public {
+    function cache(bytes32 _blockHash) public {
         _cache(_blockHash, block.timestamp);
     }
 }
@@ -36,7 +36,7 @@ contract XPowerThorOldTest36 is XPowerThorTest {
 contract XPowerLokiTest is XPowerLoki {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerLoki(_base, _deadlineIn) {}
 
-    function cache(bytes16 _blockHash) public {
+    function cache(bytes32 _blockHash) public {
         _cache(_blockHash, block.timestamp);
     }
 }
@@ -61,7 +61,7 @@ contract XPowerLokiOldTest36 is XPowerLokiTest {
 contract XPowerOdinTest is XPowerOdin {
     constructor(address[] memory _base, uint256 _deadlineIn) XPowerOdin(_base, _deadlineIn) {}
 
-    function cache(bytes16 _blockHash) public {
+    function cache(bytes32 _blockHash) public {
         _cache(_blockHash, block.timestamp);
     }
 }

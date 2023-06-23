@@ -1,5 +1,5 @@
 const { solidityPack } = require("ethers/lib/utils");
-const { createSHA256 } = require("hash-wasm");
+const { createKeccak } = require("hash-wasm");
 const { block } = require("./block");
 
 class Miner {
@@ -20,12 +20,12 @@ class Miner {
   }
 
   async init(nonce_length) {
-    const hasher = await createSHA256();
+    const hasher = await createKeccak(256);
     const abi_encode = this.abi_encoder(nonce_length);
     return (contract, address, block_hash, nonce) => {
       const data = abi_encode(contract, address, block_hash, nonce);
       const hash = hasher.init().update(data).digest("binary");
-      return hasher.init().update(hash).digest("binary");
+      return hash;
     };
   }
 
@@ -34,7 +34,7 @@ class Miner {
       let value = this.abi_encoded[block_hash];
       if (value === undefined) {
         const template = solidityPack(
-          ["uint160", "bytes16", "bytes"],
+          ["uint160", "bytes32", "bytes"],
           [
             BigInt(contract) ^ BigInt(address),
             block_hash,
@@ -44,7 +44,7 @@ class Miner {
         value = arrayify(template.slice(2));
         this.abi_encoded[block_hash] = value;
       }
-      value.set(nonce, 36);
+      value.set(nonce, 52);
       return value;
     };
   }
