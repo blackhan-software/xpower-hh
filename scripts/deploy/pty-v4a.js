@@ -33,34 +33,44 @@ async function main() {
   assert(loki_ppt_link, "missing LOKI_PPT_V4a");
   const odin_ppt_link = process.env.ODIN_PPT_V4a;
   assert(odin_ppt_link, "missing ODIN_PPT_V4a");
+  // addresses MoeTreasury[New]
+  const thor_mty_link = process.env.THOR_MTY_V4a;
+  assert(thor_mty_link, "missing THOR_MTY_V4a");
+  const loki_mty_link = process.env.LOKI_MTY_V4a;
+  assert(loki_mty_link, "missing LOKI_MTY_V4a");
+  const odin_mty_link = process.env.ODIN_MTY_V4a;
+  assert(odin_mty_link, "missing ODIN_MTY_V4a");
   //
   // deploy THOR NftTreasury[New] & re-own XPowerPpt[New]:
   //
-  const thor_treasury = await deploy(["NftTreasury", "XPowerPpt"], {
+  const thor = await deploy(["NftTreasury", "XPowerPpt"], {
     nft_link: thor_nft_link,
     ppt_link: thor_ppt_link,
+    mty_link: thor_mty_link,
   });
-  console.log(`THOR_PTY_V4a=${thor_treasury.address}`);
+  console.log(`THOR_PTY_V4a=${thor.address}`);
   //
   // deploy LOKI NftTreasury[New & re-own XPowerPpt[New]:
   //
-  const loki_treasury = await deploy(["NftTreasury", "XPowerPpt"], {
+  const loki = await deploy(["NftTreasury", "XPowerPpt"], {
     nft_link: loki_nft_link,
     ppt_link: loki_ppt_link,
+    mty_link: loki_mty_link,
   });
-  console.log(`LOKI_PTY_V4a=${loki_treasury.address}`);
+  console.log(`LOKI_PTY_V4a=${loki.address}`);
   //
   // deploy ODIN NftTreasury[New] & re-own XPowerPpt[New]:
   //
-  const odin_treasury = await deploy(["NftTreasury", "XPowerPpt"], {
+  const odin = await deploy(["NftTreasury", "XPowerPpt"], {
     nft_link: odin_nft_link,
     ppt_link: odin_ppt_link,
+    mty_link: odin_mty_link,
   });
-  console.log(`ODIN_PTY_V4a=${odin_treasury.address}`);
+  console.log(`ODIN_PTY_V4a=${odin.address}`);
 }
-async function deploy([nty_name, ppt_name], { nft_link, ppt_link }) {
+async function deploy([nty_name, ppt_name], { nft_link, ppt_link, mty_link }) {
   const nft_factory = await hre.ethers.getContractFactory(nty_name);
-  const nft_contract = await nft_factory.deploy(nft_link, ppt_link);
+  const nft_contract = await nft_factory.deploy(nft_link, ppt_link, mty_link);
   await wait(nft_contract.deployTransaction);
   const ppt_factory = await hre.ethers.getContractFactory(ppt_name);
   const ppt_contract = ppt_factory.attach(ppt_link);

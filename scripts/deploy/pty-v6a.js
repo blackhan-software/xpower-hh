@@ -25,22 +25,32 @@ async function main() {
   // addresses XPowerPpt[New]
   const xpow_ppt_link = process.env.XPOW_PPT_V6a;
   assert(xpow_ppt_link, "missing XPOW_PPT_V6a");
+  // addresses MoeTreasury[New]
+  const xpow_mty_link = process.env.THOR_MTY_V6a;
+  assert(xpow_mty_link, "missing THOR_MTY_V6a");
   //
   // deploy NftTreasury[New] & re-own XPowerPpt[New]:
   //
-  const thor = await deploy(["NftTreasury", "XPowerPpt"], {
+  const xpow = await deploy(["NftTreasury", "XPowerPpt"], {
     nft_link: xpow_nft_link,
     ppt_link: xpow_ppt_link,
+    mty_link: xpow_mty_link,
   });
-  console.log(`XPOW_PTY_V6a=${thor.nty.address}`);
+  console.log(`XPOW_PTY_V6a=${xpow.nty.address}`);
   //
   // verify contract(s):
   //
-  await verify("NftTreasury", thor.nty, xpow_nft_link, xpow_ppt_link);
+  await verify(
+    "NftTreasury",
+    xpow.nty,
+    xpow_nft_link,
+    xpow_ppt_link,
+    xpow_mty_link
+  );
 }
-async function deploy([nty_name, ppt_name], { nft_link, ppt_link }) {
+async function deploy([nty_name, ppt_name], { nft_link, ppt_link, mty_link }) {
   const nty_factory = await hre.ethers.getContractFactory(nty_name);
-  const nty_contract = await nty_factory.deploy(nft_link, ppt_link);
+  const nty_contract = await nty_factory.deploy(nft_link, ppt_link, mty_link);
   await wait(nty_contract.deployTransaction);
   const ppt_factory = await hre.ethers.getContractFactory(ppt_name);
   const ppt_contract = ppt_factory.attach(ppt_link);

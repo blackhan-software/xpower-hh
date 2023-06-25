@@ -53,6 +53,11 @@ async function transferNftRoles(factory_name, contract_name, { to: owner }) {
     to: owner,
   });
   await transferRole(contract, {
+    role: contract.NFT_OPEN_ADMIN_ROLE(),
+    from: signer.address,
+    to: owner,
+  });
+  await transferRole(contract, {
     role: contract.NFT_SEAL_ADMIN_ROLE(),
     from: signer.address,
     to: owner,

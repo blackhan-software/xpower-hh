@@ -1,0 +1,110 @@
+/**
+ * We require the Hardhat Runtime Environment (HRE) explicitly here: The import
+ * is optional but useful for running a script in a standalone fashion through:
+ *
+ * $ node <script>
+ *
+ * When running the script via `npx hardhat run <script>` you'll find the HRE's
+ * members available in the global scope.
+ */
+const hre = require("hardhat");
+const assert = require("assert");
+const { wait } = require("../wait");
+
+/**
+ * @returns list of base contract addresses
+ */
+function sov_bases(
+  token,
+  versions = ["V5a", "V5b", "V5c", "V6a", "V6b", "V6c", "V7a", "V7b"]
+) {
+  return versions.map((version) => {
+    const moe_base = process.env[`${token}_SOV_${version}`];
+    assert(moe_base, `missing ${token}_SOV_${version}`);
+    return moe_base;
+  });
+}
+/**
+ * Hardhat *always* runs the compile task when running scripts with its command
+ * line interface. But, if this script is run *directly* using `node`, then you
+ * may want to call compile manually to make sure everything is compiled:
+ *
+ * > await hre.run("compile");
+ */
+async function main() {
+  const owner = process.env.FUND_ADDRESS;
+  assert(owner, "missing FUND_ADDRESS");
+  // addresses APower[Old]
+  const thor_sov_base = sov_bases("THOR");
+  assert(thor_sov_base.length === 8);
+  const loki_sov_base = sov_bases("LOKI");
+  assert(loki_sov_base.length === 8);
+  const odin_sov_base = sov_bases("ODIN");
+  assert(odin_sov_base.length === 8);
+  // addresses XPower[New]
+  const thor_moe_link = process.env.THOR_MOE_V7c;
+  assert(thor_moe_link, "missing THOR_MOE_V7c");
+  const loki_moe_link = process.env.LOKI_MOE_V7c;
+  assert(loki_moe_link, "missing LOKI_MOE_V7c");
+  const odin_moe_link = process.env.ODIN_MOE_V7c;
+  assert(odin_moe_link, "missing ODIN_MOE_V7c");
+  // migration:
+  const deadline = 126_230_400; // 4 years
+  //
+  // deploy APowerThor[New]
+  //
+  const thor = await deploy("APowerThor", {
+    moe_link: thor_moe_link,
+    sov_base: thor_sov_base,
+    deadline,
+  });
+  console.log(`THOR_SOV_V7c=${thor.sov.address}`);
+  //
+  // deploy APowerLoki[New]
+  //
+  const loki = await deploy("APowerLoki", {
+    moe_link: loki_moe_link,
+    sov_base: loki_sov_base,
+    deadline,
+  });
+  console.log(`LOKI_SOV_V7c=${loki.sov.address}`);
+  //
+  // deploy APowerOdin[New]
+  //
+  const odin = await deploy("APowerOdin", {
+    moe_link: odin_moe_link,
+    sov_base: odin_sov_base,
+    deadline,
+  });
+  console.log(`ODIN_SOV_V7c=${odin.sov.address}`);
+  //
+  // verify contract(s):
+  //
+  await verify("APowerThor", thor.sov, thor_moe_link, thor_sov_base, deadline);
+  await verify("APowerLoki", loki.sov, loki_moe_link, loki_sov_base, deadline);
+  await verify("APowerOdin", odin.sov, odin_moe_link, odin_sov_base, deadline);
+}
+async function deploy(name, { moe_link, sov_base, deadline }) {
+  const factory = await hre.ethers.getContractFactory(name);
+  const contract = await factory.deploy(moe_link, sov_base, deadline);
+  await wait(contract.deployTransaction);
+  return { sov: contract };
+}
+async function verify(name, { address }, ...args) {
+  if (hre.network.name.match(/mainnet|fuji/)) {
+    return await hre.run("verify:verify", {
+      address,
+      contract: `contracts/APower.sol:${name}`,
+      constructorArguments: args,
+    });
+  }
+}
+if (require.main === module) {
+  main()
+    .then(() => process.exit(0))
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
+}
+exports.main = main;
