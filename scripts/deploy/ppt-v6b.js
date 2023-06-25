@@ -9,7 +9,7 @@
  */
 const hre = require("hardhat");
 const assert = require("assert");
-const { join } = require("../join");
+const { unify } = require("../unify");
 const { wait } = require("../wait");
 
 /**
@@ -50,7 +50,7 @@ async function main() {
   //
   // deploy XPowerPpt[New]:
   //
-  const xpow_ppt_base = join(thor_ppt_base, loki_ppt_base, odin_ppt_base);
+  const xpow_ppt_base = unify(thor_ppt_base, loki_ppt_base, odin_ppt_base);
   const xpow = await deploy("XPowerPpt", {
     ppt_uri: xpow_ppt_uri,
     ppt_base: xpow_ppt_base,

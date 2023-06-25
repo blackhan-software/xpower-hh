@@ -9,7 +9,7 @@
  */
 const hre = require("hardhat");
 const assert = require("assert");
-const { join } = require("../join");
+const { unify } = require("../unify");
 const { wait } = require("../wait");
 
 /**
@@ -73,7 +73,7 @@ async function main() {
   // deploy XPowerNft[New]:
   //
   const xpow_moe_link = [thor_moe_link, loki_moe_link, odin_moe_link];
-  const xpow_nft_base = join(thor_nft_base, loki_nft_base, odin_nft_base);
+  const xpow_nft_base = unify(thor_nft_base, loki_nft_base, odin_nft_base);
   const xpow = await deploy("XPowerNft", {
     nft_uri: xpow_nft_uri,
     moe_link: xpow_moe_link,
