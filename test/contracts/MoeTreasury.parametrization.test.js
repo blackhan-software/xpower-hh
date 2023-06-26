@@ -5,8 +5,8 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Nft, Ppt, NftTreasury, MoeTreasury; // contracts
-let nft, ppt, nft_treasury, moe_treasury, mt; // instances
+let Nft, Ppt, Mty, Nty; // contracts
+let nft, ppt, mty, nty; // instances
 let AThor, XThor, ALoki, XLoki, AOdin, XOdin; // contracts
 let athor, xthor, aloki, xloki, aodin, xodin; // instances
 
@@ -42,10 +42,10 @@ describe("MoeTreasury", async function () {
     expect(Nft).to.exist;
     Ppt = await ethers.getContractFactory("XPowerPpt");
     expect(Ppt).to.exist;
-    NftTreasury = await ethers.getContractFactory("NftTreasury");
-    expect(NftTreasury).to.exist;
-    MoeTreasury = await ethers.getContractFactory("MoeTreasury");
-    expect(MoeTreasury).to.exist;
+    Nty = await ethers.getContractFactory("NftTreasury");
+    expect(Nty).to.exist;
+    Mty = await ethers.getContractFactory("MoeTreasury");
+    expect(Mty).to.exist;
   });
   beforeEach(async function () {
     xthor = await XThor.deploy([], DEADLINE);
@@ -76,81 +76,76 @@ describe("MoeTreasury", async function () {
     nft = await Nft.deploy(NFT_ODIN_URL, [xodin.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
-  });
-  beforeEach(async function () {
     ppt = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
     expect(ppt).to.exist;
     await ppt.deployed();
   });
   beforeEach(async function () {
-    nft_treasury = await NftTreasury.deploy(nft.address, ppt.address);
-    expect(nft_treasury).to.exist;
-    await nft_treasury.deployed();
-  });
-  beforeEach(async function () {
-    moe_treasury = await MoeTreasury.deploy(
+    mty = await Mty.deploy(
       [xthor.address, xloki.address, xodin.address],
       [athor.address, aloki.address, aodin.address],
       ppt.address
     );
-    expect(moe_treasury).to.exist;
-    await moe_treasury.deployed();
-    mt = moe_treasury;
+    expect(mty).to.exist;
+    await mty.deployed();
+    nty = await Nty.deploy(nft.address, ppt.address, mty.address);
+    expect(nty).to.exist;
+    await nty.deployed();
   });
   beforeEach(async function () {
-    await athor.transferOwnership(moe_treasury.address);
-    expect(await athor.owner()).to.eq(moe_treasury.address);
-    await aloki.transferOwnership(moe_treasury.address);
-    expect(await aloki.owner()).to.eq(moe_treasury.address);
-    await aodin.transferOwnership(moe_treasury.address);
-    expect(await aodin.owner()).to.eq(moe_treasury.address);
+    await athor.transferOwnership(mty.address);
+    expect(await athor.owner()).to.eq(mty.address);
+    await aloki.transferOwnership(mty.address);
+    expect(await aloki.owner()).to.eq(mty.address);
+    await aodin.transferOwnership(mty.address);
+    expect(await aodin.owner()).to.eq(mty.address);
   });
   describe("parametrization of APR", async function () {
     it("should get array", async function () {
-      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 3, 1000000]);
+      Expect(await mty.getAPR(3202103)).to.equal([0, 3, 1000000]);
     });
     it("should set array", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
-      await moe_treasury.setAPR(3202103, [0, 3, 2000000]);
-      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 3, 2000000]);
+      await mty.grantRole(mty.APR_ROLE(), addresses[0]);
+      await mty.setAPR(3202103, [0, 3, 2000000]);
+      Expect(await mty.getAPR(3202103)).to.equal([0, 3, 2000000]);
     });
     it("should *not* set array (invalid array.length)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(3202103, [1, 2]).catch((ex) => {
+        await mty.setAPR(3202103, [1, 2]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 3, 1000000]);
+      Expect(await mty.getAPR(3202103)).to.equal([0, 3, 1000000]);
     });
     it("should *not* set array (invalid array[1] == 0)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(3202103, [0, 0, 0]).catch((ex) => {
+        await mty.setAPR(3202103, [0, 0, 0]).catch((ex) => {
           const m = ex.message.match(/invalid array\[1\] == 0/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 3, 1000000]);
+      Expect(await mty.getAPR(3202103)).to.equal([0, 3, 1000000]);
     });
     it("should *not* set array (invalid array[2] == 0)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APR_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPR(3202103, [0, 1, 0]).catch((ex) => {
+        await mty.setAPR(3202103, [0, 1, 0]).catch((ex) => {
           const m = ex.message.match(/invalid array\[2\] == 0/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 3, 1000000]);
+      Expect(await mty.getAPR(3202103)).to.equal([0, 3, 1000000]);
     });
     it("should *not* set array (missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
-        await moe_treasury
+        await mty
           .connect(signer_1)
           .setAPR(3202103, [0, 3, 2000000])
           .catch((ex) => {
@@ -159,55 +154,55 @@ describe("MoeTreasury", async function () {
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPR(3202103)).to.equal([0, 3, 1000000]);
+      Expect(await mty.getAPR(3202103)).to.equal([0, 3, 1000000]);
     });
   });
   describe("parametrization of APR bonus", async function () {
     it("should get array", async function () {
-      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([0, 1, 10000]);
+      Expect(await mty.getAPRBonus(3202103)).to.equal([0, 1, 10000]);
     });
     it("should set array", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
-      await moe_treasury.setAPRBonus(3202103, [0, 1, 20000]);
-      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([0, 1, 20000]);
+      await mty.grantRole(mty.APR_BONUS_ROLE(), addresses[0]);
+      await mty.setAPRBonus(3202103, [0, 1, 20000]);
+      Expect(await mty.getAPRBonus(3202103)).to.equal([0, 1, 20000]);
     });
     it("should *not* set array (invalid array.length)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(3202103, [1, 2]).catch((ex) => {
+        await mty.setAPRBonus(3202103, [1, 2]).catch((ex) => {
           const m = ex.message.match(/invalid array.length/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([0, 1, 10000]);
+      Expect(await mty.getAPRBonus(3202103)).to.equal([0, 1, 10000]);
     });
     it("should *not* set array (invalid array[1] == 0)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(3202103, [0, 0, 0]).catch((ex) => {
+        await mty.setAPRBonus(3202103, [0, 0, 0]).catch((ex) => {
           const m = ex.message.match(/invalid array\[1\] == 0/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([0, 1, 10000]);
+      Expect(await mty.getAPRBonus(3202103)).to.equal([0, 1, 10000]);
     });
     it("should *not* set array (invalid array[2] == 0)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(3202103, [0, 1, 0]).catch((ex) => {
+        await mty.setAPRBonus(3202103, [0, 1, 0]).catch((ex) => {
           const m = ex.message.match(/invalid array\[2\] == 0/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([0, 1, 10000]);
+      Expect(await mty.getAPRBonus(3202103)).to.equal([0, 1, 10000]);
     });
     it("should *not* set array (missing role)", async function () {
       const [owner, signer_1] = await ethers.getSigners();
       expect(
-        await moe_treasury
+        await mty
           .connect(signer_1)
           .setAPRBonus(3202103, [0, 1, 20000])
           .catch((ex) => {
@@ -216,7 +211,7 @@ describe("MoeTreasury", async function () {
             expect(m).to.be.not.null;
           })
       ).to.eq(undefined);
-      Expect(await moe_treasury.getAPRBonus(3202103)).to.equal([0, 1, 10000]);
+      Expect(await mty.getAPRBonus(3202103)).to.equal([0, 1, 10000]);
     });
   });
 });

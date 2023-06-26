@@ -5,8 +5,8 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let APower, XPower, Nft, Ppt, NftTreasury, MoeTreasury; // contracts
-let apower, xpower, nft, ppt, nft_treasury, moe_treasury, mt; // instances
+let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
+let moe, sov, nft, ppt, mty, nty; // instances
 
 const NFT_ODIN_URL = "https://xpowermine.com/nfts/thor/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
@@ -26,95 +26,83 @@ describe("MoeTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    APower = await ethers.getContractFactory("APowerThor");
-    expect(APower).to.exist;
-    XPower = await ethers.getContractFactory("XPowerThorTest");
-    expect(XPower).to.exist;
-  });
-  before(async function () {
+    Moe = await ethers.getContractFactory("XPowerThorTest");
+    expect(Moe).to.exist;
+    Sov = await ethers.getContractFactory("APowerThor");
+    expect(Sov).to.exist;
     Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
     Ppt = await ethers.getContractFactory("XPowerPpt");
     expect(Ppt).to.exist;
-    NftTreasury = await ethers.getContractFactory("NftTreasury");
-    expect(NftTreasury).to.exist;
-    MoeTreasury = await ethers.getContractFactory("MoeTreasury");
-    expect(MoeTreasury).to.exist;
+    Mty = await ethers.getContractFactory("MoeTreasury");
+    expect(Mty).to.exist;
+    Nty = await ethers.getContractFactory("NftTreasury");
+    expect(Nty).to.exist;
   });
   before(async function () {
-    xpower = await XPower.deploy([], DEADLINE);
-    expect(xpower).to.exist;
-    await xpower.deployed();
-    await xpower.init();
+    moe = await Moe.deploy([], DEADLINE);
+    expect(moe).to.exist;
+    await moe.deployed();
+    await moe.init();
+    sov = await Sov.deploy(moe.address, [], DEADLINE);
+    expect(sov).to.exist;
+    await sov.deployed();
   });
   before(async function () {
-    apower = await APower.deploy(xpower.address, [], DEADLINE);
-    expect(apower).to.exist;
-    await apower.deployed();
-  });
-  before(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, [xpower.address], [], DEADLINE);
+    nft = await Nft.deploy(NFT_ODIN_URL, [moe.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
-  });
-  before(async function () {
     ppt = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
     expect(ppt).to.exist;
     await ppt.deployed();
   });
   before(async function () {
-    nft_treasury = await NftTreasury.deploy(nft.address, ppt.address);
-    expect(nft_treasury).to.exist;
-    await nft_treasury.deployed();
+    mty = mty = await Mty.deploy([moe.address], [sov.address], ppt.address);
+    expect(mty).to.exist;
+    await mty.deployed();
+    nty = await Nty.deploy(nft.address, ppt.address, mty.address);
+    expect(nty).to.exist;
+    await nty.deployed();
   });
   before(async function () {
-    mt = moe_treasury = await MoeTreasury.deploy(
-      [xpower.address],
-      [apower.address],
-      ppt.address
-    );
-    expect(mt).to.exist;
-    await mt.deployed();
-  });
-  before(async function () {
-    await apower.transferOwnership(mt.address);
-    expect(await apower.owner()).to.eq(mt.address);
+    await sov.transferOwnership(mty.address);
+    expect(await sov.owner()).to.eq(mty.address);
   });
   describe("bonuses-length", async function () {
     it("should return a list of length=0", async function () {
-      expect(await mt.bonusesLength(1202103)).to.eq(0);
-      expect(await mt.bonusesLength(2202103)).to.eq(0);
-      expect(await mt.bonusesLength(3202103)).to.eq(0);
-      expect(await mt.bonusesLength(4202103)).to.eq(0);
+      expect(await mty.bonusesLength(1202103)).to.eq(0);
+      expect(await mty.bonusesLength(2202103)).to.eq(0);
+      expect(await mty.bonusesLength(3202103)).to.eq(0);
+      expect(await mty.bonusesLength(4202103)).to.eq(0);
     });
   });
   describe("apr-bonus-of (i.e rewards ~ nft-level)", async function () {
     it("should return 0.020000[%] for nft-level=00", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(20_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(20_000);
     });
     it("should return 0.020000[%] for nft-level=03", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 3, 1))).to.eq(20_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 3, 1))).to.eq(20_000);
     });
     it("should return 0.020000[%] for nft-level=06", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 6, 1))).to.eq(20_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 6, 1))).to.eq(20_000);
     });
     it("should return 0.020000[%] for nft-level=09", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 9, 1))).to.eq(20_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 9, 1))).to.eq(20_000);
     });
     it("should return 0.020000[%] for nft-level=12", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 12, 1))).to.eq(20_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 12, 1))).to.eq(20_000);
     });
     it("should return 0.020000[%] for nft-level=15", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 15, 1))).to.eq(20_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 15, 1))).to.eq(20_000);
     });
     it("should return 0.020000[%] for nft-level=18", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 18, 1))).to.eq(20_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 18, 1))).to.eq(20_000);
     });
     it("should return 0.020000[%] for nft-level=21", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 21, 1))).to.eq(20_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 21, 1))).to.eq(20_000);
     });
     it("should return 0.020000[%] for nft-level=24", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(20_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(20_000);
     });
   });
   describe("set-apr-bonus (double from 0.010000[%] to 0.020000[%])", async function () {
@@ -123,9 +111,9 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should *not* reparameterize (too large)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(1202103, [0, 1, 20_001]).catch((ex) => {
+        await mty.setAPRBonus(1202103, [0, 1, 20_001]).catch((ex) => {
           const m = ex.message.match(/invalid change: too large/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -133,21 +121,19 @@ describe("MoeTreasury", async function () {
       ).to.eq(undefined);
     });
     it("should *not* reparameterize (too large)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury
-          .setAPRBonus(1202103, [30_001, 1, 10_000])
-          .catch((ex) => {
-            const m = ex.message.match(/invalid change: too large/);
-            if (m === null) console.debug(ex);
-            expect(m).to.be.not.null;
-          })
+        await mty.setAPRBonus(1202103, [30_001, 1, 10_000]).catch((ex) => {
+          const m = ex.message.match(/invalid change: too large/);
+          if (m === null) console.debug(ex);
+          expect(m).to.be.not.null;
+        })
       ).to.eq(undefined);
     });
     it("should *not* reparameterize (too small)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(1202103, [0, 1, 4_000]).catch((ex) => {
+        await mty.setAPRBonus(1202103, [0, 1, 4_000]).catch((ex) => {
           const m = ex.message.match(/invalid change: too small/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -155,15 +141,15 @@ describe("MoeTreasury", async function () {
       ).to.eq(undefined);
     });
     it("should reparameterize", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
-      expect(await moe_treasury.setAPRBonus(1202103, [0, 1, 20_000])).to.not.eq(
+      await mty.grantRole(mty.APR_BONUS_ROLE(), addresses[0]);
+      expect(await mty.setAPRBonus(1202103, [0, 1, 20_000])).to.not.eq(
         undefined
       );
     });
     it("should *not* reparameterize (too frequent)", async function () {
-      await moe_treasury.grantRole(moe_treasury.APR_BONUS_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APR_BONUS_ROLE(), addresses[0]);
       expect(
-        await moe_treasury.setAPRBonus(1202103, [0, 1, 10_000]).catch((ex) => {
+        await mty.setAPRBonus(1202103, [0, 1, 10_000]).catch((ex) => {
           const m = ex.message.match(/invalid change: too frequent/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
@@ -177,31 +163,31 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return 0.080000[%] for nft-level=00", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(80_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(80_000);
     });
     it("should return 0.080000[%] for nft-level=03", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 3, 1))).to.eq(80_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 3, 1))).to.eq(80_000);
     });
     it("should return 0.080000[%] for nft-level=06", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 6, 1))).to.eq(80_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 6, 1))).to.eq(80_000);
     });
     it("should return 0.080000[%] for nft-level=09", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 9, 1))).to.eq(80_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 9, 1))).to.eq(80_000);
     });
     it("should return 0.080000[%] for nft-level=12", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 12, 1))).to.eq(80_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 12, 1))).to.eq(80_000);
     });
     it("should return 0.080000[%] for nft-level=15", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 15, 1))).to.eq(80_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 15, 1))).to.eq(80_000);
     });
     it("should return 0.080000[%] for nft-level=18", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 18, 1))).to.eq(80_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 18, 1))).to.eq(80_000);
     });
     it("should return 0.080000[%] for nft-level=21", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 21, 1))).to.eq(80_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 21, 1))).to.eq(80_000);
     });
     it("should return 0.080000[%] for nft-level=24", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(80_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(80_000);
     });
   });
   describe("apr-bonus-of (i.e rewards ~ nft-level × time)", async function () {
@@ -210,31 +196,31 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return 0.100000[%] for nft-level=00", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(100_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(100_000);
     });
     it("should return 0.100000[%] for nft-level=03", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 3, 1))).to.eq(100_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 3, 1))).to.eq(100_000);
     });
     it("should return 0.100000[%] for nft-level=06", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 6, 1))).to.eq(100_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 6, 1))).to.eq(100_000);
     });
     it("should return 0.100000[%] for nft-level=09", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 9, 1))).to.eq(100_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 9, 1))).to.eq(100_000);
     });
     it("should return 0.100000[%] for nft-level=12", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 12, 1))).to.eq(100_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 12, 1))).to.eq(100_000);
     });
     it("should return 0.100000[%] for nft-level=15", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 15, 1))).to.eq(100_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 15, 1))).to.eq(100_000);
     });
     it("should return 0.100000[%] for nft-level=18", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 18, 1))).to.eq(100_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 18, 1))).to.eq(100_000);
     });
     it("should return 0.100000[%] for nft-level=21", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 21, 1))).to.eq(100_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 21, 1))).to.eq(100_000);
     });
     it("should return 0.100000[%] for nft-level=24", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(100_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(100_000);
     });
   });
   describe("apr-bonus-of (i.e rewards ~ nft-level × time)", async function () {
@@ -243,31 +229,31 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return 0.120000[%] for nft-level=00", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(120_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(120_000);
     });
     it("should return 0.120000[%] for nft-level=03", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 3, 1))).to.eq(120_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 3, 1))).to.eq(120_000);
     });
     it("should return 0.120000[%] for nft-level=06", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 6, 1))).to.eq(120_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 6, 1))).to.eq(120_000);
     });
     it("should return 0.120000[%] for nft-level=09", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 9, 1))).to.eq(120_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 9, 1))).to.eq(120_000);
     });
     it("should return 0.120000[%] for nft-level=12", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 12, 1))).to.eq(120_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 12, 1))).to.eq(120_000);
     });
     it("should return 0.120000[%] for nft-level=15", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 15, 1))).to.eq(120_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 15, 1))).to.eq(120_000);
     });
     it("should return 0.120000[%] for nft-level=18", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 18, 1))).to.eq(120_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 18, 1))).to.eq(120_000);
     });
     it("should return 0.120000[%] for nft-level=21", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 21, 1))).to.eq(120_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 21, 1))).to.eq(120_000);
     });
     it("should return 0.120000[%] for nft-level=24", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(120_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(120_000);
     });
   });
   describe("apr-bonus-of (i.e rewards ~ nft-level × time)", async function () {
@@ -276,41 +262,41 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return 20.060000[%] for nft-level=00", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(20_060_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 0, 1))).to.eq(20_060_000);
     });
     it("should return 20.060000[%] for nft-level=03", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 3, 1))).to.eq(20_060_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 3, 1))).to.eq(20_060_000);
     });
     it("should return 20.060000[%] for nft-level=06", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 6, 1))).to.eq(20_060_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 6, 1))).to.eq(20_060_000);
     });
     it("should return 20.060000[%] for nft-level=09", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 9, 1))).to.eq(20_060_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 9, 1))).to.eq(20_060_000);
     });
     it("should return 20.060000[%] for nft-level=12", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 12, 1))).to.eq(20_060_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 12, 1))).to.eq(20_060_000);
     });
     it("should return 20.060000[%] for nft-level=15", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 15, 1))).to.eq(20_060_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 15, 1))).to.eq(20_060_000);
     });
     it("should return 20.060000[%] for nft-level=18", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 18, 1))).to.eq(20_060_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 18, 1))).to.eq(20_060_000);
     });
     it("should return 20.060000[%] for nft-level=21", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 21, 1))).to.eq(20_060_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 21, 1))).to.eq(20_060_000);
     });
     it("should return 20.060000[%] for nft-level=24", async function () {
-      expect(await mt.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(20_060_000);
+      expect(await mty.aprBonusOf(ppt.idBy(YEAR, 24, 1))).to.eq(20_060_000);
     });
   });
   describe("bonuses-length", async function () {
     it("should return a list of length=1", async function () {
-      expect(await mt.bonusesLength(1202103)).to.eq(1);
+      expect(await mty.bonusesLength(1202103)).to.eq(1);
     });
     it("should return a list of length=0", async function () {
-      expect(await mt.bonusesLength(2202103)).to.eq(0);
-      expect(await mt.bonusesLength(3202103)).to.eq(0);
-      expect(await mt.bonusesLength(4202103)).to.eq(0);
+      expect(await mty.bonusesLength(2202103)).to.eq(0);
+      expect(await mty.bonusesLength(3202103)).to.eq(0);
+      expect(await mty.bonusesLength(4202103)).to.eq(0);
     });
   });
 });

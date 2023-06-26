@@ -5,12 +5,10 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
+let Nft, Ppt, Mty, Nty; // contracts
+let nft, ppt, mty, nty; // instances
 let AThor, XThor, ALoki, XLoki, AOdin, XOdin; // contracts
 let athor, xthor, aloki, xloki, aodin, xodin; // instances
-let Nft, Ppt, NftTreasury; // contracts
-let nft, ppt, nft_treasury; // instances
-let MoeTreasury; // contracts
-let moe_treasury, mt; // instances
 
 const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
@@ -44,10 +42,10 @@ describe("MoeTreasury", async function () {
     expect(Nft).to.exist;
     Ppt = await ethers.getContractFactory("XPowerPpt");
     expect(Ppt).to.exist;
-    NftTreasury = await ethers.getContractFactory("NftTreasury");
-    expect(NftTreasury).to.exist;
-    MoeTreasury = await ethers.getContractFactory("MoeTreasury");
-    expect(MoeTreasury).to.exist;
+    Mty = await ethers.getContractFactory("MoeTreasury");
+    expect(Mty).to.exist;
+    Nty = await ethers.getContractFactory("NftTreasury");
+    expect(Nty).to.exist;
   });
   beforeEach(async function () {
     xthor = await XThor.deploy([], DEADLINE);
@@ -78,36 +76,31 @@ describe("MoeTreasury", async function () {
     nft = await Nft.deploy(NFT_ODIN_URL, [xodin.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
-  });
-  beforeEach(async function () {
     ppt = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
     expect(ppt).to.exist;
     await ppt.deployed();
   });
   beforeEach(async function () {
-    nft_treasury = await NftTreasury.deploy(nft.address, ppt.address);
-    expect(nft_treasury).to.exist;
-    await nft_treasury.deployed();
-  });
-  beforeEach(async function () {
-    moe_treasury = await MoeTreasury.deploy(
+    mty = await Mty.deploy(
       [xthor.address, xloki.address, xodin.address],
       [athor.address, aloki.address, aodin.address],
       ppt.address
     );
-    expect(moe_treasury).to.exist;
-    await moe_treasury.deployed();
-    mt = moe_treasury;
+    expect(mty).to.exist;
+    await mty.deployed();
+    nty = await Nty.deploy(nft.address, ppt.address, mty.address);
+    expect(nty).to.exist;
+    await nty.deployed();
   });
   describe("supportsInterface", function () {
     it("should support IERC165 interface", async function () {
-      expect(await mt.supportsInterface(0x01ffc9a7)).to.eq(true);
+      expect(await mty.supportsInterface(0x01ffc9a7)).to.eq(true);
     });
     it("should support IAccessControl interface", async function () {
-      expect(await mt.supportsInterface(0x7965db0b)).to.eq(true);
+      expect(await mty.supportsInterface(0x7965db0b)).to.eq(true);
     });
     it("should support IAccessControlEnumerable interface", async function () {
-      expect(await mt.supportsInterface(0x5a05180f)).to.eq(true);
+      expect(await mty.supportsInterface(0x5a05180f)).to.eq(true);
     });
   });
 });

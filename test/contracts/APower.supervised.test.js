@@ -5,8 +5,8 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let APower, XPower; // contracts
-let apower, xpower; // instances
+let Moe, Sov; // contracts
+let moe, sov; // instances
 
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
@@ -21,38 +21,36 @@ describe("APowerSupervised", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    APower = await ethers.getContractFactory("APowerOdin");
-    expect(APower).to.exist;
-    XPower = await ethers.getContractFactory("XPowerOdinTest");
-    expect(XPower).to.exist;
+    Moe = await ethers.getContractFactory("XPowerOdinTest");
+    expect(Moe).to.exist;
+    Sov = await ethers.getContractFactory("APowerOdin");
+    expect(Sov).to.exist;
   });
   before(async function () {
-    xpower = await XPower.deploy([], DEADLINE);
-    expect(xpower).to.exist;
-    await xpower.deployed();
-    await xpower.init();
-  });
-  before(async function () {
-    apower = await APower.deploy(xpower.address, [], DEADLINE);
-    expect(apower).to.exist;
-    await apower.deployed();
+    moe = await Moe.deploy([], DEADLINE);
+    expect(moe).to.exist;
+    await moe.deployed();
+    await moe.init();
+    sov = await Sov.deploy(moe.address, [], DEADLINE);
+    expect(sov).to.exist;
+    await sov.deployed();
   });
   it("should grant & revoke SOV_SEAL_ROLE", async function () {
-    const role = await has_role(apower.SOV_SEAL_ROLE(), {
+    const role = await has_role(sov.SOV_SEAL_ROLE(), {
       has: false,
     });
     await grant_role(role, { granted: true });
     await revoke_role(role, { revoked: true });
   });
   it("should revoke & grant SOV_SEAL_ADMIN_ROLE", async function () {
-    const role = await has_role(apower.SOV_SEAL_ADMIN_ROLE(), {
+    const role = await has_role(sov.SOV_SEAL_ADMIN_ROLE(), {
       has: true,
     });
     await revoke_role(role, { revoked: true });
     await grant_role(role, { granted: true });
   });
   it("should transfer DEFAULT_ADMIN_ROLE", async function () {
-    const role = await has_role(apower.DEFAULT_ADMIN_ROLE(), {
+    const role = await has_role(sov.DEFAULT_ADMIN_ROLE(), {
       has: true,
     });
     await grant_role(role, { granted: true, address: addresses[1] });
@@ -62,14 +60,14 @@ describe("APowerSupervised", async function () {
   });
 });
 async function revoke_role(role, { revoked, address }) {
-  await apower.revokeRole(role, address ?? addresses[0]);
+  await sov.revokeRole(role, address ?? addresses[0]);
   await has_role(role, { has: !revoked });
 }
 async function grant_role(role, { granted, address }) {
   if (granted) {
-    await apower.grantRole(role, address ?? addresses[0]);
+    await sov.grantRole(role, address ?? addresses[0]);
   } else {
-    await apower.grantRole(role, address ?? addresses[0]).catch((ex) => {
+    await sov.grantRole(role, address ?? addresses[0]).catch((ex) => {
       const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
       if (m === null) console.debug(ex);
       expect(m).to.be.not.null;
@@ -79,7 +77,7 @@ async function grant_role(role, { granted, address }) {
 }
 async function has_role(role, { has, address }) {
   const my_role = await role;
-  const has_role = await apower.hasRole(my_role, address ?? addresses[0]);
+  const has_role = await sov.hasRole(my_role, address ?? addresses[0]);
   expect(has_role).to.eq(has);
   return my_role;
 }

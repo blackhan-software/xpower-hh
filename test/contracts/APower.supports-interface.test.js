@@ -5,8 +5,8 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let APower, XPower; // contracts
-let apower, xpower; // instances
+let Moe, Sov; // contracts
+let moe, sov; // instances
 
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
@@ -21,36 +21,34 @@ describe("APower", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    APower = await ethers.getContractFactory("APowerOdin");
-    expect(APower).to.exist;
-    XPower = await ethers.getContractFactory("XPowerOdinTest");
-    expect(XPower).to.exist;
+    Moe = await ethers.getContractFactory("XPowerOdinTest");
+    expect(Moe).to.exist;
+    Sov = await ethers.getContractFactory("APowerOdin");
+    expect(Sov).to.exist;
   });
   before(async function () {
-    xpower = await XPower.deploy([], DEADLINE);
-    expect(xpower).to.exist;
-    await xpower.deployed();
-  });
-  before(async function () {
-    apower = await APower.deploy(xpower.address, [], DEADLINE);
-    expect(apower).to.exist;
-    await apower.deployed();
+    moe = await Moe.deploy([], DEADLINE);
+    expect(moe).to.exist;
+    await moe.deployed();
+    sov = await Sov.deploy(moe.address, [], DEADLINE);
+    expect(sov).to.exist;
+    await sov.deployed();
   });
   describe("supportsInterface", function () {
     it("should support IERC165 interface", async function () {
-      expect(await apower.supportsInterface(0x01ffc9a7)).to.eq(true);
+      expect(await sov.supportsInterface(0x01ffc9a7)).to.eq(true);
     });
     it("should support IERC20 interface", async function () {
-      expect(await apower.supportsInterface(0x36372b07)).to.eq(true);
+      expect(await sov.supportsInterface(0x36372b07)).to.eq(true);
     });
     it("should support IERC20Metadata interface", async function () {
-      expect(await apower.supportsInterface(0xa219a025)).to.eq(true);
+      expect(await sov.supportsInterface(0xa219a025)).to.eq(true);
     });
     it("should support IAccessControl interface", async function () {
-      expect(await apower.supportsInterface(0x7965db0b)).to.eq(true);
+      expect(await sov.supportsInterface(0x7965db0b)).to.eq(true);
     });
     it("should support IAccessControlEnumerable interface", async function () {
-      expect(await apower.supportsInterface(0x5a05180f)).to.eq(true);
+      expect(await sov.supportsInterface(0x5a05180f)).to.eq(true);
     });
   });
 });

@@ -5,10 +5,8 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let APower, XPower; // contracts
-let apower, xpower; // instances
-let Nft, Ppt, NftTreasury; // contracts
-let nft, nft_staked, nft_treasury; // instances
+let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
+let moe, sov, nft, ppt, mty, nty; // instances
 
 const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
@@ -24,50 +22,49 @@ describe("NftTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   beforeEach(async function () {
-    APower = await ethers.getContractFactory("APowerOdin");
-    expect(APower).to.exist;
-    XPower = await ethers.getContractFactory("XPowerOdinTest");
-    expect(XPower).to.exist;
-  });
-  beforeEach(async function () {
+    Sov = await ethers.getContractFactory("APowerOdin");
+    expect(Sov).to.exist;
+    Moe = await ethers.getContractFactory("XPowerOdinTest");
+    expect(Moe).to.exist;
     Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
     Ppt = await ethers.getContractFactory("XPowerPpt");
     expect(Ppt).to.exist;
-    NftTreasury = await ethers.getContractFactory("NftTreasury");
-    expect(NftTreasury).to.exist;
+    Mty = await ethers.getContractFactory("MoeTreasury");
+    expect(Mty).to.exist;
+    Nty = await ethers.getContractFactory("NftTreasury");
+    expect(Nty).to.exist;
   });
   beforeEach(async function () {
-    xpower = await XPower.deploy([], DEADLINE);
-    expect(xpower).to.exist;
-    await xpower.deployed();
+    moe = await Moe.deploy([], DEADLINE);
+    expect(moe).to.exist;
+    await moe.deployed();
+    sov = await Sov.deploy(moe.address, [], DEADLINE);
+    expect(sov).to.exist;
+    await sov.deployed();
   });
   beforeEach(async function () {
-    apower = await APower.deploy(xpower.address, [], DEADLINE);
-    expect(apower).to.exist;
-    await apower.deployed();
-  });
-  beforeEach(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, [xpower.address], [], DEADLINE);
+    nft = await Nft.deploy(NFT_ODIN_URL, [moe.address], [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
+    ppt = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
+    expect(ppt).to.exist;
+    await ppt.deployed();
   });
   beforeEach(async function () {
-    nft_staked = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
-    expect(nft_staked).to.exist;
-    await nft_staked.deployed();
-  });
-  beforeEach(async function () {
-    nft_treasury = await NftTreasury.deploy(nft.address, nft_staked.address);
-    expect(nft_treasury).to.exist;
-    await nft_treasury.deployed();
+    mty = await Mty.deploy([moe.address], [sov.address], ppt.address);
+    expect(mty).to.exist;
+    await mty.deployed();
+    nty = await Nty.deploy(nft.address, ppt.address, mty.address);
+    expect(nty).to.exist;
+    await nty.deployed();
   });
   describe("supportsInterface", function () {
     it("should support IERC165 interface", async function () {
-      expect(await nft_treasury.supportsInterface(0x01ffc9a7)).to.eq(true);
+      expect(await nty.supportsInterface(0x01ffc9a7)).to.eq(true);
     });
     it("should support IERC1155Receiver interface", async function () {
-      expect(await nft_treasury.supportsInterface(0x4e2312e0)).to.eq(true);
+      expect(await nty.supportsInterface(0x4e2312e0)).to.eq(true);
     });
   });
 });
