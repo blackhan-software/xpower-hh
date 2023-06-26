@@ -233,13 +233,16 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 currValue = aprTargetOf(id);
         Rpp.checkValue(nextValue, currValue);
         // check APR reparametrization of stamp
-        Integrator.Item memory last = aprs[id].lastOf();
-        Rpp.checkStamp(block.timestamp, last.stamp, last.meta);
+        Rpp.checkStamp(block.timestamp, _lastStamp[id]);
+        _lastStamp[id] = block.timestamp;
         // append (stamp, apr-of[nft-id]) to integrator
         aprs[id].append(block.timestamp, currValue);
         // all requirements satisfied: use array
         _apr[id] = array;
     }
+
+    /** _lastStamp[id] != aprs[id].lastOf().stamp */
+    mapping(uint256 => uint256) private _lastStamp;
 
     /** batch-set APR parameters (for nft-ids) */
     function setAPRBatch(uint256[] memory nftIds, uint256[] memory array) external onlyRole(APR_ROLE) {
@@ -261,8 +264,7 @@ contract MoeTreasury is MoeTreasurySupervised {
             Integrator.Item memory item = aprs[id].lastOf();
             uint256 target = aprTargetOf(id);
             if (item.stamp == 0 || item.value != target) {
-                // R-tag required for setAPR's Rpp.checkStamp:
-                aprs[id].append(block.timestamp, target, "R");
+                aprs[id].append(block.timestamp, target);
             }
             if (shares[i] > 0) {
                 if (_apr[id].length == 0) {
@@ -400,7 +402,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         Rpp.checkValue(nextValue, currValue);
         // check APR bonus reparametrization of stamp
         Integrator.Item memory last = bonuses[id].lastOf();
-        Rpp.checkStamp(block.timestamp, last.stamp, last.meta);
+        Rpp.checkStamp(block.timestamp, last.stamp);
         // append (stamp, apr-bonus-of[nft-id]) to integrator
         bonuses[id].append(block.timestamp, currValue);
         // all requirements satisfied: use array
