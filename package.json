@@ -75,5 +75,5 @@
     "test": "NODE_OPTIONS='--max-old-space-size=4096' hardhat test",
     "test-gas": "REPORT_GAS=true npm test"
   },
-  "version": "7.1.0"
+  "version": "7.2.0"
 }
