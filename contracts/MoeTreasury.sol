@@ -263,7 +263,10 @@ contract MoeTreasury is MoeTreasurySupervised {
             uint256 id = _ppt.idBy(2021, 3 * i, nftPrefix);
             Integrator.Item memory item = aprs[id].lastOf();
             uint256 target = aprTargetOf(id);
-            if (item.stamp == 0 || item.value != target) {
+            if (item.stamp == 0) {
+                aprs[id].append(block.timestamp - Constants.MONTH, target);
+                aprs[id].append(block.timestamp, target); // laggy init
+            } else if (item.value != target) {
                 aprs[id].append(block.timestamp, target);
             }
             if (shares[i] > 0) {
