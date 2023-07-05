@@ -44,13 +44,13 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
 
     /** mint amount of tokens for beneficiary (after wrapping XPower) */
     function mint(address to, uint256 amount) external onlyOwner {
-        assert(_moe.transferFrom(owner(), (address)(this), _wrapped(amount)));
+        assert(_moe.transferFrom(owner(), address(this), wrappable(amount)));
         _mint(to, amount);
     }
 
-    /** @return wrapped XPower maintaining collateralization (if possible) */
-    function _wrapped(uint256 amount) private view returns (uint256) {
-        uint256 balance = _moe.balanceOf((address)(this));
+    /** @return wrappable XPower maintaining collat (if possible) */
+    function wrappable(uint256 amount) public view returns (uint256) {
+        uint256 balance = _moe.balanceOf(address(this));
         uint256 supply = amount + this.totalSupply();
         if (supply > balance) {
             uint256 treasury = _moe.balanceOf(owner());
@@ -62,7 +62,7 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     /** burn amount of tokens from caller (and then unwrap XPower) */
     function burn(uint256 amount) public override {
         super.burn(amount);
-        _moe.transfer(msg.sender, _unwrapped(amount));
+        _moe.transfer(msg.sender, unwrappable(amount));
     }
 
     /**
@@ -71,12 +71,12 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
      */
     function burnFrom(address account, uint256 amount) public override {
         super.burnFrom(account, amount);
-        _moe.transfer(account, _unwrapped(amount));
+        _moe.transfer(account, unwrappable(amount));
     }
 
-    /** @return unwrapped XPower proportional to burned APower amount */
-    function _unwrapped(uint256 amount) private view returns (uint256) {
-        uint256 balance = _moe.balanceOf((address)(this));
+    /** @return unwrappable XPower proportional to burned APower amount */
+    function unwrappable(uint256 amount) public view returns (uint256) {
+        uint256 balance = _moe.balanceOf(address(this));
         uint256 supply = amount + this.totalSupply();
         if (supply > 0) {
             return (amount * balance) / supply;
@@ -86,7 +86,7 @@ abstract contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
 
     /** @return collateralization ratio with 1'000'000 ~ 100% */
     function collateralization() external view returns (uint256) {
-        uint256 balance = _moe.balanceOf((address)(this));
+        uint256 balance = _moe.balanceOf(address(this));
         uint256 supply = this.totalSupply();
         if (supply > 0) {
             return (1e6 * balance) / supply;

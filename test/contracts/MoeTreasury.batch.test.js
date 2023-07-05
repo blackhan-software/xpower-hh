@@ -197,13 +197,13 @@ describe("MoeTreasury", async function () {
       ]);
       expect(await mty.claimForBatch(account, [nft_id])).to.be.an("object");
       Expect(await mty.rewardOfBatch(account, [nft_id])).to.eq([
-        UNIT_BN.mul(14),
+        UNIT_BN.mul(15),
       ]);
       Expect(await mty.claimedForBatch(account, [nft_id])).to.eq([
-        UNIT_BN.mul(14),
+        UNIT_BN.mul(15),
       ]);
       Expect(await mty.claimableForBatch(account, [nft_id])).to.eq([ZERO]);
-      expect(await mty.moeBalanceOf(2)).to.eq(18n * UNIT);
+      expect(await mty.moeBalanceOf(2)).to.eq(17n * UNIT);
       // wait for +8 months:
       await network.provider.send("evm_increaseTime", [
         Math.round(365.25 * DAYS * 0.667),

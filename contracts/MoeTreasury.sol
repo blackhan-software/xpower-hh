@@ -57,7 +57,7 @@ contract MoeTreasury is MoeTreasurySupervised {
 
     /** @return MOE balance of available tokens */
     function moeBalanceOf(uint256 index) external view returns (uint256) {
-        return _moe[index].balanceOf((address)(this));
+        return _moe[index].balanceOf(address(this));
     }
 
     /** @return index of MOE token address */
@@ -75,7 +75,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         _claimed[account][nftId] += amount;
         XPower moe = _moeOf(_ppt.prefixOf(nftId));
         APower sov = _sovOf(_ppt.prefixOf(nftId));
-        moe.increaseAllowance((address)(sov), amount);
+        moe.increaseAllowance(address(sov), sov.wrappable(amount));
         sov.mint(account, amount);
         emit Claim(account, nftId, amount);
     }
@@ -100,7 +100,7 @@ contract MoeTreasury is MoeTreasurySupervised {
             }
             XPower moe = _moeOf(i + 1);
             APower sov = _sovOf(i + 1);
-            moe.increaseAllowance((address)(sov), subsums[i]);
+            moe.increaseAllowance(address(sov), sov.wrappable(subsums[i]));
             sov.mint(account, subsums[i]);
         }
         emit ClaimBatch(account, nftIds, amounts);

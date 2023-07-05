@@ -205,7 +205,7 @@ describe("MoeTreasury", async function () {
       console.log(
         `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
       );
-      expect(await mty.claimableFor(account, nft_id)).to.eq(40_482n * UNIT);
+      expect(await mty.claimableFor(account, nft_id)).to.eq(39_960n * UNIT);
       expect(await mty.claimFor(account, nft_id)).to.be.an("object");
     });
     it("should reparameterize (per nft.level)", async function () {
@@ -220,7 +220,7 @@ describe("MoeTreasury", async function () {
       console.log(
         `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
       );
-      expect(await mty.claimableFor(account, nft_id)).to.eq(20_705n * UNIT);
+      expect(await mty.claimableFor(account, nft_id)).to.eq(20_832n * UNIT);
       expect(await mty.claimFor(account, nft_id)).to.be.an("object");
     });
   });

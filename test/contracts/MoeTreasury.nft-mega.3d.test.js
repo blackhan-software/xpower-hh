@@ -220,7 +220,7 @@ describe("MoeTreasury", async function () {
       console.log(
         `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
       );
-      expect(await mty.claimableFor(account, nft_id)).to.eq(40_687n * UNIT);
+      expect(await mty.claimableFor(account, nft_id)).to.eq(40_292n * UNIT);
       expect(await mty.claimFor(account, nft_id)).to.be.an("object");
     });
   });
