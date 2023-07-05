@@ -117,7 +117,7 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
 
     /** open emigration for *all* nft-years (deferred by a week) */
     function migratable(bool flag) external onlyRole(NFT_OPEN_ROLE) {
-        if (flag) {
+        if (flag && _migratable == 0) {
             _migratable = block.timestamp + 7 days;
             emit Migratable(_migratable);
         }
