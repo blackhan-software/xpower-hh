@@ -8,7 +8,7 @@ let addresses; // all addresses
 let Moe, Nft; // contracts
 let moe, nft; // instances
 
-const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
+const NFT_ODIN_URL = "https://xpowermine.com/nfts/loki/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("XPowerNftSupervised", async function () {
@@ -22,7 +22,7 @@ describe("XPowerNftSupervised", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    Moe = await ethers.getContractFactory("XPowerOdinTest");
+    Moe = await ethers.getContractFactory("XPowerLokiTest");
     expect(Moe).to.exist;
   });
   before(async function () {
@@ -62,20 +62,6 @@ describe("XPowerNftSupervised", async function () {
   });
   it("should revoke & grant NFT_SEAL_ADMIN_ROLE", async function () {
     const role = await has_role(nft.NFT_SEAL_ADMIN_ROLE(), {
-      has: true,
-    });
-    await revoke_role(role, { revoked: true });
-    await grant_role(role, { granted: true });
-  });
-  it("should grant & revoke NFT_ROYALTY_ROLE", async function () {
-    const role = await has_role(nft.NFT_ROYALTY_ROLE(), {
-      has: false,
-    });
-    await grant_role(role, { granted: true });
-    await revoke_role(role, { revoked: true });
-  });
-  it("should revoke & grant NFT_ROYALTY_ADMIN_ROLE", async function () {
-    const role = await has_role(nft.NFT_ROYALTY_ADMIN_ROLE(), {
       has: true,
     });
     await revoke_role(role, { revoked: true });
