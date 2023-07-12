@@ -8,5 +8,9 @@
   "files.exclude": {
     "cache/": true,
     "coverage/": true
-  }
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python"
+  },
+  "python.formatting.provider": "none"
 }
