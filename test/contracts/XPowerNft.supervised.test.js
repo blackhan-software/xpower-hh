@@ -8,7 +8,7 @@ let addresses; // all addresses
 let Moe, Nft; // contracts
 let moe, nft; // instances
 
-const NFT_ODIN_URL = "https://xpowermine.com/nfts/loki/{id}.json";
+const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("XPowerNftSupervised", async function () {
@@ -22,7 +22,7 @@ describe("XPowerNftSupervised", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    Moe = await ethers.getContractFactory("XPowerLokiTest");
+    Moe = await ethers.getContractFactory("XPowerTest");
     expect(Moe).to.exist;
   });
   before(async function () {
@@ -35,7 +35,7 @@ describe("XPowerNftSupervised", async function () {
     await moe.deployed();
   });
   before(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, [moe.address], [], DEADLINE);
+    nft = await Nft.deploy(moe.address, NFT_XPOW_URL, [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });

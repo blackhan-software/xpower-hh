@@ -25,7 +25,7 @@ describe("XPower", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerLokiTest");
+    XPower = await ethers.getContractFactory("XPowerTest");
   });
   beforeEach(async function () {
     xpower = await XPower.deploy([], DEADLINE);

@@ -8,7 +8,7 @@ let addresses; // all addresses
 let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
 let moe, sov, nft, ppt, mty, nty; // instances
 
-const NFT_ODIN_URL = "https://xpowermine.com/nfts/thor/{id}.json";
+const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const MONTH = 2_629_800; // [seconds]
 
@@ -23,9 +23,9 @@ describe("MoeTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    Moe = await ethers.getContractFactory("XPowerThorTest");
+    Moe = await ethers.getContractFactory("XPowerTest");
     expect(Moe).to.exist;
-    Sov = await ethers.getContractFactory("APowerThor");
+    Sov = await ethers.getContractFactory("APower");
     expect(Sov).to.exist;
     Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
@@ -46,15 +46,15 @@ describe("MoeTreasury", async function () {
     await sov.deployed();
   });
   before(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, [moe.address], [], DEADLINE);
+    nft = await Nft.deploy(moe.address, NFT_XPOW_URL, [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
-    ppt = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
     expect(ppt).to.exist;
     await ppt.deployed();
   });
   before(async function () {
-    mty = await Mty.deploy([moe.address], [sov.address], ppt.address);
+    mty = await Mty.deploy(moe.address, sov.address, ppt.address);
     expect(mty).to.exist;
     await mty.deployed();
     nty = await Nty.deploy(nft.address, ppt.address, mty.address);
@@ -73,7 +73,7 @@ describe("MoeTreasury", async function () {
   describe("set-apr-bonus", async function () {
     it("should reparameterize at 0.010[%] (per nft.year)", async function () {
       const array = [0, 1, 10_000];
-      const tx = await mty.setAPRBonusBatch([1202103], array);
+      const tx = await mty.setAPRBonusBatch([202103], array);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one month", async function () {
@@ -84,7 +84,7 @@ describe("MoeTreasury", async function () {
   describe("set-apr-bonus (monthly doubling for 24 months)", async function () {
     for (let m = 1; m <= 24; m++) {
       it("should print current & target values", async function () {
-        const nft_id = await nft.idBy(new Date().getFullYear() - 1, 3, 1);
+        const nft_id = await nft.idBy(new Date().getFullYear() - 1, 3);
         const tgt = (await mty.aprBonusTargetOf(nft_id)).toString();
         const apr = (await mty.aprBonusOf(nft_id)).toString();
         console.debug("[APR_BONUS]", m, apr, tgt);
@@ -92,7 +92,7 @@ describe("MoeTreasury", async function () {
       const p = pct(m);
       it(`should reparameterize at ${p}[‱] (per nft.year)`, async function () {
         const array = [0, 1, 10_000 * 2 ** m];
-        const tx = await mty.setAPRBonusBatch([1202103], array);
+        const tx = await mty.setAPRBonusBatch([202103], array);
         expect(tx).to.not.eq(undefined);
       });
       it("should forward time by one month", async function () {

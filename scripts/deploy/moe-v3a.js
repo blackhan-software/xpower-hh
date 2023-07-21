@@ -41,27 +41,27 @@ async function main() {
   // migration:
   const deadline = 126_230_400; // 4 years
   //
-  // deploy XPowerThor[New]
+  // deploy XPower[New]
   //
-  const thor_moe = await deploy("XPowerThor", {
+  const thor_moe = await deploy("XPower", {
     moe_base: thor_moe_base,
     deadline,
     owner,
   });
   console.log(`THOR_MOE_V3a=${thor_moe.address}`);
   //
-  // deploy XPowerLoki[New]
+  // deploy XPower[New]
   //
-  const loki_moe = await deploy("XPowerLoki", {
+  const loki_moe = await deploy("XPower", {
     moe_base: loki_moe_base,
     deadline,
     owner,
   });
   console.log(`LOKI_MOE_V3a=${loki_moe.address}`);
   //
-  // deploy XPowerOdin[New]
+  // deploy XPower[New]
   //
-  const odin_moe = await deploy("XPowerOdin", {
+  const odin_moe = await deploy("XPower", {
     moe_base: odin_moe_base,
     deadline,
     owner,

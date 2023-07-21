@@ -1,0 +1,15 @@
+{
+  "name": "UNIT XPOW",
+  "description": "Stakeable UNIT XPOW NFT",
+  "external_url": "https://www.xpowermine.com/nfts?token=XPOW",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmaxCcv7MiQ7xBab9HXqJQHtyCb9ZQCwGDEgjwHU3w2cXU/320x427/2023/Loki/1-Loki_UNIT.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr-default", "value": "0%" },
+    { "trait_type": "apr-bonus", "value": "0‱" },
+    { "trait_type": "issue", "value": "2023" },
+    { "trait_type": "label", "value": "UNIT" },
+    { "trait_type": "level", "max_value": 24, "value": 0 },
+    { "trait_type": "staked", "value": "false" },
+    { "trait_type": "token", "value": "XPOW" }
+  ]
+}

@@ -39,13 +39,7 @@ task("balances-avax", "Prints the list of balances for AVAX coins").setAction(
  * List balances of accounts for XPower tokens
  */
 task("balances-xpow", "Prints the list of balances for XPower tokens")
-  .addVariadicPositionalParam(
-    "tokens",
-    "thor, loki or odin",
-    ["thor", "loki", "odin"],
-    types.string,
-    true
-  )
+  .addVariadicPositionalParam("tokens", "xpow", ["xpow"], types.string, true)
   .setAction(async (args, hre) => {
     const accounts = await hre.ethers.getSigners();
     assert(accounts.length > 0, "missing accounts");
@@ -72,13 +66,7 @@ task("mine", "Mines for XPower tokens")
   .addParam("nonceBytes", "number of nonce bytes", 8, types.int)
   .addParam("refresh", "refresh block-hash", false, types.boolean)
   .addParam("workers", "number of mining processes", workers(), types.int)
-  .addVariadicPositionalParam(
-    "tokens",
-    "thor, loki or odin",
-    ["thor", "loki", "odin"],
-    types.string,
-    true
-  )
+  .addVariadicPositionalParam("tokens", "xpow", ["xpow"], types.string, true)
   .setAction(async (args, hre) => {
     const accounts = await hre.ethers.getSigners();
     assert(accounts.length > 0, "missing accounts");

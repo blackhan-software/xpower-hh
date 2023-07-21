@@ -13,7 +13,7 @@ let UNIT; // decimals
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
+const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const DAYS = 86_400; // [seconds]
 
@@ -30,7 +30,7 @@ describe("XPowerNft", async function () {
   before(async function () {
     Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
-    Moe = await ethers.getContractFactory("XPowerLoki");
+    Moe = await ethers.getContractFactory("XPower");
     expect(Moe).to.exist;
   });
   beforeEach(async function () {
@@ -55,12 +55,12 @@ describe("XPowerNft", async function () {
     expect(UNIT >= 1n).to.be.true;
   });
   beforeEach(async function () {
-    nft_old = await Nft.deploy(NFT_LOKI_URL, [moe_old.address], [], DEADLINE);
+    nft_old = await Nft.deploy(moe_old.address, NFT_XPOW_URL, [], DEADLINE);
     expect(nft_old).to.exist;
     await nft_old.deployed();
     nft_new = await Nft.deploy(
-      NFT_LOKI_URL,
-      [moe_new.address],
+      moe_new.address,
+      NFT_XPOW_URL,
       [nft_old.address],
       DEADLINE
     );
@@ -221,10 +221,8 @@ async function moeMint(n) {
 async function nftMint(n, l = 0) {
   const year = (await nft_old.year()).toNumber();
   expect(year).to.be.greaterThan(0);
-  const moe_index = await nft_old.moeIndexOf(moe_old.address);
-  await nft_old.mint(addresses[0], l, n, moe_index);
-  const moe_prefix = await moe_old.prefix();
-  const nft_id = (await nft_old.idBy(year, l, moe_prefix)).toNumber();
+  await nft_old.mint(addresses[0], l, n);
+  const nft_id = (await nft_old.idBy(year, l)).toNumber();
   expect(nft_id).to.be.greaterThan(0);
   const nft_balance = await nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(n);
@@ -233,15 +231,13 @@ async function nftMint(n, l = 0) {
   const nft_exists = await nft_old.exists(nft_id);
   expect(nft_exists).to.eq(true);
   const nft_url = await nft_old.uri(nft_id);
-  expect(nft_url).to.eq(NFT_LOKI_URL);
+  expect(nft_url).to.eq(NFT_XPOW_URL);
 }
 async function nftMintBatch(n, l = 0) {
   const year = (await nft_old.year()).toNumber();
   expect(year).to.be.greaterThan(0);
-  const moe_index = await nft_old.moeIndexOf(moe_old.address);
-  await nft_old.mintBatch(addresses[0], [l], [n], moe_index);
-  const moe_prefix = await moe_old.prefix();
-  const nft_ids = await nft_old.idsBy(year, [l], moe_prefix);
+  await nft_old.mintBatch(addresses[0], [l], [n]);
+  const nft_ids = await nft_old.idsBy(year, [l]);
   expect(nft_ids.length).to.be.greaterThan(0);
   const nft_id = nft_ids[0].toNumber();
   expect(nft_id).to.be.greaterThan(0);
@@ -252,7 +248,7 @@ async function nftMintBatch(n, l = 0) {
   const nft_exists = await nft_old.exists(nft_id);
   expect(nft_exists).to.eq(true);
   const nft_url = await nft_old.uri(nft_id);
-  expect(nft_url).to.eq(NFT_LOKI_URL);
+  expect(nft_url).to.eq(NFT_XPOW_URL);
 }
 async function nftApprove(op) {
   const set_approval = await nft_old.setApprovalForAll(op, true);
@@ -262,8 +258,7 @@ async function nftApprove(op) {
 }
 async function nftMigrate(n, l = 0) {
   const year = await nft_new.year();
-  const moe_prefix = await moe_old.prefix();
-  const nft_id = await nft_new.idBy(year, l, moe_prefix);
+  const nft_id = await nft_new.idBy(year, l);
   const nft_index = await nft_new.oldIndexOf(nft_old.address);
   const moe_index = await moe_new.oldIndexOf(moe_old.address);
   const tx0 = await nft_old.grantRole(nft_old.NFT_OPEN_ROLE(), addresses[0]);
@@ -283,8 +278,7 @@ async function nftMigrate(n, l = 0) {
 }
 async function nftMigrateBatch(n, l = 0) {
   const year = await nft_new.year();
-  const moe_prefix = await moe_old.prefix();
-  const nft_id = await nft_new.idBy(year, l, moe_prefix);
+  const nft_id = await nft_new.idBy(year, l);
   const nft_index = await nft_new.oldIndexOf(nft_old.address);
   const moe_index = await moe_new.oldIndexOf(moe_old.address);
   const tx0 = await nft_old.grantRole(nft_old.NFT_OPEN_ROLE(), addresses[0]);

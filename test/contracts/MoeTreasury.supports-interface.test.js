@@ -5,12 +5,10 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Nft, Ppt, Mty, Nty; // contracts
-let nft, ppt, mty, nty; // instances
-let AThor, XThor, ALoki, XLoki, AOdin, XOdin; // contracts
-let athor, xthor, aloki, xloki, aodin, xodin; // instances
+let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
+let moe, sov, nft, ppt, mty, nty; // instances
 
-const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
+const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("MoeTreasury", async function () {
@@ -24,20 +22,10 @@ describe("MoeTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   beforeEach(async function () {
-    AThor = await ethers.getContractFactory("APowerThor");
-    expect(AThor).to.exist;
-    XThor = await ethers.getContractFactory("XPowerThorTest");
-    expect(XThor).to.exist;
-    ALoki = await ethers.getContractFactory("APowerLoki");
-    expect(ALoki).to.exist;
-    XLoki = await ethers.getContractFactory("XPowerLokiTest");
-    expect(XLoki).to.exist;
-    AOdin = await ethers.getContractFactory("APowerOdin");
-    expect(AOdin).to.exist;
-    XOdin = await ethers.getContractFactory("XPowerOdinTest");
-    expect(XOdin).to.exist;
-  });
-  beforeEach(async function () {
+    Sov = await ethers.getContractFactory("APower");
+    expect(Sov).to.exist;
+    Moe = await ethers.getContractFactory("XPowerTest");
+    expect(Moe).to.exist;
     Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
     Ppt = await ethers.getContractFactory("XPowerPpt");
@@ -48,44 +36,24 @@ describe("MoeTreasury", async function () {
     expect(Nty).to.exist;
   });
   beforeEach(async function () {
-    xthor = await XThor.deploy([], DEADLINE);
-    expect(xthor).to.exist;
-    await xthor.deployed();
-    await xthor.init();
-    xloki = await XLoki.deploy([], DEADLINE);
-    expect(xloki).to.exist;
-    await xloki.deployed();
-    await xloki.init();
-    xodin = await XOdin.deploy([], DEADLINE);
-    expect(xodin).to.exist;
-    await xodin.deployed();
-    await xodin.init();
+    moe = await Moe.deploy([], DEADLINE);
+    expect(moe).to.exist;
+    await moe.deployed();
+    await moe.init();
+    sov = await Sov.deploy(moe.address, [], DEADLINE);
+    expect(sov).to.exist;
+    await sov.deployed();
   });
   beforeEach(async function () {
-    athor = await AThor.deploy(xthor.address, [], DEADLINE);
-    expect(athor).to.exist;
-    await athor.deployed();
-    aloki = await ALoki.deploy(xloki.address, [], DEADLINE);
-    expect(aloki).to.exist;
-    await aloki.deployed();
-    aodin = await AOdin.deploy(xodin.address, [], DEADLINE);
-    expect(aodin).to.exist;
-    await aodin.deployed();
-  });
-  beforeEach(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, [xodin.address], [], DEADLINE);
+    nft = await Nft.deploy(moe.address, NFT_XPOW_URL, [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
-    ppt = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
     expect(ppt).to.exist;
     await ppt.deployed();
   });
   beforeEach(async function () {
-    mty = await Mty.deploy(
-      [xthor.address, xloki.address, xodin.address],
-      [athor.address, aloki.address, aodin.address],
-      ppt.address
-    );
+    mty = await Mty.deploy(moe.address, sov.address, ppt.address);
     expect(mty).to.exist;
     await mty.deployed();
     nty = await Nty.deploy(nft.address, ppt.address, mty.address);

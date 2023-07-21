@@ -3,12 +3,10 @@
 pragma solidity ^0.8.0;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ERC2981} from "@openzeppelin/contracts/token/common/ERC2981.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import {ERC1155Supply} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import {ERC1155Burnable} from "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 
-import {Constants} from "../libs/Constants.sol";
 import {Nft} from "../libs/Nft.sol";
 import {NftMigratable} from "./NftMigratable.sol";
 import {NftRoyalty} from "./NftRoyalty.sol";
@@ -42,14 +40,14 @@ abstract contract NftBase is ERC1155, ERC1155Supply, ERC1155Burnable, URIMalleab
         symbol = nftSymbol;
     }
 
-    /** @return nft-id composed of (year, level, prefix) */
-    function idBy(uint256 anno, uint256 level, uint256 prefix) public pure returns (uint256) {
-        return Nft.idBy(anno, level, prefix);
+    /** @return nft-id composed of (year, level) */
+    function idBy(uint256 anno, uint256 level) public pure returns (uint256) {
+        return Nft.idBy(anno, level);
     }
 
-    /** @return nft-ids composed of [(year, level, prefix) for level in levels] */
-    function idsBy(uint256 anno, uint256[] memory levels, uint256 prefix) public pure returns (uint256[] memory) {
-        return Nft.idsBy(anno, levels, prefix);
+    /** @return nft-ids composed of [(year, level) for level in levels] */
+    function idsBy(uint256 anno, uint256[] memory levels) public pure returns (uint256[] memory) {
+        return Nft.idsBy(anno, levels);
     }
 
     /** @return denomination of level (1, 1'000, 1'000'000, ...) */
@@ -60,11 +58,6 @@ abstract contract NftBase is ERC1155, ERC1155Supply, ERC1155Burnable, URIMalleab
     /** @return level of nft-id (0, 3, 6, ...) */
     function levelOf(uint256 nftId) public pure returns (uint256) {
         return Nft.levelOf(nftId);
-    }
-
-    /** @return prefix of nft-id (1, 2, 3, ...) */
-    function prefixOf(uint256 nftId) public pure returns (uint256) {
-        return Nft.prefixOf(nftId);
     }
 
     /** @return year of nft-id (2021, 2022, ...) */

@@ -48,17 +48,10 @@ if [ -z "$MINE_WORKERS" ] ; then
 fi
 
 #######################################################################
-# TOKEN="thor loki odin"
-
-if [ -z "$TOKEN" ] ; then
-    export TOKEN="thor loki odin"
-fi
-
-#######################################################################
 # Start miner (and restart on error):
 
 while true ; do
-    /usr/local/bin/npx hardhat mine $TOKEN \
+    /usr/local/bin/npx hardhat mine \
         --cache true \
         --json true \
         --level "$MINE_LEVEL" \

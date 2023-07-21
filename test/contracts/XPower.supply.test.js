@@ -74,51 +74,9 @@ let supply; // { total, other's, fund's }
 
 const DEADLINE = 1_814_400; // [seconds] i.e. 3 weeks
 
-describe("THOR Supply", async () => {
+describe("XPOW Supply", async () => {
   before(async () => {
-    XPower = await ethers.getContractFactory("XPowerThorTest");
-    xpower = await XPower.deploy([], DEADLINE);
-    await xpower.deployed();
-    await xpower.renounceOwnership();
-  });
-  beforeEach(async function () {
-    const decimals = await xpower.decimals();
-    expect(decimals).to.greaterThan(0);
-    UNIT = 10n ** BigInt(decimals);
-    expect(UNIT >= 1n).to.be.true;
-  });
-  before(async () => {
-    supply = await supplyOf(xpower);
-  });
-  describe("calculation", async () => {
-    it("should count maximum supply as 1.157920892373162e+76 tokens", async () => {
-      expect(supply.total).to.eq(
-        11579208923731619542357098500868790785326998466564056403945758400791312963993n *
-          UNIT +
-          UNIT / 2n
-      );
-    });
-    it("should count other's supply as 7.719472615821079e+75 tokens", async () => {
-      expect(supply.others).to.eq(
-        7719472615821079694904732333912527190217998977709370935963838933860875309329n *
-          UNIT
-      );
-    });
-    it("should count owner's supply as 3.859736307910540e+75 tokens", async () => {
-      expect(supply.owners).to.eq(
-        3859736307910539847452366166956263595108999488854685467981919466930437654664n *
-          UNIT +
-          UNIT / 2n
-      );
-    });
-    it("should count fund's supply share as 33.33%", async () => {
-      expect(supply.total.div(3)).to.eq(supply.owners);
-    });
-  });
-});
-describe("LOKI Supply", async () => {
-  before(async () => {
-    XPower = await ethers.getContractFactory("XPowerLokiTest");
+    XPower = await ethers.getContractFactory("XPowerTest");
     xpower = await XPower.deploy([], DEADLINE);
     await xpower.deployed();
     await xpower.renounceOwnership();
@@ -148,46 +106,6 @@ describe("LOKI Supply", async () => {
     it("should count owner's supply as 4.135431758475579e+75 tokens", async () => {
       expect(supply.owners).to.eq(
         4135431758475578407984678036024568137616785166630020144265683473708550717440n *
-          UNIT
-      );
-    });
-    it("should count fund's supply share as 33.33%", async () => {
-      expect(supply.total.div(3)).to.eq(supply.owners);
-    });
-  });
-});
-describe("ODIN Supply", async () => {
-  before(async () => {
-    XPower = await ethers.getContractFactory("XPowerOdinTest");
-    xpower = await XPower.deploy([], DEADLINE);
-    await xpower.deployed();
-    await xpower.renounceOwnership();
-  });
-  beforeEach(async function () {
-    const decimals = await xpower.decimals();
-    expect(decimals).to.greaterThan(0);
-    UNIT = 10n ** BigInt(decimals);
-    expect(UNIT >= 1n).to.be.true;
-  });
-  before(async () => {
-    supply = await supplyOf(xpower, -15);
-  });
-  describe("calculation", async () => {
-    it("should count maximum supply as 7.967943140642821e+78 tokens", async () => {
-      expect(supply.total).to.eq(
-        7967943140642820697584478405910336659153140819804391312965175107630913290240000n *
-          UNIT
-      );
-    });
-    it("should count other's supply as 5.311962093761881e+78 tokens", async () => {
-      expect(supply.others).to.eq(
-        5311962093761880465056318937273557772768760546536260875310116738420608860160000n *
-          UNIT
-      );
-    });
-    it("should count owner's supply as 2.655981046880940e+78 tokens", async () => {
-      expect(supply.owners).to.eq(
-        2655981046880940232528159468636778886384380273268130437655058369210304430080000n *
           UNIT
       );
     });

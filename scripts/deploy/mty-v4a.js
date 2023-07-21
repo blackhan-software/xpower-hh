@@ -39,7 +39,7 @@ async function main() {
   // deploy THOR NftTreasury[New]:
   //
   const thor_treasury = await deploy("MoeTreasury", {
-    moe_links: [thor_moe_link, loki_moe_link, odin_moe_link],
+    moe_links: [thor_moe_link],
     ppt_link: thor_ppt_link,
   });
   console.log(`THOR_MTY_V4a=${thor_treasury.address}`);
@@ -47,7 +47,7 @@ async function main() {
   // deploy LOKI NftTreasury[New]:
   //
   const loki_treasury = await deploy("MoeTreasury", {
-    moe_links: [thor_moe_link, loki_moe_link, odin_moe_link],
+    moe_links: [loki_moe_link],
     ppt_link: loki_ppt_link,
   });
   console.log(`LOKI_MTY_V4a=${loki_treasury.address}`);
@@ -55,7 +55,7 @@ async function main() {
   // deploy ODIN NftTreasury[New]:
   //
   const odin_treasury = await deploy("MoeTreasury", {
-    moe_links: [thor_moe_link, loki_moe_link, odin_moe_link],
+    moe_links: [odin_moe_link],
     ppt_link: odin_ppt_link,
   });
   console.log(`ODIN_MTY_V4a=${odin_treasury.address}`);
@@ -63,8 +63,8 @@ async function main() {
 async function deploy(mty_name, { moe_links, sov_links, ppt_link }) {
   const mty_factory = await hre.ethers.getContractFactory(mty_name);
   const mty_contract = await mty_factory.deploy(
-    moe_links,
-    sov_links ?? [],
+    moe_links[0],
+    sov_links ?? '0x0000000000000000000000000000000000000000',
     ppt_link
   );
   await wait(mty_contract.deployTransaction);

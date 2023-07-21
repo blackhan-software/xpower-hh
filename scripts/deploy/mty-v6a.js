@@ -37,40 +37,40 @@ async function main() {
   const xpow_ppt_link = process.env.XPOW_PPT_V6a;
   assert(xpow_ppt_link, "missing XPOW_PPT_V6a");
   //
-  // deploy THOR NftTreasury[New] & re-own APowerThor[New]:
+  // deploy THOR NftTreasury[New] & re-own APower[New]:
   //
   const thor_treasury = await deploy("MoeTreasury", {
     moe_links: [thor_moe_link],
     sov_links: [thor_sov_link],
     ppt_link: xpow_ppt_link,
   });
-  await transfer("APowerThor", {
+  await transfer("APower", {
     sov_link: thor_sov_link,
     treasury: thor_treasury,
   });
   console.log(`THOR_MTY_V6a=${thor_treasury.address}`);
   //
-  // deploy LOKI NftTreasury[New] & re-own APowerLoki[New]:
+  // deploy LOKI NftTreasury[New] & re-own APower[New]:
   //
   const loki_treasury = await deploy("MoeTreasury", {
     moe_links: [loki_moe_link],
     sov_links: [loki_sov_link],
     ppt_link: xpow_ppt_link,
   });
-  await transfer("APowerLoki", {
+  await transfer("APower", {
     sov_link: loki_sov_link,
     treasury: loki_treasury,
   });
   console.log(`LOKI_MTY_V6a=${loki_treasury.address}`);
   //
-  // deploy ODIN NftTreasury[New] & re-own APowerOdin[New]:
+  // deploy ODIN NftTreasury[New] & re-own APower[New]:
   //
   const odin_treasury = await deploy("MoeTreasury", {
     moe_links: [odin_moe_link],
     sov_links: [odin_sov_link],
     ppt_link: xpow_ppt_link,
   });
-  await transfer("APowerOdin", {
+  await transfer("APower", {
     sov_link: odin_sov_link,
     treasury: odin_treasury,
   });
@@ -78,7 +78,7 @@ async function main() {
 }
 async function deploy(mty_name, { moe_links, sov_links, ppt_link }) {
   const mty_factory = await hre.ethers.getContractFactory(mty_name);
-  const mty_contract = await mty_factory.deploy(moe_links, sov_links, ppt_link);
+  const mty_contract = await mty_factory.deploy(moe_links[0], sov_links[0], ppt_link);
   await wait(mty_contract.deployTransaction);
   return mty_contract;
 }

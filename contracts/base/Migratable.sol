@@ -16,7 +16,7 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
     /** burnable ERC20 tokens */
     ERC20Burnable[] private _base;
     /** base address to index map */
-    mapping(address => uint) private _index;
+    mapping(address => uint256) private _index;
     /** timestamp of immigration deadline */
     uint256 private _deadlineBy;
     /** flag to seal immigration */

@@ -51,27 +51,27 @@ async function main() {
   // migration:
   const deadline = 126_230_400; // 4 years
   //
-  // deploy APowerThor[New]
+  // deploy APower[New]
   //
-  const thor = await deploy("APowerThor", {
+  const thor = await deploy("APower", {
     moe_link: thor_moe_link,
     sov_base: thor_sov_base,
     deadline,
   });
   console.log(`THOR_SOV_V7c=${thor.sov.address}`);
   //
-  // deploy APowerLoki[New]
+  // deploy APower[New]
   //
-  const loki = await deploy("APowerLoki", {
+  const loki = await deploy("APower", {
     moe_link: loki_moe_link,
     sov_base: loki_sov_base,
     deadline,
   });
   console.log(`LOKI_SOV_V7c=${loki.sov.address}`);
   //
-  // deploy APowerOdin[New]
+  // deploy APower[New]
   //
-  const odin = await deploy("APowerOdin", {
+  const odin = await deploy("APower", {
     moe_link: odin_moe_link,
     sov_base: odin_sov_base,
     deadline,
@@ -80,9 +80,9 @@ async function main() {
   //
   // verify contract(s):
   //
-  await verify("APowerThor", thor.sov, thor_moe_link, thor_sov_base, deadline);
-  await verify("APowerLoki", loki.sov, loki_moe_link, loki_sov_base, deadline);
-  await verify("APowerOdin", odin.sov, odin_moe_link, odin_sov_base, deadline);
+  await verify("APower", thor.sov, thor_moe_link, thor_sov_base, deadline);
+  await verify("APower", loki.sov, loki_moe_link, loki_sov_base, deadline);
+  await verify("APower", odin.sov, odin_moe_link, odin_sov_base, deadline);
 }
 async function deploy(name, { moe_link, sov_base, deadline }) {
   const factory = await hre.ethers.getContractFactory(name);

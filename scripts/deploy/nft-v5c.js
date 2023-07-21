@@ -57,8 +57,8 @@ async function main() {
   // deploy XPowerNft[New]:
   //
   const thor = await deploy("XPowerNft", {
-    nft_uri: xpow_nft_uri,
     moe_link: [thor_moe_link],
+    nft_uri: xpow_nft_uri,
     nft_base: thor_nft_base,
     deadline,
     owner,
@@ -68,8 +68,8 @@ async function main() {
   // deploy XPowerNft[New]:
   //
   const loki = await deploy("XPowerNft", {
-    nft_uri: xpow_nft_uri,
     moe_link: [loki_moe_link],
+    nft_uri: xpow_nft_uri,
     nft_base: loki_nft_base,
     deadline,
     owner,
@@ -79,8 +79,8 @@ async function main() {
   // deploy XPowerNft[New]:
   //
   const odin = await deploy("XPowerNft", {
-    nft_uri: xpow_nft_uri,
     moe_link: [odin_moe_link],
+    nft_uri: xpow_nft_uri,
     nft_base: odin_nft_base,
     deadline,
     owner,
@@ -92,31 +92,31 @@ async function main() {
   await verify(
     "XPowerNft",
     thor.nft,
-    xpow_nft_uri,
     thor_moe_link,
+    xpow_nft_uri,
     thor_nft_base,
     deadline
   );
   await verify(
     "XPowerNft",
     loki.nft,
-    xpow_nft_uri,
     loki_moe_link,
+    xpow_nft_uri,
     loki_nft_base,
     deadline
   );
   await verify(
     "XPowerNft",
     odin.nft,
-    xpow_nft_uri,
     odin_moe_link,
+    xpow_nft_uri,
     odin_nft_base,
     deadline
   );
 }
-async function deploy(name, { nft_uri, moe_link, nft_base, deadline, owner }) {
+async function deploy(name, { moe_link, nft_uri, nft_base, deadline, owner }) {
   const factory = await hre.ethers.getContractFactory(name);
-  const contract = await factory.deploy(nft_uri, moe_link, nft_base, deadline);
+  const contract = await factory.deploy(moe_link[0], nft_uri, nft_base, deadline);
   await wait(contract.deployTransaction);
   const transfer = await contract.transferOwnership(owner);
   await wait(transfer);

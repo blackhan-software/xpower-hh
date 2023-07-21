@@ -1,0 +1,14 @@
+{
+  "name": "ZETTA XPOW",
+  "description": "Staked ZETTA XPOW NFT",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmSdo3XVCj388jAhyFvfkKfersEZHV5bMDS4sDt6J74nsB/320x427/2023/Loki/8-Loki_ZETTA.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr-default", "value": "7%" },
+    { "trait_type": "apr-bonus", "value": "0‱" },
+    { "trait_type": "issue", "value": "2023" },
+    { "trait_type": "label", "value": "ZETA" },
+    { "trait_type": "level", "max_value": 24, "value": 21 },
+    { "trait_type": "staked", "value": "true" },
+    { "trait_type": "token", "value": "XPOW" }
+  ]
+}

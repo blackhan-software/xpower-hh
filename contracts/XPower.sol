@@ -18,12 +18,11 @@ import {Polynomials, Polynomial} from "./libs/Polynomials.sol";
 import {Rpp} from "./libs/Rpp.sol";
 
 /**
- * Abstract base class for the XPower THOR, LOKI and ODIN proof-of-work tokens.
- * It verifies, that the nonce & the block-hash do result in a positive amount,
- * (as specified by the sub-classes). After the verification, the corresponding
- * amount of tokens are minted for the beneficiary (plus the treasury).
+ * Class for the XPOW proof-of-work tokens: It verifies, that the nonce and the
+ * block-hash result in a positive amount. After a successful verification, the
+ * corresponding amount is minted for the beneficiary (plus the treasury).
  */
-abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSupervised, Ownable {
+contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSupervised, Ownable {
     using Integrator for Integrator.Item[];
     using Polynomials for Polynomial;
 
@@ -34,16 +33,14 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     /** map from intervals to block-hashes */
     mapping(uint256 => bytes32) private _blockHashes;
 
-    /** @param symbol short token symbol */
     /** @param moeBase addresses of old contracts */
     /** @param deadlineIn seconds to end-of-migration */
     constructor(
-        string memory symbol,
         address[] memory moeBase,
         uint256 deadlineIn
     )
         // ERC20 constructor: name, symbol
-        ERC20("XPower", symbol)
+        ERC20("XPower", "XPOW")
         // Migratable: old contract, rel. deadline [seconds]
         Migratable(moeBase, deadlineIn)
     {}
@@ -135,7 +132,9 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
     }
 
     /** @return amount (for level) */
-    function amountOf(uint256 level) public view virtual returns (uint256);
+    function amountOf(uint256 level) public view returns (uint256) {
+        return (2 ** level - 1) * 10 ** decimals();
+    }
 
     /** integrator of shares: [(stamp, value)] */
     Integrator.Item[] public shares;
@@ -163,7 +162,7 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         return Polynomial(array).eval3(amount);
     }
 
-    /** fractional treasury share: 50[%] */
+    /** fractional treasury share: 33[%] */
     uint256 private constant SHARE_MUL = 1;
     uint256 private constant SHARE_DIV = 2;
 
@@ -202,99 +201,13 @@ abstract contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPo
         return super.supportsInterface(interfaceId);
     }
 
-    /** @return prefix of token */
-    function prefix() external pure virtual returns (uint256);
-
     /** @return fee-estimate plus averages over gas and gas-price */
-    function fees() external view virtual returns (uint256[] memory);
-}
-
-/**
- * Allow mining & minting for THOR proof-of-work tokens, where the rewarded
- * amount equals to *only* |leading-zeros(nonce-hash)|.
- */
-contract XPowerThor is XPower {
-    /** @param moeBase addresses of old contracts */
-    /** @param deadlineIn seconds to end-of-migration */
-    constructor(address[] memory moeBase, uint256 deadlineIn) XPower("THOR", moeBase, deadlineIn) {}
-
-    /** @return amount (for level) */
-    function amountOf(uint256 level) public view override returns (uint256) {
-        return level * 10 ** decimals();
-    }
-
-    /** @return prefix of token */
-    function prefix() external pure override returns (uint256) {
-        return 1;
-    }
-
-    /** @return fee-estimate plus averages over gas and gas-price */
-    function fees() external view override returns (uint256[] memory) {
-        return _fees(FEE_ADD, FEE_MUL, FEE_DIV);
-    }
-
-    /** fee-tracker estimate: 21_000+700+1360+1088+68*8 */
-    uint256 private constant FEE_ADD = 24_692_000_000_000;
-    uint256 private constant FEE_MUL = 1_0458328452407883;
-    uint256 private constant FEE_DIV = 1_0000000000000000;
-}
-
-/**
- * Allow mining & minting for LOKI proof-of-work tokens, where the rewarded
- * amount equals to 2 ^ |leading-zeros(nonce-hash)| - 1.
- */
-contract XPowerLoki is XPower {
-    /** @param moeBase addresses of old contracts */
-    /** @param deadlineIn seconds to end-of-migration */
-    constructor(address[] memory moeBase, uint256 deadlineIn) XPower("LOKI", moeBase, deadlineIn) {}
-
-    /** @return amount (for level) */
-    function amountOf(uint256 level) public view override returns (uint256) {
-        return (2 ** level - 1) * 10 ** decimals();
-    }
-
-    /** @return prefix of token */
-    function prefix() external pure override returns (uint256) {
-        return 2;
-    }
-
-    /** @return fee-estimate plus averages over gas and gas-price */
-    function fees() external view override returns (uint256[] memory) {
+    function fees() external view returns (uint256[] memory) {
         return _fees(FEE_ADD, FEE_MUL, FEE_DIV);
     }
 
     /** fee-tracker estimate: 21_000+700+1360+1088+68*8 */
     uint256 private constant FEE_ADD = 24_692_000_000_000;
     uint256 private constant FEE_MUL = 1_0456706376942937;
-    uint256 private constant FEE_DIV = 1_0000000000000000;
-}
-
-/**
- * Allow mining & minting for ODIN proof-of-work tokens, where the rewarded
- * amount equals to 16 ^ |leading-zeros(nonce-hash)| - 1.
- */
-contract XPowerOdin is XPower {
-    /** @param moeBase addresses of old contracts */
-    /** @param deadlineIn seconds to end-of-migration */
-    constructor(address[] memory moeBase, uint256 deadlineIn) XPower("ODIN", moeBase, deadlineIn) {}
-
-    /** @return amount (for level) */
-    function amountOf(uint256 level) public view override returns (uint256) {
-        return (16 ** level - 1) * 10 ** decimals();
-    }
-
-    /** @return prefix of token */
-    function prefix() external pure override returns (uint256) {
-        return 3;
-    }
-
-    /** @return fee-estimate plus averages over gas and gas-price */
-    function fees() external view override returns (uint256[] memory) {
-        return _fees(FEE_ADD, FEE_MUL, FEE_DIV);
-    }
-
-    /** fee-tracker estimate: 21_000+700+1360+1088+68*8 */
-    uint256 private constant FEE_ADD = 24_692_000_000_000;
-    uint256 private constant FEE_MUL = 1_0458007392761395;
     uint256 private constant FEE_DIV = 1_0000000000000000;
 }

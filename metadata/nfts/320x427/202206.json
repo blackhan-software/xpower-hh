@@ -1,0 +1,15 @@
+{
+  "name": "MEGA XPOW",
+  "description": "Stakeable MEGA XPOW NFT",
+  "external_url": "https://www.xpowermine.com/nfts?token=XPOW",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmaxCcv7MiQ7xBab9HXqJQHtyCb9ZQCwGDEgjwHU3w2cXU/320x427/2022/Loki/3-Loki_MEGA.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr-default", "value": "2%" },
+    { "trait_type": "apr-bonus", "value": "1‱" },
+    { "trait_type": "issue", "value": "2022" },
+    { "trait_type": "label", "value": "MEGA" },
+    { "trait_type": "level", "max_value": 24, "value": 6 },
+    { "trait_type": "staked", "value": "false" },
+    { "trait_type": "token", "value": "XPOW" }
+  ]
+}

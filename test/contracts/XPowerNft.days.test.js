@@ -8,7 +8,7 @@ let addresses; // all addresses
 let Moe, Nft; // contracts
 let moe, nft; // instances
 
-const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
+const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 0; // [seconds]
 
 const moment = require("moment");
@@ -26,7 +26,7 @@ describe("XPowerNft", async function () {
   before(async function () {
     Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
-    Moe = await ethers.getContractFactory("XPowerLoki");
+    Moe = await ethers.getContractFactory("XPower");
     expect(Moe).to.exist;
   });
   before(async function () {
@@ -37,7 +37,7 @@ describe("XPowerNft", async function () {
     await moe.init();
   });
   before(async function () {
-    nft = await Nft.deploy(NFT_LOKI_URL, [moe.address], [], DEADLINE);
+    nft = await Nft.deploy(moe.address, NFT_XPOW_URL, [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
   });

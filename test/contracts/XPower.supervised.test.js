@@ -21,7 +21,7 @@ describe("XPowerSupervised", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerOdinTest");
+    XPower = await ethers.getContractFactory("XPowerTest");
     expect(XPower).to.exist;
   });
   before(async function () {

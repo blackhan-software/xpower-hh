@@ -13,8 +13,8 @@ import {NftBase} from "./base/NftBase.sol";
 contract XPowerPpt is NftBase {
     /** map of age: account => nft-id => accumulator [seconds] */
     mapping(address => mapping(uint256 => int256)) private _age;
-    /** map of levels: nft-prefix => nft-level => accumulator */
-    mapping(uint256 => int256[34]) private _shares;
+    /** map of levels: nft-level => accumulator */
+    int256[34] private _shares;
 
     /** @param pptUri meta-data URI */
     /** @param pptBase addresses of old contracts */
@@ -90,8 +90,8 @@ contract XPowerPpt is NftBase {
     }
 
     /** @return share accumulators */
-    function sharesBy(uint256 nftPrefix) external view returns (int256[34] memory) {
-        return _shares[nftPrefix];
+    function shares() external view returns (int256[34] memory) {
+        return _shares;
     }
 
     /** remember mint action */
@@ -120,8 +120,7 @@ contract XPowerPpt is NftBase {
     function _memoMint(address to, uint256 nftId, uint256 amount) private {
         _pushMint(to, nftId, amount);
         uint256 level = levelOf(nftId);
-        uint256 prefix = prefixOf(nftId);
-        _shares[prefix][level / 3] += int256(amount * 10 ** level);
+        _shares[level / 3] += int256(amount * 10 ** level);
     }
 
     /** remember mint actions (incl. accumulators) */
@@ -134,8 +133,7 @@ contract XPowerPpt is NftBase {
     function _memoBurn(address from, uint256 nftId, uint256 amount) private {
         _pushBurn(from, nftId, amount);
         uint256 level = levelOf(nftId);
-        uint256 prefix = prefixOf(nftId);
-        _shares[prefix][level / 3] -= int256(amount * 10 ** level);
+        _shares[level / 3] -= int256(amount * 10 ** level);
     }
 
     /** remember burn actions (incl. accumulators) */

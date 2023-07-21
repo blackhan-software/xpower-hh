@@ -5,16 +5,14 @@ const { ethers, network } = require("hardhat");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Nft, Ppt, Nty, Mty; // contracts
-let nft, ppt, nty, mty; // instances
-let AThor, XThor, ALoki, XLoki, AOdin, XOdin; // contracts
-let athor, xthor, aloki, xloki, aodin, xodin; // instances
+let Moe, Sov, Nft, Ppt, Nty, Mty; // contracts
+let moe, sov, nft, ppt, nty, mty; // instances
 let UNIT; // decimals
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NFT_LOKI_URL = "https://xpowermine.com/nfts/odin/{id}.json";
+const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const DAYS = 86_400; // [seconds]
 
@@ -29,20 +27,10 @@ describe("MoeTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    AThor = await ethers.getContractFactory("APowerThor");
-    expect(AThor).to.exist;
-    XThor = await ethers.getContractFactory("XPowerThorTest");
-    expect(XThor).to.exist;
-    ALoki = await ethers.getContractFactory("APowerLoki");
-    expect(ALoki).to.exist;
-    XLoki = await ethers.getContractFactory("XPowerLokiTest");
-    expect(XLoki).to.exist;
-    AOdin = await ethers.getContractFactory("APowerOdin");
-    expect(AOdin).to.exist;
-    XOdin = await ethers.getContractFactory("XPowerOdinTest");
-    expect(XOdin).to.exist;
-  });
-  before(async function () {
+    Moe = await ethers.getContractFactory("XPowerTest");
+    expect(Moe).to.exist;
+    Sov = await ethers.getContractFactory("APower");
+    expect(Sov).to.exist;
     Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
     Ppt = await ethers.getContractFactory("XPowerPpt");
@@ -53,56 +41,30 @@ describe("MoeTreasury", async function () {
     expect(Nty).to.exist;
   });
   before(async function () {
-    xthor = await XThor.deploy([], DEADLINE);
-    expect(xthor).to.exist;
-    await xthor.deployed();
-    await xthor.init();
-    xloki = await XLoki.deploy([], DEADLINE);
-    expect(xloki).to.exist;
-    await xloki.deployed();
-    await xloki.init();
-    xodin = await XOdin.deploy([], DEADLINE);
-    expect(xodin).to.exist;
-    await xodin.deployed();
-    await xodin.init();
+    moe = await Moe.deploy([], DEADLINE);
+    expect(moe).to.exist;
+    await moe.deployed();
+    await moe.init();
+    sov = await Sov.deploy(moe.address, [], DEADLINE);
+    expect(sov).to.exist;
+    await sov.deployed();
   });
   before(async function () {
-    const decimals = await xodin.decimals();
+    const decimals = await moe.decimals();
     expect(decimals).to.greaterThan(0);
     UNIT = 10n ** BigInt(decimals);
     expect(UNIT >= 1n).to.be.true;
   });
   before(async function () {
-    athor = await AThor.deploy(xthor.address, [], DEADLINE);
-    expect(athor).to.exist;
-    await athor.deployed();
-    aloki = await ALoki.deploy(xloki.address, [], DEADLINE);
-    expect(aloki).to.exist;
-    await aloki.deployed();
-    aodin = await AOdin.deploy(xodin.address, [], DEADLINE);
-    expect(aodin).to.exist;
-    await aodin.deployed();
-  });
-  before(async function () {
-    table = await new HashTable(xodin, addresses[0]).init({
-      min_level: 1,
-      max_level: 1,
-    });
-  });
-  before(async function () {
-    nft = await Nft.deploy(NFT_LOKI_URL, [xodin.address], [], DEADLINE);
+    nft = await Nft.deploy(moe.address, NFT_XPOW_URL, [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
-    ppt = await Ppt.deploy(NFT_LOKI_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
     expect(ppt).to.exist;
     await ppt.deployed();
   });
   before(async function () {
-    mty = await Mty.deploy(
-      [xthor.address, xloki.address, xodin.address],
-      [athor.address, aloki.address, aodin.address],
-      ppt.address
-    );
+    mty = await Mty.deploy(moe.address, sov.address, ppt.address);
     expect(mty).to.exist;
     await mty.deployed();
     nty = await Nty.deploy(nft.address, ppt.address, mty.address);
@@ -110,44 +72,40 @@ describe("MoeTreasury", async function () {
     await nty.deployed();
   });
   before(async function () {
-    await athor.transferOwnership(mty.address);
-    expect(await athor.owner()).to.eq(mty.address);
-    await aloki.transferOwnership(mty.address);
-    expect(await aloki.owner()).to.eq(mty.address);
-    await aodin.transferOwnership(mty.address);
-    expect(await aodin.owner()).to.eq(mty.address);
+    await sov.transferOwnership(mty.address);
+    expect(await sov.owner()).to.eq(mty.address);
   });
   before(async function () {
-    while (true)
-      try {
-        await mintToken(15);
-      } catch (ex) {
-        break;
-      }
+    table = await new HashTable(moe, addresses[0]).init({
+      use_cache: true,
+      min_level: 4,
+      max_level: 4,
+      length: 1,
+    });
+    await mintToken(15);
     table.reset();
   });
   before(async function () {
-    const supply = await xodin.totalSupply();
-    expect(supply).to.be.gte(2n * UNIT);
+    const supply = await moe.totalSupply();
+    expect(supply).to.be.gte(15n * UNIT);
   });
   before(async function () {
     await increaseAllowanceBy(1n * UNIT, nft.address);
   });
   before(async function () {
-    await xodin.transfer(mty.address, 0);
+    await moe.transfer(mty.address, 0n * UNIT);
   });
   describe("moeBalance", async function () {
-    it("should return 0 [ODIN]", async function () {
-      const moe_index = await mty.moeIndexOf(xodin.address);
-      expect(await mty.moeBalanceOf(moe_index)).to.eq(0n * UNIT);
+    it("should return 0 [XPOW]", async function () {
+      expect(await moe.balanceOf(mty.address)).to.eq(0n * UNIT);
     });
   });
   describe("claimFor", async function () {
     it("should set average APR to 1.00[%]", async function () {
       await mty.grantRole(mty.APR_ROLE(), addresses[0]);
-      await mty.setAPR(3202100, [1_000_000, 2n ** 256n - 1n, 1_000_000]);
+      await mty.setAPR(202100, [1_000_000, 2n ** 256n - 1n, 1_000_000]);
     });
-    it("should return 0 [ODIN] in 120 months", async function () {
+    it("should return 0 [XPOW] in 120 months", async function () {
       const [account, nft_id] = await stakeNft(await mintNft(0, 1), 1);
       expect(
         await mty.claimFor(account, nft_id).catch((ex) => {
@@ -159,157 +117,157 @@ describe("MoeTreasury", async function () {
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 1st year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 1st year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // check balances & burn[-from] aged tokens:
-      expect(await xodin.balanceOf(aodin.address)).to.eq(0);
-      expect(await aodin.balanceOf(account)).to.eq(0);
-      const old_xp = await xodin.balanceOf(account);
-      await aodin.increaseAllowance(account, 0);
-      await aodin.burnFrom(account, 0);
-      await aodin.burn(0);
-      expect(await xodin.balanceOf(account)).to.eq(old_xp.add(0));
-      expect(await xodin.balanceOf(aodin.address)).to.eq(0);
-      expect(await aodin.balanceOf(account)).to.eq(0);
+      expect(await moe.balanceOf(sov.address)).to.eq(0);
+      expect(await sov.balanceOf(account)).to.eq(0);
+      const old_xp = await moe.balanceOf(account);
+      await sov.increaseAllowance(account, 0);
+      await sov.burnFrom(account, 0);
+      await sov.burn(0);
+      expect(await moe.balanceOf(account)).to.eq(old_xp.add(0));
+      expect(await moe.balanceOf(sov.address)).to.eq(0);
+      expect(await sov.balanceOf(account)).to.eq(0);
       // wait for +6 months: 2nd year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 2nd year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 3rd year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 3rd year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 4th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 4th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 5th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 5th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 6th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 6th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 7th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 7th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 8th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 8th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 9th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 9th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 10th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +6 months: 10th year
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 0.5]);
       await network.provider.send("evm_mine");
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
       // wait for +12 months: 11th year (nothing claimable)
       await network.provider.send("evm_increaseTime", [365.25 * DAYS * 1.0]);
       expect(
@@ -322,34 +280,32 @@ describe("MoeTreasury", async function () {
       expect(await mty.rewardOf(account, nft_id)).to.eq(0);
       expect(await mty.claimedFor(account, nft_id)).to.eq(0);
       expect(await mty.claimableFor(account, nft_id)).to.eq(0);
-      expect(await mty.moeBalanceOf(2)).to.eq(0);
+      expect(await moe.balanceOf(mty.address)).to.eq(0);
     });
   });
 });
 async function mintToken(amount) {
   const [nonce, block_hash] = table.nextNonce({ amount });
   expect(nonce).to.gte(0);
-  const tx_cache = await xodin.cache(block_hash);
+  const tx_cache = await moe.cache(block_hash);
   expect(tx_cache).to.be.an("object");
-  const tx_mint = await xodin.mint(addresses[0], block_hash, nonce);
+  const tx_mint = await moe.mint(addresses[0], block_hash, nonce);
   expect(tx_mint).to.be.an("object");
-  const balance_0 = await xodin.balanceOf(addresses[0]);
+  const balance_0 = await moe.balanceOf(addresses[0]);
   expect(balance_0).to.be.gte(amount);
-  const balance_1 = await xodin.balanceOf(addresses[1]);
+  const balance_1 = await moe.balanceOf(addresses[1]);
   expect(balance_1).to.eq(0);
 }
 async function increaseAllowanceBy(amount, spender) {
-  const tx_increase = await xodin.increaseAllowance(spender, amount);
+  const tx_increase = await moe.increaseAllowance(spender, amount);
   expect(tx_increase).to.be.an("object");
-  const allowance = await xodin.allowance(addresses[0], spender);
+  const allowance = await moe.allowance(addresses[0], spender);
   expect(allowance).to.gte(amount);
 }
 async function mintNft(level, amount) {
-  const moe_prefix = await xodin.prefix();
-  const nft_id = await nft.idBy(await nft.year(), level, moe_prefix);
+  const nft_id = await nft.idBy(await nft.year(), level);
   expect(nft_id.gt(0)).to.eq(true);
-  const moe_index = await nft.moeIndexOf(xodin.address);
-  const tx_mint = await nft.mint(addresses[0], level, amount, moe_index);
+  const tx_mint = await nft.mint(addresses[0], level, amount);
   expect(tx_mint).to.be.an("object");
   const nft_balance = await nft.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(amount);

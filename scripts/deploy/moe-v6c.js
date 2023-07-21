@@ -44,27 +44,27 @@ async function main() {
   // migration:
   const deadline = 126_230_400; // 4 years
   //
-  // deploy XPowerThor[New]
+  // deploy XPower[New]
   //
-  const thor = await deploy("XPowerThor", {
+  const thor = await deploy("XPower", {
     moe_base: thor_moe_base,
     deadline,
     owner,
   });
   console.log(`THOR_MOE_V6c=${thor.moe.address}`);
   //
-  // deploy XPowerLoki[New]
+  // deploy XPower[New]
   //
-  const loki = await deploy("XPowerLoki", {
+  const loki = await deploy("XPower", {
     moe_base: loki_moe_base,
     deadline,
     owner,
   });
   console.log(`LOKI_MOE_V6c=${loki.moe.address}`);
   //
-  // deploy XPowerOdin[New]
+  // deploy XPower[New]
   //
-  const odin = await deploy("XPowerOdin", {
+  const odin = await deploy("XPower", {
     moe_base: odin_moe_base,
     deadline,
     owner,
@@ -73,9 +73,9 @@ async function main() {
   //
   // verify contract(s):
   //
-  await verify("XPowerThor", thor.moe, thor_moe_base, deadline);
-  await verify("XPowerLoki", loki.moe, loki_moe_base, deadline);
-  await verify("XPowerOdin", odin.moe, odin_moe_base, deadline);
+  await verify("XPower", thor.moe, thor_moe_base, deadline);
+  await verify("XPower", loki.moe, loki_moe_base, deadline);
+  await verify("XPower", odin.moe, odin_moe_base, deadline);
 }
 async function deploy(name, { moe_base, deadline, owner }) {
   const factory = await hre.ethers.getContractFactory(name);

@@ -8,7 +8,7 @@ let addresses; // all addresses
 let Moe, Nft, Ppt; // contracts
 let moe, nft, ppt; // instances
 
-const NFT_ODIN_URL = "https://xpowermine.com/nfts/odin/{id}.json";
+const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("XPowerPpt", async function () {
@@ -22,7 +22,7 @@ describe("XPowerPpt", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    Moe = await ethers.getContractFactory("XPowerOdinTest");
+    Moe = await ethers.getContractFactory("XPowerTest");
     expect(Moe).to.exist;
   });
   before(async function () {
@@ -37,10 +37,10 @@ describe("XPowerPpt", async function () {
     await moe.deployed();
   });
   before(async function () {
-    nft = await Nft.deploy(NFT_ODIN_URL, [moe.address], [], DEADLINE);
+    nft = await Nft.deploy(moe.address, NFT_XPOW_URL, [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
-    ppt = await Ppt.deploy(NFT_ODIN_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
     expect(ppt).to.exist;
     await ppt.deployed();
   });

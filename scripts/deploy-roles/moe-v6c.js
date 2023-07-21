@@ -7,9 +7,9 @@ async function main() {
   //
   // transfer roles:
   //
-  await transferMoeRoles("XPowerThor", "THOR_MOE_V6c", { to: owner });
-  await transferMoeRoles("XPowerLoki", "LOKI_MOE_V6c", { to: owner });
-  await transferMoeRoles("XPowerOdin", "ODIN_MOE_V6c", { to: owner });
+  await transferMoeRoles("XPower", "THOR_MOE_V6c", { to: owner });
+  await transferMoeRoles("XPower", "LOKI_MOE_V6c", { to: owner });
+  await transferMoeRoles("XPower", "ODIN_MOE_V6c", { to: owner });
 }
 if (require.main === module) {
   main()

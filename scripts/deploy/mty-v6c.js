@@ -37,7 +37,7 @@ async function main() {
   const xpow_ppt_link = process.env.XPOW_PPT_V6c;
   assert(xpow_ppt_link, "missing XPOW_PPT_V6c");
   //
-  // deploy XPOW NftTreasury[New] & re-own APower{Thor,Loki,Odin}[New]:
+  // deploy XPOW NftTreasury[New] & re-own APower[New]:
   //
   const xpow_moe_links = [thor_moe_link, loki_moe_link, odin_moe_link];
   const xpow_sov_links = [thor_sov_link, loki_sov_link, odin_sov_link];
@@ -46,15 +46,15 @@ async function main() {
     sov_links: xpow_sov_links,
     ppt_link: xpow_ppt_link,
   });
-  await transfer("APowerThor", {
+  await transfer("APower", {
     sov_link: thor_sov_link,
     treasury: xpow_treasury,
   });
-  await transfer("APowerLoki", {
+  await transfer("APower", {
     sov_link: loki_sov_link,
     treasury: xpow_treasury,
   });
-  await transfer("APowerOdin", {
+  await transfer("APower", {
     sov_link: odin_sov_link,
     treasury: xpow_treasury,
   });
@@ -72,7 +72,7 @@ async function main() {
 }
 async function deploy(mty_name, { moe_links, sov_links, ppt_link }) {
   const mty_factory = await hre.ethers.getContractFactory(mty_name);
-  const mty_contract = await mty_factory.deploy(moe_links, sov_links, ppt_link);
+  const mty_contract = await mty_factory.deploy(moe_links[1], sov_links[1], ppt_link);
   await wait(mty_contract.deployTransaction);
   return mty_contract;
 }

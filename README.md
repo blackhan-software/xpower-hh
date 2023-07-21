@@ -1,18 +1,10 @@
-# XPower Tokens
+# XPower Token
 
-The XPower token family are proof-of-work tokens, that can only be minted by providing a correct nonce (with a recent block-hash). The THOR, LOKI and ODIN tokens are part of the same family with a maximum supply of 1.157T × 10^64 THOR, 1.240T × 10^64 LOKI and 796.794T × 10^64 ODIN tokens. To be exact:
+XPower is a proof-of-work token, i.e. it can only be minted by providing a correct nonce (with a recent block-hash). It has a maximum supply of 1.240T × 10^64 XPOW. To be exact:
 
-The maximum supply of THOR tokens is
+The maximum supply of the XPOW token is
 
-> 11579208923731619542357098500868790785326998466564056403945758400791312963993.500;
-
-the maximum supply of LOKI tokens is
-
-> 12406295275426735223954034108073704412850355499890060432797050421125652152320.000;
-
-and the maximum supply of ODIN tokens is
-
-> 7967943140642820697584478405910336659153140819804391312965175107630913290240000.000.
+> 12406295275426735223954034108073704412850355499890060432797050421125652152320.000.
 
 ## Installation
 
@@ -151,22 +143,18 @@ POSITIONAL ARGUMENTS:
 mine: Mines for XPower tokens
 ```
 
-Start mining and minting on the Avalanche mainnet for the XPower THOR, LOKI and ODIN tokens (and optionally filter for the `info` messages only &mdash; requires the `jq` tool):
+Start mining and minting on the Avalanche mainnet for the XPower XPOW tokens (and optionally filter for the `info` messages only &mdash; requires the `jq` tool):
 
 ```sh
 npx hardhat mine --network mainnet # | jq -rc 'select(.level=="info")|.message'
 ```
 
 ```txt
-[INIT#0|ACK] block-hash=0xe3f...920, timestamp=1651775580 => THOR
-[INIT#0|ACK] block-hash=0x569...ade, timestamp=1651775584 => LOKI
-[INIT#0|ACK] block-hash=0xb7a...f4d, timestamp=1651775588 => ODIN
+[INIT#0|ACK] block-hash=0x569...ade, timestamp=1651775584 => XPOW
 ```
 
 ```txt
-[MINT#4|ACK] nonce=0x80a...531, block_hash=0xe3f...920 =>       5 THOR [096.468 H/ms]
-[MINT#2|ACK] nonce=0x981...08d, block_hash=0x569...ade =>      31 LOKI [120.812 H/ms]
-[MINT#3|ACK] nonce=0xa69...d6e, block_hash=0xb7a...f4d => 1048575 ODIN [121.778 H/ms]
+[MINT#2|ACK] nonce=0x981...08d, block_hash=0x569...ade =>      31 XPOW [120.812 H/ms]
 ...
 ```
 
@@ -177,9 +165,7 @@ npx hardhat mine --network mainnet --level 7 thor # | jq -rc '.message'
 ```
 
 ```txt
-[MINT#3|ACK] nonce=0xbb9...9b8, block_hash=0x699...09d => 7 THOR [104.973 H/ms]
-[MINT#1|ACK] nonce=0x557...cfd, block_hash=0x699...09d => 8 THOR [120.621 H/ms]
-[MINT#2|ACK] nonce=0x626...3c4, block_hash=0x699...09d => 7 THOR [119.361 H/ms]
+[MINT#2|ACK] nonce=0x626...3c4, block_hash=0x699...09d => 7 XPOW [119.361 H/ms]
 ...
 ```
 
@@ -200,8 +186,6 @@ npx hardhat balances-avax --network mainnet
 ..which lists all present accounts with nano-AVAX balances.
 
 ## Systemd Integration
-
-The examples below are specific to mine (and mint) *all* the XPower THOR, LOKI and ODIN tokens simultaneously (across multiple CPU cores). If you want to mine them individually, then you have to replace the `xpow-` prefix with the `thor-`, `loki-` or `odin-` prefixes respectively.
 
 ### Service installation
 
@@ -283,7 +267,7 @@ export MINT_ADDRESS_PK=0x..
 Run docker image to start mining:
 
 ```sh
-docker run -ti -e MINT_ADDRESS="$MINT_ADDRESS" -e MINT_ADDRESS_PK="$MINT_ADDRESS_PK" -e MINE_LEVEL=7 -e MINE_WORKERS=3 -e TOKEN="thor loki odin" xpower-hh
+docker run -ti -e MINT_ADDRESS="$MINT_ADDRESS" -e MINT_ADDRESS_PK="$MINT_ADDRESS_PK" -e MINE_LEVEL=7 -e MINE_WORKERS=3 xpower-hh
 ```
 
 ## Copyright

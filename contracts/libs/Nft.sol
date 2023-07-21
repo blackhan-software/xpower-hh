@@ -6,19 +6,19 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {Constants} from "./Constants.sol";
 
 library Nft {
-    /** @return nft-id composed of (year, level, prefix) */
-    function idBy(uint256 anno, uint256 level, uint256 prefix) internal pure returns (uint256) {
+    /** @return nft-id composed of (year, level) */
+    function idBy(uint256 anno, uint256 level) internal pure returns (uint256) {
         require(level % 3 == 0, "non-ternary level");
         require(level < 100, "invalid level");
         require(anno > 2020, "invalid year");
-        return eonOf(anno) * prefix + 100 * anno + level;
+        return 100 * anno + level;
     }
 
-    /** @return nft-ids composed of [(year, level, prefix) for level in levels] */
-    function idsBy(uint256 anno, uint256[] memory levels, uint256 prefix) internal pure returns (uint256[] memory) {
+    /** @return nft-ids composed of [(year, level) for level in levels] */
+    function idsBy(uint256 anno, uint256[] memory levels) internal pure returns (uint256[] memory) {
         uint256[] memory ids = new uint256[](levels.length);
         for (uint256 i = 0; i < levels.length; i++) {
-            ids[i] = idBy(anno, levels[i], prefix);
+            ids[i] = idBy(anno, levels[i]);
         }
         return ids;
     }
@@ -38,16 +38,9 @@ library Nft {
         return level;
     }
 
-    /** @return prefix of nft-id (1, 2, 3, ...) */
-    function prefixOf(uint256 nftId) internal pure returns (uint256) {
-        uint256 prefix = nftId / eonOf(yearOf(nftId));
-        require(prefix > 0, "invalid prefix");
-        return prefix;
-    }
-
     /** @return year of nft-id (2021, 2022, ...) */
     function yearOf(uint256 nftId) internal pure returns (uint256) {
-        uint256 anno = (nftId / 100) % 10 ** Math.log10(nftId / 100);
+        uint256 anno = nftId / 100;
         require(anno > 2020, "invalid year");
         return anno;
     }

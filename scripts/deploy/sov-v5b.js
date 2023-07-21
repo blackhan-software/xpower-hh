@@ -38,27 +38,27 @@ async function main() {
   // migration:
   const deadline = 126_230_400; // 4 years
   //
-  // deploy APowerThor[New]
+  // deploy APower[New]
   //
-  const thor_sov = await deploy("APowerThor", {
+  const thor_sov = await deploy("APower", {
     moe_link: thor_moe_link,
     sov_base: [thor_sov_base],
     deadline,
   });
   console.log(`THOR_SOV_V5b=${thor_sov.address}`);
   //
-  // deploy APowerLoki[New]
+  // deploy APower[New]
   //
-  const loki_sov = await deploy("APowerLoki", {
+  const loki_sov = await deploy("APower", {
     moe_link: loki_moe_link,
     sov_base: [loki_sov_base],
     deadline,
   });
   console.log(`LOKI_SOV_V5b=${loki_sov.address}`);
   //
-  // deploy APowerOdin[New]
+  // deploy APower[New]
   //
-  const odin_sov = await deploy("APowerOdin", {
+  const odin_sov = await deploy("APower", {
     moe_link: odin_moe_link,
     sov_base: [odin_sov_base],
     deadline,

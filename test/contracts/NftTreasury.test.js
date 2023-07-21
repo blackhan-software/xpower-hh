@@ -12,7 +12,7 @@ let UNIT; // decimals
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
+const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("NftTreasury", async function () {
@@ -26,9 +26,9 @@ describe("NftTreasury", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    Moe = await ethers.getContractFactory("XPowerLokiTest");
+    Moe = await ethers.getContractFactory("XPowerTest");
     expect(Moe).to.exist;
-    Sov = await ethers.getContractFactory("APowerLoki");
+    Sov = await ethers.getContractFactory("APower");
     expect(Sov).to.exist;
     Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
@@ -49,15 +49,15 @@ describe("NftTreasury", async function () {
     await sov.deployed();
   });
   beforeEach(async function () {
-    nft = await Nft.deploy(NFT_LOKI_URL, [moe.address], [], DEADLINE);
+    nft = await Nft.deploy(moe.address, NFT_XPOW_URL, [], DEADLINE);
     expect(nft).to.exist;
     await nft.deployed();
-    ppt = await Ppt.deploy(NFT_LOKI_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
     expect(ppt).to.exist;
     await ppt.deployed();
   });
   beforeEach(async function () {
-    mty = await Mty.deploy([moe.address], [sov.address], ppt.address);
+    mty = await Mty.deploy(moe.address, sov.address, ppt.address);
     expect(mty).to.exist;
     await mty.deployed();
     nty = await Nty.deploy(nft.address, ppt.address, mty.address);
@@ -231,11 +231,9 @@ async function increaseAllowanceBy(amount, spender) {
   expect(allowance).to.be.gte(amount);
 }
 async function mintNft(level, amount) {
-  const moe_prefix = await moe.prefix();
-  const nft_id = await nft.idBy(await nft.year(), level, moe_prefix);
+  const nft_id = await nft.idBy(await nft.year(), level);
   expect(nft_id.gt(0)).to.eq(true);
-  const moe_index = await nft.moeIndexOf(moe.address);
-  const tx_mint = await nft.mint(addresses[0], level, amount, moe_index);
+  const tx_mint = await nft.mint(addresses[0], level, amount);
   expect(tx_mint).to.be.an("object");
   const nft_balance = await nft.balanceOf(addresses[0], nft_id);
   expect(nft_balance).to.eq(amount);

@@ -39,12 +39,8 @@ class Token {
 }
 const amount_of = (symbol) => {
   switch (symbol) {
-    case "THOR":
-      return (hash) => zeros(hash);
-    case "LOKI":
+    case "XPOW":
       return (hash) => 2 ** zeros(hash) - 1;
-    case "ODIN":
-      return (hash) => 16 ** zeros(hash) - 1;
     default:
       throw new Error(`unknown ${symbol}`);
   }
@@ -61,20 +57,10 @@ const zeros = (hash, counter = 0) => {
 };
 const contract = async (symbol) => {
   switch (symbol) {
-    case "THOR": {
-      const { address, env_name } = moe_latest(symbol);
-      assert(address, `missing ${env_name}`);
-      return await hre.ethers.getContractAt("XPowerThor", address);
-    }
-    case "LOKI": {
+    case "XPOW": {
       const { address, env_name } = moe_latest(symbol);
       assert(address, `missing ${env_name}`);
       return await hre.ethers.getContractAt("XPowerLoki", address);
-    }
-    case "ODIN": {
-      const { address, env_name } = moe_latest(symbol);
-      assert(address, `missing ${env_name}`);
-      return await hre.ethers.getContractAt("XPowerOdin", address);
     }
     default:
       throw new Error(`unknown ${symbol}`);
@@ -82,24 +68,16 @@ const contract = async (symbol) => {
 };
 const normalized = (symbol) => {
   switch (symbol.toUpperCase()) {
-    case "THOR":
-      return "THOR";
-    case "LOKI":
-      return "LOKI";
-    case "ODIN":
-      return "ODIN";
+    case "XPOW":
+      return "XPOW";
     default:
       throw new Error(`unknown ${symbol}`);
   }
 };
 const threshold_of = (symbol) => {
   switch (symbol) {
-    case "THOR":
-      return (level) => level;
-    case "LOKI":
+    case "XPOW":
       return (level) => 2 ** level - 1;
-    case "ODIN":
-      return (level) => 16 ** level - 1;
     default:
       throw new Error(`unknown ${symbol}`);
   }

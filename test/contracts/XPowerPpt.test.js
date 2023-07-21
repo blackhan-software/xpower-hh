@@ -10,7 +10,7 @@ let ppt; // instance
 
 const DATA =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
-const NFT_LOKI_URL = "https://xpowermine.com/nfts/loki/{id}.json";
+const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("XPowerPpt", async function () {
@@ -28,241 +28,239 @@ describe("XPowerPpt", async function () {
     expect(Ppt).to.exist;
   });
   beforeEach(async function () {
-    ppt = await Ppt.deploy(NFT_LOKI_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
     expect(ppt).to.exist;
     await ppt.deployed();
   });
   describe("mint", async function () {
     it("should mint nft-staked for amount=1", async function () {
-      await pptMint(1202100, 1);
+      await pptMint(202100, 1);
     });
   });
   describe("mint-batch", async function () {
     it("should mint nft-staked for amount=1", async function () {
-      await pptMintBatch(1202100, 1);
+      await pptMintBatch(202100, 1);
     });
   });
   describe("sharesBy", async function () {
-    for (const p of [1, 2, 3]) {
-      it(`should mint and return shares-by nft-prefix=${p}`, async function () {
-        await pptMint(ppt.idBy(2021, 0, p), 1);
-        await pptMint(ppt.idBy(2021, 3, p), 2);
-        await pptMint(ppt.idBy(2021, 6, p), 3);
-        const shares = await ppt.sharesBy(p);
-        expect(shares.length).to.eq(34);
-        expect(shares[0]).to.eq(1);
-        expect(shares[1]).to.eq(2_000);
-        expect(shares[2]).to.eq(3_000_000);
-        expect(shares[3]).to.eq(0);
-      });
-      it(`should burn and return shares-by nft-prefix=${p}`, async function () {
-        await pptMint(ppt.idBy(2021, 0, p), 1);
-        await pptBurn(ppt.idBy(2021, 0, p), 1);
-        await pptMint(ppt.idBy(2021, 3, p), 2);
-        await pptBurn(ppt.idBy(2021, 3, p), 2);
-        await pptMint(ppt.idBy(2021, 6, p), 3);
-        await pptBurn(ppt.idBy(2021, 6, p), 3);
-        const shares = await ppt.sharesBy(p);
-        expect(shares.length).to.eq(34);
-        expect(shares[0]).to.eq(0);
-        expect(shares[1]).to.eq(0);
-        expect(shares[2]).to.eq(0);
-        expect(shares[3]).to.eq(0);
-      });
-    }
+    it(`should mint and return shares-by`, async function () {
+      await pptMint(ppt.idBy(2021, 0), 1);
+      await pptMint(ppt.idBy(2021, 3), 2);
+      await pptMint(ppt.idBy(2021, 6), 3);
+      const shares = await ppt.shares();
+      expect(shares.length).to.eq(34);
+      expect(shares[0]).to.eq(1);
+      expect(shares[1]).to.eq(2_000);
+      expect(shares[2]).to.eq(3_000_000);
+      expect(shares[3]).to.eq(0);
+    });
+    it(`should burn and return shares-by`, async function () {
+      await pptMint(ppt.idBy(2021, 0), 1);
+      await pptBurn(ppt.idBy(2021, 0), 1);
+      await pptMint(ppt.idBy(2021, 3), 2);
+      await pptBurn(ppt.idBy(2021, 3), 2);
+      await pptMint(ppt.idBy(2021, 6), 3);
+      await pptBurn(ppt.idBy(2021, 6), 3);
+      const shares = await ppt.shares();
+      expect(shares.length).to.eq(34);
+      expect(shares[0]).to.eq(0);
+      expect(shares[1]).to.eq(0);
+      expect(shares[2]).to.eq(0);
+      expect(shares[3]).to.eq(0);
+    });
   });
   describe("burn", async function () {
     it("should burn nft-staked for amount=3", async function () {
-      await pptMint(1202100, 5);
-      await pptBurn(1202100, 5);
+      await pptMint(202100, 5);
+      await pptBurn(202100, 5);
     });
   });
   describe("mint-batch", async function () {
     it("should mint nft-staked for amount=1", async function () {
-      await pptMintBatch(1202100, 1);
+      await pptMintBatch(202100, 1);
     });
   });
   describe("burn-batch", async function () {
     it("should burn nft-staked for amount=3", async function () {
-      await pptMintBatch(1202100, 5);
-      await pptBurnBatch(1202100, 5);
+      await pptMintBatch(202100, 5);
+      await pptBurnBatch(202100, 5);
     });
   });
   describe("age [10×mint]", async function () {
     it("should mint nft-staked & check age", async function () {
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(0, 5);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(0, 5);
       // mint:
-      await ppt.mint(addresses[0], 1202100, 1);
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(0, 5);
+      await ppt.mint(addresses[0], 202100, 1);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202100, 1);
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(50, 5);
+      await ppt.mint(addresses[0], 202100, 1);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(50, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202100, 1);
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(100, 5);
+      await ppt.mint(addresses[0], 202100, 1);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(100, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202100, 1);
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(150, 5);
+      await ppt.mint(addresses[0], 202100, 1);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(150, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202100, 1);
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(200, 5);
+      await ppt.mint(addresses[0], 202100, 1);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(200, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202100, 1);
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(250, 5);
+      await ppt.mint(addresses[0], 202100, 1);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(250, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202100, 1);
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(300, 5);
+      await ppt.mint(addresses[0], 202100, 1);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(300, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202100, 1);
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(350, 5);
+      await ppt.mint(addresses[0], 202100, 1);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(350, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202100, 1);
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(400, 5);
+      await ppt.mint(addresses[0], 202100, 1);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(400, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202100, 1);
-      expect(await ageOf(addresses[0], 1202100)).to.approximately(450, 5);
+      await ppt.mint(addresses[0], 202100, 1);
+      expect(await ageOf(addresses[0], 202100)).to.approximately(450, 5);
       await network.provider.send("evm_increaseTime", [100]);
     });
   });
   describe("age [5×mint, 5×burn]", async function () {
     it("should mint/burn nft-staked & check age", async function () {
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(0, 5);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(0, 5);
       // mint:
-      await ppt.mint(addresses[0], 1202103, 1);
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(0, 5);
+      await ppt.mint(addresses[0], 202103, 1);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202103, 1);
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(50, 5);
+      await ppt.mint(addresses[0], 202103, 1);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(50, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202103, 1);
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(100, 5);
+      await ppt.mint(addresses[0], 202103, 1);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(100, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202103, 1);
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(150, 5);
+      await ppt.mint(addresses[0], 202103, 1);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(150, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202103, 1);
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(200, 5);
+      await ppt.mint(addresses[0], 202103, 1);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(200, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
-      await ppt.burn(addresses[0], 1202103, 1);
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(375, 5);
+      await ppt.burn(addresses[0], 202103, 1);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(375, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.burn(addresses[0], 1202103, 1);
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(634, 5);
+      await ppt.burn(addresses[0], 202103, 1);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(634, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.burn(addresses[0], 1202103, 1);
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(1100, 5);
+      await ppt.burn(addresses[0], 202103, 1);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(1100, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.burn(addresses[0], 1202103, 1);
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(2400, 5);
+      await ppt.burn(addresses[0], 202103, 1);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(2400, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.burn(addresses[0], 1202103, 1);
-      expect(await ageOf(addresses[0], 1202103)).to.approximately(0, 5);
+      await ppt.burn(addresses[0], 202103, 1);
+      expect(await ageOf(addresses[0], 202103)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
     });
   });
   describe("age [mint, burn, mint, burn, ...]", async function () {
     it("should mint/burn nft-staked & check age", async function () {
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(0, 5);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
       // mint:
-      await ppt.mint(addresses[0], 1202106, 1);
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(0, 5);
+      await ppt.mint(addresses[0], 202106, 1);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
-      await ppt.burn(addresses[0], 1202106, 1);
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(0, 5);
+      await ppt.burn(addresses[0], 202106, 1);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
-      await ppt.mint(addresses[0], 1202106, 1);
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(100, 5);
+      await ppt.mint(addresses[0], 202106, 1);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(100, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
-      await ppt.burn(addresses[0], 1202106, 1);
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(0, 5);
+      await ppt.burn(addresses[0], 202106, 1);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
-      await ppt.mint(addresses[0], 1202106, 1);
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(200, 5);
+      await ppt.mint(addresses[0], 202106, 1);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(200, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
-      await ppt.burn(addresses[0], 1202106, 1);
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(0, 5);
+      await ppt.burn(addresses[0], 202106, 1);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
-      await ppt.mint(addresses[0], 1202106, 1);
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(300, 5);
+      await ppt.mint(addresses[0], 202106, 1);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(300, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
-      await ppt.burn(addresses[0], 1202106, 1);
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(0, 5);
+      await ppt.burn(addresses[0], 202106, 1);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
-      await ppt.mint(addresses[0], 1202106, 1);
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(400, 5);
+      await ppt.mint(addresses[0], 202106, 1);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(400, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
-      await ppt.burn(addresses[0], 1202106, 1);
-      expect(await ageOf(addresses[0], 1202106)).to.approximately(0, 5);
+      await ppt.burn(addresses[0], 202106, 1);
+      expect(await ageOf(addresses[0], 202106)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
     });
   });
   describe("age [mint, mint, burn, burn, ...]", async function () {
     it("should mint/burn nft-staked & check age", async function () {
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(0, 5);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(0, 5);
       // mint:
-      await ppt.mint(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(0, 5);
+      await ppt.mint(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(50, 5);
+      await ppt.mint(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(50, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
-      await ppt.burn(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(300, 5);
+      await ppt.burn(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(300, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.burn(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(0, 5);
-      await network.provider.send("evm_increaseTime", [100]);
-      // mint:
-      await ppt.mint(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(400, 5);
-      await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(250, 5);
-      await network.provider.send("evm_increaseTime", [100]);
-      // burn:
-      await ppt.burn(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(700, 5);
-      await network.provider.send("evm_increaseTime", [100]);
-      await ppt.burn(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(0, 5);
+      await ppt.burn(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // mint:
-      await ppt.mint(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(800, 5);
+      await ppt.mint(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(400, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.mint(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(450, 5);
+      await ppt.mint(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(250, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn:
-      await ppt.burn(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(1100, 5);
+      await ppt.burn(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(700, 5);
       await network.provider.send("evm_increaseTime", [100]);
-      await ppt.burn(addresses[0], 1202109, 1);
-      expect(await ageOf(addresses[0], 1202109)).to.approximately(0, 5);
+      await ppt.burn(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(0, 5);
+      await network.provider.send("evm_increaseTime", [100]);
+      // mint:
+      await ppt.mint(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(800, 5);
+      await network.provider.send("evm_increaseTime", [100]);
+      await ppt.mint(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(450, 5);
+      await network.provider.send("evm_increaseTime", [100]);
+      // burn:
+      await ppt.burn(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(1100, 5);
+      await network.provider.send("evm_increaseTime", [100]);
+      await ppt.burn(addresses[0], 202109, 1);
+      expect(await ageOf(addresses[0], 202109)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
     });
   });
   describe("age [mint-batch, burn-batch]", async function () {
     it("should mint/burn nft-staked & check age", async function () {
-      expect(await ageOf(addresses[0], 1202112)).to.approximately(0, 5);
+      expect(await ageOf(addresses[0], 202112)).to.approximately(0, 5);
       // mint-batch:
-      await ppt.mintBatch(addresses[0], [1202100], [1]);
-      expect(await ageOf(addresses[0], 1202112)).to.approximately(0, 5);
+      await ppt.mintBatch(addresses[0], [202100], [1]);
+      expect(await ageOf(addresses[0], 202112)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       // burn-batch:
-      await ppt.burnBatch(addresses[0], [1202100], [1]);
-      expect(await ageOf(addresses[0], 1202112)).to.approximately(0, 5);
+      await ppt.burnBatch(addresses[0], [202100], [1]);
+      expect(await ageOf(addresses[0], 202112)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
     });
   });
@@ -270,65 +268,65 @@ describe("XPowerPpt", async function () {
     it("should transfer nft-staked", async function () {
       const [from, to] = addresses;
       // mint:
-      await ppt.mint(from, 1202200, 1);
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      await ppt.mint(from, 202200, 1);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
-      expect(await ageOf(from, 1202200)).to.approximately(100, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      expect(await ageOf(from, 202200)).to.approximately(100, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
-      expect(await ageOf(from, 1202200)).to.approximately(200, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      expect(await ageOf(from, 202200)).to.approximately(200, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // transfer:
-      await pptTransfer(from, to, 1202200, 1);
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      await pptTransfer(from, to, 202200, 1);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(100, 5);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(100, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(200, 5);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(200, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // burn:
-      await ppt.burn(to, 1202200, 1);
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      await ppt.burn(to, 202200, 1);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
     });
     it("should *not* transfer nft-staked (not token owner or approved)", async function () {
       const [to, from] = addresses; // REVERSED!
       // mint: (for *to* and not *from*!)
-      await ppt.mint(from, 1202200, 1);
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      await ppt.mint(from, 202200, 1);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // transfer:
       const tx_transfer = await ppt
-        .safeTransferFrom(from, to, 1202200, 1, DATA)
+        .safeTransferFrom(from, to, 202200, 1, DATA)
         .catch((ex) => {
           const m = ex.message.match(/caller is not token owner or approved/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         });
       expect(tx_transfer).to.eq(undefined);
-      expect(await ageOf(from, 1202200)).to.approximately(100, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      expect(await ageOf(from, 202200)).to.approximately(100, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // burn:
-      await ppt.burn(from, 1202200, 1);
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      await ppt.burn(from, 202200, 1);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
     });
@@ -337,90 +335,90 @@ describe("XPowerPpt", async function () {
     it("should transfer nft-staked", async function () {
       const [from, to] = addresses;
       // mint:
-      await ppt.mintBatch(from, [1202200], [1]);
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      await ppt.mintBatch(from, [202200], [1]);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
-      expect(await ageOf(from, 1202200)).to.approximately(100, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      expect(await ageOf(from, 202200)).to.approximately(100, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
-      expect(await ageOf(from, 1202200)).to.approximately(200, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      expect(await ageOf(from, 202200)).to.approximately(200, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // transfer:
-      await pptTransferBatch(from, to, [1202200], [1]);
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      await pptTransferBatch(from, to, [202200], [1]);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(100, 5);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(100, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(200, 5);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(200, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // burn:
-      await ppt.burnBatch(to, [1202200], [1]);
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      await ppt.burnBatch(to, [202200], [1]);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
     });
     it("should *not* transfer nft-staked (not token owner or approved)", async function () {
       const [to, from] = addresses; // REVERSED!
       // mint: (for *to* and not *from*!)
-      await ppt.mintBatch(from, [1202200], [1]);
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      await ppt.mintBatch(from, [202200], [1]);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // transfer:
       const tx_transfer = await ppt
-        .safeBatchTransferFrom(from, to, [1202200], [1], DATA)
+        .safeBatchTransferFrom(from, to, [202200], [1], DATA)
         .catch((ex) => {
           const m = ex.message.match(/caller is not token owner or approved/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;
         });
       expect(tx_transfer).to.eq(undefined);
-      expect(await ageOf(from, 1202200)).to.approximately(100, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      expect(await ageOf(from, 202200)).to.approximately(100, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
       // burn:
-      await ppt.burnBatch(from, [1202200], [1]);
-      expect(await ageOf(from, 1202200)).to.approximately(0, 5);
-      expect(await ageOf(to, 1202200)).to.approximately(0, 5);
+      await ppt.burnBatch(from, [202200], [1]);
+      expect(await ageOf(from, 202200)).to.approximately(0, 5);
+      expect(await ageOf(to, 202200)).to.approximately(0, 5);
       await network.provider.send("evm_increaseTime", [100]);
       await network.provider.send("evm_mine");
     });
   });
   describe("setURI", function () {
-    const NFT_LOKI_WWW = "https://www.xpowermine.com/nfts/loki/{id}.json";
+    const NFT_XPOW_WWW = "https://www.xpowermine.com/nfts/xpow/{id}.json";
     it("should set new URI", async function () {
       await ppt.grantRole(ppt.URI_DATA_ROLE(), addresses[0]);
       const nft_year = (await ppt.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
-      const nft_id = (await ppt.idBy(nft_year, 0, 0)).toNumber();
+      const nft_id = (await ppt.idBy(nft_year, 0)).toNumber();
       expect(nft_id).to.be.greaterThan(0);
-      await ppt.setURI(NFT_LOKI_WWW);
+      await ppt.setURI(NFT_XPOW_WWW);
       const nft_url = await ppt.uri(nft_id);
-      expect(nft_url).to.eq(NFT_LOKI_WWW);
+      expect(nft_url).to.eq(NFT_XPOW_WWW);
     });
     it("should *not* set new URI (missing role)", async function () {
       await ppt.revokeRole(ppt.URI_DATA_ROLE(), addresses[0]);
       const nft_year = (await ppt.year()).toNumber();
       expect(nft_year).to.be.greaterThan(0);
-      const nft_id = (await ppt.idBy(nft_year, 0, 0)).toNumber();
+      const nft_id = (await ppt.idBy(nft_year, 0)).toNumber();
       expect(nft_id).to.be.greaterThan(0);
       await ppt.transferOwnership(addresses[1]);
       expect(
-        await ppt.setURI(NFT_LOKI_WWW).catch((ex) => {
+        await ppt.setURI(NFT_XPOW_WWW).catch((ex) => {
           const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
           if (m === null) console.debug(ex);
           expect(m).to.be.not.null;

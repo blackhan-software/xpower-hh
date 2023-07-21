@@ -16,7 +16,7 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     /** burnable ERC1155 tokens */
     ERC1155Burnable[] private _base;
     /** base address to index map */
-    mapping(address => uint) private _index;
+    mapping(address => uint256) private _index;
     /** timestamp of immigration deadline */
     uint256 private _deadlineBy;
     /** flag to seal immigration */
@@ -61,7 +61,7 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     /** burn amount of ERC1155 */
     function _burnFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) internal virtual {
         require(!_sealed[index[0]], "migration sealed");
-        uint256 tryId = nftId % Nft.eonOf(Nft.yearOf(nftId));
+        uint256 tryId = nftId + Nft.eonOf(Nft.yearOf(nftId)) * 2;
         uint256 tryBalance = _base[index[0]].balanceOf(account, tryId);
         _base[index[0]].burn(account, tryBalance > 0 ? tryId : nftId, amount);
     }

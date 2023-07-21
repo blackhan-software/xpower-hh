@@ -1,6 +1,0 @@
-[Unit]
-Description=XPower ODIN miner (re)starter
-
-[Service]
-ExecStart=/usr/bin/systemctl restart --user odin-miner@%i.service
-Type=oneshot
