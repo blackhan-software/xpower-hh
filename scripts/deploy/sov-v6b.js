@@ -10,6 +10,7 @@
 const hre = require("hardhat");
 const assert = require("assert");
 const { wait } = require("../wait");
+const { ethers } = require("hardhat");
 
 /**
  * @returns list of base contract addresses
@@ -32,65 +33,37 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses APower[Old]
-  const thor_sov_base = sov_bases("THOR");
-  assert(thor_sov_base.length === 4);
-  const loki_sov_base = sov_bases("LOKI");
-  assert(loki_sov_base.length === 4);
-  const odin_sov_base = sov_bases("ODIN");
-  assert(odin_sov_base.length === 4);
+  const xpow_sov_base = sov_bases("XPOW");
+  assert(xpow_sov_base.length === 4);
   // addresses XPower[New]
-  const thor_moe_link = process.env.THOR_MOE_V6b;
-  assert(thor_moe_link, "missing THOR_MOE_V6b");
-  const loki_moe_link = process.env.LOKI_MOE_V6b;
-  assert(loki_moe_link, "missing LOKI_MOE_V6b");
-  const odin_moe_link = process.env.ODIN_MOE_V6b;
-  assert(odin_moe_link, "missing ODIN_MOE_V6b");
+  const xpow_moe_link = process.env.XPOW_MOE_V6b;
+  assert(xpow_moe_link, "missing XPOW_MOE_V6b");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy APower[New]
   //
-  const thor = await deploy("APower", {
-    moe_link: thor_moe_link,
-    sov_base: thor_sov_base,
+  const { sov } = await deploy("APower", {
+    moe_link: xpow_moe_link,
+    sov_base: xpow_sov_base,
     deadline,
   });
-  console.log(`THOR_SOV_V6b=${thor.sov.address}`);
-  //
-  // deploy APower[New]
-  //
-  const loki = await deploy("APower", {
-    moe_link: loki_moe_link,
-    sov_base: loki_sov_base,
-    deadline,
-  });
-  console.log(`LOKI_SOV_V6b=${loki.sov.address}`);
-  //
-  // deploy APower[New]
-  //
-  const odin = await deploy("APower", {
-    moe_link: odin_moe_link,
-    sov_base: odin_sov_base,
-    deadline,
-  });
-  console.log(`ODIN_SOV_V6b=${odin.sov.address}`);
+  console.log(`XPOW_SOV_V6b=${sov.target}`);
   //
   // verify contract(s):
   //
-  await verify("APower", thor.sov, thor_moe_link, thor_sov_base, deadline);
-  await verify("APower", loki.sov, loki_moe_link, loki_sov_base, deadline);
-  await verify("APower", odin.sov, odin_moe_link, odin_sov_base, deadline);
+  await verify("APower", sov, xpow_moe_link, xpow_sov_base, deadline);
 }
 async function deploy(name, { moe_link, sov_base, deadline }) {
-  const factory = await hre.ethers.getContractFactory(name);
+  const factory = await ethers.getContractFactory(name);
   const contract = await factory.deploy(moe_link, sov_base, deadline);
-  await wait(contract.deployTransaction);
+  await wait(contract);
   return { sov: contract };
 }
-async function verify(name, { address }, ...args) {
+async function verify(name, { target }, ...args) {
   if (hre.network.name.match(/mainnet|fuji/)) {
     return await hre.run("verify:verify", {
-      address,
+      address: target,
       contract: `contracts/APower.sol:${name}`,
       constructorArguments: args,
     });

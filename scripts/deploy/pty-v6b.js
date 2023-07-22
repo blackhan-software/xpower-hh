@@ -10,6 +10,7 @@
 const hre = require("hardhat");
 const assert = require("assert");
 const { wait } = require("../wait");
+const { ethers } = require("hardhat");
 
 /**
  * Hardhat *always* runs the compile task when running scripts with its command
@@ -31,39 +32,37 @@ async function main() {
   //
   // deploy NftTreasury[New] & re-own XPowerPpt[New]:
   //
-  const xpow = await deploy(["NftTreasury", "XPowerPpt"], {
+  const { nty } = await deploy("NftTreasury", {
     nft_link: xpow_nft_link,
     ppt_link: xpow_ppt_link,
     mty_link: xpow_mty_link,
   });
-  console.log(`XPOW_PTY_V6b=${xpow.nty.address}`);
+  await transfer("XPowerPpt", {
+    ppt_link: xpow_ppt_link,
+    treasury: nty,
+  });
+  console.log(`XPOW_PTY_V6b=${nty.target}`);
   //
   // verify contract(s):
   //
-  await verify(
-    "NftTreasury",
-    xpow.nty,
-    xpow_nft_link,
-    xpow_ppt_link,
-    xpow_mty_link
-  );
+  await verify("NftTreasury", nty, xpow_nft_link, xpow_ppt_link, xpow_mty_link);
 }
-async function deploy([nty_name, ppt_name], { nft_link, ppt_link, mty_link }) {
-  const nty_factory = await hre.ethers.getContractFactory(nty_name);
-  const nty_contract = await nty_factory.deploy(nft_link, ppt_link, mty_link);
-  await wait(nty_contract.deployTransaction);
-  const ppt_factory = await hre.ethers.getContractFactory(ppt_name);
-  const ppt_contract = ppt_factory.attach(ppt_link);
-  const ppt_transfer = await ppt_contract.transferOwnership(
-    nty_contract.address
-  );
-  await wait(ppt_transfer);
-  return { nty: nty_contract };
+async function deploy(nty_name, { nft_link, ppt_link, mty_link }) {
+  const factory = await ethers.getContractFactory(nty_name);
+  const contract = await factory.deploy(nft_link, ppt_link, mty_link);
+  await wait(contract);
+  return { nty: contract };
 }
-async function verify(name, { address }, ...args) {
+async function transfer(ppt_name, { ppt_link, treasury }) {
+  const factory = await ethers.getContractFactory(ppt_name);
+  const contract = factory.attach(ppt_link);
+  const transfer = await contract.transferOwnership(treasury.target);
+  await wait(transfer);
+}
+async function verify(name, { target }, ...args) {
   if (hre.network.name.match(/mainnet|fuji/)) {
     return await hre.run("verify:verify", {
-      address,
+      address: target,
       contract: `contracts/NftTreasury.sol:${name}`,
       constructorArguments: args,
     });

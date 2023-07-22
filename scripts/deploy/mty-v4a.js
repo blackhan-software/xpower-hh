@@ -7,9 +7,9 @@
  * When running the script via `npx hardhat run <script>` you'll find the HRE's
  * members available in the global scope.
  */
-const hre = require("hardhat");
 const assert = require("assert");
 const { wait } = require("../wait");
+const { ethers } = require("hardhat");
 
 /**
  * Hardhat *always* runs the compile task when running scripts with its command
@@ -22,53 +22,29 @@ async function main() {
   const none = process.env.NONE_ADDRESS;
   assert(none, "missing NONE_ADDRESS");
   // addresses XPower[New]
-  const thor_moe_link = process.env.THOR_MOE_V4a;
-  assert(thor_moe_link, "missing THOR_MOE_V4a");
-  const loki_moe_link = process.env.LOKI_MOE_V4a;
-  assert(loki_moe_link, "missing LOKI_MOE_V4a");
-  const odin_moe_link = process.env.ODIN_MOE_V4a;
-  assert(odin_moe_link, "missing ODIN_MOE_V4a");
+  const xpow_moe_link = process.env.XPOW_MOE_V4a;
+  assert(xpow_moe_link, "missing XPOW_MOE_V4a");
   // addresses XPowerPpt[New]
-  const thor_ppt_link = process.env.THOR_PPT_V4a;
-  assert(thor_ppt_link, "missing THOR_PPT_V4a");
-  const loki_ppt_link = process.env.LOKI_PPT_V4a;
-  assert(loki_ppt_link, "missing LOKI_PPT_V4a");
-  const odin_ppt_link = process.env.ODIN_PPT_V4a;
-  assert(odin_ppt_link, "missing ODIN_PPT_V4a");
+  const xpow_ppt_link = process.env.XPOW_PPT_V4a;
+  assert(xpow_ppt_link, "missing XPOW_PPT_V4a");
   //
-  // deploy THOR NftTreasury[New]:
+  // deploy XPOW NftTreasury[New]:
   //
-  const thor_treasury = await deploy("MoeTreasury", {
-    moe_links: [thor_moe_link],
-    ppt_link: thor_ppt_link,
+  const { mty } = await deploy("MoeTreasury", {
+    moe_links: [xpow_moe_link],
+    ppt_link: xpow_ppt_link,
   });
-  console.log(`THOR_MTY_V4a=${thor_treasury.address}`);
-  //
-  // deploy LOKI NftTreasury[New]:
-  //
-  const loki_treasury = await deploy("MoeTreasury", {
-    moe_links: [loki_moe_link],
-    ppt_link: loki_ppt_link,
-  });
-  console.log(`LOKI_MTY_V4a=${loki_treasury.address}`);
-  //
-  // deploy ODIN NftTreasury[New]:
-  //
-  const odin_treasury = await deploy("MoeTreasury", {
-    moe_links: [odin_moe_link],
-    ppt_link: odin_ppt_link,
-  });
-  console.log(`ODIN_MTY_V4a=${odin_treasury.address}`);
+  console.log(`XPOW_MTY_V4a=${mty.target}`);
 }
 async function deploy(mty_name, { moe_links, sov_links, ppt_link }) {
-  const mty_factory = await hre.ethers.getContractFactory(mty_name);
-  const mty_contract = await mty_factory.deploy(
+  const factory = await ethers.getContractFactory(mty_name);
+  const contract = await factory.deploy(
     moe_links[0],
-    sov_links ?? '0x0000000000000000000000000000000000000000',
-    ppt_link
+    sov_links ?? "0x0000000000000000000000000000000000000000",
+    ppt_link,
   );
-  await wait(mty_contract.deployTransaction);
-  return mty_contract;
+  await wait(contract);
+  return { mty: contract };
 }
 if (require.main === module) {
   main()

@@ -10,6 +10,7 @@
 const hre = require("hardhat");
 const assert = require("assert");
 const { wait } = require("../wait");
+const { ethers } = require("hardhat");
 
 /**
  * @returns list of base contract addresses
@@ -27,7 +28,7 @@ function moe_bases(
     "V6b",
     "V6c",
     "V7a",
-  ]
+  ],
 ) {
   return versions.map((version) => {
     const moe_base = process.env[`${token}_MOE_${version}`];
@@ -46,60 +47,36 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPower[Old]
-  const thor_moe_base = moe_bases("THOR");
-  assert(thor_moe_base.length === 10);
-  const loki_moe_base = moe_bases("LOKI");
-  assert(loki_moe_base.length === 10);
-  const odin_moe_base = moe_bases("ODIN");
-  assert(odin_moe_base.length === 10);
+  const xpow_moe_base = moe_bases("XPOW");
+  assert(xpow_moe_base.length === 10);
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPower[New]
   //
-  const thor = await deploy("XPower", {
-    moe_base: thor_moe_base,
+  const { moe } = await deploy("XPower", {
+    moe_base: xpow_moe_base,
     deadline,
     owner,
   });
-  console.log(`THOR_MOE_V7b=${thor.moe.address}`);
-  //
-  // deploy XPower[New]
-  //
-  const loki = await deploy("XPower", {
-    moe_base: loki_moe_base,
-    deadline,
-    owner,
-  });
-  console.log(`LOKI_MOE_V7b=${loki.moe.address}`);
-  //
-  // deploy XPower[New]
-  //
-  const odin = await deploy("XPower", {
-    moe_base: odin_moe_base,
-    deadline,
-    owner,
-  });
-  console.log(`ODIN_MOE_V7b=${odin.moe.address}`);
+  console.log(`XPOW_MOE_V7b=${moe.target}`);
   //
   // verify contract(s):
   //
-  await verify("XPower", thor.moe, thor_moe_base, deadline);
-  await verify("XPower", loki.moe, loki_moe_base, deadline);
-  await verify("XPower", odin.moe, odin_moe_base, deadline);
+  await verify("XPower", moe, xpow_moe_base, deadline);
 }
 async function deploy(name, { moe_base, deadline, owner }) {
-  const factory = await hre.ethers.getContractFactory(name);
+  const factory = await ethers.getContractFactory(name);
   const contract = await factory.deploy(moe_base, deadline);
-  await wait(contract.deployTransaction);
+  await wait(contract);
   const transfer = await contract.transferOwnership(owner);
   await wait(transfer);
   return { moe: contract };
 }
-async function verify(name, { address }, ...args) {
+async function verify(name, { target }, ...args) {
   if (hre.network.name.match(/mainnet|fuji/)) {
     return await hre.run("verify:verify", {
-      address,
+      address: target,
       contract: `contracts/XPower.sol:${name}`,
       constructorArguments: args,
     });

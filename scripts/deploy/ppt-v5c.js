@@ -10,6 +10,7 @@
 const hre = require("hardhat");
 const assert = require("assert");
 const { wait } = require("../wait");
+const { ethers } = require("hardhat");
 
 /**
  * @returns list of base contract addresses
@@ -32,12 +33,8 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPowerPpt[Old]
-  const thor_ppt_base = ppt_bases("THOR");
-  assert(thor_ppt_base.length === 3);
-  const loki_ppt_base = ppt_bases("LOKI");
-  assert(loki_ppt_base.length === 3);
-  const odin_ppt_base = ppt_bases("ODIN");
-  assert(odin_ppt_base.length === 3);
+  const xpow_ppt_base = ppt_bases("XPOW");
+  assert(xpow_ppt_base.length === 3);
   // addresses XPowerPpt[Uri]
   const xpow_ppt_uri = process.env.XPOW_PPT_URI;
   assert(xpow_ppt_uri, "missing XPOW_PPT_URI");
@@ -46,47 +43,27 @@ async function main() {
   //
   // deploy XPowerPpt[New]:
   //
-  const thor = await deploy("XPowerPpt", {
+  const { ppt } = await deploy("XPowerPpt", {
     ppt_uri: xpow_ppt_uri,
-    ppt_base: thor_ppt_base,
+    ppt_base: xpow_ppt_base,
     deadline,
   });
-  console.log(`THOR_PPT_V5c=${thor.ppt.address}`);
-  //
-  // deploy XPowerPpt[New]:
-  //
-  const loki = await deploy("XPowerPpt", {
-    ppt_uri: xpow_ppt_uri,
-    ppt_base: loki_ppt_base,
-    deadline,
-  });
-  console.log(`LOKI_PPT_V5c=${loki.ppt.address}`);
-  //
-  // deploy XPowerPpt[New]:
-  //
-  const odin = await deploy("XPowerPpt", {
-    ppt_uri: xpow_ppt_uri,
-    ppt_base: odin_ppt_base,
-    deadline,
-  });
-  console.log(`ODIN_PPT_V5c=${odin.ppt.address}`);
+  console.log(`XPOW_PPT_V5c=${ppt.target}`);
   //
   // verify contract(s):
   //
-  await verify("XPowerPpt", thor.ppt, xpow_ppt_uri, thor_ppt_base, deadline);
-  await verify("XPowerPpt", loki.ppt, xpow_ppt_uri, loki_ppt_base, deadline);
-  await verify("XPowerPpt", odin.ppt, xpow_ppt_uri, odin_ppt_base, deadline);
+  await verify("XPowerPpt", ppt, xpow_ppt_uri, xpow_ppt_base, deadline);
 }
 async function deploy(name, { ppt_uri, ppt_base, deadline }) {
-  const factory = await hre.ethers.getContractFactory(name);
+  const factory = await ethers.getContractFactory(name);
   const contract = await factory.deploy(ppt_uri, ppt_base, deadline);
-  await wait(contract.deployTransaction);
+  await wait(contract);
   return { ppt: contract };
 }
-async function verify(name, { address }, ...args) {
+async function verify(name, { target }, ...args) {
   if (hre.network.name.match(/mainnet|fuji/)) {
     return await hre.run("verify:verify", {
-      address,
+      address: target,
       contract: `contracts/XPowerPpt.sol:${name}`,
       constructorArguments: args,
     });

@@ -7,9 +7,9 @@
  * When running the script via `npx hardhat run <script>` you'll find the HRE's
  * members available in the global scope.
  */
-const hre = require("hardhat");
 const assert = require("assert");
 const { wait } = require("../wait");
+const { ethers } = require("hardhat");
 
 /**
  * @returns list of base contract addresses
@@ -32,49 +32,27 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPower[Old]
-  const thor_moe_base = moe_bases("THOR");
-  assert(thor_moe_base.length === 0);
-  const loki_moe_base = moe_bases("LOKI");
-  assert(loki_moe_base.length === 0);
-  const odin_moe_base = moe_bases("ODIN");
-  assert(odin_moe_base.length === 0);
+  const xpow_moe_base = moe_bases("XPOW");
+  assert(xpow_moe_base.length === 0);
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPower[Old]
   //
-  const thor_moe = await deploy("XPower", {
-    moe_base: thor_moe_base,
+  const { moe } = await deploy("XPower", {
+    moe_base: xpow_moe_base,
     deadline,
     owner,
   });
-  console.log(`THOR_MOE_V2a=${thor_moe.address}`);
-  //
-  // deploy XPower[Old]
-  //
-  const loki_moe = await deploy("XPower", {
-    moe_base: loki_moe_base,
-    deadline,
-    owner,
-  });
-  console.log(`LOKI_MOE_V2a=${loki_moe.address}`);
-  //
-  // deploy XPower[Old]
-  //
-  const odin_moe = await deploy("XPower", {
-    moe_base: odin_moe_base,
-    deadline,
-    owner,
-  });
-  console.log(`ODIN_MOE_V2a=${odin_moe.address}`);
+  console.log(`XPOW_MOE_V2a=${moe.target}`);
 }
 async function deploy(name, { moe_base, deadline, owner }) {
-  const factory = await hre.ethers.getContractFactory(name);
+  const factory = await ethers.getContractFactory(name);
   const contract = await factory.deploy(moe_base, deadline);
-  await wait(contract.deployTransaction);
+  await wait(contract);
   const transfer = await contract.transferOwnership(owner);
   await wait(transfer);
-  return contract;
+  return { moe: contract };
 }
 if (require.main === module) {
   main()

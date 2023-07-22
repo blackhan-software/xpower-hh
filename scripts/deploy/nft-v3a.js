@@ -7,9 +7,9 @@
  * When running the script via `npx hardhat run <script>` you'll find the HRE's
  * members available in the global scope.
  */
-const hre = require("hardhat");
 const assert = require("assert");
 const { wait } = require("../wait");
+const { ethers } = require("hardhat");
 
 /**
  * @returns list of base contract addresses
@@ -32,19 +32,11 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPowerNft[Old]
-  const thor_nft_base = nft_bases("THOR");
-  assert(thor_nft_base.length === 1);
-  const loki_nft_base = nft_bases("LOKI");
-  assert(loki_nft_base.length === 1);
-  const odin_nft_base = nft_bases("ODIN");
-  assert(odin_nft_base.length === 1);
+  const xpow_nft_base = nft_bases("XPOW");
+  assert(xpow_nft_base.length === 1);
   // addresses XPower[New]
-  const thor_moe_link = process.env.THOR_MOE_V3a;
-  assert(thor_moe_link, "missing THOR_MOE_V3a");
-  const loki_moe_link = process.env.LOKI_MOE_V3a;
-  assert(loki_moe_link, "missing LOKI_MOE_V3a");
-  const odin_moe_link = process.env.ODIN_MOE_V3a;
-  assert(odin_moe_link, "missing ODIN_MOE_V3a");
+  const xpow_moe_link = process.env.XPOW_MOE_V3a;
+  assert(xpow_moe_link, "missing XPOW_MOE_V3a");
   // addresses XPowerNft[Uri]
   const xpow_nft_uri = process.env.XPOW_NFT_URI;
   assert(xpow_nft_uri, "missing XPOW_NFT_URI");
@@ -53,44 +45,22 @@ async function main() {
   //
   // deploy XPowerNft[New]:
   //
-  const thor_nft = await deploy("XPowerNft", {
-    moe_link: [thor_moe_link],
+  const { nft } = await deploy("XPowerNft", {
+    moe_link: xpow_moe_link,
     nft_uri: xpow_nft_uri,
-    nft_base: thor_nft_base,
+    nft_base: xpow_nft_base,
     deadline,
     owner,
   });
-  console.log(`THOR_NFT_V3a=${thor_nft.address}`);
-  //
-  // deploy XPowerNft[New]:
-  //
-  const loki_nft = await deploy("XPowerNft", {
-    moe_link: [loki_moe_link],
-    nft_uri: xpow_nft_uri,
-    nft_base: loki_nft_base,
-    deadline,
-    owner,
-  });
-  console.log(`LOKI_NFT_V3a=${loki_nft.address}`);
-  //
-  // deploy XPowerNft[New]:
-  //
-  const odin_nft = await deploy("XPowerNft", {
-    moe_link: [odin_moe_link],
-    nft_uri: xpow_nft_uri,
-    nft_base: odin_nft_base,
-    deadline,
-    owner,
-  });
-  console.log(`ODIN_NFT_V3a=${odin_nft.address}`);
+  console.log(`XPOW_NFT_V3a=${nft.target}`);
 }
 async function deploy(name, { moe_link, nft_uri, nft_base, deadline, owner }) {
-  const factory = await hre.ethers.getContractFactory(name);
-  const contract = await factory.deploy(moe_link[0], nft_uri, nft_base, deadline);
-  await wait(contract.deployTransaction);
+  const factory = await ethers.getContractFactory(name);
+  const contract = await factory.deploy(moe_link, nft_uri, nft_base, deadline);
+  await wait(contract);
   const transfer = await contract.transferOwnership(owner);
   await wait(transfer);
-  return contract;
+  return { nft: contract };
 }
 if (require.main === module) {
   main()

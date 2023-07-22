@@ -7,9 +7,7 @@ async function main() {
   //
   // transfer roles:
   //
-  await transferSovRoles("APower", "THOR_SOV_V7b", { to: owner });
-  await transferSovRoles("APower", "LOKI_SOV_V7b", { to: owner });
-  await transferSovRoles("APower", "ODIN_SOV_V7b", { to: owner });
+  await transferSovRoles("APower", "XPOW_SOV_V7b", { to: owner });
 }
 if (require.main === module) {
   main()

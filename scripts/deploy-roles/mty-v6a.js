@@ -7,9 +7,7 @@ async function main() {
   //
   // transfer roles:
   //
-  await transferMtyRoles("MoeTreasury", "THOR_MTY_V6a", { to: owner });
-  await transferMtyRoles("MoeTreasury", "LOKI_MTY_V6a", { to: owner });
-  await transferMtyRoles("MoeTreasury", "ODIN_MTY_V6a", { to: owner });
+  await transferMtyRoles("MoeTreasury", "XPOW_MTY_V6a", { to: owner });
 }
 if (require.main === module) {
   main()
