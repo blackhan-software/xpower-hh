@@ -44,8 +44,8 @@ contract MoeTreasury is MoeTreasurySupervised {
     event Claim(address account, uint256 nftId, uint256 amount);
 
     /** claim APower tokens */
-    function claimFor(address account, uint256 nftId) external {
-        uint256 amount = claimableFor(account, nftId);
+    function claim(address account, uint256 nftId) external {
+        uint256 amount = claimable(account, nftId);
         require(amount > 0, "nothing claimable");
         _claimed[account][nftId] += amount;
         _moe.increaseAllowance(address(_sov), _sov.wrappable(amount));
@@ -57,9 +57,9 @@ contract MoeTreasury is MoeTreasurySupervised {
     event ClaimBatch(address account, uint256[] nftIds, uint256[] amounts);
 
     /** claim APower tokens */
-    function claimForBatch(address account, uint256[] memory nftIds) external {
+    function claimBatch(address account, uint256[] memory nftIds) external {
         require(Array.unique(nftIds), "unsorted or duplicate ids");
-        uint256[] memory amounts = claimableForBatch(account, nftIds);
+        uint256[] memory amounts = claimableBatch(account, nftIds);
         uint256 subsum;
         for (uint256 i = 0; i < nftIds.length; i++) {
             require(amounts[i] > 0, "nothing claimable");
@@ -72,40 +72,40 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return claimed amount */
-    function claimedFor(address account, uint256 nftId) public view returns (uint256) {
+    function claimed(address account, uint256 nftId) public view returns (uint256) {
         return _claimed[account][nftId];
     }
 
     /** @return claimed amounts */
-    function claimedForBatch(address account, uint256[] memory nftIds) public view returns (uint256[] memory) {
-        uint256[] memory claimed = new uint256[](nftIds.length);
+    function claimedBatch(address account, uint256[] memory nftIds) public view returns (uint256[] memory) {
+        uint256[] memory claimedRewards = new uint256[](nftIds.length);
         for (uint256 i = 0; i < nftIds.length; i++) {
-            claimed[i] = claimedFor(account, nftIds[i]);
+            claimedRewards[i] = claimed(account, nftIds[i]);
         }
-        return claimed;
+        return claimedRewards;
     }
 
     /** @return claimable amount */
-    function claimableFor(address account, uint256 nftId) public view returns (uint256) {
-        uint256 claimed = claimedFor(account, nftId);
-        uint256 reward = rewardOf(account, nftId);
-        if (reward > claimed) {
-            return reward - claimed;
+    function claimable(address account, uint256 nftId) public view returns (uint256) {
+        uint256 claimedReward = claimed(account, nftId);
+        uint256 generalReward = rewardOf(account, nftId);
+        if (generalReward > claimedReward) {
+            return generalReward - claimedReward;
         }
         return 0;
     }
 
     /** @return claimable amount */
-    function claimableForBatch(address account, uint256[] memory nftIds) public view returns (uint256[] memory) {
-        uint256[] memory claimed = claimedForBatch(account, nftIds);
-        uint256[] memory rewards = rewardOfBatch(account, nftIds);
-        uint256[] memory pending = new uint256[](nftIds.length);
+    function claimableBatch(address account, uint256[] memory nftIds) public view returns (uint256[] memory) {
+        uint256[] memory claimedRewards = claimedBatch(account, nftIds);
+        uint256[] memory generalRewards = rewardOfBatch(account, nftIds);
+        uint256[] memory pendingRewards = new uint256[](nftIds.length);
         for (uint256 i = 0; i < nftIds.length; i++) {
-            if (rewards[i] > claimed[i]) {
-                pending[i] = rewards[i] - claimed[i];
+            if (generalRewards[i] > claimedRewards[i]) {
+                pendingRewards[i] = generalRewards[i] - claimedRewards[i];
             }
         }
-        return pending;
+        return pendingRewards;
     }
 
     /** @return reward amount */

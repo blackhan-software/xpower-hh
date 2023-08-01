@@ -103,7 +103,7 @@ describe("MoeTreasury", async function () {
       expect(await moe.balanceOf(mty.address)).to.eq(110n * UNIT);
     });
   });
-  describe("claimFor", async function () {
+  describe("claim", async function () {
     let account, nft_id;
     it("should stake KILO NFTs", async function () {
       [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
@@ -115,8 +115,8 @@ describe("MoeTreasury", async function () {
       console.log(
         `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
       );
-      expect(await mty.claimableFor(account, nft_id)).to.eq(0n * UNIT);
-      const claimed = await mty.claimFor(account, nft_id).catch((ex) => {
+      expect(await mty.claimable(account, nft_id)).to.eq(0n * UNIT);
+      const claimed = await mty.claim(account, nft_id).catch((ex) => {
         const m = ex.message.match(/nothing claimable/);
         if (m === null) console.debug(ex);
         expect(m).to.be.not.null;
@@ -135,8 +135,8 @@ describe("MoeTreasury", async function () {
       console.log(
         `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
       );
-      expect(await mty.claimableFor(account, nft_id)).to.eq(10n * UNIT);
-      expect(await mty.claimFor(account, nft_id)).to.be.an("object");
+      expect(await mty.claimable(account, nft_id)).to.eq(10n * UNIT);
+      expect(await mty.claim(account, nft_id)).to.be.an("object");
     });
     it("should reparameterize (per nft.level)", async function () {
       const tx = await mty.setAPRBatch([202103], [0, 3, 1_000_000]);
@@ -150,8 +150,8 @@ describe("MoeTreasury", async function () {
       console.log(
         `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
       );
-      expect(await mty.claimableFor(account, nft_id)).to.eq(10n * UNIT);
-      expect(await mty.claimFor(account, nft_id)).to.be.an("object");
+      expect(await mty.claimable(account, nft_id)).to.eq(10n * UNIT);
+      expect(await mty.claim(account, nft_id)).to.be.an("object");
     });
     it("should reparameterize (per nft.level)", async function () {
       const tx = await mty.setAPRBatch([202103], [0, 3, 2_000_000]);
@@ -165,8 +165,8 @@ describe("MoeTreasury", async function () {
       console.log(
         `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
       );
-      expect(await mty.claimableFor(account, nft_id)).to.eq(20n * UNIT);
-      expect(await mty.claimFor(account, nft_id)).to.be.an("object");
+      expect(await mty.claimable(account, nft_id)).to.eq(20n * UNIT);
+      expect(await mty.claim(account, nft_id)).to.be.an("object");
     });
     it("should reparameterize (per nft.level)", async function () {
       const tx = await mty.setAPRBatch([202103], [0, 3, 1_000_000]);
@@ -180,8 +180,8 @@ describe("MoeTreasury", async function () {
       console.log(
         `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
       );
-      expect(await mty.claimableFor(account, nft_id)).to.eq(11n * UNIT);
-      expect(await mty.claimFor(account, nft_id)).to.be.an("object");
+      expect(await mty.claimable(account, nft_id)).to.eq(11n * UNIT);
+      expect(await mty.claim(account, nft_id)).to.be.an("object");
     });
   });
 });
