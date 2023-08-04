@@ -29,15 +29,15 @@ abstract contract MoeTreasurySupervised is Supervised {
     /** role grants right to change APR parametrization */
     bytes32 public constant APR_ROLE = keccak256("APR_ROLE");
     bytes32 public constant APR_ADMIN_ROLE = keccak256("APR_ADMIN_ROLE");
-    /** role grants right to change APR bonus parametrization */
-    bytes32 public constant APR_BONUS_ROLE = keccak256("APR_BONUS_ROLE");
-    bytes32 public constant APR_BONUS_ADMIN_ROLE = keccak256("APR_BONUS_ADMIN_ROLE");
+    /** role grants right to change APB parametrization */
+    bytes32 public constant APB_ROLE = keccak256("APB_ROLE");
+    bytes32 public constant APB_ADMIN_ROLE = keccak256("APB_ADMIN_ROLE");
 
     constructor() {
         _setRoleAdmin(APR_ROLE, APR_ADMIN_ROLE);
         _grantRole(APR_ADMIN_ROLE, msg.sender);
-        _setRoleAdmin(APR_BONUS_ROLE, APR_BONUS_ADMIN_ROLE);
-        _grantRole(APR_BONUS_ADMIN_ROLE, msg.sender);
+        _setRoleAdmin(APB_ROLE, APB_ADMIN_ROLE);
+        _grantRole(APB_ADMIN_ROLE, msg.sender);
     }
 }
 
