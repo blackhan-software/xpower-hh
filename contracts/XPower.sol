@@ -97,7 +97,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
         _mint(to, amount);
     }
 
-    /** @return block-hash (for interval) */
+    /** @return block-hash */
     function blockHashOf(uint256 interval) public view returns (bytes32) {
         return _blockHashes[interval];
     }
@@ -123,7 +123,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
         return !_hashes[pairIndex];
     }
 
-    /** @return leading-zeros (for nonce-hash) */
+    /** @return number of leading-zeros */
     function zerosOf(bytes32 nonceHash) public pure returns (uint8) {
         if (nonceHash > 0) {
             return uint8(63 - (Math.log2(uint256(nonceHash)) >> 2));
@@ -141,7 +141,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     /** parametrization of share: coefficients */
     uint256[] private _share;
 
-    /** @return duration weighted mean of shares (for amount) */
+    /** @return duration weighted mean of shares */
     function shareOf(uint256 amount) public view returns (uint256) {
         if (shares.length == 0) {
             return shareTargetOf(amount);
@@ -152,12 +152,12 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
         return (point * amount) / amountOf(1);
     }
 
-    /** @return share target (for amount) */
+    /** @return share target */
     function shareTargetOf(uint256 amount) public view returns (uint256) {
         return shareTargetOf(amount, getShare());
     }
 
-    /** @return share target (for amount & parametrization) */
+    /** @return share target */
     function shareTargetOf(uint256 amount, uint256[] memory array) private pure returns (uint256) {
         return Polynomial(array).eval3(amount);
     }
@@ -165,15 +165,17 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     /** fractional treasury share: 33[%] */
     uint256 private constant SHARE_MUL = 1;
     uint256 private constant SHARE_DIV = 2;
+    uint256 private constant SHARE_EXP = 8;
 
     /** @return share parameters */
     function getShare() public view returns (uint256[] memory) {
         if (_share.length > 0) {
             return _share;
         }
-        uint256[] memory array = new uint256[](3);
+        uint256[] memory array = new uint256[](4);
         array[1] = SHARE_DIV;
         array[2] = SHARE_MUL;
+        array[3] = SHARE_EXP;
         return array;
     }
 
@@ -183,7 +185,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
         // check share reparametrization of value
         uint256 nextValue = shareTargetOf(amountOf(1), array);
         uint256 currValue = shareTargetOf(amountOf(1));
-        Rpp.checkValue(nextValue, currValue);
+        Rpp.checkValue(nextValue, currValue, amountOf(1));
         // check share reparametrization of stamp
         uint256 lastStamp = shares.lastOf().stamp;
         uint256 currStamp = block.timestamp;
