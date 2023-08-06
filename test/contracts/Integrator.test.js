@@ -38,17 +38,13 @@ describe("Integrator", async function () {
   describe("headOf", async function () {
     it("should return [0,0,0]", async function () {
       const [stamp, value, area] = await integrator.headOf();
-      expect(stamp).to.deep.eq(0);
-      expect(value).to.deep.eq(0);
-      expect(area).to.deep.eq(0);
+      Expect([stamp, value, area]).to.deep.eq([0, 0, 0]);
     });
   });
   describe("lastOf", async function () {
     it("should return [0,0,0]", async function () {
       const [stamp, value, area] = await integrator.lastOf();
-      expect(stamp).to.deep.eq(0);
-      expect(value).to.deep.eq(0);
-      expect(area).to.deep.eq(0);
+      Expect([stamp, value, area]).to.deep.eq([0, 0, 0]);
     });
   });
   describe("areaOf(M{0,1,6}, {0,1000})", async function () {
@@ -326,3 +322,6 @@ describe("Integrator", async function () {
     });
   });
 });
+function Expect(big_numbers) {
+  return expect(big_numbers.map((bn) => bn.toNumber())).deep;
+}

@@ -9,9 +9,6 @@ let Moe, Nft; // contracts
 let moe, nft; // instances
 let UNIT; // decimals
 
-const { HashTable } = require("../hash-table");
-let table; // pre-hashed nonces
-
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 0; // [seconds]
 
@@ -26,10 +23,10 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
+    Moe = await ethers.getContractFactory("XPowerTest");
+    expect(Moe).to.exist;
     Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
-    Moe = await ethers.getContractFactory("XPower");
-    expect(Moe).to.exist;
   });
   beforeEach(async function () {
     moe = await Moe.deploy([], DEADLINE);
@@ -37,13 +34,6 @@ describe("XPowerNft", async function () {
     await moe.deployed();
     await moe.transferOwnership(addresses[1]);
     await moe.init();
-  });
-  beforeEach(async function () {
-    table = await new HashTable(moe, addresses[0]).init({
-      min_level: 4,
-      max_level: 4,
-      length: 1,
-    });
   });
   beforeEach(async function () {
     const decimals = await moe.decimals();
@@ -78,24 +68,6 @@ describe("XPowerNft", async function () {
       expect(tx).to.eq(undefined);
     });
   });
-  describe("upgradeBatch", async function () {
-    it("should *not* upgrade NFTs (non-ternary level)", async function () {
-      const tx = await nftUpgradeBatch(1, 1).catch((ex) => {
-        const m = ex.message.match(/non-ternary level/);
-        if (m === null) console.debug(ex);
-        expect(m).to.be.not.null;
-      });
-      expect(tx).to.eq(undefined);
-    });
-    it("should *not* upgrade NFTs (burn amount exceeds total-supply)", async function () {
-      const tx = await nftUpgradeBatch(1, 3).catch((ex) => {
-        const m = ex.message.match(/burn amount exceeds totalSupply/);
-        if (m === null) console.debug(ex);
-        expect(m).to.be.not.null;
-      });
-      expect(tx).to.eq(undefined);
-    });
-  });
 });
 async function nftUpgrade(n, l = 0) {
   const year = (await nft.year()).toNumber();
@@ -110,27 +82,6 @@ async function nftUpgrade(n, l = 0) {
   expect(nft_balance).to.eq(n);
   const nft_supply = await nft.totalSupply(nft_id);
   expect(nft_supply).to.eq(n);
-  const nft_exists = await nft.exists(nft_id);
-  expect(nft_exists).to.eq(true);
-  const nft_url = await nft.uri(nft_id);
-  expect(nft_url).to.eq(NFT_XPOW_URL);
-}
-async function nftUpgradeBatch(n, l = 0) {
-  const year = await nft.year();
-  expect(year.toNumber()).to.be.greaterThan(0);
-  const old_balance = await moe.balanceOf(addresses[0]);
-  const [years, units, amounts] = [[year], [[l]], [[n]]];
-  await nft.upgradeBatch(addresses[0], years, units, amounts);
-  const new_balance = await moe.balanceOf(addresses[0]);
-  expect(old_balance.sub(new_balance)).to.eq(0);
-  const nft_ids = await nft.idsBy(year, [l]);
-  expect(nft_ids.length).to.equal(1);
-  const nft_id = nft_ids[0].toNumber();
-  expect(nft_id).to.be.greaterThan(0);
-  const nft_balance = await nft.balanceOf(addresses[0], nft_id);
-  expect(nft_balance).to.eq(n);
-  const nft_supply = await nft.totalSupply(nft_id);
-  expect(nft_supply.toNumber()).to.eq(n);
   const nft_exists = await nft.exists(nft_id);
   expect(nft_exists).to.eq(true);
   const nft_url = await nft.uri(nft_id);

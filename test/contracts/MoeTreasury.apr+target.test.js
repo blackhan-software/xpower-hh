@@ -74,15 +74,15 @@ describe("MoeTreasury", async function () {
         const rate = positive(now_year - y) * 10_000;
         const rate_padded = String(rate).padStart(6, "0");
         it(`should return 0.${rate_padded}[%] for nft-year=${y} & now-year=${now_year}`, async () => {
-          expect(await mty.aprBonusTargetOf(ppt.idBy(y, 0))).to.eq(rate);
-          expect(await mty.aprBonusTargetOf(ppt.idBy(y, 3))).to.eq(rate);
-          expect(await mty.aprBonusTargetOf(ppt.idBy(y, 6))).to.eq(rate);
-          expect(await mty.aprBonusTargetOf(ppt.idBy(y, 9))).to.eq(rate);
-          expect(await mty.aprBonusTargetOf(ppt.idBy(y, 12))).to.eq(rate);
-          expect(await mty.aprBonusTargetOf(ppt.idBy(y, 15))).to.eq(rate);
-          expect(await mty.aprBonusTargetOf(ppt.idBy(y, 18))).to.eq(rate);
-          expect(await mty.aprBonusTargetOf(ppt.idBy(y, 21))).to.eq(rate);
-          expect(await mty.aprBonusTargetOf(ppt.idBy(y, 24))).to.eq(rate);
+          Expect(await mty.apbTargetOf(ppt.idBy(y, 0))).to.eq([rate, 1e6]);
+          Expect(await mty.apbTargetOf(ppt.idBy(y, 3))).to.eq([rate, 1e6]);
+          Expect(await mty.apbTargetOf(ppt.idBy(y, 6))).to.eq([rate, 1e6]);
+          Expect(await mty.apbTargetOf(ppt.idBy(y, 9))).to.eq([rate, 1e6]);
+          Expect(await mty.apbTargetOf(ppt.idBy(y, 12))).to.eq([rate, 1e6]);
+          Expect(await mty.apbTargetOf(ppt.idBy(y, 15))).to.eq([rate, 1e6]);
+          Expect(await mty.apbTargetOf(ppt.idBy(y, 18))).to.eq([rate, 1e6]);
+          Expect(await mty.apbTargetOf(ppt.idBy(y, 21))).to.eq([rate, 1e6]);
+          Expect(await mty.apbTargetOf(ppt.idBy(y, 24))).to.eq([rate, 1e6]);
         });
       }
       it(`should forward time by one year`, async function () {
@@ -92,3 +92,6 @@ describe("MoeTreasury", async function () {
     }
   });
 });
+function Expect(big_numbers) {
+  return expect(big_numbers.map((bn) => bn.toNumber())).deep;
+}

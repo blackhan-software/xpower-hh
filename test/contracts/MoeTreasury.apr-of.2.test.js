@@ -72,9 +72,8 @@ describe("MoeTreasury", async function () {
   });
   describe("set-apr", async function () {
     it("should reparameterize at 1[%] (per nft.level)", async function () {
-      const array = [0, 3, 1000000];
-      const tx = await mty.setAPRBatch([1202103], array);
-      expect(tx).to.not.eq(undefined);
+      const tx = await mty.setAPRBatch([202103], [0, 3, 1e6, 8]);
+      expect(tx).be.an("object");
     });
     it("should forward time by one month", async function () {
       await network.provider.send("evm_increaseTime", [MONTH]);
@@ -84,15 +83,14 @@ describe("MoeTreasury", async function () {
   describe("set-apr (monthly doubling for 24 months)", async function () {
     for (let m = 1; m <= 24; m++) {
       it("should print current & target values", async function () {
-        const tgt = (await mty.aprTargetOf(1202103)).toString();
-        const apr = (await mty.aprOf(1202103)).toString();
+        const tgt = Numbers(await mty.aprTargetOf(202103));
+        const apr = Numbers(await mty.aprOf(202103));
         console.debug("[APR]", m, apr, tgt);
       });
       const p = pct(m);
       it(`should reparameterize at ${p}[%] (per nft.level)`, async function () {
-        const array = [0, 3, 1000000 * 2 ** m];
-        const tx = await mty.setAPRBatch([1202103], array);
-        expect(tx).to.not.eq(undefined);
+        const tx = await mty.setAPRBatch([202103], [0, 3, 1e6 * 2 ** m, 8]);
+        expect(tx).be.an("object");
       });
       it("should forward time by one month", async function () {
         await network.provider.send("evm_increaseTime", [MONTH]);
@@ -101,6 +99,9 @@ describe("MoeTreasury", async function () {
     }
   });
 });
+function Numbers(big_numbers) {
+  return big_numbers.map((bn) => bn.toNumber());
+}
 function pct(m) {
   return 2 ** m;
 }

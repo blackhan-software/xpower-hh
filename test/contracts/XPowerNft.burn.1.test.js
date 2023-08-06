@@ -9,9 +9,6 @@ let Moe, Nft; // contracts
 let moe, nft; // instances
 let UNIT; // decimals
 
-const { HashTable } = require("../hash-table");
-const tables = {}; // pre-hashed nonces
-
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const DAYS = 86_400; // [seconds]
@@ -28,10 +25,10 @@ describe("XPowerNft", async function () {
     expect(addresses.length).to.be.greaterThan(15);
   });
   before(async function () {
+    Moe = await ethers.getContractFactory("XPowerTest");
+    expect(Moe).to.exist;
     Nft = await ethers.getContractFactory("XPowerNft");
     expect(Nft).to.exist;
-    Moe = await ethers.getContractFactory("XPower");
-    expect(Moe).to.exist;
   });
   beforeEach(async function () {
     moe = await Moe.deploy([], DEADLINE);
@@ -39,20 +36,6 @@ describe("XPowerNft", async function () {
     await moe.deployed();
     await moe.transferOwnership(addresses[1]);
     await moe.init();
-  });
-  beforeEach(async function () {
-    const a0 = addresses[0];
-    tables[a0] = await new HashTable(moe, a0).init({
-      min_level: 4,
-      max_level: 4,
-      length: 1,
-    });
-    const a2 = addresses[2];
-    tables[a2] = await new HashTable(moe, a2).init({
-      min_level: 4,
-      max_level: 4,
-      length: 1,
-    });
   });
   beforeEach(async function () {
     const decimals = await moe.decimals();
@@ -156,9 +139,7 @@ async function allowanceOf(n, a = accounts[0]) {
   expect(tx).to.be.an("object");
 }
 async function moeMint(n, a = accounts[0]) {
-  const [nonce, block_hash] = tables[a.address].nextNonce({ amount: n });
-  expect(nonce.gte(0)).to.eq(true);
-  const tx = await moe.connect(a).mint(a.address, block_hash, nonce);
+  const tx = await moe.connect(a).fake(a.address, BigInt(n) * UNIT);
   expect(tx).to.be.an("object");
   return tx;
 }

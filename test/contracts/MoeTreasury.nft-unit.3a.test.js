@@ -9,9 +9,6 @@ let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
 let moe, sov, nft, ppt, mty, nty; // instances
 let UNIT; // decimals
 
-const { HashTable } = require("../hash-table");
-let table; // pre-hashed nonces
-
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const DAYS = 86_400; // [seconds]
@@ -78,16 +75,7 @@ describe("MoeTreasury", async function () {
     expect(await sov.owner()).to.eq(mty.address);
   });
   before(async function () {
-    table = await new HashTable(moe, addresses[0]).init({
-      use_cache: true,
-      min_level: 4,
-      max_level: 4,
-      length: 1,
-    });
-    await mintToken(15);
-    table.reset();
-  });
-  before(async function () {
+    await mintToken(15n * UNIT);
     const supply = await moe.totalSupply();
     expect(supply).to.be.gte(15n * UNIT);
   });
@@ -108,9 +96,7 @@ describe("MoeTreasury", async function () {
       [account, nft_id] = await stakeNft(await mintNft(0, 1), 1);
     });
     it("should return zero [XPOW] in 0 year", async function () {
-      console.log(
-        `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
-      );
+      await PrintRates(mty, nft_id);
       expect(await mty.claimable(account, nft_id)).to.eq(0n * UNIT);
       const claimed = await mty.claim(account, nft_id).catch((ex) => {
         const m = ex.message.match(/nothing claimable/);
@@ -123,7 +109,7 @@ describe("MoeTreasury", async function () {
       await mty.grantRole(mty.APR_ROLE(), addresses[0]);
     });
     it("should reparameterize (per nft.level)", async function () {
-      const tx = await mty.setAPRBatch([202100], [1_000_000, U256, 1_000_000]);
+      const tx = await mty.setAPRBatch([202100], [1e6, U256, 1e6, 8]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -131,9 +117,7 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return zero [XPOW] in 1 year", async function () {
-      console.log(
-        `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
-      );
+      await PrintRates(mty, nft_id);
       expect(await mty.claimable(account, nft_id)).to.eq(0n * UNIT);
       const claimed = await mty.claim(account, nft_id).catch((ex) => {
         const m = ex.message.match(/nothing claimable/);
@@ -143,7 +127,7 @@ describe("MoeTreasury", async function () {
       expect(claimed).to.eq(undefined);
     });
     it("should reparameterize (per nft.level)", async function () {
-      const tx = await mty.setAPRBatch([202100], [1_000_000, U256, 1_000_000]);
+      const tx = await mty.setAPRBatch([202100], [1e6, U256, 1e6, 8]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -151,9 +135,7 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return zero [XPOW] in 2 years", async function () {
-      console.log(
-        `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
-      );
+      await PrintRates(mty, nft_id);
       expect(await mty.claimable(account, nft_id)).to.eq(0n * UNIT);
       const claimed = await mty.claim(account, nft_id).catch((ex) => {
         const m = ex.message.match(/nothing claimable/);
@@ -163,7 +145,7 @@ describe("MoeTreasury", async function () {
       expect(claimed).to.eq(undefined);
     });
     it("should reparameterize (per nft.level)", async function () {
-      const tx = await mty.setAPRBatch([202100], [1_000_000, U256, 1_000_000]);
+      const tx = await mty.setAPRBatch([202100], [1e6, U256, 1e6, 8]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -171,9 +153,7 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return zero [XPOW] in 3 years", async function () {
-      console.log(
-        `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
-      );
+      await PrintRates(mty, nft_id);
       expect(await mty.claimable(account, nft_id)).to.eq(0n * UNIT);
       const claimed = await mty.claim(account, nft_id).catch((ex) => {
         const m = ex.message.match(/nothing claimable/);
@@ -183,7 +163,7 @@ describe("MoeTreasury", async function () {
       expect(claimed).to.eq(undefined);
     });
     it("should reparameterize (per nft.level)", async function () {
-      const tx = await mty.setAPRBatch([202100], [1_000_000, U256, 1_000_000]);
+      const tx = await mty.setAPRBatch([202100], [1e6, U256, 1e6, 8]);
       expect(tx).to.not.eq(undefined);
     });
     it("should forward time by one year", async function () {
@@ -191,9 +171,7 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_mine", []);
     });
     it("should return zero [XPOW] in 4 years", async function () {
-      console.log(
-        `[APR] ${await mty.aprOf(nft_id)} & ${await mty.aprBonusOf(nft_id)}`
-      );
+      await PrintRates(mty, nft_id);
       expect(await mty.claimable(account, nft_id)).to.eq(0n * UNIT);
       const claimed = await mty.claim(account, nft_id).catch((ex) => {
         const m = ex.message.match(/nothing claimable/);
@@ -205,11 +183,7 @@ describe("MoeTreasury", async function () {
   });
 });
 async function mintToken(amount) {
-  const [nonce, block_hash] = table.nextNonce({ amount });
-  expect(nonce).to.gte(0);
-  const tx_cache = await moe.cache(block_hash);
-  expect(tx_cache).to.be.an("object");
-  const tx_mint = await moe.mint(addresses[0], block_hash, nonce);
+  const tx_mint = await moe.fake(addresses[0], amount);
   expect(tx_mint).to.be.an("object");
   const balance_0 = await moe.balanceOf(addresses[0]);
   expect(balance_0).to.be.gte(amount);
@@ -252,4 +226,16 @@ async function stakeNft(nft_id, amount) {
   const nft_balance = await nft.balanceOf(account, nft_id);
   expect(nft_balance).to.eq(nft_balance_old.sub(amount));
   return [account, nft_id];
+}
+async function PrintRates(mty, nft_id) {
+  console.log(
+    "[APR]",
+    Numbers(await mty.aprOf(nft_id)),
+    "&",
+    "[APB]",
+    Numbers(await mty.apbOf(nft_id))
+  );
+}
+function Numbers(big_numbers) {
+  return big_numbers.map((bn) => bn.toNumber());
 }

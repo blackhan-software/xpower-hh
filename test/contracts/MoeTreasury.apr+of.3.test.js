@@ -67,30 +67,30 @@ describe("MoeTreasury", async function () {
   });
   describe("grant-role", async function () {
     it(`should grant reparametrization right`, async function () {
-      await mty.grantRole(mty.APR_BONUS_ROLE(), addresses[0]);
+      await mty.grantRole(mty.APB_ROLE(), addresses[0]);
     });
   });
-  describe("set-apr-bonus", async function () {
+  describe("set-apb", async function () {
     it("should reparameterize at 0.010000[%] (per nft.year)", async function () {
-      const array = [0, 1, 10_000];
-      expect(await mty.setAPRBonusBatch([202103], array)).to.not.eq(undefined);
+      const tx = await mty.setAPBBatch([202103], [0, 1, 0.01e6, 8]);
+      expect(tx).be.an("object");
     });
     it("should forward time by one month", async function () {
       await network.provider.send("evm_increaseTime", [MONTH]);
       await network.provider.send("evm_mine", []);
     });
   });
-  describe("set-apr-bonus", async function () {
+  describe("set-apb", async function () {
     it("should reparameterize at 0.020000[%] (per nft.year)", async function () {
-      const array = [0, 1, 20_000];
-      expect(await mty.setAPRBonusBatch([202103], array)).to.not.eq(undefined);
+      const tx = await mty.setAPBBatch([202103], [0, 1, 0.02e6, 8]);
+      expect(tx).be.an("object");
     });
     for (let m = 1; m <= 24 * 4; m++) {
       it("should print current & target values", async function () {
         const nft_id = await nft.idBy(new Date().getFullYear() - 1, 3);
-        const tgt = (await mty.aprBonusTargetOf(nft_id)).toString();
-        const apr = (await mty.aprBonusOf(nft_id)).toString();
-        console.debug("[APR_BONUS]", m, apr, tgt);
+        const tgt = Numbers(await mty.apbTargetOf(nft_id));
+        const apb = Numbers(await mty.apbOf(nft_id));
+        console.debug("[APB]", m, apb, tgt);
       });
       it("should forward time by one month", async function () {
         await network.provider.send("evm_increaseTime", [MONTH / 4]);
@@ -99,3 +99,6 @@ describe("MoeTreasury", async function () {
     }
   });
 });
+function Numbers(big_numbers) {
+  return big_numbers.map((bn) => bn.toNumber());
+}

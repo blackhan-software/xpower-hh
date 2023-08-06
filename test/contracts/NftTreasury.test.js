@@ -9,9 +9,6 @@ let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
 let moe, sov, nft, ppt, mty, nty; // instances
 let UNIT; // decimals
 
-const { HashTable } = require("../hash-table");
-let table; // pre-hashed nonces
-
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
@@ -65,16 +62,13 @@ describe("NftTreasury", async function () {
     await nty.deployed();
   });
   beforeEach(async function () {
-    table = await new HashTable(moe, addresses[0]).init();
-  });
-  beforeEach(async function () {
     const decimals = await moe.decimals();
     expect(decimals).to.greaterThan(0);
     UNIT = 10n ** BigInt(decimals);
     expect(UNIT >= 1n).to.be.true;
   });
   beforeEach(async function () {
-    await mintToken(1);
+    await mintToken(1n * UNIT);
     await increaseAllowanceBy(UNIT, nft.address);
   });
   describe("stake", async function () {
@@ -215,9 +209,7 @@ describe("NftTreasury", async function () {
   });
 });
 async function mintToken(amount) {
-  const [nonce, block_hash] = table.getNonce({ amount });
-  expect(nonce).to.gte(0);
-  const tx_mint = await moe.mint(addresses[0], block_hash, nonce);
+  const tx_mint = await moe.fake(addresses[0], amount);
   expect(tx_mint).to.be.an("object");
   const balance_0 = await moe.balanceOf(addresses[0]);
   expect(balance_0).to.be.gte(amount);

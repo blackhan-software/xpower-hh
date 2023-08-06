@@ -16,9 +16,6 @@ let DECI_OLD, DECI_NEW; // 10 units
 let Mty, Nft, Ppt, Nty; // contracts
 let mty, nft, ppt, nty; // instances
 
-const { HashTable } = require("../hash-table");
-let table; // pre-hashed nonces
-
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const DAYS = 86_400; // [seconds]
@@ -107,17 +104,7 @@ describe("APower Migration", async function () {
     expect(await sov_old.owner()).to.eq(mty.address);
   });
   beforeEach(async function () {
-    table = await new HashTable(moe_old, A0).init({
-      use_cache: true,
-      min_level: 4,
-      max_level: 4,
-      length: 74,
-    });
-    for (let i = 0; i < 74; i++) {
-      const [n, bh] = await cacheBlockHash(15);
-      await mintToken(15, [n, bh]);
-    }
-    table.reset();
+    await mintToken(1110n * UNIT_OLD);
   });
   beforeEach(async function () {
     const old_supply = await moe_old.totalSupply();
@@ -224,15 +211,8 @@ describe("APower Migration", async function () {
     });
   });
 });
-async function cacheBlockHash(amount) {
-  const [nonce, block_hash] = table.nextNonce({ amount });
-  expect(nonce).to.gte(0);
-  const cache = await moe_old.cache(block_hash);
-  expect(cache).to.be.an("object");
-  return [nonce, block_hash];
-}
-async function mintToken(amount, [nonce, block_hash]) {
-  const tx_mint = await moe_old.mint(A0, block_hash, nonce);
+async function mintToken(amount) {
+  const tx_mint = await moe_old.fake(A0, amount);
   expect(tx_mint).to.be.an("object");
   const balance_0 = await moe_old.balanceOf(A0);
   expect(balance_0).to.be.gte(amount);

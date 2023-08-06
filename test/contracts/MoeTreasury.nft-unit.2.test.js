@@ -9,12 +9,10 @@ let Moe, Sov, Nft, Ppt, Nty, Mty; // contracts
 let moe, sov, nft, ppt, nty, mty; // instances
 let UNIT; // decimals
 
-const { HashTable } = require("../hash-table");
-let table; // pre-hashed nonces
-
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const DAYS = 86_400; // [seconds]
+const U256 = 2n ** 256n - 1n;
 
 describe("MoeTreasury", async function () {
   before(async function () {
@@ -76,16 +74,7 @@ describe("MoeTreasury", async function () {
     expect(await sov.owner()).to.eq(mty.address);
   });
   before(async function () {
-    table = await new HashTable(moe, addresses[0]).init({
-      use_cache: true,
-      min_level: 4,
-      max_level: 4,
-      length: 1,
-    });
-    await mintToken(15);
-    table.reset();
-  });
-  before(async function () {
+    await mintToken(15n * UNIT);
     const supply = await moe.totalSupply();
     expect(supply).to.be.gte(15n * UNIT);
   });
@@ -103,7 +92,7 @@ describe("MoeTreasury", async function () {
   describe("claim", async function () {
     it("should set average APR to 1.00[%]", async function () {
       await mty.grantRole(mty.APR_ROLE(), addresses[0]);
-      await mty.setAPR(202100, [1_000_000, 2n ** 256n - 1n, 1_000_000]);
+      await mty.setAPR(202100, [1e6, U256, 1e6, 8]);
     });
     it("should return 0 [XPOW] in 120 months", async function () {
       const [account, nft_id] = await stakeNft(await mintNft(0, 1), 1);
@@ -285,11 +274,7 @@ describe("MoeTreasury", async function () {
   });
 });
 async function mintToken(amount) {
-  const [nonce, block_hash] = table.nextNonce({ amount });
-  expect(nonce).to.gte(0);
-  const tx_cache = await moe.cache(block_hash);
-  expect(tx_cache).to.be.an("object");
-  const tx_mint = await moe.mint(addresses[0], block_hash, nonce);
+  const tx_mint = await moe.fake(addresses[0], amount);
   expect(tx_mint).to.be.an("object");
   const balance_0 = await moe.balanceOf(addresses[0]);
   expect(balance_0).to.be.gte(amount);

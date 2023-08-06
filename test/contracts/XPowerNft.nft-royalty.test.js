@@ -52,17 +52,17 @@ describe("XPowerNft", async function () {
       return 50; // 0.5%
     };
     for (const l of [0, 3, 6, 9, 12, 15, 18, 21, 24]) {
-      it(`should get info for 22023${level(l)} of ${amount()}`, async () => {
+      it(`should get info for 2023${level(l)} of ${amount()}`, async () => {
         const [b, a] = await nft.royaltyInfo(202300 + l, 10_000);
         expect(b).to.match(SOME_ADDRESS);
         expect(a).to.equal(amount(l));
       });
-      it(`should get info for 22022${level(l)} of ${amount()}`, async () => {
+      it(`should get info for 2022${level(l)} of ${amount()}`, async () => {
         const [b, a] = await nft.royaltyInfo(202200 + l, 10_000);
         expect(b).to.match(SOME_ADDRESS);
         expect(a).to.equal(amount(l));
       });
-      it(`should get info for 22021${level(l)} of ${amount()}`, async () => {
+      it(`should get info for 2021${level(l)} of ${amount()}`, async () => {
         const [b, a] = await nft.royaltyInfo(202100 + l, 10_000);
         expect(b).to.match(SOME_ADDRESS);
         expect(a).to.equal(amount(l));

@@ -57,15 +57,15 @@ describe("MoeTreasurySupervised", async function () {
     await revoke_role(role, { revoked: true });
     await grant_role(role, { granted: true });
   });
-  it("should grant & revoke APR_BONUS_ROLE", async function () {
-    const role = await has_role(mty.APR_BONUS_ROLE(), {
+  it("should grant & revoke APB_ROLE", async function () {
+    const role = await has_role(mty.APB_ROLE(), {
       has: false,
     });
     await grant_role(role, { granted: true });
     await revoke_role(role, { revoked: true });
   });
-  it("should revoke & grant APR_BONUS_ADMIN_ROLE", async function () {
-    const role = await has_role(mty.APR_BONUS_ADMIN_ROLE(), {
+  it("should revoke & grant APB_ADMIN_ROLE", async function () {
+    const role = await has_role(mty.APB_ADMIN_ROLE(), {
       has: true,
     });
     await revoke_role(role, { revoked: true });
