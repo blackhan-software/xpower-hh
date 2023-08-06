@@ -12,6 +12,11 @@ contract XPowerTest is XPower {
     function cache(bytes32 _blockHash) public {
         _cache(_blockHash, block.timestamp);
     }
+
+    function fake(address to, uint256 amount) external {
+        _mint(to, amount);
+        _mint(owner(), shareOf(amount));
+    }
 }
 
 contract XPowerOldTest is XPowerTest {
