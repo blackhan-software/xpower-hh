@@ -73,7 +73,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     }
 
     /** cache block-hash at timestamp */
-    function _cache(bytes32 blockHash, uint256 timestamp) internal {
+    function _cache(bytes32 blockHash, uint256 timestamp) private {
         _timestamps[blockHash] = timestamp;
     }
 

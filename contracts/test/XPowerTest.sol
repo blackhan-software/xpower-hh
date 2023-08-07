@@ -9,10 +9,6 @@ import {XPower} from "../XPower.sol";
 contract XPowerTest is XPower {
     constructor(address[] memory _base, uint256 _deadlineIn) XPower(_base, _deadlineIn) {}
 
-    function cache(bytes32 _blockHash) public {
-        _cache(_blockHash, block.timestamp);
-    }
-
     function fake(address to, uint256 amount) external {
         _mint(to, amount);
         _mint(owner(), shareOf(amount));
