@@ -1,10 +1,12 @@
+[![Main](https://github.com/blackhan-software/xpower-hh/actions/workflows/main.yaml/badge.svg)](https://github.com/blackhan-software/xpower-hh/actions/workflows/main.yaml)
+
 # XPower Token
 
 XPower is a proof-of-work token, i.e. it can only be minted by providing a correct nonce (with a recent block-hash). It has a maximum supply of 1.240T × 10^64 XPOW. To be exact:
 
 The maximum supply of the XPOW token is
 
-> 12406295275426735223954034108073704412850355499890060432797050421125652152320.000.
+> 12406295275426735223954034108073704412850355499890060432797050421125652152320.
 
 ## Installation
 
@@ -43,7 +45,7 @@ npx eslint '**/*.js' [--fix|--quiet]
 ### Prettier
 
 ```sh
-npx prettier '**/*.{json,sol,md}' [--check|--write]
+npx prettier '**/*.{json,md}' [--check|--write]
 ```
 
 ### Solhint
@@ -94,7 +96,7 @@ npx hardhat run 'scripts/deploy.js' [--no-compile] [--network $NETWORK]
 
 ## Mining & Minting
 
-XPower tokens can be mined and minted at [xpowermine.com](https://www.xpowermine.com/home), but you can also use a *terminal* based miner to do so. First, download the source code from this link, unpack the archive and then follow the instructions below:
+XPower tokens can be mined and minted at [xpowermine.com](https://www.xpowermine.com/home), but you can also use a _terminal_ based miner to do so. First, download the source code from this link, unpack the archive and then follow the instructions below:
 
 > https://github.com/xpowermine/xpower-hh/archive/refs/heads/main.zip
 
@@ -110,7 +112,7 @@ npm install && npm run build
 cp .env-avalanche-main .env
 ```
 
-..plus change in `.env` the `MINT_ADDRESS` to _your own_ one; don't forget to set the corresponding `MINT_ADDRESS_PK` _private key_ too. It's also possible to use the private key of a *different* address: That way the account of the beneficiary and the minting fee payer can be &mdash; for security purposes &mdash; separated.
+..plus change in `.env` the `MINT_ADDRESS` to _your own_ one; don't forget to set the corresponding `MINT_ADDRESS_PK` _private key_ too. It's also possible to use the private key of a _different_ address: That way the account of the beneficiary and the minting fee payer can be &mdash; for security purposes &mdash; separated.
 
 ```sh
 MINT_ADDRESS=0x...    # beneficiary address (account to *receive* minted tokens)
@@ -125,20 +127,21 @@ MINT_ADDRESS_PK=0x... # minter address' private key (can be a different account)
 ### Mining and Minting:
 
 ```sh
-Usage: hardhat [GLOBAL OPTIONS] mine [--cache <BOOLEAN>] [--json <BOOLEAN>] [--level <INT>] [--mint <BOOLEAN>] [--refresh <BOOLEAN>] [--workers <INT>] [...tokens]
+Usage: hardhat [GLOBAL OPTIONS] mine [--cache <BOOLEAN>] [--json <BOOLEAN>] [--level <INT>] [--mint <BOOLEAN>] [--nonce-bytes <INT>] [--refresh <BOOLEAN>] [--workers <INT>] [...tokens]
 
 OPTIONS:
 
   --cache       cache block-hash (default: true)
   --json        json logs (default: false)
-  --level       minimum minting threshold (default: 7)
+  --level       minimum minting threshold (default: 6)
   --mint        auto-mint if possible (default: true)
+  --nonce-bytes number of nonce bytes (default: 8)
   --refresh     refresh block-hash (default: false)
   --workers     number of mining processes (default: CPUs - 1)
 
 POSITIONAL ARGUMENTS:
 
-  tokens        thor, loki or odin (default: ["thor","loki","odin"])
+  tokens        xpow (default: ["xpow"])
 
 mine: Mines for XPower tokens
 ```
@@ -154,18 +157,18 @@ npx hardhat mine --network mainnet # | jq -rc 'select(.level=="info")|.message'
 ```
 
 ```txt
-[MINT#2|ACK] nonce=0x981...08d, block_hash=0x569...ade =>      31 XPOW [120.812 H/ms]
+[MINT#2|ACK] nonce=0x981...08d, block_hash=0x569...ade => 63 XPOW [279.289 H/ms]
 ...
 ```
 
-..where you should see the `[MINT]` prefix, if minting for the `nonce` value has been successful. Via the positional `tokens` arguments you can also choose which token(s) you want to mine and mint for: `thor`, `loki` or `odin`. Further, to skip minting *lower* valued amounts you can use the `level` option:
+..where you should see the `[MINT]` prefix, if minting for the `nonce` value has been successful. Further, to skip minting _lower_ valued amounts you can use the `level` option:
 
 ```sh
-npx hardhat mine --network mainnet --level 7 thor # | jq -rc '.message'
+npx hardhat mine --network mainnet --level 7 # | jq -rc '.message'
 ```
 
 ```txt
-[MINT#2|ACK] nonce=0x626...3c4, block_hash=0x699...09d => 7 XPOW [119.361 H/ms]
+[MINT#2|ACK] nonce=0x626...3c4, block_hash=0x699...09d => 127 XPOW [609.415 H/ms]
 ...
 ```
 
@@ -174,7 +177,7 @@ npx hardhat mine --network mainnet --level 7 thor # | jq -rc '.message'
 ### XPower and AVAX Balances
 
 ```sh
-npx hardhat balances-xpow --network mainnet [thor|loki|odin]
+npx hardhat balances-xpow --network mainnet
 ```
 
 ..which lists all present accounts with XPower balances.
@@ -247,7 +250,7 @@ Disable the timer service:
 systemctl disable --user xpow-miner@7.timer
 ```
 
-..to ensure that mining does *not* start upon a reboot.
+..to ensure that mining does _not_ start upon a reboot.
 
 ## Docker Integration
 
@@ -272,4 +275,4 @@ docker run -ti -e MINT_ADDRESS="$MINT_ADDRESS" -e MINT_ADDRESS_PK="$MINT_ADDRESS
 
 ## Copyright
 
- © 2023 [Blackhan Software Ltd](https://www.linkedin.com/company/blackhan)
+© 2023 [Blackhan Software Ltd](https://www.linkedin.com/company/blackhan)
