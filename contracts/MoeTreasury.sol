@@ -15,6 +15,8 @@ import {Power} from "./libs/Power.sol";
 import {Rpp} from "./libs/Rpp.sol";
 import {MoeTreasurySupervised} from "./base/Supervised.sol";
 
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+
 /**
  * Treasury to claim (MoE) tokens for staked XPowerNft(s).
  */
@@ -112,12 +114,10 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** @return reward amount */
     function rewardOf(address account, uint256 nftId) public view returns (uint256) {
         uint256 age = _ppt.ageOf(account, nftId);
-        (uint256 aprRate, uint256 aprBase) = aprOf(nftId);
-        (uint256 apbRate, uint256 apbBase) = apbOf(nftId);
+        uint256 rate = aprOf(nftId) + apbOf(nftId);
         uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
-        uint256 aprReward = (aprRate * age * denomination) / (aprBase * Constants.CENTURY);
-        uint256 apbReward = (apbRate * age * denomination) / (apbBase * Constants.CENTURY);
-        return (aprReward + apbReward) * 10 ** _moe.decimals();
+        uint256 reward = Math.mulDiv(rate * age, denomination, 1e6 * Constants.CENTURY);
+        return reward * 10 ** _moe.decimals();
     }
 
     /** @return reward amounts */
@@ -141,26 +141,25 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return duration weighted mean of APRs */
-    function aprOf(uint256 nftId) public view returns (uint256, uint256) {
-        (uint256 rate, uint256 base) = aprTargetOf(nftId);
+    function aprOf(uint256 nftId) public view returns (uint256) {
+        uint256 rate = aprTargetOf(nftId);
         uint256 id = _aprId(nftId);
         if (aprs[id].length > 0) {
-            uint256 mean = aprs[id].meanOf(block.timestamp, rate);
-            return (mean, base);
+            return aprs[id].meanOf(block.timestamp, rate);
         }
-        return (rate, base);
+        return rate;
     }
 
     /** @return target for annualized percentage rate */
-    function aprTargetOf(uint256 nftId) public view returns (uint256, uint256) {
+    function aprTargetOf(uint256 nftId) public view returns (uint256) {
         return aprTargetOf(nftId, getAPR(nftId));
     }
 
     /** @return target for annualized percentage rate */
-    function aprTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256, uint256) {
+    function aprTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256) {
         uint256 rate = Polynomial(array).eval3(_ppt.levelOf(nftId));
-        uint256 base = Power.raised(1e6, array[array.length - 1]);
-        return ((rate * 1e6) / base, 1e6);
+        uint256 base = Power.raise(1e6, array[array.length - 1]);
+        return Math.mulDiv(rate, 1e6, base);
     }
 
     /** annual percentage rate: 1.000000[%] (per nft.level) */
@@ -187,8 +186,8 @@ contract MoeTreasury is MoeTreasurySupervised {
         // fixed nft-id as anchor
         uint256 id = _aprId(nftId);
         // check APR reparametrization of value
-        (uint256 nextRate, ) = aprTargetOf(id, array);
-        (uint256 currRate, ) = aprTargetOf(id);
+        uint256 nextRate = aprTargetOf(id, array);
+        uint256 currRate = aprTargetOf(id);
         Rpp.checkValue(nextRate, currRate, 1e6);
         // check APR reparametrization of stamp
         Rpp.checkStamp(block.timestamp, _lastStamp[id]);
@@ -220,7 +219,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         for (uint256 i = 0; i < maxLength; i++) {
             uint256 id = _ppt.idBy(2021, 3 * i);
             Integrator.Item memory item = aprs[id].lastOf();
-            (uint256 target, ) = aprTargetOf(id);
+            uint256 target = aprTargetOf(id);
             if (item.stamp == 0) {
                 aprs[id].append(block.timestamp - Constants.MONTH, target);
                 aprs[id].append(block.timestamp, target); // laggy init
@@ -229,7 +228,7 @@ contract MoeTreasury is MoeTreasurySupervised {
             }
             if (shares[i] > 0) {
                 if (_apr[id].length == 0) {
-                    _apr[id] = new uint256[](4); // [add, div, mul, pow]
+                    _apr[id] = new uint256[](4); // [add, div, mul, exp]
                     _apr[id][0] = _scalar(APR_MUL, sum, bins, shares[i]);
                     _apr[id][1] = type(uint256).max; // div-by-infinity
                     _apr[id][2] = APR_MUL;
@@ -291,13 +290,13 @@ contract MoeTreasury is MoeTreasurySupervised {
         return (bins, sum, max);
     }
 
-    /** @return additive scalar (for mul, sum, bins & share) */
+    /** @return additive scalar */
     function _scalar(uint256 mul, uint256 sum, uint256 bins, int256 share) private pure returns (uint256) {
         assert(bins > 0 && share > 0); // no div-by-zero
-        return (mul * sum) / (bins * uint256(share));
+        return Math.mulDiv(mul, sum, bins * uint256(share));
     }
 
-    /** @return apr-id (for nft-level) */
+    /** @return apr-id */
     function _aprId(uint256 nftId) private view returns (uint256) {
         return _ppt.idBy(2021, _ppt.levelOf(nftId));
     }
@@ -314,31 +313,30 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return duration weighted mean of APBs (per nft.level) */
-    function apbOf(uint256 nftId) public view returns (uint256, uint256) {
-        (uint256 rate, uint256 base) = apbTargetOf(nftId);
+    function apbOf(uint256 nftId) public view returns (uint256) {
+        uint256 rate = apbTargetOf(nftId);
         uint256 id = _apbId(nftId);
         if (apbs[id].length > 0) {
-            uint256 mean = apbs[id].meanOf(block.timestamp, rate);
-            return (mean, base);
+            return apbs[id].meanOf(block.timestamp, rate);
         }
-        return (rate, base);
+        return rate;
     }
 
     /** @return target for annualized percentage rate bonus */
-    function apbTargetOf(uint256 nftId) public view returns (uint256, uint256) {
+    function apbTargetOf(uint256 nftId) public view returns (uint256) {
         return apbTargetOf(nftId, getAPB(nftId));
     }
 
     /** @return target for annualized percentage rate bonus */
-    function apbTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256, uint256) {
+    function apbTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256) {
         uint256 nowYear = _ppt.year();
         uint256 nftYear = _ppt.yearOf(nftId);
         if (nowYear > nftYear || nowYear == nftYear) {
             uint256 rate = Polynomial(array).eval3(nowYear - nftYear);
-            uint256 base = Power.raised(1e6, array[array.length - 1]);
-            return ((rate * 1e6) / base, 1e6);
+            uint256 base = Power.raise(1e6, array[array.length - 1]);
+            return Math.mulDiv(rate, 1e6, base);
         }
-        return (0, 1e6);
+        return 0;
     }
 
     /** annual percentage bonus: 1.0000[‱] (per nft.year) */
@@ -365,8 +363,8 @@ contract MoeTreasury is MoeTreasurySupervised {
         // fixed nft-id as anchor
         uint256 id = _apbId(nftId);
         // check APB reparametrization of value
-        (uint256 nextRate, ) = apbTargetOf(id, array);
-        (uint256 currRate, ) = apbTargetOf(id);
+        uint256 nextRate = apbTargetOf(id, array);
+        uint256 currRate = apbTargetOf(id);
         Rpp.checkValue(nextRate, currRate, 1e6);
         // check APB reparametrization of stamp
         Integrator.Item memory last = apbs[id].lastOf();
