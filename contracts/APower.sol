@@ -76,7 +76,7 @@ contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
         uint256 balance = _moe.balanceOf(address(this));
         uint256 supply = amount + this.totalSupply();
         if (supply > 0) {
-            return (amount * balance) / supply;
+            return Math.mulDiv(amount, balance, supply);
         }
         return 0;
     }
@@ -86,7 +86,7 @@ contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
         uint256 balance = _moe.balanceOf(address(this));
         uint256 supply = this.totalSupply();
         if (supply > 0) {
-            return (1e6 * balance) / supply;
+            return Math.mulDiv(1e6, balance, supply);
         }
         return 0;
     }
