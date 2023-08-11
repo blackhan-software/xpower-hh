@@ -56,16 +56,4 @@ library Polynomials {
         uint256 ratio = Math.mulDiv(value, p.array[2], p.array[1]);
         return Power.raise(ratio + p.array[0], p.array[3]);
     }
-
-    function subClamped(uint256 lhs, uint256 rhs) private pure returns (uint256) {
-        return lhs > rhs ? lhs - rhs : 0; // avoid less-than-0 error
-    }
-
-    function div(uint256 lhs, uint256 rhs) private pure returns (uint256) {
-        return lhs / rhs; // allow div-by-0 error
-    }
-
-    function divClamped(uint256 lhs, uint256 rhs) private pure returns (uint256) {
-        return rhs > 0 ? lhs / rhs : type(uint256).max; // avoid div-by-0 error
-    }
 }
