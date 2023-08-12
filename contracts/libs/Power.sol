@@ -14,9 +14,9 @@ library Power {
     /**
      * @return n raised to the power of (exp/[root=8])
      */
-    function raised(uint256 n, uint256 exp) internal pure returns (uint256) {
+    function raise(uint256 n, uint256 exp) internal pure returns (uint256) {
         (uint256 integer, uint256 fraction) = (exp / 8, exp % 8);
-        return n ** integer * _sqrt2(_eighth(n ** 2, fraction));
+        return n ** integer * _eighth(n, fraction);
     }
 
     function _eighth(uint256 n, uint256 exp) private pure returns (uint256) {
