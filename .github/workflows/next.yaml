@@ -14,21 +14,16 @@ jobs:
       matrix:
         node-version: [18.x]
         tests:
-          - Array.*
-          - Integrator.*
-          - Interpolator.*
-          - Polynomials.*
-          - XPower.*
-          - XPowerTest.*
-          - XPowerNft.*
-          - XPowerPpt.*
-          - APower.*
-          - NftTreasury.*
-          - MoeTreasury.apr{-,+}*
-          - MoeTreasury.batch.*
-          - MoeTreasury.nft-*
-          - MoeTreasury.{par,sup}*
-          - MoeTreasury.refresh-rates.*
+          - Libs/Array.*
+          - Libs/Integrator.*
+          - Libs/Polynomials.*
+          - Libs/Power.*
+          - APower/APower.*
+          - XPower/XPower.*
+          - XPowerNft/XPowerNft.*
+          - XPowerPpt/XPowerPpt.*
+          - NftTreasury/NftTreasury.*
+          - MoeTreasury/MoeTreasury.*
 
     steps:
       - uses: actions/checkout@v3
@@ -45,4 +40,4 @@ jobs:
           npm run build --if-present
 
       - name: Npm test
-        run: npm run -- test ./test/contracts/${{ matrix.tests }}
+        run: npm run -- test ./test/${{ matrix.tests }}
