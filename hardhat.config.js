@@ -2,12 +2,8 @@ const { task, types } = require("hardhat/config");
 const assert = require("assert");
 require("dotenv").config();
 
-require("@nomiclabs/hardhat-etherscan");
-require("@nomiclabs/hardhat-waffle");
-require("hardhat-gas-reporter");
-require("solidity-coverage");
-
-const { Token } = require("./source/token");
+require("@nomicfoundation/hardhat-toolbox");
+const { Token, format } = require("./source/token");
 const { start, workers } = require("./source/cluster");
 
 /**
@@ -25,12 +21,12 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
  * List balances of accounts for AVAX coins
  */
 task("balances-avax", "Prints the list of balances for AVAX coins").setAction(
-  async (args, hre) => {
-    const accounts = await hre.ethers.getSigners();
+  async (args, { ethers }) => {
+    const accounts = await ethers.getSigners();
     assert(accounts.length > 0, "missing accounts");
     for (const { address } of accounts) {
-      const balance = await hre.ethers.provider.getBalance(address);
-      console.log(`${address} => ${balance.toString()} nAVAX`);
+      const balance = await ethers.provider.getBalance(address);
+      console.log(`${address}: ${format(balance)} AVAX`);
     }
   }
 );
@@ -40,17 +36,18 @@ task("balances-avax", "Prints the list of balances for AVAX coins").setAction(
  */
 task("balances-xpow", "Prints the list of balances for XPower tokens")
   .addVariadicPositionalParam("tokens", "xpow", ["xpow"], types.string, true)
-  .setAction(async (args, hre) => {
-    const accounts = await hre.ethers.getSigners();
+  .setAction(async (args, { ethers }) => {
+    const accounts = await ethers.getSigners();
     assert(accounts.length > 0, "missing accounts");
     const symbols = Array.from(
       new Set(args.tokens.map((token) => Token.symbol(token)))
     );
     for (const symbol of symbols) {
       const xpower = await Token.contract(symbol);
+      const base = 10n ** (await xpower.decimals());
       for (const { address } of accounts) {
-        const balance = await xpower.balanceOf(address);
-        console.log(`${address} => ${balance.toString()} ${symbol}`);
+        const balance = Number(await xpower.balanceOf(address));
+        console.log(`${address}: ${format(balance, base)} ${symbol}`);
       }
     }
   });
@@ -67,8 +64,8 @@ task("mine", "Mines for XPower tokens")
   .addParam("refresh", "refresh block-hash", false, types.boolean)
   .addParam("workers", "number of mining processes", workers(), types.int)
   .addVariadicPositionalParam("tokens", "xpow", ["xpow"], types.string, true)
-  .setAction(async (args, hre) => {
-    const accounts = await hre.ethers.getSigners();
+  .setAction(async (args, { ethers }) => {
+    const accounts = await ethers.getSigners();
     assert(accounts.length > 0, "missing accounts");
     const beneficiary = process.env.MINT_ADDRESS;
     assert(beneficiary, "missing MINT_ADDRESS");
@@ -94,7 +91,7 @@ task("mine", "Mines for XPower tokens")
  */
 module.exports = {
   solidity: {
-    version: "0.8.18",
+    version: "0.8.19",
     settings: {
       optimizer: {
         enabled: true,
