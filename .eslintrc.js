@@ -1,17 +1,16 @@
 module.exports = {
   env: {
     browser: false,
-    es2021: true,
     mocha: true,
     node: true,
   },
   extends: [
     "standard",
-    "plugin:prettier/recommended",
     "plugin:node/recommended",
+    "plugin:prettier/recommended",
   ],
   parserOptions: {
-    ecmaVersion: 12,
+    ecmaVersion: 15,
   },
   globals: {
     hre: true,
@@ -27,7 +26,18 @@ module.exports = {
     },
     {
       files: ["hardhat.config.js", "scripts/**", "source/**", "test/**"],
-      rules: { "node/no-unpublished-require": "off" },
+      rules: {
+        "no-unused-vars": [
+          "error",
+          {
+            argsIgnorePattern: "^_",
+            varsIgnorePattern: "^_",
+            caughtErrorsIgnorePattern: "^_",
+          },
+        ],
+        "node/no-unpublished-require": ["off"],
+        "node/no-extraneous-require": ["off"],
+      },
     },
   ],
   rules: {
