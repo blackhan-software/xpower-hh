@@ -102,7 +102,7 @@ class HashTable {
             {
               encoding: "utf8",
               flag: "a",
-            }
+            },
           );
         }
         // if (a) {
