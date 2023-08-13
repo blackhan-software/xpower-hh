@@ -16,7 +16,7 @@ const log_init = (logger) => {
       logger(
         `[INIT#${worker}|${
           result ?? "..."
-        }] block_hash=${block_hash}, timestamp=${timestamp} => ${symbol}`
+        }] block_hash=${block_hash}, timestamp=${timestamp} => ${symbol}`,
       );
     }
   };
@@ -49,7 +49,7 @@ const log_mint = (logger) => {
       logger(
         `[MINT#${worker}|${
           result ?? "..."
-        }] nonce=${nonce}, block_hash=${block_hash} => ${amount} ${symbol} [${hms} H/ms]`
+        }] nonce=${nonce}, block_hash=${block_hash} => ${amount} ${symbol} [${hms} H/ms]`,
       );
     }
   };

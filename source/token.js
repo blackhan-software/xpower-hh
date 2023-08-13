@@ -1,4 +1,4 @@
-const { NonceManager } = require("./nonce-manager");
+const { NonceManager } = require("ethers");
 const assert = require("assert");
 
 class Token {
@@ -7,7 +7,7 @@ class Token {
       const signers = await hre.ethers.getSigners();
       assert(signers.length, "missing signers");
       const [signer] = signers.filter((s) =>
-        s.address.match(new RegExp(address, "i"))
+        s.address.match(new RegExp(address, "i")),
       );
       assert(signer, "missing signer for address");
       const manager = new NonceManager(signer);
@@ -60,7 +60,7 @@ const contract = async (symbol) => {
     case "XPOW": {
       const { address, env_name } = moe_latest(symbol);
       assert(address, `missing ${env_name}`);
-      return await hre.ethers.getContractAt("XPowerLoki", address);
+      return await hre.ethers.getContractAt("XPower", address);
     }
     default:
       throw new Error(`unknown ${symbol}`);

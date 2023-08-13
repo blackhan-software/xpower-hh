@@ -1,4 +1,4 @@
-const { solidityPack } = require("ethers/lib/utils");
+const { solidityPacked } = require("ethers");
 const { createKeccak } = require("hash-wasm");
 const { block } = require("./block");
 
@@ -33,13 +33,13 @@ class Miner {
     return (contract, address, block_hash, nonce) => {
       let value = this.abi_encoded[block_hash];
       if (value === undefined) {
-        const template = solidityPack(
+        const template = solidityPacked(
           ["uint160", "bytes32", "bytes"],
           [
             BigInt(contract) ^ BigInt(address),
             block_hash,
             new Uint8Array(nonce_length),
-          ]
+          ],
         );
         value = arrayify(template.slice(2));
         this.abi_encoded[block_hash] = value;

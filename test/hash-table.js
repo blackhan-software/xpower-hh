@@ -1,5 +1,5 @@
 const { ethers } = require("hardhat");
-const { hexlify } = ethers.utils;
+const { hexlify } = ethers;
 
 const fs = require("fs").promises;
 const { tmpdir } = require("os");
@@ -37,7 +37,7 @@ class HashTable {
     const at_interval = await this.contract.currentInterval();
     const block_hash = await this.contract.blockHashOf(at_interval);
     const symbol = await this.contract.symbol();
-    const contract_address = this.contract.address;
+    const contract_target = this.contract.target;
     const [date] = new Date().toISOString().split("T");
     const name = `${address}:${symbol}@${date}I${at_interval}[L${min_level}…${max_level}:${length}]`;
     const path = join(tmpdir(), name);
@@ -87,7 +87,7 @@ class HashTable {
         increment(nonce)
       ) {
         const x = hexlify(nonce);
-        const h = mine(contract_address, address, block_hash, nonce);
+        const h = mine(contract_target, address, block_hash, nonce);
         const a = token.amount_of(h);
         if (a < min_threshold) {
           continue;
@@ -127,13 +127,13 @@ class HashTable {
       this._index[amount] = 0;
     }
     const [nonce, block_hash] = this.get_nonce(amount, this._index[amount]++);
-    return [ethers.BigNumber.from(nonce), block_hash];
+    return [nonce, block_hash];
   }
 
   /** @returns [nonce, block-hash] for amount */
   getNonce({ amount, index = 0 }) {
     const [nonce, block_hash] = this.get_nonce(amount, index);
-    return [ethers.BigNumber.from(nonce), block_hash];
+    return [nonce, block_hash];
   }
 
   /** @returns hash for amount */
@@ -178,7 +178,7 @@ class HashTable {
       this._NBH2H = {};
     }
     const nbh = this.get_nonce(amount);
-    this._NBH2H[nbh.join(":")] = hexlify(Object.values(hash));
+    this._NBH2H[nbh.join(":")] = hexlify(hash);
   }
 
   /** @returns hash-cache[amount] => hash */

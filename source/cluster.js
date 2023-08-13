@@ -1,6 +1,3 @@
-const { BigNumber } = require("ethers");
-const crypto = require("crypto");
-
 const { logger, log_init, log_mint, dbg_mint, err_mint } = require("./log");
 
 const { block } = require("./block");
@@ -10,6 +7,7 @@ const { Miner } = require("./miner");
 const { Token } = require("./token");
 
 const cluster = require("cluster");
+const crypto = require("crypto");
 const process = require("process");
 const { cpus } = require("os");
 const { assert } = require("console");
@@ -17,7 +15,7 @@ const { assert } = require("console");
 async function start(
   symbols,
   [minter, beneficiary],
-  { cache, json, level, mint, nonce_length, n_workers, refresh }
+  { cache, json, level, mint, nonce_length, n_workers, refresh },
 ) {
   if (cluster.isPrimary) {
     const { counter } = await fork(n_workers);
@@ -34,7 +32,7 @@ async function start(
         cache,
         json,
       });
-      initialized[symbol] = { block_hash, timestamp };
+      initialized[symbol] = { block_hash, timestamp: Number(timestamp) };
     }
     for (const { id } of Object.values(cluster.workers)) {
       const symbol = symbols[(Number(id) - 1) % symbols.length];
@@ -128,7 +126,7 @@ async function busy() {
 async function init(
   symbol,
   [minter],
-  { block_hash, timestamp, cache, refresh, json }
+  { block_hash, timestamp, cache, refresh, json },
 ) {
   if (cache) {
     if (typeof refresh === "boolean") {
@@ -163,16 +161,16 @@ async function init(
 async function loop(
   symbol,
   [minter, beneficiary],
-  { block_hash, cache, json, level, mint, nonce_length, refresh, timestamp }
+  { block_hash, cache, json, level, mint, nonce_length, refresh, timestamp },
 ) {
   let [nonce, counter] = large_random(nonce_length);
   const { start, now } = { start: counter, now: performance.now() };
-  const { address } = await Token.contract(symbol, minter);
+  const { target } = await Token.contract(symbol, minter);
   const mine = await new Miner().init(nonce_length);
   const token = new Token(symbol);
   const threshold = token.threshold(level);
   while (true) {
-    const hash = mine(address, beneficiary, block_hash, nonce);
+    const hash = mine(target, beneficiary, block_hash, nonce);
     const amount = token.amount_of(hash);
     if (amount >= threshold) {
       const hms = Number(counter - start) / (performance.now() - now);
@@ -251,7 +249,7 @@ async function loop(
 function large_random(length) {
   const bytes = crypto.randomBytes(length);
   if (bytes[0] > 15) {
-    return [bytes, BigNumber.from(bytes).toBigInt()];
+    return [bytes, bytes.readBigUInt64BE()];
   }
   return large_random(length);
 }
