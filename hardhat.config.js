@@ -28,7 +28,7 @@ task("balances-avax", "Prints the list of balances for AVAX coins").setAction(
       const balance = await ethers.provider.getBalance(address);
       console.log(`${address}: ${format(balance)} AVAX`);
     }
-  }
+  },
 );
 
 /**
@@ -40,7 +40,7 @@ task("balances-xpow", "Prints the list of balances for XPower tokens")
     const accounts = await ethers.getSigners();
     assert(accounts.length > 0, "missing accounts");
     const symbols = Array.from(
-      new Set(args.tokens.map((token) => Token.symbol(token)))
+      new Set(args.tokens.map((token) => Token.symbol(token))),
     );
     for (const symbol of symbols) {
       const xpower = await Token.contract(symbol);
@@ -94,8 +94,8 @@ module.exports = {
     version: "0.8.19",
     settings: {
       optimizer: {
-        enabled: true,
-        runs: Number(process.env.OPTIMIZER_RUNS || 100),
+        enabled: Boolean(process.env.OPTIMIZER_FLAG || 1),
+        runs: Number(process.env.OPTIMIZER_RUNS || 200),
       },
     },
   },
