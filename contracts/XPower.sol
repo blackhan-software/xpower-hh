@@ -210,6 +210,6 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
 
     /** fee-tracker estimate: 21_000+700+1360+1088+68*8 */
     uint256 private constant FEE_ADD = 24_692_000_000_000;
-    uint256 private constant FEE_MUL = 1_0456706376942937;
+    uint256 private constant FEE_MUL = 1_0451368666278393;
     uint256 private constant FEE_DIV = 1_0000000000000000;
 }

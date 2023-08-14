@@ -6,7 +6,7 @@ import numpy as np
 import os
 
 base = os.path.dirname(os.path.abspath(__file__))
-path = os.path.join(base, 'loki-fee.log')
+path = os.path.join(base, 'xpow-fee.log')
 data = np.genfromtxt(path)
 
 fee = data[:,0]
