@@ -98,4 +98,7 @@ function moe_latest(symbol) {
     env_name: `${symbol}_MOE_V??`,
   };
 }
-exports.Token = Token;
+const format = (n, base = 10n ** 18n) => {
+  return (Number(n) / Number(base)).toFixed(3).padStart(9, " ");
+};
+module.exports = { Token, format };
