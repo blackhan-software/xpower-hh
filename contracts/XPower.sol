@@ -165,7 +165,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     /** fractional treasury share: 33[%] */
     uint256 private constant SHARE_MUL = 1;
     uint256 private constant SHARE_DIV = 2;
-    uint256 private constant SHARE_EXP = 8;
+    uint256 private constant SHARE_EXP = 256;
 
     /** @return share parameters */
     function getShare() public view returns (uint256[] memory) {

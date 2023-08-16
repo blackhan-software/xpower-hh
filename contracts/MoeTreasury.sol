@@ -165,7 +165,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** annual percentage rate: 1.000000[%] (per nft.level) */
     uint256 private constant APR_MUL = 1_000_000;
     uint256 private constant APR_DIV = 3;
-    uint256 private constant APR_EXP = 8;
+    uint256 private constant APR_EXP = 256;
 
     /** @return APR parameters */
     function getAPR(uint256 nftId) public view returns (uint256[] memory) {
@@ -342,7 +342,7 @@ contract MoeTreasury is MoeTreasurySupervised {
     /** annual percentage bonus: 1.0000[‱] (per nft.year) */
     uint256 private constant APB_MUL = 10_000;
     uint256 private constant APB_DIV = 1;
-    uint256 private constant APB_EXP = 8;
+    uint256 private constant APB_EXP = 256;
 
     /** @return APB parameters */
     function getAPB(uint256 nftId) public view returns (uint256[] memory) {
