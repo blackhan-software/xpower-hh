@@ -62,19 +62,14 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
             assert(blockHash > 0);
             uint256 timestamp = block.timestamp;
             assert(timestamp > 0);
-            _cache(blockHash, timestamp);
             _blockHashes[interval] = blockHash;
+            _timestamps[blockHash] = timestamp;
             emit Init(blockHash, timestamp);
         } else {
             bytes32 blockHash = _blockHashes[interval];
             uint256 timestamp = _timestamps[blockHash];
             emit Init(blockHash, timestamp);
         }
-    }
-
-    /** cache block-hash at timestamp */
-    function _cache(bytes32 blockHash, uint256 timestamp) private {
-        _timestamps[blockHash] = timestamp;
     }
 
     /** mint tokens for to-beneficiary, block-hash & data (incl. nonce) */
