@@ -10,7 +10,7 @@ struct Polynomial {
 
 library Polynomials {
     /**
-     * @return value evaluated with {(value+[5-4])*[3/2]+[1-0]}^{[6]/8}
+     * @return value evaluated with {(value+[5-4])*[3/2]+[1-0]}^{[6]/256}
      *
      * Evaluates a `value` using a linear function -- defined by
      * the provided polynomial coefficients.
@@ -23,7 +23,7 @@ library Polynomials {
     }
 
     /**
-     * @return value evaluated with {(value+[4-3])*[2/1]+[0]}^{[5]/8}
+     * @return value evaluated with {(value+[4-3])*[2/1]+[0]}^{[5]/256}
      *
      * Evaluates a `value` using a linear function -- defined by
      * the provided polynomial coefficients.
@@ -35,7 +35,7 @@ library Polynomials {
     }
 
     /**
-     * @return value evaluated with {(value)*[3/2]+[1-0]}^{[4]/8}
+     * @return value evaluated with {(value)*[3/2]+[1-0]}^{[4]/256}
      *
      * Evaluates a `value` using a linear function -- defined by
      * the provided polynomial coefficients.
@@ -47,7 +47,7 @@ library Polynomials {
     }
 
     /**
-     * @return value evaluated with {(value)*[2/1]+[0]}^{[3]/8}
+     * @return value evaluated with {(value)*[2/1]+[0]}^{[3]/256}
      *
      * Evaluates a `value` using a linear function -- defined by
      * the provided polynomial coefficients.
