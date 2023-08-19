@@ -73,7 +73,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     }
 
     /** mint tokens for to-beneficiary, block-hash & data (incl. nonce) */
-    function mint(address to, bytes32 blockHash, bytes memory data) external tracked {
+    function mint(address to, bytes32 blockHash, bytes calldata data) external tracked {
         // check block-hash to be in current interval
         require(_recent(blockHash), "expired block-hash");
         // calculate nonce-hash & pair-index for to, block-hash & data
@@ -108,7 +108,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     }
 
     /** @return hash of contract, to-beneficiary, block-hash & data (incl. nonce) */
-    function _hashOf(address to, bytes32 blockHash, bytes memory data) internal view returns (bytes32, bytes32) {
+    function _hashOf(address to, bytes32 blockHash, bytes calldata data) internal view returns (bytes32, bytes32) {
         bytes32 nonceHash = keccak256(bytes.concat(bytes20(uint160(address(this)) ^ uint160(to)), blockHash, data));
         return (nonceHash, nonceHash ^ blockHash);
     }
