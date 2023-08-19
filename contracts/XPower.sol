@@ -75,15 +75,15 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     /** mint tokens for to-beneficiary, block-hash & data (incl. nonce) */
     function mint(address to, bytes32 blockHash, bytes memory data) external tracked {
         // check block-hash to be in current interval
-        require(recent(blockHash), "expired block-hash");
+        require(_recent(blockHash), "expired block-hash");
         // calculate nonce-hash & pair-index for to, block-hash & data
-        (bytes32 nonceHash, bytes32 pairIndex) = hashOf(to, blockHash, data);
-        require(unique(pairIndex), "duplicate nonce-hash");
+        (bytes32 nonceHash, bytes32 pairIndex) = _hashOf(to, blockHash, data);
+        require(_unique(pairIndex), "duplicate nonce-hash");
         // calculate number of zeros of nonce-hash
-        uint256 zeros = zerosOf(nonceHash);
+        uint256 zeros = _zerosOf(nonceHash);
         require(zeros > 0, "empty nonce-hash");
         // calculate amount of tokens of zeros
-        uint256 amount = amountOf(zeros);
+        uint256 amount = _amountOf(zeros);
         // ensure unique (nonce-hash, block-hash)
         _hashes[pairIndex] = true;
         // mint for project treasury
@@ -93,7 +93,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     }
 
     /** @return block-hash */
-    function blockHashOf(uint256 interval) public view returns (bytes32) {
+    function blockHashOf(uint256 interval) external view returns (bytes32) {
         return _blockHashes[interval];
     }
 
@@ -103,23 +103,23 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     }
 
     /** check whether block-hash has recently been cached */
-    function recent(bytes32 blockHash) public view returns (bool) {
+    function _recent(bytes32 blockHash) private view returns (bool) {
         return _timestamps[blockHash] > currentInterval();
     }
 
     /** @return hash of contract, to-beneficiary, block-hash & data (incl. nonce) */
-    function hashOf(address to, bytes32 blockHash, bytes memory data) public view returns (bytes32, bytes32) {
+    function _hashOf(address to, bytes32 blockHash, bytes memory data) internal view returns (bytes32, bytes32) {
         bytes32 nonceHash = keccak256(bytes.concat(bytes20(uint160(address(this)) ^ uint160(to)), blockHash, data));
         return (nonceHash, nonceHash ^ blockHash);
     }
 
     /** check whether (nonce-hash, block-hash) pair is unique */
-    function unique(bytes32 pairIndex) public view returns (bool) {
+    function _unique(bytes32 pairIndex) private view returns (bool) {
         return !_hashes[pairIndex];
     }
 
     /** @return number of leading-zeros */
-    function zerosOf(bytes32 nonceHash) public pure returns (uint8) {
+    function _zerosOf(bytes32 nonceHash) internal pure returns (uint8) {
         if (nonceHash > 0) {
             return uint8(63 - (Math.log2(uint256(nonceHash)) >> 2));
         }
@@ -127,7 +127,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     }
 
     /** @return amount (for level) */
-    function amountOf(uint256 level) public view returns (uint256) {
+    function _amountOf(uint256 level) internal view returns (uint256) {
         return (2 ** level - 1) * 10 ** decimals();
     }
 
@@ -142,9 +142,9 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
             return shareTargetOf(amount);
         }
         uint256 stamp = block.timestamp;
-        uint256 value = shareTargetOf(amountOf(1));
+        uint256 value = shareTargetOf(_amountOf(1));
         uint256 point = shares.meanOf(stamp, value);
-        return (point * amount) / amountOf(1);
+        return (point * amount) / _amountOf(1);
     }
 
     /** @return share target */
@@ -175,12 +175,12 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
     }
 
     /** set share parameters */
-    function setShare(uint256[] memory array) public onlyRole(SHARE_ROLE) {
+    function setShare(uint256[] memory array) external onlyRole(SHARE_ROLE) {
         Rpp.checkArray(array);
         // check share reparametrization of value
-        uint256 nextValue = shareTargetOf(amountOf(1), array);
-        uint256 currValue = shareTargetOf(amountOf(1));
-        Rpp.checkValue(nextValue, currValue, amountOf(1));
+        uint256 nextValue = shareTargetOf(_amountOf(1), array);
+        uint256 currValue = shareTargetOf(_amountOf(1));
+        Rpp.checkValue(nextValue, currValue, _amountOf(1));
         // check share reparametrization of stamp
         uint256 lastStamp = shares.lastOf().stamp;
         uint256 currStamp = block.timestamp;

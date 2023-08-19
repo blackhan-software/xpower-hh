@@ -16,17 +16,17 @@ abstract contract URIMalleable is ERC1155, URIMalleableSupervised {
     string private _uriContract;
 
     /** get contract-level metadata URI */
-    function contractURI() public view returns (string memory) {
+    function contractURI() external view returns (string memory) {
         return _uriContract;
     }
 
     /** set contract-level metadata URI */
-    function setContractURI(string memory uri) public onlyRole(URI_DATA_ROLE) {
+    function setContractURI(string memory uri) external onlyRole(URI_DATA_ROLE) {
         _uriContract = uri;
     }
 
     /** set metadata URI (for all token types) */
-    function setURI(string memory uri) public onlyRole(URI_DATA_ROLE) {
+    function setURI(string memory uri) external onlyRole(URI_DATA_ROLE) {
         _setURI(uri);
     }
 

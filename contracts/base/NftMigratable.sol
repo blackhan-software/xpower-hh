@@ -108,7 +108,7 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     }
 
     /** @return seal flags (of all bases) */
-    function seals() public view returns (bool[] memory) {
+    function seals() external view returns (bool[] memory) {
         return _sealed;
     }
 

@@ -14,6 +14,18 @@ contract XPowerTest is XPower {
         _mint(to, amount);
         _mint(owner(), shareOf(amount));
     }
+
+    function hashOf(address to, bytes32 blockHash, bytes memory data) external view returns (bytes32, bytes32) {
+        return super._hashOf(to, blockHash, data);
+    }
+
+    function zerosOf(bytes32 nonceHash) external pure returns (uint8) {
+        return super._zerosOf(nonceHash);
+    }
+
+    function amountOf(uint256 level) external view returns (uint256) {
+        return super._amountOf(level);
+    }
 }
 
 contract XPowerOldTest is XPowerTest {
