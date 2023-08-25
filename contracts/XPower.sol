@@ -99,7 +99,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
 
     /** @return current interval's timestamp */
     function currentInterval() public view returns (uint256) {
-        return block.timestamp - (block.timestamp % (1 hours));
+        return block.timestamp / (1 hours);
     }
 
     /** check whether block-hash has recently been cached */
