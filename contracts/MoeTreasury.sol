@@ -75,12 +75,18 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return claimed amount */
-    function claimed(address account, uint256 nftId) public view returns (uint256) {
+    function claimed(
+        address account,
+        uint256 nftId
+    ) public view returns (uint256) {
         return _claimed[account][nftId];
     }
 
     /** @return claimed amounts */
-    function claimedBatch(address account, uint256[] memory nftIds) public view returns (uint256[] memory) {
+    function claimedBatch(
+        address account,
+        uint256[] memory nftIds
+    ) public view returns (uint256[] memory) {
         uint256[] memory claimedRewards = new uint256[](nftIds.length);
         for (uint256 i = 0; i < nftIds.length; i++) {
             claimedRewards[i] = claimed(account, nftIds[i]);
@@ -89,7 +95,10 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return claimable amount */
-    function claimable(address account, uint256 nftId) public view returns (uint256) {
+    function claimable(
+        address account,
+        uint256 nftId
+    ) public view returns (uint256) {
         uint256 claimedReward = claimed(account, nftId);
         uint256 generalReward = rewardOf(account, nftId);
         if (generalReward > claimedReward) {
@@ -99,7 +108,10 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return claimable amount */
-    function claimableBatch(address account, uint256[] memory nftIds) public view returns (uint256[] memory) {
+    function claimableBatch(
+        address account,
+        uint256[] memory nftIds
+    ) public view returns (uint256[] memory) {
         uint256[] memory claimedRewards = claimedBatch(account, nftIds);
         uint256[] memory generalRewards = rewardOfBatch(account, nftIds);
         uint256[] memory pendingRewards = new uint256[](nftIds.length);
@@ -112,16 +124,26 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return reward amount */
-    function rewardOf(address account, uint256 nftId) public view returns (uint256) {
+    function rewardOf(
+        address account,
+        uint256 nftId
+    ) public view returns (uint256) {
         uint256 age = _ppt.ageOf(account, nftId);
         uint256 rate = aprOf(nftId) + apbOf(nftId);
         uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
-        uint256 reward = Math.mulDiv(rate * age, denomination, 1e6 * Constants.CENTURY);
+        uint256 reward = Math.mulDiv(
+            rate * age,
+            denomination,
+            1e6 * Constants.CENTURY
+        );
         return reward * 10 ** _moe.decimals();
     }
 
     /** @return reward amounts */
-    function rewardOfBatch(address account, uint256[] memory nftIds) public view returns (uint256[] memory) {
+    function rewardOfBatch(
+        address account,
+        uint256[] memory nftIds
+    ) public view returns (uint256[] memory) {
         uint256[] memory rewards = new uint256[](nftIds.length);
         for (uint256 i = 0; i < nftIds.length; i++) {
             rewards[i] = rewardOf(account, nftIds[i]);
@@ -156,7 +178,10 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return target for annualized percentage rate */
-    function aprTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256) {
+    function aprTargetOf(
+        uint256 nftId,
+        uint256[] memory array
+    ) private view returns (uint256) {
         uint256 rate = Polynomial(array).eval3(_ppt.levelOf(nftId));
         uint256 base = Power.raise(1e6, array[array.length - 1]);
         return Math.mulDiv(rate, 1e6, base);
@@ -181,28 +206,40 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** set APR parameters */
-    function setAPR(uint256 nftId, uint256[] memory array) public onlyRole(APR_ROLE) {
+    function setAPR(
+        uint256 nftId,
+        uint256[] memory array
+    ) public onlyRole(APR_ROLE) {
         Rpp.checkArray(array);
         // fixed nft-id as anchor
         uint256 id = _aprId(nftId);
-        // check APR reparametrization of value
+        // check APR reparametrization of value (rate)
         uint256 nextRate = aprTargetOf(id, array);
         uint256 currRate = aprTargetOf(id);
         Rpp.checkValue(nextRate, currRate, 1e6);
+        // check APR reparametrization of value (mean)
+        uint256 nextMean = _aprMeanOf(array);
+        uint256 currMean = _aprMeanOf(_apr[id]);
+        Rpp.checkValue(nextMean, currMean, APR_MUL);
         // check APR reparametrization of stamp
-        Rpp.checkStamp(block.timestamp, _lastStamp[id]);
-        _lastStamp[id] = block.timestamp;
+        Integrator.Item memory last = aprs[id].lastOf("S");
+        Rpp.checkStamp(block.timestamp, last.stamp);
         // append (stamp, apr-of[nft-id]) to integrator
-        aprs[id].append(block.timestamp, currRate);
+        aprs[id].append(block.timestamp, currRate, "S");
         // all requirements satisfied: use array
         _apr[id] = array;
     }
 
-    /** _lastStamp[id] != aprs[id].lastOf().stamp */
-    mapping(uint256 => uint256) private _lastStamp;
+    /** @return mean of annualized percentage rate */
+    function _aprMeanOf(uint256[] memory array) private pure returns (uint256) {
+        return array.length > 2 ? array[2] : APR_MUL;
+    }
 
     /** batch-set APR parameters */
-    function setAPRBatch(uint256[] memory nftIds, uint256[] memory array) external onlyRole(APR_ROLE) {
+    function setAPRBatch(
+        uint256[] memory nftIds,
+        uint256[] memory array
+    ) external onlyRole(APR_ROLE) {
         for (uint256 i = 0; i < nftIds.length; i++) {
             setAPR(nftIds[i], array);
         }
@@ -278,7 +315,9 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return moments of (bins, sum, max) */
-    function _moments(int256[34] memory shares) private pure returns (uint256, uint256, uint256) {
+    function _moments(
+        int256[34] memory shares
+    ) private pure returns (uint256, uint256, uint256) {
         (uint256 bins, uint256 sum, uint256 max) = (0, 0, 0);
         for (uint256 i = 0; i < shares.length; i++) {
             if (shares[i] > 0) {
@@ -291,7 +330,12 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return additive scalar */
-    function _scalar(uint256 mul, uint256 sum, uint256 bins, int256 share) private pure returns (uint256) {
+    function _scalar(
+        uint256 mul,
+        uint256 sum,
+        uint256 bins,
+        int256 share
+    ) private pure returns (uint256) {
         assert(bins > 0 && share > 0); // no div-by-zero
         return Math.mulDiv(mul, sum, bins * uint256(share));
     }
@@ -328,7 +372,10 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** @return target for annualized percentage rate bonus */
-    function apbTargetOf(uint256 nftId, uint256[] memory array) private view returns (uint256) {
+    function apbTargetOf(
+        uint256 nftId,
+        uint256[] memory array
+    ) private view returns (uint256) {
         uint256 nowYear = _ppt.year();
         uint256 nftYear = _ppt.yearOf(nftId);
         if (nowYear > nftYear || nowYear == nftYear) {
@@ -358,7 +405,10 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** set APB parameters */
-    function setAPB(uint256 nftId, uint256[] memory array) public onlyRole(APB_ROLE) {
+    function setAPB(
+        uint256 nftId,
+        uint256[] memory array
+    ) public onlyRole(APB_ROLE) {
         Rpp.checkArray(array);
         // fixed nft-id as anchor
         uint256 id = _apbId(nftId);
@@ -376,7 +426,10 @@ contract MoeTreasury is MoeTreasurySupervised {
     }
 
     /** batch-set APB parameters */
-    function setAPBBatch(uint256[] memory nftIds, uint256[] memory array) external onlyRole(APB_ROLE) {
+    function setAPBBatch(
+        uint256[] memory nftIds,
+        uint256[] memory array
+    ) external onlyRole(APB_ROLE) {
         for (uint256 i = 0; i < nftIds.length; i++) {
             setAPB(nftIds[i], array);
         }
