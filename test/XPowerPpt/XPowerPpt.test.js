@@ -9,7 +9,6 @@ let ppt; // instance
 const DATA =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
-const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("XPowerPpt", async function () {
   before(async function () {
@@ -26,7 +25,7 @@ describe("XPowerPpt", async function () {
     expect(Ppt).to.be.an("object");
   });
   beforeEach(async function () {
-    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], 0);
     expect(ppt).to.be.an("object");
   });
   describe("mint", async function () {

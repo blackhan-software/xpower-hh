@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 const { expect } = require("chai");
 
-let power; // instances
+let power; // instance
 
 describe("Power", async function () {
   const error = (p, ref) => {

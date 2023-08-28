@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 const { expect } = require("chai");
 
-let poly; // instances
+let poly; // instance
 
 describe("Polynomials", async function () {
   before(async function () {

@@ -3,11 +3,10 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
-let moe, sov, nft, ppt, mty, nty; // instances
+let Moe, Sov, Nft, Ppt, Mty, Nty; // contract
+let moe, sov, nft, ppt, mty, nty; // instance
 
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
-const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const MONTH = 2_629_800; // [seconds]
 
 describe("MoeTreasury", async function () {
@@ -35,16 +34,16 @@ describe("MoeTreasury", async function () {
     expect(Nty).to.be.an("object");
   });
   before(async function () {
-    moe = await Moe.deploy([], DEADLINE);
+    moe = await Moe.deploy([], 0);
     expect(moe).to.be.an("object");
     await moe.init();
-    sov = await Sov.deploy(moe.target, [], DEADLINE);
+    sov = await Sov.deploy(moe.target, [], 0);
     expect(sov).to.be.an("object");
   });
   before(async function () {
-    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], DEADLINE);
+    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], 0);
     expect(nft).to.be.an("object");
-    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], 0);
     expect(ppt).to.be.an("object");
   });
   before(async function () {
@@ -64,7 +63,7 @@ describe("MoeTreasury", async function () {
   });
   describe("set-apr", async function () {
     it("should reparameterize at 1[%] (per nft.level)", async function () {
-      const tx = await mty.setAPRBatch([202103], [0, 3, 1e6, 256]);
+      const tx = await mty.setAPRBatch([202103], [0, 3, mul(1e6), 256]);
       expect(tx).be.an("object");
     });
     it("should forward time by one month", async function () {
@@ -74,7 +73,7 @@ describe("MoeTreasury", async function () {
   });
   describe("set-apr", async function () {
     it("should reparameterize at 2[%] (per nft.level)", async function () {
-      const tx = await mty.setAPRBatch([202103], [0, 3, 2e6, 256]);
+      const tx = await mty.setAPRBatch([202103], [0, 3, mul(2e6), 256]);
       expect(tx).be.an("object");
     });
     for (let m = 1; m <= 24 * 4; m++) {
@@ -90,3 +89,6 @@ describe("MoeTreasury", async function () {
     }
   });
 });
+function mul(n, ARR = 3.375) {
+  return Math.round(ARR * n);
+}

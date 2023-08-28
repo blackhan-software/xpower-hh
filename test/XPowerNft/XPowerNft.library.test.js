@@ -3,11 +3,10 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Nft; // contracts
-let moe, nft; // instances
+let Moe, Nft; // contract
+let moe, nft; // instance
 
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
-const DEADLINE = 0; // [seconds]
 
 describe("XPowerNft", async function () {
   before(async function () {
@@ -23,13 +22,13 @@ describe("XPowerNft", async function () {
     expect(Moe).to.be.an("object");
   });
   beforeEach(async function () {
-    moe = await Moe.deploy([], DEADLINE);
+    moe = await Moe.deploy([], 0);
     expect(moe).to.be.an("object");
     await moe.transferOwnership(addresses[1]);
     await moe.init();
   });
   beforeEach(async function () {
-    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], DEADLINE);
+    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], 0);
     expect(nft).to.be.an("object");
   });
   describe("levelOf", async function () {

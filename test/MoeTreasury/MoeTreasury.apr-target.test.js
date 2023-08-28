@@ -3,11 +3,10 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
-let moe, sov, nft, ppt, mty, nty; // instances
+let Moe, Sov, Nft, Ppt, Mty, Nty; // contract
+let moe, sov, nft, ppt, mty, nty; // instance
 
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
-const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("MoeTreasury", async function () {
   before(async function () {
@@ -34,16 +33,16 @@ describe("MoeTreasury", async function () {
     expect(Nty).to.be.an("object");
   });
   before(async function () {
-    moe = await Moe.deploy([], DEADLINE);
+    moe = await Moe.deploy([], 0);
     expect(moe).to.be.an("object");
     await moe.init();
-    sov = await Sov.deploy(moe.target, [], DEADLINE);
+    sov = await Sov.deploy(moe.target, [], 0);
     expect(sov).to.be.an("object");
   });
   before(async function () {
-    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], DEADLINE);
+    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], 0);
     expect(nft).to.be.an("object");
-    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], 0);
     expect(ppt).to.be.an("object");
   });
   before(async function () {
@@ -58,49 +57,52 @@ describe("MoeTreasury", async function () {
   });
   describe("apr-target (i.e rewards ~ nft-level)", async function () {
     it("should return 0[%] for nft-level=00", async function () {
-      expect(await mty.aprTargetOf(202100)).to.eq(0x0);
-      expect(await mty.aprTargetOf(202200)).to.eq(0x0);
-      expect(await mty.aprTargetOf(202300)).to.eq(0x0);
+      expect(await mty.aprTargetOf(202100)).to.eq(mul(0x0));
+      expect(await mty.aprTargetOf(202200)).to.eq(mul(0x0));
+      expect(await mty.aprTargetOf(202300)).to.eq(mul(0x0));
     });
     it("should return 1[%] for nft-level=03", async function () {
-      expect(await mty.aprTargetOf(202103)).to.eq(1e6);
-      expect(await mty.aprTargetOf(202203)).to.eq(1e6);
-      expect(await mty.aprTargetOf(202303)).to.eq(1e6);
+      expect(await mty.aprTargetOf(202103)).to.eq(mul(1e6));
+      expect(await mty.aprTargetOf(202203)).to.eq(mul(1e6));
+      expect(await mty.aprTargetOf(202303)).to.eq(mul(1e6));
     });
     it("should return 2[%] for nft-level=06", async function () {
-      expect(await mty.aprTargetOf(202106)).to.eq(2e6);
-      expect(await mty.aprTargetOf(202206)).to.eq(2e6);
-      expect(await mty.aprTargetOf(202306)).to.eq(2e6);
+      expect(await mty.aprTargetOf(202106)).to.eq(mul(2e6));
+      expect(await mty.aprTargetOf(202206)).to.eq(mul(2e6));
+      expect(await mty.aprTargetOf(202306)).to.eq(mul(2e6));
     });
     it("should return 3[%] for nft-level=09", async function () {
-      expect(await mty.aprTargetOf(202109)).to.eq(3e6);
-      expect(await mty.aprTargetOf(202209)).to.eq(3e6);
-      expect(await mty.aprTargetOf(202309)).to.eq(3e6);
+      expect(await mty.aprTargetOf(202109)).to.eq(mul(3e6));
+      expect(await mty.aprTargetOf(202209)).to.eq(mul(3e6));
+      expect(await mty.aprTargetOf(202309)).to.eq(mul(3e6));
     });
     it("should return 4[%] for nft-level=12", async function () {
-      expect(await mty.aprTargetOf(202112)).to.eq(4e6);
-      expect(await mty.aprTargetOf(202212)).to.eq(4e6);
-      expect(await mty.aprTargetOf(202312)).to.eq(4e6);
+      expect(await mty.aprTargetOf(202112)).to.eq(mul(4e6));
+      expect(await mty.aprTargetOf(202212)).to.eq(mul(4e6));
+      expect(await mty.aprTargetOf(202312)).to.eq(mul(4e6));
     });
     it("should return 5[%] for nft-level=15", async function () {
-      expect(await mty.aprTargetOf(202115)).to.eq(5e6);
-      expect(await mty.aprTargetOf(202215)).to.eq(5e6);
-      expect(await mty.aprTargetOf(202315)).to.eq(5e6);
+      expect(await mty.aprTargetOf(202115)).to.eq(mul(5e6));
+      expect(await mty.aprTargetOf(202215)).to.eq(mul(5e6));
+      expect(await mty.aprTargetOf(202315)).to.eq(mul(5e6));
     });
     it("should return 6[%] for nft-level=18", async function () {
-      expect(await mty.aprTargetOf(202118)).to.eq(6e6);
-      expect(await mty.aprTargetOf(202218)).to.eq(6e6);
-      expect(await mty.aprTargetOf(202318)).to.eq(6e6);
+      expect(await mty.aprTargetOf(202118)).to.eq(mul(6e6));
+      expect(await mty.aprTargetOf(202218)).to.eq(mul(6e6));
+      expect(await mty.aprTargetOf(202318)).to.eq(mul(6e6));
     });
     it("should return 7[%] for nft-level=21", async function () {
-      expect(await mty.aprTargetOf(202121)).to.eq(7e6);
-      expect(await mty.aprTargetOf(202221)).to.eq(7e6);
-      expect(await mty.aprTargetOf(202321)).to.eq(7e6);
+      expect(await mty.aprTargetOf(202121)).to.eq(mul(7e6));
+      expect(await mty.aprTargetOf(202221)).to.eq(mul(7e6));
+      expect(await mty.aprTargetOf(202321)).to.eq(mul(7e6));
     });
     it("should return 8[%] for nft-level=24", async function () {
-      expect(await mty.aprTargetOf(202124)).to.eq(8e6);
-      expect(await mty.aprTargetOf(202224)).to.eq(8e6);
-      expect(await mty.aprTargetOf(202324)).to.eq(8e6);
+      expect(await mty.aprTargetOf(202124)).to.eq(mul(8e6));
+      expect(await mty.aprTargetOf(202224)).to.eq(mul(8e6));
+      expect(await mty.aprTargetOf(202324)).to.eq(mul(8e6));
     });
   });
 });
+function mul(n, ARR = 3.375) {
+  return Math.round(ARR * n);
+}

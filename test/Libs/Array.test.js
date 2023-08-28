@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 const { expect } = require("chai");
 
-let array; // instances
+let array; // instance
 
 describe("Array", async function () {
   before(async function () {

@@ -3,10 +3,8 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Sov; // contracts
-let moe, sov; // instances
-
-const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
+let Moe, Sov; // contract
+let moe, sov; // instance
 
 describe("APowerSupervised", async function () {
   before(async function () {
@@ -22,10 +20,10 @@ describe("APowerSupervised", async function () {
     expect(Sov).to.be.an("object");
   });
   before(async function () {
-    moe = await Moe.deploy([], DEADLINE);
+    moe = await Moe.deploy([], 0);
     expect(moe).to.be.an("object");
     await moe.init();
-    sov = await Sov.deploy(moe.target, [], DEADLINE);
+    sov = await Sov.deploy(moe.target, [], 0);
     expect(sov).to.be.an("object");
   });
   it("should grant & revoke SOV_SEAL_ROLE", async function () {

@@ -3,11 +3,10 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
-let moe, sov, nft, ppt, mty, nty; // instances
+let Moe, Sov, Nft, Ppt, Mty, Nty; // contract
+let moe, sov, nft, ppt, mty, nty; // instance
 
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
-const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("NftTreasury", async function () {
   beforeEach(async function () {
@@ -31,15 +30,15 @@ describe("NftTreasury", async function () {
     expect(Nty).to.be.an("object");
   });
   beforeEach(async function () {
-    moe = await Moe.deploy([], DEADLINE);
+    moe = await Moe.deploy([], 0);
     expect(moe).to.be.an("object");
-    sov = await Sov.deploy(moe.target, [], DEADLINE);
+    sov = await Sov.deploy(moe.target, [], 0);
     expect(sov).to.be.an("object");
   });
   beforeEach(async function () {
-    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], DEADLINE);
+    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], 0);
     expect(nft).to.be.an("object");
-    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], 0);
     expect(ppt).to.be.an("object");
   });
   beforeEach(async function () {

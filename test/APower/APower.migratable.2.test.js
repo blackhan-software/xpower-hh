@@ -1,12 +1,11 @@
 const { ethers } = require("hardhat");
 const { expect } = require("chai");
 
-let MoeOld, MoeNew; // contracts
-let SovOld, SovNew; // contracts
-let moe_old, moe_new; // instances
-let sov_old, sov_new; // instances
+let MoeOld, MoeNew; // contract
+let SovOld, SovNew; // contract
+let moe_old, moe_new; // instance
+let sov_old, sov_new; // instance
 let UNIT_OLD, UNIT_NEW; // decimals
-let DECI_OLD, DECI_NEW; // 10 units
 
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
@@ -32,14 +31,12 @@ describe("APower Migration", async function () {
     expect(decimals).to.eq(36);
     UNIT_OLD = 10n ** BigInt(decimals);
     expect(UNIT_OLD >= 1n).to.eq(true);
-    DECI_OLD = 10n * UNIT_OLD;
   });
   beforeEach(async function () {
     const decimals = await moe_new.decimals();
     expect(decimals).to.eq(18);
     UNIT_NEW = 10n ** BigInt(decimals);
     expect(UNIT_NEW >= 1n).to.eq(true);
-    DECI_NEW = 10n * UNIT_NEW;
   });
   beforeEach(async function () {
     // deploy old apower contracts:
@@ -76,41 +73,41 @@ describe("APower Migration", async function () {
   describe("newUnits", async function () {
     it("should convert old moe-amount => new moe-amount", async function () {
       expect(await moe_new.newUnits(UNIT_OLD, 0)).to.eq(UNIT_NEW);
-      expect(await moe_new.newUnits(DECI_OLD, 0)).to.eq(DECI_NEW);
+      expect(await moe_new.newUnits(33n * UNIT_OLD, 0)).to.eq(33n * UNIT_NEW);
     });
     it("should convert old sov-amount => new sov-amount", async function () {
       expect(await sov_new.newUnits(UNIT_OLD, 0)).to.eq(UNIT_NEW);
-      expect(await sov_new.newUnits(DECI_OLD, 0)).to.eq(DECI_NEW);
+      expect(await sov_new.newUnits(33n * UNIT_OLD, 0)).to.eq(33n * UNIT_NEW);
     });
   });
   describe("oldUnits", async function () {
     it("should convert new moe-amount => old moe-amount", async function () {
       expect(await moe_new.oldUnits(UNIT_NEW, 0)).to.eq(UNIT_OLD);
-      expect(await moe_new.oldUnits(DECI_NEW, 0)).to.eq(DECI_OLD);
+      expect(await moe_new.oldUnits(33n * UNIT_NEW, 0)).to.eq(33n * UNIT_OLD);
     });
     it("should convert new sov-amount => old sov-amount", async function () {
       expect(await sov_new.oldUnits(UNIT_NEW, 0)).to.eq(UNIT_OLD);
-      expect(await sov_new.oldUnits(DECI_NEW, 0)).to.eq(DECI_OLD);
+      expect(await sov_new.oldUnits(33n * UNIT_NEW, 0)).to.eq(33n * UNIT_OLD);
     });
   });
   describe("moeUnits", async function () {
     it("should convert old sov-amount => old moe-units", async function () {
       expect(await sov_old.moeUnits(UNIT_OLD)).to.eq(UNIT_OLD);
-      expect(await sov_old.moeUnits(DECI_OLD)).to.eq(DECI_OLD);
+      expect(await sov_old.moeUnits(33n * UNIT_OLD)).to.eq(33n * UNIT_OLD);
     });
     it("should convert new sov-amount => new moe-units", async function () {
       expect(await sov_new.moeUnits(UNIT_NEW)).to.eq(UNIT_NEW);
-      expect(await sov_new.moeUnits(DECI_NEW)).to.eq(DECI_NEW);
+      expect(await sov_new.moeUnits(33n * UNIT_NEW)).to.eq(33n * UNIT_NEW);
     });
   });
   describe("sovUnits", async function () {
     it("should convert old moe-amount => old sov-units", async function () {
       expect(await sov_old.sovUnits(UNIT_OLD)).to.eq(UNIT_OLD);
-      expect(await sov_old.sovUnits(DECI_OLD)).to.eq(DECI_OLD);
+      expect(await sov_old.sovUnits(33n * UNIT_OLD)).to.eq(33n * UNIT_OLD);
     });
     it("should convert new moe-amount => new sov-units", async function () {
       expect(await sov_new.sovUnits(UNIT_NEW)).to.eq(UNIT_NEW);
-      expect(await sov_new.sovUnits(DECI_NEW)).to.eq(DECI_NEW);
+      expect(await sov_new.sovUnits(33n * UNIT_NEW)).to.eq(33n * UNIT_NEW);
     });
   });
 });

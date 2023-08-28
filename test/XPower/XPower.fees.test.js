@@ -3,14 +3,13 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let XPower; // contract
-let xpower; // instance
+let Moe; // contract
+let moe; // instance
 let UNIT; // decimals
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
-const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const LENGTH = BigInt(process.env.RUNS ?? 16n);
 
 describe("XPower", async function () {
@@ -26,23 +25,23 @@ describe("XPower", async function () {
     expect(addresses.length).to.be.greaterThan(1);
   });
   before(async function () {
-    XPower = await ethers.getContractFactory("XPowerTest");
+    Moe = await ethers.getContractFactory("XPowerTest");
   });
   before(async function () {
-    xpower = await XPower.deploy([], DEADLINE);
-    expect(xpower).to.be.an("object");
-    await xpower.transferOwnership(addresses[1]);
-    await xpower.init();
+    moe = await Moe.deploy([], 0);
+    expect(moe).to.be.an("object");
+    await moe.transferOwnership(addresses[1]);
+    await moe.init();
   });
   before(async function () {
-    table = await new HashTable(xpower, addresses[0]).init({
+    table = await new HashTable(moe, addresses[0]).init({
       length: LENGTH * 2n,
       min_level: 2,
       max_level: 2,
     });
   });
   before(async function () {
-    const decimals = await xpower.decimals();
+    const decimals = await moe.decimals();
     expect(decimals).to.greaterThan(0);
     UNIT = 10n ** BigInt(decimals);
     expect(UNIT >= 1n).to.eq(true);
@@ -53,12 +52,12 @@ describe("XPower", async function () {
         const [nonce, block_hash] = table.getNonce({ amount: 3, index });
         expect(nonce).to.match(/^0x[a-f0-9]+$/);
         try {
-          await xpower.mint(addresses[0], block_hash, nonce);
+          await moe.mint(addresses[0], block_hash, nonce);
         } catch (ex) {
           console.log("[ERR]", ex.message);
           return;
         }
-        const fees = await xpower.fees();
+        const fees = await moe.fees();
         expect(fees[0] > 0).to.eq(true);
         expect(fees[1] > 0).to.eq(true);
         expect(fees[2] > 0).to.eq(true);

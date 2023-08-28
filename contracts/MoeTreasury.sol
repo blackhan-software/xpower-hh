@@ -187,8 +187,8 @@ contract MoeTreasury is MoeTreasurySupervised {
         return Math.mulDiv(rate, 1e6, base);
     }
 
-    /** annual percentage rate: 1.000000[%] (per nft.level) */
-    uint256 private constant APR_MUL = 1_000_000;
+    /** annual percentage rate: 3.375000[%] (per nft.level) */
+    uint256 public constant APR_MUL = 3_375_000;
     uint256 private constant APR_DIV = 3;
     uint256 private constant APR_EXP = 256;
 

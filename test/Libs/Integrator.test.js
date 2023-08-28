@@ -3,7 +3,7 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let integrator; // instances
+let integrator; // instance
 
 const DAYS = 24 * 3600;
 const CENTURY = 365_25 * DAYS;

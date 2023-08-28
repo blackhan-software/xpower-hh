@@ -3,10 +3,8 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let XPower; // contracts
-let xpower; // instances
-
-const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
+let XPower; // contract
+let xpower; // instance
 
 describe("XPowerSupervised", async function () {
   before(async function () {
@@ -20,7 +18,7 @@ describe("XPowerSupervised", async function () {
     expect(XPower).to.be.an("object");
   });
   before(async function () {
-    xpower = await XPower.deploy([], DEADLINE);
+    xpower = await XPower.deploy([], 0);
     expect(xpower).to.be.an("object");
     await xpower.init();
   });

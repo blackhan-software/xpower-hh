@@ -3,11 +3,10 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Sov, Mty; // contracts
-let moe, sov, mty; // instances
+let Moe, Sov, Mty; // contract
+let moe, sov, mty; // instance
 
 const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
-const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 
 describe("MoeTreasurySupervised", async function () {
   before(async function () {
@@ -25,10 +24,10 @@ describe("MoeTreasurySupervised", async function () {
     expect(Mty).to.be.an("object");
   });
   before(async function () {
-    moe = await Moe.deploy([], DEADLINE);
+    moe = await Moe.deploy([], 0);
     expect(moe).to.be.an("object");
     await moe.init();
-    sov = await Sov.deploy(moe.target, [], DEADLINE);
+    sov = await Sov.deploy(moe.target, [], 0);
     expect(sov).to.be.an("object");
     mty = await Mty.deploy(moe.target, sov.target, NONE_ADDRESS);
     expect(mty).to.be.an("object");

@@ -3,13 +3,11 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
-let moe, sov, nft, ppt, mty, nty; // instances
+let Moe, Sov, Nft, Ppt, Mty, Nty; // contract
+let moe, sov, nft, ppt, mty, nty; // instance
 let UNIT; // decimals
 
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
-const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
-const APR = 1.0; // average percent
 
 describe("MoeTreasury", async function () {
   beforeEach(async function () {
@@ -33,16 +31,16 @@ describe("MoeTreasury", async function () {
     expect(Nty).to.be.an("object");
   });
   beforeEach(async function () {
-    moe = await Moe.deploy([], DEADLINE);
+    moe = await Moe.deploy([], 0);
     expect(moe).to.be.an("object");
     await moe.init();
-    sov = await Sov.deploy(moe.target, [], DEADLINE);
+    sov = await Sov.deploy(moe.target, [], 0);
     expect(sov).to.be.an("object");
   });
   beforeEach(async function () {
-    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], DEADLINE);
+    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], 0);
     expect(nft).to.be.an("object");
-    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], 0);
     expect(ppt).to.be.an("object");
   });
   beforeEach(async function () {
@@ -53,8 +51,8 @@ describe("MoeTreasury", async function () {
   });
   beforeEach(async function () {
     await mty.grantRole(mty.APR_ROLE(), addresses[0]);
-    await mty.setAPR(202100, [0, 3, APR * 1e6, 256]);
-    await mty.setAPR(202103, [0, 3, APR * 1e6, 256]);
+    await mty.setAPR(202100, [0, 3, mul(1e6), 256]);
+    await mty.setAPR(202103, [0, 3, mul(1e6), 256]);
   });
   beforeEach(async function () {
     await sov.transferOwnership(mty.target);
@@ -86,106 +84,106 @@ describe("MoeTreasury", async function () {
   });
   it("should fast refresh-rates [1E0×UNITs]", async function () {
     const nft_unit = await mintNft(0, 1);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0x0);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0x0), 1);
     await stakeNft(nft_unit, 1);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(1e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(1e6), 1);
   });
   it("should fast refresh-rates [2E0×UNITs]", async function () {
     const nft_unit = await mintNft(0, 2);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0x0);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0x0), 1);
     await stakeNft(nft_unit, 2);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(1e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(1e6), 1);
   });
   it("should fast refresh-rates [1E3×UNITs]", async function () {
     const nft_unit = await mintNft(0, 1e3);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0x0);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0x0), 1);
     await stakeNft(nft_unit, 1e3);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(1e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(1e6), 1);
   });
   it("should fast refresh-rates [2E3×UNITs]", async function () {
     const nft_unit = await mintNft(0, 2e3);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0x0);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0x0), 1);
     await stakeNft(nft_unit, 2e3);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(1e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(1e6), 1);
   });
   it("should fast refresh-rates [1E0×UNITs,1E0×KILOs]", async function () {
     const nft_unit = await mintNft(0, 1);
     const nft_kilo = await mintNft(3, 1);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0x0);
-    expect(await mty.aprTargetOf(nft_kilo)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0x0), 1);
+    expect(await mty.aprTargetOf(nft_kilo)).to.be.closeTo(mul(1e6), 1);
     await stakeNft(nft_unit, 1);
     await stakeNft(nft_kilo, 1);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0.5005e9);
-    expect(await mty.aprTargetOf(nft_kilo)).to.eq(APR * 0.5005e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0.5005e9), 1);
+    expect(await mty.aprTargetOf(nft_kilo)).to.be.closeTo(mul(0.5005e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0.5005e9);
-    expect(await mty.aprTargetOf(nft_kilo)).to.eq(APR * 0.5005e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0.5005e9), 1);
+    expect(await mty.aprTargetOf(nft_kilo)).to.be.closeTo(mul(0.5005e6), 1);
   });
   it("should fast refresh-rates [2E0×UNITs,2E0×KILOs]", async function () {
     const nft_unit = await mintNft(0, 2);
     const nft_kilo = await mintNft(3, 2);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0x0);
-    expect(await mty.aprTargetOf(nft_kilo)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0x0), 1);
+    expect(await mty.aprTargetOf(nft_kilo)).to.be.closeTo(mul(1e6), 1);
     await stakeNft(nft_unit, 2);
     await stakeNft(nft_kilo, 2);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0.5005e9);
-    expect(await mty.aprTargetOf(nft_kilo)).to.eq(APR * 0.5005e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0.5005e9), 1);
+    expect(await mty.aprTargetOf(nft_kilo)).to.be.closeTo(mul(0.5005e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0.5005e9);
-    expect(await mty.aprTargetOf(nft_kilo)).to.eq(APR * 0.5005e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0.5005e9), 1);
+    expect(await mty.aprTargetOf(nft_kilo)).to.be.closeTo(mul(0.5005e6), 1);
   });
   it("should fast refresh-rates [1E3×UNITs,1E0×KILOs]", async function () {
     const nft_unit = await mintNft(0, 1e3);
     const nft_kilo = await mintNft(3, 1);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 0x0);
-    expect(await mty.aprTargetOf(nft_kilo)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(0x0), 1);
+    expect(await mty.aprTargetOf(nft_kilo)).to.be.closeTo(mul(1e6), 1);
     await stakeNft(nft_unit, 1e3);
     await stakeNft(nft_kilo, 1);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 1e6);
-    expect(await mty.aprTargetOf(nft_kilo)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(1e6), 1);
+    expect(await mty.aprTargetOf(nft_kilo)).to.be.closeTo(mul(1e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit)).to.eq(APR * 1e6);
-    expect(await mty.aprTargetOf(nft_kilo)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit)).to.be.closeTo(mul(1e6), 1);
+    expect(await mty.aprTargetOf(nft_kilo)).to.be.closeTo(mul(1e6), 1);
   });
   it("should fast refresh-rates [2E3×UNITs,2E0×KILOs]", async function () {
     const nft_unit1 = await mintNft(0, 1e3);
-    expect(await mty.aprTargetOf(nft_unit1)).to.eq(APR * 0x0);
+    expect(await mty.aprTargetOf(nft_unit1)).to.be.closeTo(mul(0x0), 1);
     await stakeNft(nft_unit1, 1e3);
-    expect(await mty.aprTargetOf(nft_unit1)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit1)).to.be.closeTo(mul(1e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit1)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit1)).to.be.closeTo(mul(1e6), 1);
     const nft_unit2 = await mintNft(0, 1e3);
-    expect(await mty.aprTargetOf(nft_unit2)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit2)).to.be.closeTo(mul(1e6), 1);
     await stakeNft(nft_unit2, 1e3);
-    expect(await mty.aprTargetOf(nft_unit2)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit2)).to.be.closeTo(mul(1e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit2)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit2)).to.be.closeTo(mul(1e6), 1);
     const nft_kilo1 = await mintNft(3, 1);
-    expect(await mty.aprTargetOf(nft_unit1)).to.eq(APR * 1e6);
-    expect(await mty.aprTargetOf(nft_kilo1)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit1)).to.be.closeTo(mul(1e6), 1);
+    expect(await mty.aprTargetOf(nft_kilo1)).to.be.closeTo(mul(1e6), 1);
     await stakeNft(nft_kilo1, 1);
-    expect(await mty.aprTargetOf(nft_unit1)).to.eq(APR * 0.75e6);
-    expect(await mty.aprTargetOf(nft_kilo1)).to.eq(APR * 1.5e6);
+    expect(await mty.aprTargetOf(nft_unit1)).to.be.closeTo(mul(0.75e6), 1);
+    expect(await mty.aprTargetOf(nft_kilo1)).to.be.closeTo(mul(1.5e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit1)).to.eq(APR * 0.75e6);
-    expect(await mty.aprTargetOf(nft_kilo1)).to.eq(APR * 1.5e6);
+    expect(await mty.aprTargetOf(nft_unit1)).to.be.closeTo(mul(0.75e6), 1);
+    expect(await mty.aprTargetOf(nft_kilo1)).to.be.closeTo(mul(1.5e6), 1);
     const nft_kilo2 = await mintNft(3, 1);
-    expect(await mty.aprTargetOf(nft_unit2)).to.eq(APR * 0.75e6);
-    expect(await mty.aprTargetOf(nft_kilo2)).to.eq(APR * 1.5e6);
+    expect(await mty.aprTargetOf(nft_unit2)).to.be.closeTo(mul(0.75e6), 1);
+    expect(await mty.aprTargetOf(nft_kilo2)).to.be.closeTo(mul(1.5e6), 1);
     await stakeNft(nft_kilo2, 1);
-    expect(await mty.aprTargetOf(nft_unit2)).to.eq(APR * 1e6);
-    expect(await mty.aprTargetOf(nft_kilo2)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit2)).to.be.closeTo(mul(1e6), 1);
+    expect(await mty.aprTargetOf(nft_kilo2)).to.be.closeTo(mul(1e6), 1);
     await mty.refreshRates(false);
-    expect(await mty.aprTargetOf(nft_unit2)).to.eq(APR * 1e6);
-    expect(await mty.aprTargetOf(nft_kilo2)).to.eq(APR * 1e6);
+    expect(await mty.aprTargetOf(nft_unit2)).to.be.closeTo(mul(1e6), 1);
+    expect(await mty.aprTargetOf(nft_kilo2)).to.be.closeTo(mul(1e6), 1);
   });
 });
 async function mintToken(amount) {
@@ -228,4 +226,7 @@ async function stakeNft(nft_id, amount) {
   const nft_balance = await nft.balanceOf(account, nft_id);
   expect(nft_balance).to.eq(nft_balance_old - BigInt(amount));
   return nft_id;
+}
+function mul(n, ARR = 3.375) {
+  return Math.round(ARR * n);
 }

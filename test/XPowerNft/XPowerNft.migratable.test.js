@@ -3,9 +3,9 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Nft; // contracts
-let moe_old, nft_old; // instances
-let moe_new, nft_new; // instances
+let Moe, Nft; // contract
+let moe_old, nft_old; // instance
+let moe_new, nft_new; // instance
 let UNIT; // decimals
 
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";

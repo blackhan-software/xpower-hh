@@ -3,8 +3,8 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
-let moe, sov, nft, ppt, mty, nty; // instances
+let Moe, Sov, Nft, Ppt, Mty, Nty; // contract
+let moe, sov, nft, ppt, mty, nty; // instance
 
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
@@ -55,12 +55,12 @@ describe("MoeTreasury", async function () {
   });
   describe("parametrization of APR", async function () {
     it("should get array", async function () {
-      Expect(await mty.getAPR(202103)).to.eq([0, 3, 1e6, 256]);
+      Expect(await mty.getAPR(202103)).to.eq([0, 3, 3375e3, 256]);
     });
     it("should set array", async function () {
       await mty.grantRole(mty.APR_ROLE(), addresses[0]);
-      await mty.setAPR(202103, [0, 3, 2e6, 256]);
-      Expect(await mty.getAPR(202103)).to.eq([0, 3, 2e6, 256]);
+      await mty.setAPR(202103, [0, 3, 6750e3, 256]);
+      Expect(await mty.getAPR(202103)).to.eq([0, 3, 6750e3, 256]);
     });
     it("should *not* set array (invalid array.length)", async function () {
       await mty.grantRole(mty.APR_ROLE(), addresses[0]);
@@ -71,7 +71,7 @@ describe("MoeTreasury", async function () {
           expect(m).to.not.eq(null);
         }),
       ).to.eq(undefined);
-      Expect(await mty.getAPR(202103)).to.eq([0, 3, 1e6, 256]);
+      Expect(await mty.getAPR(202103)).to.eq([0, 3, 3375e3, 256]);
     });
     it("should *not* set array (invalid array[1] == 0)", async function () {
       await mty.grantRole(mty.APR_ROLE(), addresses[0]);
@@ -82,7 +82,7 @@ describe("MoeTreasury", async function () {
           expect(m).to.not.eq(null);
         }),
       ).to.eq(undefined);
-      Expect(await mty.getAPR(202103)).to.eq([0, 3, 1e6, 256]);
+      Expect(await mty.getAPR(202103)).to.eq([0, 3, 3375e3, 256]);
     });
     it("should *not* set array (invalid array[2] == 0)", async function () {
       await mty.grantRole(mty.APR_ROLE(), addresses[0]);
@@ -93,21 +93,21 @@ describe("MoeTreasury", async function () {
           expect(m).to.not.eq(null);
         }),
       ).to.eq(undefined);
-      Expect(await mty.getAPR(202103)).to.eq([0, 3, 1e6, 256]);
+      Expect(await mty.getAPR(202103)).to.eq([0, 3, 3375e3, 256]);
     });
     it("should *not* set array (missing role)", async function () {
       const [_owner, signer_1] = await ethers.getSigners();
       expect(
         await mty
           .connect(signer_1)
-          .setAPR(202103, [0, 3, 2e6, 256])
+          .setAPR(202103, [0, 3, 6750e3, 256])
           .catch((ex) => {
             const m = ex.message.match(/account 0x[0-9a-f]+ is missing role/);
             if (m === null) console.debug(ex);
             expect(m).to.not.eq(null);
           }),
       ).to.eq(undefined);
-      Expect(await mty.getAPR(202103)).to.eq([0, 3, 1e6, 256]);
+      Expect(await mty.getAPR(202103)).to.eq([0, 3, 3375e3, 256]);
     });
   });
   describe("parametrization of APR bonus", async function () {

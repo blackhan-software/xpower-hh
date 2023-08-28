@@ -3,14 +3,13 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Sov, Nft, Ppt, Mty, Nty; // contracts
-let moe, sov, nft, ppt, mty, nty; // instances
+let Moe, Sov, Nft, Ppt, Mty, Nty; // contract
+let moe, sov, nft, ppt, mty, nty; // instance
 let UNIT; // decimals
 
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
-const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
-const DAYS = 86_400; // [seconds]
-const YEAR = 365.25 * DAYS;
+const YEAR = 365.25 * 86_400; // [seconds];
+const U256 = 2n ** 256n - 1n;
 
 describe("MoeTreasury", async function () {
   before(async function () {
@@ -37,10 +36,10 @@ describe("MoeTreasury", async function () {
     expect(Nty).to.be.an("object");
   });
   before(async function () {
-    moe = await Moe.deploy([], DEADLINE);
+    moe = await Moe.deploy([], 0);
     expect(moe).to.be.an("object");
     await moe.init();
-    sov = await Sov.deploy(moe.target, [], DEADLINE);
+    sov = await Sov.deploy(moe.target, [], 0);
     expect(sov).to.be.an("object");
   });
   before(async function () {
@@ -50,9 +49,9 @@ describe("MoeTreasury", async function () {
     expect(UNIT >= 1n).to.eq(true);
   });
   before(async function () {
-    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], DEADLINE);
+    nft = await Nft.deploy(moe.target, NFT_XPOW_URL, [], 0);
     expect(nft).to.be.an("object");
-    ppt = await Ppt.deploy(NFT_XPOW_URL, [], DEADLINE);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], 0);
     expect(ppt).to.be.an("object");
   });
   before(async function () {
@@ -66,32 +65,50 @@ describe("MoeTreasury", async function () {
     expect(await sov.owner()).to.eq(mty.target);
   });
   before(async function () {
-    await mintToken(1110n * UNIT);
+    await mintToken(15n * UNIT);
     const supply = await moe.totalSupply();
-    expect(supply).to.be.gte(1110n * UNIT);
+    expect(supply).to.be.gte(15n * UNIT);
   });
   before(async function () {
-    await increaseAllowanceBy(1110n * UNIT, nft.target);
+    await increaseAllowanceBy(15n * UNIT, nft.target);
   });
   before(async function () {
-    await moe.transfer(mty.target, 110n * UNIT);
+    await moe.transfer(mty.target, 1n * UNIT);
   });
   describe("moeBalance", async function () {
-    it("should return 110n [XPOW]", async function () {
-      expect(await moe.balanceOf(mty.target)).to.eq(110n * UNIT);
+    it("should return 1n [XPOW]", async function () {
+      expect(await moe.balanceOf(mty.target)).to.eq(1n * UNIT);
     });
   });
   describe("claim", async function () {
     let account, nft_id;
-    it("should stake KILO NFTs", async function () {
-      [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
+    it("should stake UNIT NFTs", async function () {
+      [account, nft_id] = await stakeNft(await mintNft(0, 1), 1);
+    });
+    it("should return zero [APOW] in 0 year", async function () {
+      await PrintRates(mty, nft_id);
+      expect(await mty.claimable(account, nft_id)).to.eq(0);
+      const claimed = await mty.claim(account, nft_id).catch((ex) => {
+        const m = ex.message.match(/nothing claimable/);
+        if (m === null) console.debug(ex);
+        expect(m).to.not.eq(null);
+      });
+      expect(claimed).to.eq(undefined);
     });
     it("should grant reparametrization right", async function () {
       await mty.grantRole(mty.APR_ROLE(), addresses[0]);
     });
-    it("should return zero [XPOW] in 0 year", async function () {
+    it("should reparameterize (per nft.level)", async function () {
+      const tx = await mty.setAPRBatch([202100], [6750e3, U256, 6750e3, 256]);
+      expect(tx).to.be.an("object");
+    });
+    it("should forward time by one year", async function () {
+      await network.provider.send("evm_increaseTime", [YEAR]);
+      await network.provider.send("evm_mine", []);
+    });
+    it("should return zero [APOW] in 1 year", async function () {
       await PrintRates(mty, nft_id);
-      expect(await mty.claimable(account, nft_id)).to.eq(0n * UNIT);
+      expect(await mty.claimable(account, nft_id)).to.eq(0);
       const claimed = await mty.claim(account, nft_id).catch((ex) => {
         const m = ex.message.match(/nothing claimable/);
         if (m === null) console.debug(ex);
@@ -100,56 +117,58 @@ describe("MoeTreasury", async function () {
       expect(claimed).to.eq(undefined);
     });
     it("should reparameterize (per nft.level)", async function () {
-      const tx = await mty.setAPRBatch([202103], [0, 3, 2e6, 256]);
+      const tx = await mty.setAPRBatch([202100], [3375e3, U256, 3375e3, 256]);
       expect(tx).to.be.an("object");
     });
     it("should forward time by one year", async function () {
       await network.provider.send("evm_increaseTime", [YEAR]);
       await network.provider.send("evm_mine", []);
     });
-    it("should return some [XPOW] in 1 year", async function () {
+    it("should return zero [APOW] in 2 years", async function () {
       await PrintRates(mty, nft_id);
-      expect(await mty.claimable(account, nft_id)).to.eq(19n * UNIT);
-      expect(await mty.claim(account, nft_id)).to.be.an("object");
+      expect(await mty.claimable(account, nft_id)).to.eq(0);
+      const claimed = await mty.claim(account, nft_id).catch((ex) => {
+        const m = ex.message.match(/nothing claimable/);
+        if (m === null) console.debug(ex);
+        expect(m).to.not.eq(null);
+      });
+      expect(claimed).to.eq(undefined);
     });
     it("should reparameterize (per nft.level)", async function () {
-      const tx = await mty.setAPRBatch([202103], [0, 3, 1e6, 256]);
+      const tx = await mty.setAPRBatch([202100], [3375e3, U256, 3375e3, 256]);
       expect(tx).to.be.an("object");
     });
     it("should forward time by one year", async function () {
       await network.provider.send("evm_increaseTime", [YEAR]);
       await network.provider.send("evm_mine", []);
     });
-    it("should return some [XPOW] in 2 years", async function () {
+    it("should return zero [APOW] in 3 years", async function () {
       await PrintRates(mty, nft_id);
-      expect(await mty.claimable(account, nft_id)).to.eq(10n * UNIT);
-      expect(await mty.claim(account, nft_id)).to.be.an("object");
+      expect(await mty.claimable(account, nft_id)).to.eq(0);
+      const claimed = await mty.claim(account, nft_id).catch((ex) => {
+        const m = ex.message.match(/nothing claimable/);
+        if (m === null) console.debug(ex);
+        expect(m).to.not.eq(null);
+      });
+      expect(claimed).to.eq(undefined);
     });
     it("should reparameterize (per nft.level)", async function () {
-      const tx = await mty.setAPRBatch([202103], [0, 3, 1e6, 256]);
+      const tx = await mty.setAPRBatch([202100], [3375e3, U256, 3375e3, 256]);
       expect(tx).to.be.an("object");
     });
     it("should forward time by one year", async function () {
       await network.provider.send("evm_increaseTime", [YEAR]);
       await network.provider.send("evm_mine", []);
     });
-    it("should return some [XPOW] in 3 years", async function () {
+    it("should return zero [APOW] in 4 years", async function () {
       await PrintRates(mty, nft_id);
-      expect(await mty.claimable(account, nft_id)).to.eq(11n * UNIT);
-      expect(await mty.claim(account, nft_id)).to.be.an("object");
-    });
-    it("should reparameterize (per nft.level)", async function () {
-      const tx = await mty.setAPRBatch([202103], [0, 3, 1e6, 256]);
-      expect(tx).to.be.an("object");
-    });
-    it("should forward time by one year", async function () {
-      await network.provider.send("evm_increaseTime", [YEAR]);
-      await network.provider.send("evm_mine", []);
-    });
-    it("should return some [XPOW] in 4 years", async function () {
-      await PrintRates(mty, nft_id);
-      expect(await mty.claimable(account, nft_id)).to.eq(11n * UNIT);
-      expect(await mty.claim(account, nft_id)).to.be.an("object");
+      expect(await mty.claimable(account, nft_id)).to.eq(0);
+      const claimed = await mty.claim(account, nft_id).catch((ex) => {
+        const m = ex.message.match(/nothing claimable/);
+        if (m === null) console.debug(ex);
+        expect(m).to.not.eq(null);
+      });
+      expect(claimed).to.eq(undefined);
     });
   });
 });
