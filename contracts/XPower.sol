@@ -8,24 +8,16 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 
+import {Constants} from "./libs/Constants.sol";
 import {FeeTracker} from "./base/FeeTracker.sol";
 import {Migratable, MoeMigratable} from "./base/Migratable.sol";
-import {Supervised, XPowerSupervised} from "./base/Supervised.sol";
-
-import {Constants} from "./libs/Constants.sol";
-import {Integrator} from "./libs/Integrator.sol";
-import {Polynomials, Polynomial} from "./libs/Polynomials.sol";
-import {Rpp} from "./libs/Rpp.sol";
 
 /**
  * Class for the XPOW proof-of-work tokens: It verifies, that the nonce and the
  * block-hash result in a positive amount. After a successful verification, the
  * corresponding amount is minted for the beneficiary (plus the treasury).
  */
-contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSupervised, Ownable {
-    using Integrator for Integrator.Item[];
-    using Polynomials for Polynomial;
-
+contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, Ownable {
     /** set of nonce-hashes already minted for */
     mapping(bytes32 => bool) private _hashes;
     /** map from block-hashes to timestamps */
@@ -87,7 +79,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
         // ensure unique (nonce-hash, block-hash)
         _hashes[pairIndex] = true;
         // mint for project treasury
-        _mint(owner(), shareOf(amount));
+        _mint(owner(), amount * 2);
         // mint for beneficiary
         _mint(to, amount);
     }
@@ -131,70 +123,10 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, XPowerSuperv
         return (2 ** level - 1) * 10 ** decimals();
     }
 
-    /** integrator of shares: [(stamp, value)] */
-    Integrator.Item[] public shares;
-    /** parametrization of share: coefficients */
-    uint256[] private _share;
-
-    /** @return duration weighted mean of shares */
-    function shareOf(uint256 amount) public view returns (uint256) {
-        if (shares.length == 0) {
-            return shareTargetOf(amount);
-        }
-        uint256 stamp = block.timestamp;
-        uint256 value = shareTargetOf(_amountOf(1));
-        uint256 point = shares.meanOf(stamp, value);
-        return (point * amount) / _amountOf(1);
-    }
-
-    /** @return share target */
-    function shareTargetOf(uint256 amount) public view returns (uint256) {
-        return shareTargetOf(amount, getShare());
-    }
-
-    /** @return share target */
-    function shareTargetOf(uint256 amount, uint256[] memory array) private pure returns (uint256) {
-        return Polynomial(array).eval3(amount);
-    }
-
-    /** fractional treasury share: 33[%] */
-    uint256 private constant SHARE_MUL = 1;
-    uint256 private constant SHARE_DIV = 2;
-    uint256 private constant SHARE_EXP = 256;
-
-    /** @return share parameters */
-    function getShare() public view returns (uint256[] memory) {
-        if (_share.length > 0) {
-            return _share;
-        }
-        uint256[] memory array = new uint256[](4);
-        array[1] = SHARE_DIV;
-        array[2] = SHARE_MUL;
-        array[3] = SHARE_EXP;
-        return array;
-    }
-
-    /** set share parameters */
-    function setShare(uint256[] memory array) external onlyRole(SHARE_ROLE) {
-        Rpp.checkArray(array);
-        // check share reparametrization of value
-        uint256 nextValue = shareTargetOf(_amountOf(1), array);
-        uint256 currValue = shareTargetOf(_amountOf(1));
-        Rpp.checkValue(nextValue, currValue, _amountOf(1));
-        // check share reparametrization of stamp
-        uint256 lastStamp = shares.lastOf().stamp;
-        uint256 currStamp = block.timestamp;
-        Rpp.checkStamp(currStamp, lastStamp);
-        // append (stamp, share-of) to integrator
-        shares.append(currStamp, currValue);
-        // all requirements true: use array
-        _share = array;
-    }
-
     /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(MoeMigratable, Supervised) returns (bool) {
+    ) public view virtual override(MoeMigratable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 

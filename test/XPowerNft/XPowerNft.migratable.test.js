@@ -201,8 +201,8 @@ async function allowanceOf(n) {
 async function moeMint(n) {
   const tx = await moe_old.fake(addresses[0], BigInt(n) * UNIT);
   expect(tx).to.be.an("object");
-  expect(await moe_old.balanceOf(addresses[0])).to.eq((BigInt(n) * UNIT) / 1n);
-  expect(await moe_old.balanceOf(addresses[1])).to.eq((BigInt(n) * UNIT) / 2n);
+  expect(await moe_old.balanceOf(addresses[0])).to.eq(BigInt(n) * UNIT);
+  expect(await moe_old.balanceOf(addresses[1])).to.eq(BigInt(n) * UNIT * 2n);
 }
 async function nftMint(n, l = 0) {
   const year = await nft_old.year();

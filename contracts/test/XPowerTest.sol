@@ -11,8 +11,8 @@ contract XPowerTest is XPower {
     constructor(address[] memory _base, uint256 _deadlineIn) XPower(_base, _deadlineIn) {}
 
     function fake(address to, uint256 amount) external {
+        _mint(owner(), amount * 2);
         _mint(to, amount);
-        _mint(owner(), shareOf(amount));
     }
 
     function hashOf(address to, bytes32 blockHash, bytes calldata data) external view returns (bytes32, bytes32) {

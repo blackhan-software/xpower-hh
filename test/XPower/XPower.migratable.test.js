@@ -49,7 +49,7 @@ describe("XPower Migration", async function () {
     it("should mint for amount=1", async function () {
       const tx = await moe_old.fake(addresses[0], UNIT);
       expect(tx).to.be.an("object");
-      expect(await moe_old.balanceOf(addresses[0])).to.eq(UNIT + UNIT / 2n);
+      expect(await moe_old.balanceOf(addresses[0])).to.eq(UNIT + UNIT * 2n);
     });
   });
   describe("new", async function () {
@@ -60,12 +60,12 @@ describe("XPower Migration", async function () {
     it("should mint for amount=1", async function () {
       const tx = await moe_new.fake(addresses[0], UNIT);
       expect(tx).to.be.an("object");
-      expect(await moe_new.balanceOf(addresses[0])).to.eq(UNIT + UNIT / 2n);
+      expect(await moe_new.balanceOf(addresses[0])).to.eq(UNIT + UNIT * 2n);
     });
     it("should approve allowance old[1]", async function () {
       const tx = await moe_old.fake(addresses[0], UNIT);
       expect(tx).to.be.an("object");
-      expect(await moe_old.balanceOf(addresses[0])).to.eq(UNIT + UNIT / 2n);
+      expect(await moe_old.balanceOf(addresses[0])).to.eq(UNIT + UNIT * 2n);
       // increase allowance for spender (i.e. XPowerNew)
       const [owner, spender] = [addresses[0], moe_new.target];
       const old_increase = await moe_old.increaseAllowance(spender, UNIT);
@@ -120,7 +120,7 @@ describe("XPower Migration", async function () {
         expect(minter.address).to.match(/^0x/);
         const tx = await moe_old.connect(minter).fake(minter.address, 1n);
         expect(tx).to.be.an("object");
-        expect(await moe_old.balanceOf(minter.address)).to.eq(2n);
+        expect(await moe_old.balanceOf(minter.address)).to.eq(9n);
         // increase allowance for spender (i.e. XPowerNew)
         const [owner, spender] = [minter.address, moe_new.target];
         const old_increase = await moe_old
@@ -139,7 +139,7 @@ describe("XPower Migration", async function () {
         expect(new_migrated).to.eq(4n * UNIT);
         // ensure old[owner] = 1 & old[spender] = 0
         const old_balance_owner = await moe_old.balanceOf(owner);
-        expect(old_balance_owner).to.eq(1n);
+        expect(old_balance_owner).to.eq(8n);
         const old_balance_spender = await moe_old.balanceOf(spender);
         expect(old_balance_spender).to.eq(0n);
         // ensure new[owner] = 1 & new[spender] = 0
@@ -158,7 +158,7 @@ describe("XPower Migration", async function () {
     it("should *not* migrate old[0] (insufficient allowance)", async function () {
       const tx = await moe_old.fake(addresses[0], 1n);
       expect(tx).to.be.an("object");
-      expect(await moe_old.balanceOf(addresses[0])).to.eq(1n);
+      expect(await moe_old.balanceOf(addresses[0])).to.eq(3n);
       const new_migrate = await moe_new.migrate(1n, [0, 0]).catch((ex) => {
         const m = ex.message.match(/insufficient allowance/);
         if (m === null) console.debug(ex);
@@ -168,10 +168,10 @@ describe("XPower Migration", async function () {
       const new_migrated = await moe_new.migrated();
       expect(new_migrated).to.eq(0n);
     });
-    it("should *but* migrate old[0] = 1 balance", async function () {
+    it("should *but* migrate old[0] = 2 balance", async function () {
       const tx = await moe_old.fake(addresses[0], 1n);
       expect(tx).to.be.an("object");
-      expect(await moe_old.balanceOf(addresses[0])).to.eq(1n);
+      expect(await moe_old.balanceOf(addresses[0])).to.eq(3n);
       // increase allowance for spender (i.e. XPowerNew)
       const [owner, spender] = [addresses[0], moe_new.target];
       const old_increase = await moe_old.increaseAllowance(spender, 5n);
@@ -183,9 +183,9 @@ describe("XPower Migration", async function () {
       // migrate amount from old[owner] to new[owner]
       const new_migrate = await moe_new.migrate(2n, [0, 0]);
       expect(new_migrate).to.be.an("object");
-      // ensure migrated amount = 1 < 2
+      // ensure migrated amount = 2
       const new_migrated = await moe_new.migrated();
-      expect(new_migrated).to.eq(UNIT);
+      expect(new_migrated).to.eq(UNIT * 2n);
     });
     it("should migrate old[2]", async function () {
       const minter = accounts[2];
@@ -285,7 +285,7 @@ describe("XPower Migration", async function () {
       const tx = await moe_old.connect(minter).fake(minter.address, 3n);
       expect(tx).to.be.an("object");
       expect(await moe_old.balanceOf(minter.address)).to.eq(3n);
-      expect(await moe_old.balanceOf(addresses[0])).to.eq(1n);
+      expect(await moe_old.balanceOf(addresses[0])).to.eq(6n);
       // increase allowance for spender (i.e. XPowerNew)
       const [owner, spender] = [minter.address, moe_new.target];
       const old_increase = await moe_old
