@@ -15,14 +15,31 @@ const { ethers } = require("hardhat");
 /**
  * @returns list of base contract addresses
  */
-function moe_bases(
+function nft_bases(
   token,
-  versions = ["V2a", "V3a", "V4a", "V5a", "V5b", "V5c"],
+  versions = [
+    "V2a",
+    "V2b",
+    "V2c",
+    "V3a",
+    "V3b",
+    "V4a",
+    "V5a",
+    "V5b",
+    "V5c",
+    "V6a",
+    "V6b",
+    "V6c",
+    "V7a",
+    "V7b",
+    "V7c",
+    "V8a",
+  ],
 ) {
   return versions.map((version) => {
-    const moe_base = process.env[`${token}_MOE_${version}`];
-    assert(moe_base, `missing ${token}_MOE_${version}`);
-    return moe_base;
+    const nft_base = process.env[`${token}_NFT_${version}`];
+    assert(nft_base, `missing ${token}_NFT_${version}`);
+    return nft_base;
   });
 }
 /**
@@ -30,43 +47,51 @@ function moe_bases(
  * line interface. But, if this script is run *directly* using `node`, then you
  * may want to call compile manually to make sure everything is compiled:
  *
- * > await hre.run("compile");
+ * > await hre.run('compile');
  */
 async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
-  // addresses XPower[Old]
-  const moe_base = moe_bases("XPOW");
-  assert(moe_base.length === 6);
+  // addresses XPowerNft[Old]
+  const nft_base = nft_bases("XPOW");
+  assert(nft_base.length === 16);
+  // addresses XPower[New]
+  const moe_link = process.env.XPOW_MOE_V8b;
+  assert(moe_link, "missing XPOW_MOE_V8b");
+  // addresses XPowerNft[Uri]
+  const nft_uri = process.env.XPOW_NFT_URI;
+  assert(nft_uri, "missing XPOW_NFT_URI");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
-  // deploy XPower[New]
+  // deploy XPowerNft[New]:
   //
-  const { moe } = await deploy("XPower", {
-    moe_base,
+  const { nft } = await deploy("XPowerNft", {
+    moe_link,
+    nft_uri,
+    nft_base,
     deadline,
     owner,
   });
-  console.log(`XPOW_MOE_V6a=${moe.target}`);
+  console.log(`XPOW_NFT_V8b=${nft.target}`);
   //
   // verify contract(s):
   //
-  await verify("XPower", moe, moe_base, deadline);
+  await verify("XPowerNft", nft, moe_link, nft_uri, nft_base, deadline);
 }
-async function deploy(name, { moe_base, deadline, owner }) {
+async function deploy(name, { moe_link, nft_uri, nft_base, deadline, owner }) {
   const factory = await ethers.getContractFactory(name);
-  const contract = await factory.deploy(moe_base, deadline);
+  const contract = await factory.deploy(moe_link, nft_uri, nft_base, deadline);
   await wait(contract);
   const transfer = await contract.transferOwnership(owner);
   await wait(transfer);
-  return { moe: contract };
+  return { nft: contract };
 }
 async function verify(name, { target }, ...args) {
   if (hre.network.name.match(/mainnet|fuji/)) {
     return await hre.run("verify:verify", {
       address: target,
-      contract: `contracts/XPower.sol:${name}`,
+      contract: `contracts/XPowerNft.sol:${name}`,
       constructorArguments: args,
     });
   }

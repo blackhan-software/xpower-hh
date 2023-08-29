@@ -30,19 +30,19 @@ function ppt_bases(token, versions = []) {
  */
 async function main() {
   // addresses XPowerPpt[Old]
-  const xpow_ppt_base = ppt_bases("XPOW");
-  assert(xpow_ppt_base.length === 0);
+  const ppt_base = ppt_bases("XPOW");
+  assert(ppt_base.length === 0);
   // addresses XPowerNft[Uri]
-  const xpow_ppt_uri = process.env.XPOW_PPT_URI;
-  assert(xpow_ppt_uri, "missing XPOW_PPT_URI");
+  const ppt_uri = process.env.XPOW_PPT_URI;
+  assert(ppt_uri, "missing XPOW_PPT_URI");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerNft[New]:
   //
   const { ppt } = await deploy("XPowerPpt", {
-    ppt_uri: xpow_ppt_uri,
-    ppt_base: xpow_ppt_base,
+    ppt_uri,
+    ppt_base,
     deadline,
   });
   console.log(`XPOW_PPT_V4a=${ppt.target}`);

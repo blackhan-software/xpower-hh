@@ -17,7 +17,22 @@ const { ethers } = require("hardhat");
  */
 function moe_bases(
   token,
-  versions = ["V2a", "V3a", "V4a", "V5a", "V5b", "V5c"],
+  versions = [
+    "V1a",
+    "V2a",
+    "V3a",
+    "V4a",
+    "V5a",
+    "V5b",
+    "V5c",
+    "V6a",
+    "V6b",
+    "V6c",
+    "V7a",
+    "V7b",
+    "V7c",
+    "V8a",
+  ],
 ) {
   return versions.map((version) => {
     const moe_base = process.env[`${token}_MOE_${version}`];
@@ -37,7 +52,7 @@ async function main() {
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPower[Old]
   const moe_base = moe_bases("XPOW");
-  assert(moe_base.length === 6);
+  assert(moe_base.length === 14);
   // migration:
   const deadline = 126_230_400; // 4 years
   //
@@ -48,7 +63,7 @@ async function main() {
     deadline,
     owner,
   });
-  console.log(`XPOW_MOE_V6a=${moe.target}`);
+  console.log(`XPOW_MOE_V8b=${moe.target}`);
   //
   // verify contract(s):
   //

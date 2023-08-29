@@ -7,6 +7,7 @@
  * When running the script via `npx hardhat run <script>` you'll find the HRE's
  * members available in the global scope.
  */
+const hre = require("hardhat");
 const assert = require("assert");
 const { wait } = require("../wait");
 const { ethers } = require("hardhat");
@@ -20,14 +21,14 @@ const { ethers } = require("hardhat");
  */
 async function main() {
   // addresses XPower[New]
-  const moe_link = process.env.XPOW_MOE_V6a;
-  assert(moe_link, "missing XPOW_MOE_V6a");
+  const moe_link = process.env.XPOW_MOE_V8b;
+  assert(moe_link, "missing XPOW_MOE_V8b");
   // addresses APower[New]
-  const sov_link = process.env.XPOW_SOV_V6a;
-  assert(sov_link, "missing XPOW_SOV_V6a");
+  const sov_link = process.env.XPOW_SOV_V8b;
+  assert(sov_link, "missing XPOW_SOV_V8b");
   // addresses XPowerPpt[New]
-  const ppt_link = process.env.XPOW_PPT_V6a;
-  assert(ppt_link, "missing XPOW_PPT_V6a");
+  const ppt_link = process.env.XPOW_PPT_V8b;
+  assert(ppt_link, "missing XPOW_PPT_V8b");
   //
   // deploy XPOW NftTreasury[New] & re-own APower[New]:
   //
@@ -40,7 +41,11 @@ async function main() {
     sov_link,
     treasury: mty,
   });
-  console.log(`XPOW_MTY_V6a=${mty.target}`);
+  console.log(`XPOW_MTY_V8b=${mty.target}`);
+  //
+  // verify contract(s):
+  //
+  await verify("MoeTreasury", mty, moe_link, sov_link, ppt_link);
 }
 async function deploy(mty_name, { moe_link, sov_link, ppt_link }) {
   const factory = await ethers.getContractFactory(mty_name);
@@ -53,6 +58,15 @@ async function transfer(sov_name, { sov_link, treasury }) {
   const contract = factory.attach(sov_link);
   const transfer = await contract.transferOwnership(treasury.target);
   await wait(transfer);
+}
+async function verify(name, { target }, ...args) {
+  if (hre.network.name.match(/mainnet|fuji/)) {
+    return await hre.run("verify:verify", {
+      address: target,
+      contract: `contracts/MoeTreasury.sol:${name}`,
+      constructorArguments: args,
+    });
+  }
 }
 if (require.main === module) {
   main()

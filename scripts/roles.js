@@ -23,11 +23,6 @@ async function transferMoeRoles(factory_name, contract_name, { to: owner }) {
     to: owner,
   });
   await transferRole(contract, {
-    role: contract.SHARE_ADMIN_ROLE(),
-    from: signer.address,
-    to: owner,
-  });
-  await transferRole(contract, {
     role: contract.MOE_SEAL_ADMIN_ROLE(),
     from: signer.address,
     to: owner,

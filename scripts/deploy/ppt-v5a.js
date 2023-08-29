@@ -32,19 +32,19 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPowerPpt[Old]
-  const xpow_ppt_base = ppt_bases("XPOW");
-  assert(xpow_ppt_base.length === 1);
+  const ppt_base = ppt_bases("XPOW");
+  assert(ppt_base.length === 1);
   // addresses XPowerPpt[Uri]
-  const xpow_ppt_uri = process.env.XPOW_PPT_URI;
-  assert(xpow_ppt_uri, "missing XPOW_PPT_URI");
+  const ppt_uri = process.env.XPOW_PPT_URI;
+  assert(ppt_uri, "missing XPOW_PPT_URI");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerPpt[New]:
   //
   const { ppt } = await deploy("XPowerPpt", {
-    ppt_uri: xpow_ppt_uri,
-    ppt_base: xpow_ppt_base,
+    ppt_uri,
+    ppt_base,
     deadline,
   });
   console.log(`XPOW_PPT_V5a=${ppt.target}`);

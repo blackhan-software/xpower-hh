@@ -36,23 +36,23 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPowerNft[Old]
-  const xpow_nft_base = nft_bases("XPOW");
-  assert(xpow_nft_base.length === 6);
+  const nft_base = nft_bases("XPOW");
+  assert(nft_base.length === 6);
   // addresses XPower[New]
-  const xpow_moe_link = process.env.XPOW_MOE_V5c;
-  assert(xpow_moe_link, "missing XPOW_MOE_V5c");
+  const moe_link = process.env.XPOW_MOE_V5c;
+  assert(moe_link, "missing XPOW_MOE_V5c");
   // addresses XPowerNft[Uri]
-  const xpow_nft_uri = process.env.XPOW_NFT_URI;
-  assert(xpow_nft_uri, "missing XPOW_NFT_URI");
+  const nft_uri = process.env.XPOW_NFT_URI;
+  assert(nft_uri, "missing XPOW_NFT_URI");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerNft[New]:
   //
   const { nft } = await deploy("XPowerNft", {
-    moe_link: xpow_moe_link,
-    nft_uri: xpow_nft_uri,
-    nft_base: xpow_nft_base,
+    moe_link,
+    nft_uri,
+    nft_base,
     deadline,
     owner,
   });
@@ -60,14 +60,7 @@ async function main() {
   //
   // verify contract(s):
   //
-  await verify(
-    "XPowerNft",
-    nft,
-    xpow_moe_link,
-    xpow_nft_uri,
-    xpow_nft_base,
-    deadline,
-  );
+  await verify("XPowerNft", nft, moe_link, nft_uri, nft_base, deadline);
 }
 async function deploy(name, { moe_link, nft_uri, nft_base, deadline, owner }) {
   const factory = await ethers.getContractFactory(name);

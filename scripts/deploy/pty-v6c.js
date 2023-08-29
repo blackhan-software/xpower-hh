@@ -21,31 +21,31 @@ const { ethers } = require("hardhat");
  */
 async function main() {
   // addresses XPowerNft[New]
-  const xpow_nft_link = process.env.XPOW_NFT_V6c;
-  assert(xpow_nft_link, "missing XPOW_NFT_V6c");
+  const nft_link = process.env.XPOW_NFT_V6c;
+  assert(nft_link, "missing XPOW_NFT_V6c");
   // addresses XPowerPpt[New]
-  const xpow_ppt_link = process.env.XPOW_PPT_V6c;
-  assert(xpow_ppt_link, "missing XPOW_PPT_V6c");
+  const ppt_link = process.env.XPOW_PPT_V6c;
+  assert(ppt_link, "missing XPOW_PPT_V6c");
   // addresses MoeTreasury[New]
-  const xpow_mty_link = process.env.XPOW_MTY_V6c;
-  assert(xpow_mty_link, "missing XPOW_MTY_V6c");
+  const mty_link = process.env.XPOW_MTY_V6c;
+  assert(mty_link, "missing XPOW_MTY_V6c");
   //
   // deploy NftTreasury[New] & re-own XPowerPpt[New]:
   //
   const { nty } = await deploy("NftTreasury", {
-    nft_link: xpow_nft_link,
-    ppt_link: xpow_ppt_link,
-    mty_link: xpow_mty_link,
+    nft_link,
+    ppt_link,
+    mty_link,
   });
   await transfer("XPowerPpt", {
-    ppt_link: xpow_ppt_link,
+    ppt_link,
     treasury: nty,
   });
   console.log(`XPOW_PTY_V6c=${nty.target}`);
   //
   // verify contract(s):
   //
-  await verify("NftTreasury", nty, xpow_nft_link, xpow_ppt_link, xpow_mty_link);
+  await verify("NftTreasury", nty, nft_link, ppt_link, mty_link);
 }
 async function deploy(nty_name, { nft_link, ppt_link, mty_link }) {
   const factory = await ethers.getContractFactory(nty_name);

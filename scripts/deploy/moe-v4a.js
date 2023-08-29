@@ -32,15 +32,15 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPower[Old]
-  const xpow_moe_base = moe_bases("XPOW");
-  assert(xpow_moe_base.length === 1);
+  const moe_base = moe_bases("XPOW");
+  assert(moe_base.length === 1);
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPower[New]
   //
   const { moe } = await deploy("XPower", {
-    moe_base: xpow_moe_base,
+    moe_base,
     deadline,
     owner,
   });

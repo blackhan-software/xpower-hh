@@ -33,26 +33,26 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses APower[Old]
-  const xpow_sov_base = sov_bases("XPOW");
-  assert(xpow_sov_base.length === 2);
+  const sov_base = sov_bases("XPOW");
+  assert(sov_base.length === 2);
   // addresses XPower[New]
-  const xpow_moe_link = process.env.XPOW_MOE_V5c;
-  assert(xpow_moe_link, "missing XPOW_MOE_V5c");
+  const moe_link = process.env.XPOW_MOE_V5c;
+  assert(moe_link, "missing XPOW_MOE_V5c");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy APower[New]
   //
   const { sov } = await deploy("APower", {
-    moe_link: xpow_moe_link,
-    sov_base: xpow_sov_base,
+    moe_link,
+    sov_base,
     deadline,
   });
   console.log(`XPOW_SOV_V5c=${sov.target}`);
   //
   // verify contract(s):
   //
-  await verify("APower", sov, xpow_moe_link, xpow_sov_base, deadline);
+  await verify("APower", sov, moe_link, sov_base, deadline);
 }
 async function deploy(name, { moe_link, sov_base, deadline }) {
   const factory = await ethers.getContractFactory(name);

@@ -39,26 +39,26 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses XPowerPpt[Old]
-  const xpow_ppt_base = ppt_bases("XPOW");
-  assert(xpow_ppt_base.length === 7);
+  const ppt_base = ppt_bases("XPOW");
+  assert(ppt_base.length === 7);
   // addresses XPowerPpt[Uri]
-  const xpow_ppt_uri = process.env.XPOW_PPT_URI;
-  assert(xpow_ppt_uri, "missing XPOW_PPT_URI");
+  const ppt_uri = process.env.XPOW_PPT_URI;
+  assert(ppt_uri, "missing XPOW_PPT_URI");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy XPowerPpt[New]:
   //
   const { ppt } = await deploy("XPowerPpt", {
-    ppt_uri: xpow_ppt_uri,
-    ppt_base: xpow_ppt_base,
+    ppt_uri,
+    ppt_base,
     deadline,
   });
   console.log(`XPOW_PPT_V7a=${ppt.target}`);
   //
   // verify contract(s):
   //
-  await verify("XPowerPpt", ppt, xpow_ppt_uri, xpow_ppt_base, deadline);
+  await verify("XPowerPpt", ppt, ppt_uri, ppt_base, deadline);
 }
 async function deploy(name, { ppt_uri, ppt_base, deadline }) {
   const factory = await ethers.getContractFactory(name);

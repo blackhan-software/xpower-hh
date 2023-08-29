@@ -22,19 +22,19 @@ async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
   // addresses APower[Old]
-  const xpow_sov_base = process.env.XPOW_SOV_V5a;
-  assert(xpow_sov_base, "missing XPOW_SOV_V5a");
+  const sov_base = process.env.XPOW_SOV_V5a;
+  assert(sov_base, "missing XPOW_SOV_V5a");
   // addresses XPower[New]
-  const xpow_moe_link = process.env.XPOW_MOE_V5b;
-  assert(xpow_moe_link, "missing XPOW_MOE_V5b");
+  const moe_link = process.env.XPOW_MOE_V5b;
+  assert(moe_link, "missing XPOW_MOE_V5b");
   // migration:
   const deadline = 126_230_400; // 4 years
   //
   // deploy APower[New]
   //
   const { sov } = await deploy("APower", {
-    moe_link: xpow_moe_link,
-    sov_base: [xpow_sov_base],
+    moe_link,
+    sov_base: [sov_base],
     deadline,
   });
   console.log(`XPOW_SOV_V5b=${sov.target}`);

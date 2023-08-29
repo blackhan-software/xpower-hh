@@ -20,24 +20,24 @@ const { ethers } = require("hardhat");
  */
 async function main() {
   // addresses XPower[New]
-  const xpow_moe_link = process.env.XPOW_MOE_V5a;
-  assert(xpow_moe_link, "missing XPOW_MOE_V5a");
+  const moe_link = process.env.XPOW_MOE_V5a;
+  assert(moe_link, "missing XPOW_MOE_V5a");
   // addresses APower[New]
-  const xpow_sov_link = process.env.XPOW_SOV_V5a;
-  assert(xpow_sov_link, "missing XPOW_SOV_V5a");
+  const sov_link = process.env.XPOW_SOV_V5a;
+  assert(sov_link, "missing XPOW_SOV_V5a");
   // addresses XPowerPpt[New]
-  const xpow_ppt_link = process.env.XPOW_PPT_V5a;
-  assert(xpow_ppt_link, "missing XPOW_PPT_V5a");
+  const ppt_link = process.env.XPOW_PPT_V5a;
+  assert(ppt_link, "missing XPOW_PPT_V5a");
   //
   // deploy XPOW NftTreasury[New] & re-own APower[New]:
   //
   const { mty } = await deploy("MoeTreasury", {
-    moe_link: xpow_moe_link,
-    sov_link: xpow_sov_link,
-    ppt_link: xpow_ppt_link,
+    moe_link,
+    sov_link,
+    ppt_link,
   });
   await transfer("APower", {
-    sov_link: xpow_sov_link,
+    sov_link,
     treasury: mty,
   });
   console.log(`XPOW_MTY_V5a=${mty.target}`);

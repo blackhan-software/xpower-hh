@@ -21,31 +21,31 @@ const { ethers } = require("hardhat");
  */
 async function main() {
   // addresses XPower[New]
-  const xpow_moe_link = process.env.XPOW_MOE_V6b;
-  assert(xpow_moe_link, "missing XPOW_MOE_V6b");
+  const moe_link = process.env.XPOW_MOE_V6b;
+  assert(moe_link, "missing XPOW_MOE_V6b");
   // addresses APower[New]
-  const xpow_sov_link = process.env.XPOW_SOV_V6b;
-  assert(xpow_sov_link, "missing XPOW_SOV_V6b");
+  const sov_link = process.env.XPOW_SOV_V6b;
+  assert(sov_link, "missing XPOW_SOV_V6b");
   // addresses XPowerPpt[New]
-  const xpow_ppt_link = process.env.XPOW_PPT_V6b;
-  assert(xpow_ppt_link, "missing XPOW_PPT_V6b");
+  const ppt_link = process.env.XPOW_PPT_V6b;
+  assert(ppt_link, "missing XPOW_PPT_V6b");
   //
   // deploy XPOW NftTreasury[New] & re-own APower[New]:
   //
   const { mty } = await deploy("MoeTreasury", {
-    moe_link: xpow_moe_link,
-    sov_link: xpow_sov_link,
-    ppt_link: xpow_ppt_link,
+    moe_link,
+    sov_link,
+    ppt_link,
   });
   await transfer("APower", {
-    sov_link: xpow_sov_link,
+    sov_link,
     treasury: mty,
   });
   console.log(`XPOW_MTY_V6b=${mty.target}`);
   //
   // verify contract(s):
   //
-  await verify("MoeTreasury", mty, xpow_moe_link, xpow_sov_link, xpow_ppt_link);
+  await verify("MoeTreasury", mty, moe_link, sov_link, ppt_link);
 }
 async function deploy(mty_name, { moe_link, sov_link, ppt_link }) {
   const factory = await ethers.getContractFactory(mty_name);

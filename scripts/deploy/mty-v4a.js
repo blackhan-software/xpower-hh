@@ -22,17 +22,17 @@ async function main() {
   const none = process.env.NONE_ADDRESS;
   assert(none, "missing NONE_ADDRESS");
   // addresses XPower[New]
-  const xpow_moe_link = process.env.XPOW_MOE_V4a;
-  assert(xpow_moe_link, "missing XPOW_MOE_V4a");
+  const moe_link = process.env.XPOW_MOE_V4a;
+  assert(moe_link, "missing XPOW_MOE_V4a");
   // addresses XPowerPpt[New]
-  const xpow_ppt_link = process.env.XPOW_PPT_V4a;
-  assert(xpow_ppt_link, "missing XPOW_PPT_V4a");
+  const ppt_link = process.env.XPOW_PPT_V4a;
+  assert(ppt_link, "missing XPOW_PPT_V4a");
   //
   // deploy XPOW NftTreasury[New]:
   //
   const { mty } = await deploy("MoeTreasury", {
-    moe_links: [xpow_moe_link],
-    ppt_link: xpow_ppt_link,
+    moe_links: [moe_link],
+    ppt_link,
   });
   console.log(`XPOW_MTY_V4a=${mty.target}`);
 }
