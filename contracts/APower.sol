@@ -11,11 +11,18 @@ import {XPower} from "./XPower.sol";
 import {SovMigratable} from "./base/Migratable.sol";
 
 /**
- * Class for the APOW tokens, where only the owner of the contract i.e the
- * MoeTreasury is entitled to mint them.
+ * Class for the APOW tokens, where only the owner of the contract i.e. the
+ * MoeTreasury is entitled to mint them -- with a supply rate of on average
+ * one token per minute.
  */
 contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
-    /** (burnable) proof-of-work tokens */
+    /** timestamp of contract deployment (absolute) */
+    uint256 private _timestamp = block.timestamp;
+    /** timestamp of last mean (relative) */
+    uint256 private _time;
+    /** last mean of claims */
+    uint256 private _mean;
+    /** (burnable) XPower */
     XPower private _moe;
 
     /** @param moeLink address of XPower tokens */
@@ -39,21 +46,56 @@ contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
         return _moe.decimals();
     }
 
-    /** mint amount of tokens for beneficiary (after wrapping XPower) */
-    function mint(address to, uint256 amount) external onlyOwner {
-        assert(_moe.transferFrom(owner(), address(this), wrappable(amount)));
-        _mint(to, amount);
+    /** mint on average one APower/min (after wrapping XPower) */
+    function mint(address to, uint256 claim) external onlyOwner {
+        assert(_moe.transferFrom(owner(), address(this), wrappable(claim)));
+        (uint256 a, uint256 m, uint256 t) = _mintable(claim, _mean, _time);
+        (_mean, _time) = (m, t);
+        _mint(to, a);
     }
 
-    /** @return wrappable XPower maintaining collat (if possible) */
-    function wrappable(uint256 amount) public view returns (uint256) {
-        uint256 balance = _moe.balanceOf(address(this));
-        uint256 supply = amount + this.totalSupply();
-        if (supply > balance) {
-            uint256 treasury = _moe.balanceOf(owner());
-            return Math.min(treasury, supply - balance);
+    /** @return wrappable XPower targeting a ratio of 1:1 (at most) */
+    function wrappable(uint256 claim) public view returns (uint256) {
+        uint256 treasury = _moe.balanceOf(owner());
+        return Math.min(claim, treasury);
+    }
+
+    /** @return mintable APower w.r.t. long-term mean of claims */
+    function mintable(uint256 claim) external view returns (uint256) {
+        (uint256 a, , ) = _mintable(claim, _mean, _time);
+        return a;
+    }
+
+    /** @return mintable APower w.r.t. long-term mean of claims */
+    function mintableBatch(
+        uint256[] memory claims
+    ) external view returns (uint256[] memory) {
+        (uint256 mean, uint256 time) = (_mean, _time);
+        uint256[] memory mintables = new uint256[](claims.length);
+        for (uint256 i = 0; i < claims.length; i++) {
+            (uint256 a, uint256 m, uint256 t) = _mintable(
+                claims[i],
+                mean,
+                time
+            );
+            (mean, time) = (m, t);
+            mintables[i] = a;
         }
-        return 0;
+        return mintables;
+    }
+
+    function _mintable(
+        uint256 claim,
+        uint256 mean,
+        uint256 time
+    ) private view returns (uint256, uint256, uint256) {
+        if (claim > 0) {
+            uint256 t = block.timestamp - _timestamp;
+            uint256 m = Math.mulDiv(mean, time, t) + claim / t;
+            uint256 a = Math.mulDiv(claim, 10 ** decimals() / 60, m);
+            return (a, m, t);
+        }
+        return (0, mean, time);
     }
 
     /** burn amount of tokens from caller (and then unwrap XPower) */
@@ -74,19 +116,19 @@ contract APower is ERC20, ERC20Burnable, SovMigratable, Ownable {
     /** @return unwrappable XPower proportional to burned APower amount */
     function unwrappable(uint256 amount) public view returns (uint256) {
         uint256 balance = _moe.balanceOf(address(this));
-        uint256 supply = amount + this.totalSupply();
+        uint256 supply = amount + totalSupply();
         if (supply > 0) {
-            return Math.mulDiv(amount, balance, supply);
+            return Math.mulDiv(balance, amount, supply);
         }
         return 0;
     }
 
-    /** @return collateralization ratio with 1'000'000 ~ 100% */
-    function collateralization() external view returns (uint256) {
+    /** @return APOW to XPOW conversion: 1e18 ~ 100% */
+    function metric() external view returns (uint256) {
         uint256 balance = _moe.balanceOf(address(this));
-        uint256 supply = this.totalSupply();
+        uint256 supply = totalSupply();
         if (supply > 0) {
-            return Math.mulDiv(1e6, balance, supply);
+            return Math.mulDiv(10 ** decimals(), balance, supply);
         }
         return 0;
     }

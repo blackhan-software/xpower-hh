@@ -80,7 +80,7 @@ describe("MoeTreasury", async function () {
     });
   });
   describe("claim", async function () {
-    it("should return 347 [APOW] in 120 months", async function () {
+    it("should return 10 [APOW] in 120 months", async function () {
       const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
       expect(
         await mty.claim(account, nft_id).catch((ex) => {
@@ -100,16 +100,21 @@ describe("MoeTreasury", async function () {
       expect(await mty.claimed(account, nft_id)).to.eq(33n * UNIT);
       expect(await mty.claimable(account, nft_id)).to.eq(0);
       expect(await moe.balanceOf(mty.target)).to.eq(314n * UNIT);
+      // APOW balance:
+      expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
       // check balances & burn[-from] aged tokens:
       expect(await moe.balanceOf(sov.target)).to.eq(33n * UNIT);
-      expect(await sov.balanceOf(account)).to.eq(33n * UNIT);
+      expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
       const old_xp = await moe.balanceOf(account);
-      await sov.increaseAllowance(account, 17n * UNIT);
-      await sov.burnFrom(account, 17n * UNIT);
-      await sov.burn(16n * UNIT);
-      expect(await moe.balanceOf(account)).to.eq(old_xp + 33n * UNIT);
-      expect(await moe.balanceOf(sov.target)).to.eq(0);
-      expect(await sov.balanceOf(account)).to.eq(0);
+      await sov.increaseAllowance(account, (525_960n * UNIT) / 2n);
+      await sov.burnFrom(account, (525_960n * UNIT) / 2n);
+      await sov.burn((525_960n * UNIT) / 2n);
+      expect(await moe.balanceOf(account)).to.be.closeTo(
+        old_xp + 33n * UNIT,
+        UNIT,
+      );
+      expect(await moe.balanceOf(sov.target)).to.closeTo(0, UNIT);
+      expect(await sov.balanceOf(account)).to.closeTo(0, UNIT);
       // wait for +12 months: 2nd year
       await network.provider.send("evm_increaseTime", [YEAR]);
       expect(await mty.claim(account, nft_id)).to.be.an("object");
@@ -180,6 +185,8 @@ describe("MoeTreasury", async function () {
       expect(await mty.claimed(account, nft_id)).to.eq(383n * UNIT);
       expect(await mty.claimable(account, nft_id)).to.eq(0);
       expect(await moe.balanceOf(mty.target)).to.eq(0);
+      // APOW balance:
+      expect(await sov.balanceOf(account)).to.closeTo(5_366_110n * UNIT, UNIT);
     });
   });
 });

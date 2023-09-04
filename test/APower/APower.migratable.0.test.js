@@ -16,6 +16,7 @@ let mty, nft, ppt, nty; // instance
 const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const YEAR = 365.25 * 86_400; // [seconds]
+const U256 = 2n ** 256n - 1n;
 
 describe("APower Migration", async function () {
   beforeEach(async function () {
@@ -29,9 +30,9 @@ describe("APower Migration", async function () {
     [A0, A1] = addresses;
   });
   beforeEach(async function () {
-    SovOld = await ethers.getContractFactory("APowerOldTest");
+    SovOld = await ethers.getContractFactory("APowerOldTest36");
     SovNew = await ethers.getContractFactory("APowerTest");
-    MoeOld = await ethers.getContractFactory("XPowerOldTest");
+    MoeOld = await ethers.getContractFactory("XPowerOldTest36");
     MoeNew = await ethers.getContractFactory("XPowerTest");
   });
   beforeEach(async function () {
@@ -56,7 +57,7 @@ describe("APower Migration", async function () {
   });
   beforeEach(async function () {
     const decimals = await moe_old.decimals();
-    expect(decimals).to.eq(0);
+    expect(decimals).to.eq(36);
     UNIT_OLD = 10n ** BigInt(decimals);
     expect(UNIT_OLD >= 1n).to.eq(true);
   });
@@ -122,7 +123,7 @@ describe("APower Migration", async function () {
     expect(new_supply).to.be.eq(0);
   });
   it("should *not* migrate old (insufficient allowance)", async function () {
-    const tx = await sov_new.migrate(33n * UNIT_OLD, [0, 0]).catch((ex) => {
+    const tx = await sov_new.migrate(UNIT_OLD, [0, 0]).catch((ex) => {
       const m = ex.message.match(/insufficient allowance/);
       if (m === null) console.debug(ex);
       expect(m).to.not.eq(null);
@@ -132,25 +133,35 @@ describe("APower Migration", async function () {
     expect(new_migrated).to.eq(0);
   });
   it("should *not* migrate old (burn amount exceeds balance)", async function () {
-    await sov_old.increaseAllowance(sov_new.target, 51n * UNIT_OLD);
-    const tx = await sov_new.migrate(51n * UNIT_OLD, [0, 0]).catch((ex) => {
-      const m = ex.message.match(/burn amount exceeds balance/);
-      if (m === null) console.debug(ex);
-      expect(m).to.not.eq(null);
-    });
+    await moe_old.increaseAllowance(moe_new.target, U256);
+    await moe_new.increaseAllowance(sov_new.target, U256);
+    await sov_old.increaseAllowance(sov_new.target, U256);
+    const tx = await sov_new
+      .migrate(525_961n * UNIT_OLD, [0, 0])
+      .catch((ex) => {
+        const m = ex.message.match(/burn amount exceeds balance/);
+        if (m === null) console.debug(ex);
+        expect(m).to.not.eq(null);
+      });
     expect(tx).to.eq(undefined);
     const new_migrated = await sov_new.migrated();
     expect(new_migrated).to.eq(0);
   });
   it("should migrate old", async function () {
-    await moe_old.increaseAllowance(moe_new.target, 33n * UNIT_OLD);
-    await moe_new.increaseAllowance(sov_new.target, 33n * UNIT_NEW);
-    await sov_old.increaseAllowance(sov_new.target, 33n * UNIT_OLD);
-    expect(await sov_old.balanceOf(A0)).to.eq(33n * UNIT_OLD);
+    await moe_old.increaseAllowance(moe_new.target, U256);
+    await moe_new.increaseAllowance(sov_new.target, U256);
+    await sov_old.increaseAllowance(sov_new.target, U256);
+    expect(await sov_old.balanceOf(A0)).to.closeTo(
+      525_960n * UNIT_OLD,
+      UNIT_OLD,
+    );
     expect(await sov_new.balanceOf(A0)).to.eq(0);
-    await sov_new.migrate(33n * UNIT_OLD, [0, 0]);
+    await sov_new.migrate(sov_old.balanceOf(A0), [0, 0]);
     expect(await sov_old.balanceOf(A0)).to.eq(0);
-    expect(await sov_new.balanceOf(A0)).to.eq(33n * UNIT_NEW);
+    expect(await sov_new.balanceOf(A0)).to.closeTo(
+      525_960n * UNIT_NEW,
+      UNIT_NEW,
+    );
   });
   it("should *not* migrate old (migration sealed)", async function () {
     await sov_new.grantRole(sov_new.SOV_SEAL_ROLE(), A0);
@@ -159,8 +170,8 @@ describe("APower Migration", async function () {
     expect(await sov_new.seals()).to.deep.eq([true]);
     await sov_new.sealAll();
     expect(await sov_new.seals()).to.deep.eq([true]);
-    await sov_old.increaseAllowance(sov_new.target, 33n * UNIT_OLD);
-    const tx = await sov_new.migrate(33n * UNIT_OLD, [0, 0]).catch((ex) => {
+    await sov_old.increaseAllowance(sov_new.target, UNIT_OLD);
+    const tx = await sov_new.migrate(UNIT_OLD, [0, 0]).catch((ex) => {
       const m = ex.message.match(/migration sealed/);
       if (m === null) console.debug(ex);
       expect(m).to.not.eq(null);
@@ -181,8 +192,8 @@ describe("APower Migration", async function () {
   });
   it("should *not* migrate old (deadline passed)", async function () {
     await network.provider.send("evm_increaseTime", [126_230_400]);
-    await sov_old.increaseAllowance(sov_new.target, 33n * UNIT_OLD);
-    const tx = await sov_new.migrate(33n * UNIT_OLD, [0, 0]).catch((ex) => {
+    await sov_old.increaseAllowance(sov_new.target, UNIT_OLD);
+    const tx = await sov_new.migrate(UNIT_OLD, [0, 0]).catch((ex) => {
       const m = ex.message.match(/deadline passed/);
       if (m === null) console.debug(ex);
       expect(m).to.not.eq(null);

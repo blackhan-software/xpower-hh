@@ -18,7 +18,7 @@ import {MoeTreasurySupervised} from "./base/Supervised.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 /**
- * Treasury to claim (MoE) tokens for staked XPowerNft(s).
+ * Treasury to mint (SoV) tokens for staked XPowerNft(s).
  */
 contract MoeTreasury is MoeTreasurySupervised {
     using Integrator for Integrator.Item[];
@@ -33,6 +33,8 @@ contract MoeTreasury is MoeTreasurySupervised {
 
     /** map of rewards claimed: account => nft-id => amount */
     mapping(address => mapping(uint256 => uint256)) private _claimed;
+    /** map of rewards minted: account => nft-id => amount */
+    mapping(address => mapping(uint256 => uint256)) private _minted;
 
     /** @param moeLink address of contract for XPower tokens */
     /** @param sovLink address of contract for APower tokens */
@@ -43,6 +45,42 @@ contract MoeTreasury is MoeTreasurySupervised {
         _ppt = XPowerPpt(pptLink);
     }
 
+    /** @return minted amount */
+    function minted(
+        address account,
+        uint256 nftId
+    ) public view returns (uint256) {
+        return _minted[account][nftId];
+    }
+
+    /** @return minted amounts */
+    function mintedBatch(
+        address account,
+        uint256[] memory nftIds
+    ) public view returns (uint256[] memory) {
+        uint256[] memory mintedRewards = new uint256[](nftIds.length);
+        for (uint256 i = 0; i < nftIds.length; i++) {
+            mintedRewards[i] = minted(account, nftIds[i]);
+        }
+        return mintedRewards;
+    }
+
+    /** @return mintable amount */
+    function mintable(
+        address account,
+        uint256 nftId
+    ) public view returns (uint256) {
+        return _sov.mintable(claimable(account, nftId));
+    }
+
+    /** @return mintable amounts */
+    function mintableBatch(
+        address account,
+        uint256[] memory nftIds
+    ) public view returns (uint256[] memory) {
+        return _sov.mintableBatch(claimableBatch(account, nftIds));
+    }
+
     /** emitted on claiming NFT reward */
     event Claim(address account, uint256 nftId, uint256 amount);
 
@@ -51,6 +89,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 amount = claimable(account, nftId);
         require(amount > 0, "nothing claimable");
         _claimed[account][nftId] += amount;
+        _minted[account][nftId] += _sov.mintable(amount);
         _moe.increaseAllowance(address(_sov), _sov.wrappable(amount));
         _sov.mint(account, amount);
         emit Claim(account, nftId, amount);
@@ -63,14 +102,13 @@ contract MoeTreasury is MoeTreasurySupervised {
     function claimBatch(address account, uint256[] memory nftIds) external {
         require(Array.unique(nftIds), "unsorted or duplicate ids");
         uint256[] memory amounts = claimableBatch(account, nftIds);
-        uint256 subsum;
         for (uint256 i = 0; i < nftIds.length; i++) {
             require(amounts[i] > 0, "nothing claimable");
             _claimed[account][nftIds[i]] += amounts[i];
-            subsum += amounts[i];
+            _minted[account][nftIds[i]] += _sov.mintable(amounts[i]);
+            _moe.increaseAllowance(address(_sov), _sov.wrappable(amounts[i]));
+            _sov.mint(account, amounts[i]);
         }
-        _moe.increaseAllowance(address(_sov), _sov.wrappable(subsum));
-        _sov.mint(account, subsum);
         emit ClaimBatch(account, nftIds, amounts);
     }
 
@@ -107,7 +145,7 @@ contract MoeTreasury is MoeTreasurySupervised {
         return 0;
     }
 
-    /** @return claimable amount */
+    /** @return claimable amounts */
     function claimableBatch(
         address account,
         uint256[] memory nftIds

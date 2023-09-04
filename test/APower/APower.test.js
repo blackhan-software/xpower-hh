@@ -66,15 +66,12 @@ describe("APower", async function () {
     expect(await sov.owner()).to.eq(mty.target);
   });
   beforeEach(async function () {
-    await mintToken(1102n * UNIT);
+    await mintToken(1_602_199n * UNIT);
     const supply = await moe.totalSupply();
-    expect(supply).to.be.gte(1102n * UNIT);
+    expect(supply).to.be.gte(1_602_199n * UNIT);
   });
   beforeEach(async function () {
     await increaseAllowanceBy(1000n * UNIT, nft.target);
-  });
-  beforeEach(async function () {
-    await moe.transfer(mty.target, 102n * UNIT);
   });
   it("should mint after 1st year", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
@@ -84,26 +81,26 @@ describe("APower", async function () {
     expect(await mty.rewardOf(account, nft_id)).to.eq(33n * UNIT);
     expect(await mty.claimed(account, nft_id)).to.eq(33n * UNIT);
     expect(await mty.claimable(account, nft_id)).to.eq(0);
-    expect(await moe.balanceOf(mty.target)).to.eq(69n * UNIT);
+    expect(await moe.balanceOf(mty.target)).to.eq(0);
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(33n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(33n * UNIT);
-    expect(await sov.collateralization()).to.eq(1e6);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
+    expect(await sov.metric()).to.eq(0);
   });
   it("should mint after 1st year (pre-transferred)", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
-    expect(await moe.transfer(sov.target, 10n * UNIT)).to.be.an("object");
+    expect(await moe.transfer(sov.target, 525_960n * UNIT)).to.be.an("object");
     // wait for +12 months: 1st year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     expect(await mty.rewardOf(account, nft_id)).to.eq(33n * UNIT);
     expect(await mty.claimed(account, nft_id)).to.eq(33n * UNIT);
     expect(await mty.claimable(account, nft_id)).to.eq(0);
-    expect(await moe.balanceOf(mty.target)).to.eq(79n * UNIT);
+    expect(await moe.balanceOf(mty.target)).to.eq(0);
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(33n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(33n * UNIT);
-    expect(await sov.collateralization()).to.eq(1e6);
+    expect(await moe.balanceOf(sov.target)).to.eq(525_960n * UNIT);
+    expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
+    expect(await sov.metric()).to.closeTo(UNIT, UNIT / 1000n); // ~ 100%
   });
   it("should burn after 1st year", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
@@ -113,13 +110,13 @@ describe("APower", async function () {
     expect(await mty.rewardOf(account, nft_id)).to.eq(33n * UNIT);
     expect(await mty.claimed(account, nft_id)).to.eq(33n * UNIT);
     expect(await mty.claimable(account, nft_id)).to.eq(0);
-    expect(await moe.balanceOf(mty.target)).to.eq(69n * UNIT);
+    expect(await moe.balanceOf(mty.target)).to.eq(0);
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(33n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(33n * UNIT);
-    expect(await sov.collateralization()).to.eq(1e6);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
+    expect(await sov.metric()).to.eq(0);
     // burn balances of (aged) tokens:
-    await burnToken(33n * UNIT);
+    await burnToken(await sov.balanceOf(account));
   });
   it("should mint after 2nd year", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
@@ -127,40 +124,42 @@ describe("APower", async function () {
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(33n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(33n * UNIT);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
     // wait for +12 months: 2nd year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     expect(await mty.rewardOf(account, nft_id)).to.eq(67n * UNIT);
     expect(await mty.claimed(account, nft_id)).to.eq(67n * UNIT);
     expect(await mty.claimable(account, nft_id)).to.eq(0);
-    expect(await moe.balanceOf(mty.target)).to.eq(35n * UNIT);
+    expect(await moe.balanceOf(mty.target)).to.eq(0);
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(67n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(67n * UNIT);
-    expect(await sov.collateralization()).to.eq(1e6);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(1_059_770n * UNIT, UNIT);
+    expect(await sov.metric()).to.eq(0);
   });
   it("should mint after 2nd year (pre-transferred)", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
-    expect(await moe.transfer(sov.target, 20n * UNIT)).to.be.an("object");
+    expect(await moe.transfer(sov.target, 1_059_770n * UNIT)).to.be.an(
+      "object",
+    );
     // wait for +12 months: 1st year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(33n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(33n * UNIT);
+    expect(await moe.balanceOf(sov.target)).to.eq(1_059_770n * UNIT);
+    expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
     // wait for +12 months: 2nd year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     expect(await mty.rewardOf(account, nft_id)).to.eq(67n * UNIT);
     expect(await mty.claimed(account, nft_id)).to.eq(67n * UNIT);
     expect(await mty.claimable(account, nft_id)).to.eq(0);
-    expect(await moe.balanceOf(mty.target)).to.eq(55n * UNIT);
+    expect(await moe.balanceOf(mty.target)).to.eq(0);
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(67n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(67n * UNIT);
-    expect(await sov.collateralization()).to.eq(1e6);
+    expect(await moe.balanceOf(sov.target)).to.eq(1_059_770n * UNIT);
+    expect(await sov.balanceOf(account)).to.closeTo(1_059_770n * UNIT, UNIT);
+    expect(await sov.metric()).to.closeTo(UNIT, UNIT / 1000n); // ~ 100%
   });
   it("should burn after 2nd year", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
@@ -168,21 +167,21 @@ describe("APower", async function () {
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(33n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(33n * UNIT);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
     // wait for +12 months: 2nd year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     expect(await mty.rewardOf(account, nft_id)).to.eq(67n * UNIT);
     expect(await mty.claimed(account, nft_id)).to.eq(67n * UNIT);
     expect(await mty.claimable(account, nft_id)).to.eq(0);
-    expect(await moe.balanceOf(mty.target)).to.eq(35n * UNIT);
+    expect(await moe.balanceOf(mty.target)).to.eq(0);
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(67n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(67n * UNIT);
-    expect(await sov.collateralization()).to.eq(1e6);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(1_059_770n * UNIT, UNIT);
+    expect(await sov.metric()).to.eq(0);
     // burn balances of (aged) tokens:
-    await burnToken(67n * UNIT);
+    await burnToken(await sov.balanceOf(account));
   });
   it("should mint after 3rd year", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
@@ -190,14 +189,14 @@ describe("APower", async function () {
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(33n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(33n * UNIT);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
     // wait for +12 months: 2nd year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(67n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(67n * UNIT);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(1_059_770n * UNIT, UNIT);
     // wait for +12 months: 3rd year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
@@ -206,36 +205,38 @@ describe("APower", async function () {
     expect(await mty.claimable(account, nft_id)).to.eq(0);
     expect(await moe.balanceOf(mty.target)).to.eq(0);
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(102n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(102n * UNIT);
-    expect(await sov.collateralization()).to.eq(1e6);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(1_601_199n * UNIT, UNIT);
+    expect(await sov.metric()).to.eq(0);
   });
   it("should mint after 3rd year (pre-transferred)", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
-    expect(await moe.transfer(sov.target, 33n * UNIT)).to.be.an("object");
+    expect(await moe.transfer(sov.target, 1_601_199n * UNIT)).to.be.an(
+      "object",
+    );
     // wait for +12 months: 1st year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(33n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(33n * UNIT);
+    expect(await moe.balanceOf(sov.target)).to.eq(1_601_199n * UNIT);
+    expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
     // wait for +12 months: 2nd year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(67n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(67n * UNIT);
+    expect(await moe.balanceOf(sov.target)).to.eq(1_601_199n * UNIT);
+    expect(await sov.balanceOf(account)).to.closeTo(1_059_770n * UNIT, UNIT);
     // wait for +12 months: 3rd year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     expect(await mty.rewardOf(account, nft_id)).to.eq(102n * UNIT);
     expect(await mty.claimed(account, nft_id)).to.eq(102n * UNIT);
     expect(await mty.claimable(account, nft_id)).to.eq(0);
-    expect(await moe.balanceOf(mty.target)).to.eq(33n * UNIT);
+    expect(await moe.balanceOf(mty.target)).to.eq(0);
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(102n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(102n * UNIT);
-    expect(await sov.collateralization()).to.eq(1e6);
+    expect(await moe.balanceOf(sov.target)).to.eq(1_601_199n * UNIT);
+    expect(await sov.balanceOf(account)).to.closeTo(1_601_199n * UNIT, UNIT);
+    expect(await sov.metric()).to.closeTo(UNIT, UNIT / 1000n); // ~ 100%
   });
   it("should burn after 3rd year", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
@@ -243,14 +244,14 @@ describe("APower", async function () {
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(33n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(33n * UNIT);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
     // wait for +12 months: 2nd year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(67n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(67n * UNIT);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(1_059_770n * UNIT, UNIT);
     // wait for +12 months: 3rd year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
@@ -259,11 +260,11 @@ describe("APower", async function () {
     expect(await mty.claimable(account, nft_id)).to.eq(0);
     expect(await moe.balanceOf(mty.target)).to.eq(0);
     // check balances of (aged) tokens:
-    expect(await moe.balanceOf(sov.target)).to.eq(102n * UNIT);
-    expect(await sov.balanceOf(account)).to.eq(102n * UNIT);
-    expect(await sov.collateralization()).to.eq(1e6);
+    expect(await moe.balanceOf(sov.target)).to.eq(0);
+    expect(await sov.balanceOf(account)).to.closeTo(1_601_199n * UNIT, UNIT);
+    expect(await sov.metric()).to.eq(0);
     // burn balances of (aged) tokens:
-    await burnToken(102n * UNIT);
+    await burnToken(await sov.balanceOf(account));
   });
 });
 async function mintToken(amount) {
@@ -276,23 +277,23 @@ async function mintToken(amount) {
 }
 async function burnToken(amount) {
   const c_balance_old = await moe.balanceOf(sov.target);
-  expect(c_balance_old).to.be.gt(0);
+  expect(c_balance_old).to.be.gte(0);
   const x_balance_old = await moe.balanceOf(addresses[0]);
-  expect(x_balance_old).to.be.gt(0);
+  expect(x_balance_old).to.be.gte(0);
   const a_balance_old = await sov.balanceOf(addresses[0]);
-  expect(a_balance_old).to.be.gt(0);
+  expect(a_balance_old).to.be.gte(0);
   const tx_increase = await sov.increaseAllowance(addresses[0], amount);
   expect(tx_increase).to.be.an("object");
   const tx_burn = await sov.burnFrom(addresses[0], amount);
   expect(tx_burn).to.be.an("object");
   const c_balance_new = await moe.balanceOf(sov.target);
-  expect(c_balance_new).to.eq(c_balance_old - BigInt(amount));
+  expect(c_balance_new).to.lte(c_balance_old);
   const x_balance_new = await moe.balanceOf(addresses[0]);
-  expect(x_balance_new).to.eq(x_balance_old + BigInt(amount));
+  expect(x_balance_new).to.gte(x_balance_old);
   const a_balance_new = await sov.balanceOf(addresses[0]);
   expect(a_balance_new).to.eq(a_balance_old - BigInt(amount));
-  const collateralization = await sov.collateralization();
-  expect(collateralization).to.eq(0);
+  const metric = await sov.metric();
+  expect(metric).to.eq(0);
 }
 async function increaseAllowanceBy(amount, spender) {
   const tx_increase = await moe.increaseAllowance(spender, amount);

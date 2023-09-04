@@ -100,6 +100,8 @@ describe("MoeTreasury", async function () {
       expect(await mty.claimed(account, nft_id)).to.eq(0);
       expect(await mty.claimable(account, nft_id)).to.eq(0);
       expect(await moe.balanceOf(mty.target)).to.eq(0);
+      // APOW balance:
+      expect(await sov.balanceOf(account)).to.eq(0);
       // check balances & burn[-from] aged tokens:
       expect(await moe.balanceOf(sov.target)).to.eq(0);
       expect(await sov.balanceOf(account)).to.eq(0);
@@ -186,6 +188,8 @@ describe("MoeTreasury", async function () {
       expect(await mty.claimed(account, nft_id)).to.eq(0);
       expect(await mty.claimable(account, nft_id)).to.eq(0);
       expect(await moe.balanceOf(mty.target)).to.eq(0);
+      // APOW balance:
+      expect(await sov.balanceOf(account)).to.eq(0);
     });
   });
 });
