@@ -4,20 +4,26 @@
 pragma solidity ^0.8.0;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 
 import {Constants} from "./libs/Constants.sol";
 import {FeeTracker} from "./base/FeeTracker.sol";
-import {Migratable, MoeMigratable} from "./base/Migratable.sol";
+import {MoeMigratable} from "./base/Migratable.sol";
+import {Transferable} from "./base/Transferable.sol";
 
 /**
  * Class for the XPOW proof-of-work tokens: It verifies, that the nonce and the
  * block-hash result in a positive amount. After a successful verification, the
  * corresponding amount is minted for the beneficiary (plus the treasury).
  */
-contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, Ownable {
+contract XPower is
+    ERC20,
+    ERC20Burnable,
+    FeeTracker,
+    MoeMigratable,
+    Transferable
+{
     /** set of nonce-hashes already minted for */
     mapping(bytes32 => bool) private _hashes;
     /** map from block-hashes to timestamps */
@@ -33,9 +39,11 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, Ownable {
     )
         // ERC20 constructor: name, symbol
         ERC20("XPower", "XPOW")
-        // Migratable: old contract, rel. deadline [seconds]
-        Migratable(moeBase, deadlineIn)
-    {}
+        // MoeMigratable: old contract, rel. deadline [seconds]
+        MoeMigratable(moeBase, deadlineIn)
+    {
+        grantRole(TRANSFER_ROLE, msg.sender);
+    }
 
     /** @return number of decimals of representation */
     function decimals() public view virtual override returns (uint8) {
@@ -65,7 +73,11 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, Ownable {
     }
 
     /** mint tokens for to-beneficiary, block-hash & data (incl. nonce) */
-    function mint(address to, bytes32 blockHash, bytes calldata data) external tracked {
+    function mint(
+        address to,
+        bytes32 blockHash,
+        bytes calldata data
+    ) external tracked {
         // check block-hash to be in current interval
         require(_recent(blockHash), "expired block-hash");
         // calculate nonce-hash & pair-index for to, block-hash & data
@@ -100,8 +112,18 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, Ownable {
     }
 
     /** @return hash of contract, to-beneficiary, block-hash & data (incl. nonce) */
-    function _hashOf(address to, bytes32 blockHash, bytes calldata data) internal view returns (bytes32, bytes32) {
-        bytes32 nonceHash = keccak256(bytes.concat(bytes20(uint160(address(this)) ^ uint160(to)), blockHash, data));
+    function _hashOf(
+        address to,
+        bytes32 blockHash,
+        bytes calldata data
+    ) internal view returns (bytes32, bytes32) {
+        bytes32 nonceHash = keccak256(
+            bytes.concat(
+                bytes20(uint160(address(this)) ^ uint160(to)),
+                blockHash,
+                data
+            )
+        );
         return (nonceHash, nonceHash ^ blockHash);
     }
 
@@ -126,7 +148,7 @@ contract XPower is ERC20, ERC20Burnable, MoeMigratable, FeeTracker, Ownable {
     /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(MoeMigratable) returns (bool) {
+    ) public view virtual override(MoeMigratable, Transferable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 

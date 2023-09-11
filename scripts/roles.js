@@ -13,6 +13,15 @@ async function transferMoeRoles(factory_name, contract_name, { to: owner }) {
   assert(contract, `missing ${factory_name} contract`);
   const [signer] = await ethers.getSigners();
   assert(signer?.address, "missing signer address");
+  await renounceRole(contract, {
+    role: contract.TRANSFER_ROLE(),
+    from: signer.address,
+  });
+  await transferRole(contract, {
+    role: contract.TRANSFER_ADMIN_ROLE(),
+    from: signer.address,
+    to: owner,
+  });
   await transferRole(contract, {
     role: contract.SHARE_ADMIN_ROLE(),
     from: signer.address,
@@ -162,20 +171,23 @@ async function transferMtyRoles(factory_name, contract_name, { to: owner }) {
   process.stdout.write("\n");
   return contract;
 }
+async function renounceRole(contract, { role, from }) {
+  return transferRole(contract, { role, from });
+}
 async function transferRole(contract, { role, from, to }) {
   while (true) {
     try {
       const count = await contract.getRoleMemberCount(await role);
       for (let index = 0; index < count; index++) {
         const member = await contract.getRoleMember(await role, index);
-        if (member !== to) {
+        if (member !== to && to) {
           await wait(
             await contract.grantRole(await role, to, {
               gasLimit: 500_000,
             }),
           );
         }
-        if (member === from) {
+        if (member === from && from) {
           await wait(
             await contract.renounceRole(await role, from, {
               gasLimit: 500_000,

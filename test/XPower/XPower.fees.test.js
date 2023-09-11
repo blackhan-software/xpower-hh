@@ -30,6 +30,7 @@ describe("XPower", async function () {
   before(async function () {
     moe = await Moe.deploy([], 0);
     expect(moe).to.be.an("object");
+    await moe.grantRole(moe.TRANSFER_ROLE(), addresses[0]);
     await moe.transferOwnership(addresses[1]);
     await moe.init();
   });

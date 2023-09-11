@@ -31,10 +31,12 @@ describe("XPowerNft", async function () {
   beforeEach(async function () {
     moe_old = await Moe.deploy([], DEADLINE);
     expect(moe_old).to.be.an("object");
+    await moe_old.grantRole(moe_old.TRANSFER_ROLE(), addresses[0]);
     await moe_old.transferOwnership(addresses[1]);
     await moe_old.init();
     moe_new = await Moe.deploy([moe_old.target], DEADLINE);
     expect(moe_new).to.be.an("object");
+    await moe_new.grantRole(moe_new.TRANSFER_ROLE(), addresses[0]);
     await moe_new.transferOwnership(addresses[1]);
     await moe_new.init();
   });
@@ -57,7 +59,9 @@ describe("XPowerNft", async function () {
   });
   after(async function () {
     const [owner, signer_1] = await ethers.getSigners();
+    await moe_old.grantRole(moe_old.TRANSFER_ROLE(), addresses[1]);
     await moe_old.connect(signer_1).transferOwnership(owner.address);
+    await moe_new.grantRole(moe_new.TRANSFER_ROLE(), addresses[1]);
     await moe_new.connect(signer_1).transferOwnership(owner.address);
   });
   describe("oldIndexOf", async function () {
