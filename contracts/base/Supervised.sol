@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
+// solhint-disable one-contract-per-file
 pragma solidity ^0.8.0;
 
 import {AccessControlEnumerable} from "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
@@ -11,6 +12,17 @@ abstract contract Supervised is AccessControlEnumerable {
     /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return super.supportsInterface(interfaceId);
+    }
+}
+
+abstract contract TransferableSupervised is Supervised {
+    /** role grants right to transfer a contract's ownership */
+    bytes32 public constant TRANSFER_ROLE = keccak256("TRANSFER_ROLE");
+    bytes32 public constant TRANSFER_ADMIN_ROLE = keccak256("TRANSFER_ADMIN_ROLE");
+
+    constructor() {
+        _setRoleAdmin(TRANSFER_ROLE, TRANSFER_ADMIN_ROLE);
+        _grantRole(TRANSFER_ADMIN_ROLE, msg.sender);
     }
 }
 
