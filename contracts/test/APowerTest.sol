@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 // solhint-disable no-empty-blocks
+// solhint-disable one-contract-per-file
 pragma solidity ^0.8.0;
 
 import {APower} from "../APower.sol";

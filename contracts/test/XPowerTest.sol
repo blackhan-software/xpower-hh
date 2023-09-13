@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
-// solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
+// solhint-disable not-rely-on-time
+// solhint-disable one-contract-per-file
 pragma solidity ^0.8.0;
 
 import {XPower} from "../XPower.sol";
