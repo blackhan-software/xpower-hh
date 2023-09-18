@@ -13,53 +13,73 @@ const { wait } = require("../wait");
 const { ethers } = require("hardhat");
 
 /**
+ * @returns list of base contract addresses
+ */
+function sov_bases(
+  token,
+  versions = [
+    "V5a",
+    "V5b",
+    "V5c",
+    "V6a",
+    "V6b",
+    "V6c",
+    "V7a",
+    "V7b",
+    "V7c",
+    "V8a",
+    "V8b",
+  ],
+) {
+  return versions.map((version) => {
+    const moe_base = process.env[`${token}_SOV_${version}`];
+    assert(moe_base, `missing ${token}_SOV_${version}`);
+    return moe_base;
+  });
+}
+/**
  * Hardhat *always* runs the compile task when running scripts with its command
  * line interface. But, if this script is run *directly* using `node`, then you
  * may want to call compile manually to make sure everything is compiled:
  *
- * > await hre.run('compile');
+ * > await hre.run("compile");
  */
 async function main() {
   const owner = process.env.FUND_ADDRESS;
   assert(owner, "missing FUND_ADDRESS");
+  // addresses APower[Old]
+  const sov_base = sov_bases("XPOW");
+  assert(sov_base.length === 11);
   // addresses XPower[New]
-  const moe_link = process.env.XPOW_MOE_V8b;
-  assert(moe_link, "missing XPOW_MOE_V8b");
-  // addresses MoeTreasury[New]
-  const mty_link = process.env.XPOW_MTY_V8b;
-  assert(mty_link, "missing XPOW_MTY_V8b");
+  const moe_link = process.env.XPOW_MOE_V8c;
+  assert(moe_link, "missing XPOW_MOE_V8c");
+  // migration:
+  const deadline = 126_230_400; // 4 years
   //
-  // deploy MoeSplitter[New]:
+  // deploy APower[New]
   //
-  const { payees, shares } = {
-    payees: [owner, mty_link],
-    shares: [50, 50],
-  };
-  const { msp } = await deploy("MoeSplitter", {
-    payees,
-    shares,
+  const { sov } = await deploy("APower", {
     moe_link,
+    sov_base,
+    deadline,
   });
-  console.log(`XPOW_MSP_V8b=${msp.target}`);
+  console.log(`XPOW_SOV_V8c=${sov.target}`);
   //
   // verify contract(s):
   //
-  await verify("MoeSplitter", msp, payees, shares);
+  await verify("APower", sov, moe_link, sov_base, deadline);
 }
-async function deploy(name, { payees, shares, moe_link }) {
+async function deploy(name, { moe_link, sov_base, deadline }) {
   const factory = await ethers.getContractFactory(name);
-  const msp = await factory.deploy(payees, shares);
-  await wait(msp);
-  const moe = await ethers.getContractAt("XPower", moe_link);
-  const transfer = await moe.transferOwnership(msp.target);
-  await wait(transfer);
-  return { msp };
+  const contract = await factory.deploy(moe_link, sov_base, deadline);
+  await wait(contract);
+  return { sov: contract };
 }
 async function verify(name, { target }, ...args) {
   if (hre.network.name.match(/mainnet|fuji/)) {
     return await hre.run("verify:verify", {
       address: target,
-      contract: `contracts/MoeSplitter.sol:${name}`,
+      contract: `contracts/APower.sol:${name}`,
       constructorArguments: args,
     });
   }

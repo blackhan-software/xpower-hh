@@ -21,14 +21,14 @@ const { ethers } = require("hardhat");
  */
 async function main() {
   // addresses XPower[New]
-  const moe_link = process.env.XPOW_MOE_V8b;
-  assert(moe_link, "missing XPOW_MOE_V8b");
+  const moe_link = process.env.XPOW_MOE_V8c;
+  assert(moe_link, "missing XPOW_MOE_V8c");
   // addresses APower[New]
-  const sov_link = process.env.XPOW_SOV_V8b;
-  assert(sov_link, "missing XPOW_SOV_V8b");
+  const sov_link = process.env.XPOW_SOV_V8c;
+  assert(sov_link, "missing XPOW_SOV_V8c");
   // addresses XPowerPpt[New]
-  const ppt_link = process.env.XPOW_PPT_V8b;
-  assert(ppt_link, "missing XPOW_PPT_V8b");
+  const ppt_link = process.env.XPOW_PPT_V8c;
+  assert(ppt_link, "missing XPOW_PPT_V8c");
   //
   // deploy XPOW NftTreasury[New] & re-own APower[New]:
   //
@@ -45,7 +45,7 @@ async function main() {
     erc_link: sov_link,
     treasury: mty,
   });
-  console.log(`XPOW_MTY_V8b=${mty.target}`);
+  console.log(`XPOW_MTY_V8c=${mty.target}`);
   //
   // verify contract(s):
   //

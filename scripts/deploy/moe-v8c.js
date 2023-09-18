@@ -32,6 +32,7 @@ function moe_bases(
     "V7b",
     "V7c",
     "V8a",
+    "V8b",
   ],
 ) {
   return versions.map((version) => {
@@ -50,7 +51,7 @@ function moe_bases(
 async function main() {
   // addresses XPower[Old]
   const moe_base = moe_bases("XPOW");
-  assert(moe_base.length === 14);
+  assert(moe_base.length === 15);
   // migration:
   const deadline = 126_230_400; // 4 years
   //
@@ -60,7 +61,7 @@ async function main() {
     moe_base,
     deadline,
   });
-  console.log(`XPOW_MOE_V8b=${moe.target}`);
+  console.log(`XPOW_MOE_V8c=${moe.target}`);
   //
   // verify contract(s):
   //

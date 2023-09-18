@@ -20,46 +20,42 @@ const { ethers } = require("hardhat");
  * > await hre.run('compile');
  */
 async function main() {
-  // addresses XPower[New]
-  const moe_link = process.env.XPOW_MOE_V8b;
-  assert(moe_link, "missing XPOW_MOE_V8b");
-  // addresses APower[New]
-  const sov_link = process.env.XPOW_SOV_V8b;
-  assert(sov_link, "missing XPOW_SOV_V8b");
+  // addresses XPowerNft[New]
+  const nft_link = process.env.XPOW_NFT_V8c;
+  assert(nft_link, "missing XPOW_NFT_V8c");
   // addresses XPowerPpt[New]
-  const ppt_link = process.env.XPOW_PPT_V8b;
-  assert(ppt_link, "missing XPOW_PPT_V8b");
+  const ppt_link = process.env.XPOW_PPT_V8c;
+  assert(ppt_link, "missing XPOW_PPT_V8c");
+  // addresses MoeTreasury[New]
+  const mty_link = process.env.XPOW_MTY_V8c;
+  assert(mty_link, "missing XPOW_MTY_V8c");
   //
-  // deploy XPOW NftTreasury[New] & re-own APower[New]:
+  // deploy NftTreasury[New] & re-own XPowerPpt[New]:
   //
-  const { mty } = await deploy("MoeTreasury", {
-    moe_link,
-    sov_link,
+  const { nty } = await deploy("NftTreasury", {
+    nft_link,
     ppt_link,
+    mty_link,
   });
-  await transfer("XPower", {
-    erc_link: moe_link,
-    treasury: mty,
+  await transfer("XPowerPpt", {
+    ppt_link,
+    treasury: nty,
   });
-  await transfer("APower", {
-    erc_link: sov_link,
-    treasury: mty,
-  });
-  console.log(`XPOW_MTY_V8b=${mty.target}`);
+  console.log(`XPOW_PTY_V8c=${nty.target}`);
   //
   // verify contract(s):
   //
-  await verify("MoeTreasury", mty, moe_link, sov_link, ppt_link);
+  await verify("NftTreasury", nty, nft_link, ppt_link, mty_link);
 }
-async function deploy(mty_name, { moe_link, sov_link, ppt_link }) {
-  const factory = await ethers.getContractFactory(mty_name);
-  const contract = await factory.deploy(moe_link, sov_link, ppt_link);
+async function deploy(nty_name, { nft_link, ppt_link, mty_link }) {
+  const factory = await ethers.getContractFactory(nty_name);
+  const contract = await factory.deploy(nft_link, ppt_link, mty_link);
   await wait(contract);
-  return { mty: contract };
+  return { nty: contract };
 }
-async function transfer(erc_name, { erc_link, treasury }) {
-  const factory = await ethers.getContractFactory(erc_name);
-  const contract = factory.attach(erc_link);
+async function transfer(ppt_name, { ppt_link, treasury }) {
+  const factory = await ethers.getContractFactory(ppt_name);
+  const contract = factory.attach(ppt_link);
   const transfer = await contract.transferOwnership(treasury.target);
   await wait(transfer);
 }
@@ -67,7 +63,7 @@ async function verify(name, { target }, ...args) {
   if (hre.network.name.match(/mainnet|fuji/)) {
     return await hre.run("verify:verify", {
       address: target,
-      contract: `contracts/MoeTreasury.sol:${name}`,
+      contract: `contracts/NftTreasury.sol:${name}`,
       constructorArguments: args,
     });
   }
