@@ -3,6 +3,7 @@
 // solhint-disable no-empty-blocks
 pragma solidity ^0.8.0;
 
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
@@ -10,20 +11,13 @@ import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC2
 import {Constants} from "./libs/Constants.sol";
 import {FeeTracker} from "./base/FeeTracker.sol";
 import {MoeMigratable} from "./base/Migratable.sol";
-import {Transferable} from "./base/Transferable.sol";
 
 /**
  * Class for the XPOW proof-of-work tokens: It verifies, that the nonce and the
  * block-hash result in a positive amount. After a successful verification, the
  * corresponding amount is minted for the beneficiary (plus the MoE treasury).
  */
-contract XPower is
-    ERC20,
-    ERC20Burnable,
-    FeeTracker,
-    MoeMigratable,
-    Transferable
-{
+contract XPower is ERC20, ERC20Burnable, FeeTracker, MoeMigratable, Ownable {
     /** set of nonce-hashes already minted for */
     mapping(bytes32 => bool) private _hashes;
     /** map from block-hashes to timestamps */
@@ -41,9 +35,7 @@ contract XPower is
         ERC20("XPower", "XPOW")
         // MoeMigratable: old contract, rel. deadline [seconds]
         MoeMigratable(moeBase, deadlineIn)
-    {
-        grantRole(TRANSFER_ROLE, msg.sender);
-    }
+    {}
 
     /** @return number of decimals of representation */
     function decimals() public view virtual override returns (uint8) {
@@ -148,7 +140,7 @@ contract XPower is
     /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(MoeMigratable, Transferable) returns (bool) {
+    ) public view virtual override(MoeMigratable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 

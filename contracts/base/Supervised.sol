@@ -15,17 +15,6 @@ abstract contract Supervised is AccessControlEnumerable {
     }
 }
 
-abstract contract TransferableSupervised is Supervised {
-    /** role grants right to transfer a contract's ownership */
-    bytes32 public constant TRANSFER_ROLE = keccak256("TRANSFER_ROLE");
-    bytes32 public constant TRANSFER_ADMIN_ROLE = keccak256("TRANSFER_ADMIN_ROLE");
-
-    constructor() {
-        _setRoleAdmin(TRANSFER_ROLE, TRANSFER_ADMIN_ROLE);
-        _grantRole(TRANSFER_ADMIN_ROLE, msg.sender);
-    }
-}
-
 abstract contract MoeTreasurySupervised is Supervised {
     /** role grants right to change APR parametrization */
     bytes32 public constant APR_ROLE = keccak256("APR_ROLE");
@@ -43,7 +32,7 @@ abstract contract MoeTreasurySupervised is Supervised {
 }
 
 abstract contract MoeMigratableSupervised is Supervised {
-    /** role grants right to seal MOE migration */
+    /** role grants right to seal MOE immigration */
     bytes32 public constant MOE_SEAL_ROLE = keccak256("MOE_SEAL_ROLE");
     bytes32 public constant MOE_SEAL_ADMIN_ROLE = keccak256("MOE_SEAL_ADMIN_ROLE");
 
@@ -54,7 +43,7 @@ abstract contract MoeMigratableSupervised is Supervised {
 }
 
 abstract contract SovMigratableSupervised is Supervised {
-    /** role grants right to seal SOV migration */
+    /** role grants right to seal SOV immigration */
     bytes32 public constant SOV_SEAL_ROLE = keccak256("SOV_SEAL_ROLE");
     bytes32 public constant SOV_SEAL_ADMIN_ROLE = keccak256("SOV_SEAL_ADMIN_ROLE");
 
