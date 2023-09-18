@@ -23,7 +23,7 @@ async function supplyOf(contract, delta = 0n, log = undefined) {
       expect(supply_gt).to.be.gt(others);
       others += delta_full;
     }
-    const amount_extra = amount / 2n;
+    const amount_extra = (34_929n * amount) / 10n ** 6n;
     if (amount_extra) {
       const delta_half = weight * amount_extra;
       expect(delta_half).to.be.gt(0);
@@ -36,7 +36,7 @@ async function supplyOf(contract, delta = 0n, log = undefined) {
       if (owners) {
         const relative_inv =
           Number((amount + amount_extra) * PRECISION) / Number(amount_extra);
-        const relative_pct = (100 * PRECISION) / relative_inv;
+        const relative_pct = (100 * Number(PRECISION)) / relative_inv;
         if (log) {
           log(`#[${i}] = ${amount} & ${amount_extra} =>`, relative_pct, "%");
         }
@@ -46,10 +46,10 @@ async function supplyOf(contract, delta = 0n, log = undefined) {
       if (log) log("W[", i, "] =", weight);
       if (log) log("∑[", i, "] =", others);
       if (log) log("Ω[", i, "] =", owners);
-      if (!owners.isZero()) {
+      if (owners > 0) {
         const supply_inv =
           Number((others + owners) * PRECISION) / Number(owners);
-        const supply_pct = (100 * PRECISION) / supply_inv;
+        const supply_pct = (100 * Number(PRECISION)) / supply_inv;
         if (log) log("S[", i, "] =", supply_pct, "%");
       } else {
         if (log) log("S[", i, "] =", 0, "%");
@@ -82,26 +82,25 @@ describe("XPOW Supply", async () => {
     supply = await supplyOf(xpower);
   });
   describe("calculation", async () => {
-    it("should count maximum supply as 1.240629527542673e+76 tokens", async () => {
+    it("should count maximum supply as 8.559756508734744e+11 × 1e64 tokens", async () => {
       expect(supply.total).to.eq(
-        12406295275426735223954034108073704412850355499890060432797050421125652152320n *
-          UNIT,
+        8559756508734743772394349710289740556191203711430480235769479063523433370898923520000000000000n,
       );
     });
-    it("should count other's supply as 8.270863516951157e+75 tokens", async () => {
+    it("should count other's supply as 8.270863516951157e+11 × 1e64 tokens", async () => {
       expect(supply.others).to.eq(
-        8270863516951156815969356072049136275233570333260040288531366947417101434880n *
-          UNIT,
+        8270863516951156815969356072049136275233570333260040288531366947417101434880000000000000000000n,
       );
     });
-    it("should count owner's supply as 4.135431758475579e+75 tokens", async () => {
+    it("should count owner's supply as 2.888929917835870e+08 × 1e64 tokens", async () => {
       expect(supply.owners).to.eq(
-        4135431758475578407984678036024568137616785166630020144265683473708550717440n *
-          UNIT,
+        288892991783586956424993638240604280957633378170439947238112116106331936018923520000000000000n,
       );
     });
-    it("should count fund's supply share as 33.33%", async () => {
-      expect(supply.total / 3n).to.eq(supply.owners);
+    it("should count owner's supply share as 3.375%", async () => {
+      expect((100 * Number(supply.owners)) / Number(supply.total)).to.eq(
+        3.375_0141314041833,
+      );
     });
   });
 });

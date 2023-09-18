@@ -2,11 +2,9 @@
 
 # XPower Token
 
-XPower is a proof-of-work token, i.e. it can only be minted by providing a correct nonce (with a recent block-hash). It has a maximum supply of 1.240T × 10^64 XPOW. To be exact:
+XPower is a proof-of-work token, i.e. it can only be minted by providing a correct nonce (with a recent block-hash). It has a maximum supply of 0.856T × 10^64 XPOW. To be exact, the maximum supply of the XPOW token is:
 
-The maximum supply of the XPOW token is
-
-> 12406295275426735223954034108073704412850355499890060432797050421125652152320.
+> 8559756508734743772394349710289740556191203711430480235769479063523433370898.923520
 
 ## Installation
 

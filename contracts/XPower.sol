@@ -15,7 +15,7 @@ import {Transferable} from "./base/Transferable.sol";
 /**
  * Class for the XPOW proof-of-work tokens: It verifies, that the nonce and the
  * block-hash result in a positive amount. After a successful verification, the
- * corresponding amount is minted for the beneficiary (plus the treasury).
+ * corresponding amount is minted for the beneficiary (plus the MoE treasury).
  */
 contract XPower is
     ERC20,
@@ -90,9 +90,9 @@ contract XPower is
         uint256 amount = _amountOf(zeros);
         // ensure unique (nonce-hash, block-hash)
         _hashes[pairIndex] = true;
-        // mint for project treasury
-        _mint(owner(), amount * 2);
-        // mint for beneficiary
+        // mint for contract owner: 3.375%
+        _mint(owner(), Math.mulDiv(34_929, amount, 1e6));
+        // mint for beneficiary: 96.625%
         _mint(to, amount);
     }
 

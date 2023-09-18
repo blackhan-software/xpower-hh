@@ -7,6 +7,9 @@ let Moe; // contract
 let moe; // instance
 let UNIT; // decimals
 
+// 3.375% share of minted XPOW
+const PART = BigInt(34_929e12);
+
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
 
@@ -60,7 +63,7 @@ describe("XPower", async function () {
       const tx = await moe.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await moe.balanceOf(addresses[0])).to.eq(UNIT);
-      expect(await moe.balanceOf(addresses[1])).to.eq(UNIT * 2n);
+      expect(await moe.balanceOf(addresses[1])).to.eq(PART);
     });
     it("should mint for amount=1 once (duplicate nonce-hash)", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 1 });
@@ -68,7 +71,7 @@ describe("XPower", async function () {
       const tx_1st = await moe.mint(addresses[0], block_hash, nonce);
       expect(tx_1st).to.be.an("object");
       expect(await moe.balanceOf(addresses[0])).to.eq(UNIT);
-      expect(await moe.balanceOf(addresses[1])).to.eq(UNIT * 2n);
+      expect(await moe.balanceOf(addresses[1])).to.eq(PART);
       const tx_2nd = await moe
         .mint(addresses[0], block_hash, nonce)
         .catch((ex) => {
@@ -78,7 +81,7 @@ describe("XPower", async function () {
         });
       expect(tx_2nd).to.eq(undefined);
       expect(await moe.balanceOf(addresses[0])).to.eq(UNIT);
-      expect(await moe.balanceOf(addresses[1])).to.eq(UNIT * 2n);
+      expect(await moe.balanceOf(addresses[1])).to.eq(PART);
     });
     it("should *not* mint for amount=1 (expired block-hash)", async function () {
       const [nonce] = table.getNonce({ amount: 1 });
@@ -98,7 +101,7 @@ describe("XPower", async function () {
       const tx = await moe.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await moe.balanceOf(addresses[0])).to.eq(3n * UNIT);
-      expect(await moe.balanceOf(addresses[1])).to.eq(3n * UNIT * 2n);
+      expect(await moe.balanceOf(addresses[1])).to.eq(3n * PART);
     });
     it("should mint for amount=3 once (duplicate nonce-hash)", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 3 });
@@ -106,7 +109,7 @@ describe("XPower", async function () {
       const tx_1 = await moe.mint(addresses[0], block_hash, nonce);
       expect(tx_1).to.be.an("object");
       expect(await moe.balanceOf(addresses[0])).to.eq(3n * UNIT);
-      expect(await moe.balanceOf(addresses[1])).to.eq(3n * UNIT * 2n);
+      expect(await moe.balanceOf(addresses[1])).to.eq(3n * PART);
       const tx_2nd = await moe
         .mint(addresses[0], block_hash, nonce)
         .catch((ex) => {
@@ -116,7 +119,7 @@ describe("XPower", async function () {
         });
       expect(tx_2nd).to.eq(undefined);
       expect(await moe.balanceOf(addresses[0])).to.eq(3n * UNIT);
-      expect(await moe.balanceOf(addresses[1])).to.eq(3n * UNIT * 2n);
+      expect(await moe.balanceOf(addresses[1])).to.eq(3n * PART);
     });
     it("should *not* mint for amount=3 (expired block-hash)", async function () {
       const [nonce] = table.getNonce({ amount: 3 });
@@ -182,10 +185,10 @@ describe("XPower", async function () {
       const tx = await moe.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await moe.balanceOf(addresses[0])).to.eq(UNIT);
-      expect(await moe.balanceOf(addresses[1])).to.eq(UNIT * 2n);
+      expect(await moe.balanceOf(addresses[1])).to.eq(PART);
       await moe.burn(UNIT);
       expect(await moe.balanceOf(addresses[0])).to.eq(0n);
-      expect(await moe.balanceOf(addresses[1])).to.eq(UNIT * 2n);
+      expect(await moe.balanceOf(addresses[1])).to.eq(PART);
     });
     it("should mint for amount=3 & burn 2 tokens", async function () {
       const [nonce, block_hash] = table.getNonce({ amount: 3 });
@@ -193,10 +196,10 @@ describe("XPower", async function () {
       const tx = await moe.mint(addresses[0], block_hash, nonce);
       expect(tx).to.be.an("object");
       expect(await moe.balanceOf(addresses[0])).to.eq(3n * UNIT);
-      expect(await moe.balanceOf(addresses[1])).to.eq(3n * UNIT * 2n);
+      expect(await moe.balanceOf(addresses[1])).to.eq(3n * PART);
       await moe.burn(2n * UNIT);
       expect(await moe.balanceOf(addresses[0])).to.eq(1n * UNIT);
-      expect(await moe.balanceOf(addresses[1])).to.eq(3n * UNIT * 2n);
+      expect(await moe.balanceOf(addresses[1])).to.eq(3n * PART);
     });
   });
 });
