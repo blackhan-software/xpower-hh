@@ -2,9 +2,9 @@
 
 # XPower Token
 
-XPower is a proof-of-work token, i.e. it can only be minted by providing a correct nonce (with a recent block-hash). It has a maximum supply of 0.856T × 10^64 XPOW. To be exact, the maximum supply of the XPOW token is:
+XPower is a proof-of-work token, i.e. it can only be minted by providing a correct nonce (with a recent block-hash). It has a maximum supply of 0.930T × 1E64 XPOW. To be exact, the maximum supply of the XPOW token is:
 
-> 8559756508734743772394349710289740556191203711430480235769479063523433370898.923520
+> 9304721456570051417965525581055278309637766624917545324597787815844239114240
 
 ## Installation
 
@@ -131,8 +131,8 @@ OPTIONS:
 
   --cache       cache block-hash (default: true)
   --json        json logs (default: false)
-  --level       minimum minting threshold (default: 6)
   --mint        auto-mint if possible (default: true)
+  --mint-level  minimum minting threshold (default: 6)
   --nonce-bytes number of nonce bytes (default: 8)
   --refresh     refresh block-hash (default: false)
   --workers     number of mining processes (default: CPUs - 1)
@@ -159,10 +159,10 @@ npx hardhat mine --network mainnet # | jq -rc 'select(.level=="info")|.message'
 ...
 ```
 
-..where you should see the `[MINT]` prefix, if minting for the `nonce` value has been successful. Further, to skip minting _lower_ valued amounts you can use the `level` option:
+..where you should see the `[MINT]` prefix, if minting for the `nonce` value has been successful. Further, to skip minting _lower_ valued amounts you can use the `mint-level` option:
 
 ```sh
-npx hardhat mine --network mainnet --level 7 # | jq -rc '.message'
+npx hardhat mine --network mainnet --mint-level 7 # | jq -rc '.message'
 ```
 
 ```txt
@@ -192,16 +192,28 @@ npx hardhat balances-avax --network mainnet
 
 > By default the service files assume the miner (repository) to be accessible at `/opt/xpower-hh`. If that is not the case, either provide a corresponding symbolic link or (if you cannot access `/opt`) modify the service files accordingly.
 
+Create the systemd user directory:
+
+```sh
+mkdir -p ~/.config/systemd/user
+```
+
 Copy the systemd unit files to the user directory:
 
 ```sh
 cp --update ./services/* ~/.config/systemd/user/
 ```
 
-Enable the timer service (for e.g. `level=7`):
+Reload the systemd user daemon:
 
 ```sh
-systemctl enable --user xpow-miner@7.timer
+systemctl --user daemon-reload
+```
+
+Enable the timer service (for e.g. `mint-level=6`):
+
+```sh
+systemctl enable --user xpow-miner@6.timer
 ```
 
 ..to ensure that mining starts upon a reboot (optional).
@@ -211,7 +223,7 @@ systemctl enable --user xpow-miner@7.timer
 Start the timer service (to auto-[re]start &ndash; every hour &ndash; the miner service):
 
 ```sh
-systemctl start --user xpow-miner@7.timer
+systemctl start --user xpow-miner@6.timer
 ```
 
 List the installed timer services:
@@ -223,7 +235,7 @@ systemctl list-timers --user
 Follow the journal of the miner service:
 
 ```sh
-journalctl --user -fu xpow-miner@7.service
+journalctl --user -fu xpow-miner@6.service
 ```
 
 ### Service stop
@@ -231,13 +243,13 @@ journalctl --user -fu xpow-miner@7.service
 Stop the timer service:
 
 ```sh
-systemctl stop --user xpow-miner@7.timer
+systemctl stop --user xpow-miner@6.timer
 ```
 
 Stop the miner service:
 
 ```sh
-systemctl stop --user xpow-miner@7.service
+systemctl stop --user xpow-miner@6.service
 ```
 
 ### Service removal
@@ -245,30 +257,41 @@ systemctl stop --user xpow-miner@7.service
 Disable the timer service:
 
 ```sh
-systemctl disable --user xpow-miner@7.timer
+systemctl disable --user xpow-miner@6.timer
 ```
 
 ..to ensure that mining does _not_ start upon a reboot.
 
 ## Docker Integration
 
-Build docker image:
+Pull the docker image of the miner:
 
 ```sh
-docker build -t xpower-hh .
+docker pull xpowermine/miner
 ```
 
-Set minting address and private-key (can also be for a different address):
+Or, build the docker image (for development &mdash; otherwise skip):
+
+```sh
+docker build -t xpowermine/miner .
+```
+
+Set the minter address and a private-key (can also be of a different address), plus the RPC end-point (optional):
 
 ```sh
 export MINT_ADDRESS=0x..
 export MINT_ADDRESS_PK=0x..
+export AVAX_MAINNET_RPC=https://api.avax.network/ext/bc/C/rpc
 ```
 
-Run docker image to start mining:
+Then, run a docker instance to start mining:
 
 ```sh
-docker run -ti -e MINT_ADDRESS="$MINT_ADDRESS" -e MINT_ADDRESS_PK="$MINT_ADDRESS_PK" -e MINE_LEVEL=7 -e MINE_WORKERS=3 xpower-hh
+docker run --rm -ti \
+-e MINT_ADDRESS="$MINT_ADDRESS" \
+-e MINT_ADDRESS_PK="$MINT_ADDRESS_PK" \
+-e AVAX_MAINNET_RPC="$AVAX_MAINNET_RPC" \
+-e MINT_LEVEL=6 -e MINE_WORKERS=3 xpowermine/miner
 ```
 
 ## Copyright
