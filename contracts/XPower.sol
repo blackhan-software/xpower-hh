@@ -82,9 +82,9 @@ contract XPower is ERC20, ERC20Burnable, FeeTracker, MoeMigratable, Ownable {
         uint256 amount = _amountOf(zeros);
         // ensure unique (nonce-hash, block-hash)
         _hashes[pairIndex] = true;
-        // mint for contract owner: 3.375%
-        _mint(owner(), Math.mulDiv(34_929, amount, 1e6));
-        // mint for beneficiary: 96.625%
+        // mint for contract owner
+        _mint(owner(), amount >> 3);
+        // mint for beneficiary
         _mint(to, amount);
     }
 

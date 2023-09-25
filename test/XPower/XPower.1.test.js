@@ -7,8 +7,8 @@ let Moe; // contract
 let moe; // instance
 let UNIT; // decimals
 
-// 3.375% share of minted XPOW
-const PART = BigInt(34_929e12);
+// 1 / 9th share of minted XPOW
+const PART = BigInt(1e18) / 8n;
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
