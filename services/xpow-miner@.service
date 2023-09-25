@@ -6,7 +6,7 @@ After=network.target
 [Service]
 WorkingDirectory=/opt/xpower-hh
 EnvironmentFile=/opt/xpower-hh/.env
-ExecStart=npx hardhat mine --network mainnet --json true --level %i
+ExecStart=/usr/bin/npx hardhat mine --network mainnet --json true --mint-level %i
 Restart=on-failure
 RestartSec=60
 Nice=10

@@ -34,10 +34,10 @@ if [ -z "$MINT_ADDRESS_PK" ] ; then
 fi
 
 #######################################################################
-# MINE_LEVEL=7
+# MINT_LEVEL=6
 
-if [ -z "$MINE_LEVEL" ] ; then
-    export MINE_LEVEL=7
+if [ -z "$MINT_LEVEL" ] ; then
+    export MINT_LEVEL=6
 fi
 
 #######################################################################
@@ -54,8 +54,8 @@ while true ; do
     /usr/local/bin/npx hardhat mine \
         --cache true \
         --json true \
-        --level "$MINE_LEVEL" \
         --mint true \
+        --mint-level "$MINT_LEVEL" \
         --workers "$MINE_WORKERS" \
         --network mainnet
 done

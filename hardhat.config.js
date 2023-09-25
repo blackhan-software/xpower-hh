@@ -58,8 +58,8 @@ task("balances-xpow", "Prints the list of balances for XPower tokens")
 task("mine", "Mines for XPower tokens")
   .addParam("cache", "cache block-hash", true, types.boolean)
   .addParam("json", "json logs", false, types.boolean)
-  .addParam("level", "minimum minting threshold", 6, types.int)
   .addParam("mint", "auto-mint if possible", true, types.boolean)
+  .addParam("mintLevel", "minimum minting threshold", 6, types.int)
   .addParam("nonceBytes", "number of nonce bytes", 8, types.int)
   .addParam("refresh", "refresh block-hash", false, types.boolean)
   .addParam("workers", "number of mining processes", workers(), types.int)
@@ -69,13 +69,13 @@ task("mine", "Mines for XPower tokens")
     assert(accounts.length > 0, "missing accounts");
     const beneficiary = process.env.MINT_ADDRESS;
     assert(beneficiary, "missing MINT_ADDRESS");
-    assert(args.level > 0, "level is not larger than zero");
+    assert(args.mintLevel > 0, "level is not larger than zero");
     assert(args.workers > 0, "workers is not larger than zero");
     const symbols = args.tokens.map((token) => Token.symbol(token));
     return start(symbols, [accounts[0].address, beneficiary], {
       cache: args.cache,
       json: args.json,
-      level: args.level,
+      level: args.mintLevel,
       mint: args.mint,
       nonce_length: args.nonceBytes,
       n_workers: args.workers,
@@ -123,7 +123,9 @@ module.exports = {
       gasMultiplier: 1.25, // gasPrice: 100_000_000_000,
     },
     /* avalanche */ fuji: {
-      url: "https://api.avax-test.network/ext/bc/C/rpc",
+      url:
+        process.env.AVAX_TESTNET_RPC ||
+        "https://api.avax-test.network/ext/bc/C/rpc",
       chainId: 43113,
       accounts: [
         process.env.MINT_ADDRESS_PK ||
@@ -132,7 +134,8 @@ module.exports = {
       gasMultiplier: 1.25, // gasPrice: 100_000_000_000,
     },
     /* avalanche */ mainnet: {
-      url: "https://api.avax.network/ext/bc/C/rpc",
+      url:
+        process.env.AVAX_MAINNET_RPC || "https://api.avax.network/ext/bc/C/rpc",
       chainId: 43114,
       accounts: [
         process.env.MINT_ADDRESS_PK ||
