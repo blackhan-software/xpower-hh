@@ -29,7 +29,7 @@ class Token {
   }
 
   constructor(symbol) {
-    this.amount_of = amount_of(symbol);
+    this.amount_of = (h) => 2 ** zeros(h) - 1;
     this.symbol = symbol;
   }
 
@@ -37,14 +37,6 @@ class Token {
     return threshold_of(this.symbol)(level);
   }
 }
-const amount_of = (symbol) => {
-  switch (symbol) {
-    case "XPOW":
-      return (hash) => 2 ** zeros(hash) - 1;
-    default:
-      throw new Error(`unknown ${symbol}`);
-  }
-};
 const zeros = (hash, counter = 0) => {
   while (hash[counter] === 0) {
     counter++;

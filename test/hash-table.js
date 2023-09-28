@@ -76,7 +76,12 @@ class HashTable {
     //
     // try writing { nonce: [hash, amount] }
     //
-    const mine = await new Miner().init(nonce_length);
+    const mine = await new Miner().init(
+      contract_target,
+      address,
+      block_hash,
+      nonce_length,
+    );
     const token = new Token(symbol);
     const min_threshold = token.threshold(min_level);
     const max_threshold = token.threshold(max_level);
@@ -87,7 +92,7 @@ class HashTable {
         increment(nonce)
       ) {
         const x = hexlify(nonce);
-        const h = mine(contract_target, address, block_hash, nonce);
+        const h = mine(nonce);
         const a = token.amount_of(h);
         if (a < min_threshold) {
           continue;

@@ -15,38 +15,25 @@ class Miner {
     return Math.floor(parseInt(timestamp) / ms);
   }
 
-  constructor() {
-    this.abi_encoded = {}; // cache: block-hash => abi.encode(...)
-  }
-
-  async init(nonce_length) {
+  async init(contract, address, block_hash, nonce_length) {
     const hasher = await createKeccak(256);
-    const abi_encode = this.abi_encoder(nonce_length);
-    return (contract, address, block_hash, nonce) => {
-      const data = abi_encode(contract, address, block_hash, nonce);
-      const hash = hasher.init().update(data).digest("binary");
-      return hash;
+    const array = this.abi_encode(contract, address, block_hash, nonce_length);
+    return (nonce) => {
+      array.set(nonce, 52);
+      return hasher.init().update(array).digest("binary");
     };
   }
 
-  abi_encoder(nonce_length) {
-    return (contract, address, block_hash, nonce) => {
-      let value = this.abi_encoded[block_hash];
-      if (value === undefined) {
-        const template = solidityPacked(
-          ["uint160", "bytes32", "bytes"],
-          [
-            BigInt(contract) ^ BigInt(address),
-            block_hash,
-            new Uint8Array(nonce_length),
-          ],
-        );
-        value = arrayify(template.slice(2));
-        this.abi_encoded[block_hash] = value;
-      }
-      value.set(nonce, 52);
-      return value;
-    };
+  abi_encode(contract, address, block_hash, nonce_length) {
+    const template = solidityPacked(
+      ["uint160", "bytes32", "bytes"],
+      [
+        BigInt(contract) ^ BigInt(address),
+        block_hash,
+        new Uint8Array(nonce_length),
+      ],
+    );
+    return arrayify(template.slice(2));
   }
 }
 function arrayify(data, list = []) {
