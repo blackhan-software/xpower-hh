@@ -2,7 +2,6 @@ const { ethers } = require("hardhat");
 const { expect } = require("chai");
 
 let accounts; // all accounts
-let addresses; // all addresses
 let Moe, Nft; // contract
 let moe, nft; // instance
 let UNIT; // decimals
@@ -13,8 +12,6 @@ describe("XPowerNft", async function () {
   before(async function () {
     accounts = await ethers.getSigners();
     expect(accounts.length).to.be.greaterThan(0);
-    addresses = accounts.map((acc) => acc.address);
-    expect(addresses.length).to.be.greaterThan(15);
   });
   before(async function () {
     Moe = await ethers.getContractFactory("XPowerTest");
@@ -25,7 +22,7 @@ describe("XPowerNft", async function () {
   beforeEach(async function () {
     moe = await Moe.deploy([], 0);
     expect(moe).to.be.an("object");
-    await moe.transferOwnership(addresses[1]);
+    await moe.transferOwnership(accounts[1]);
     await moe.init();
   });
   beforeEach(async function () {
@@ -82,6 +79,23 @@ describe("XPowerNft", async function () {
         }),
       ).to.eq(undefined);
     });
+    it("should mint NFTs for level=UNIT & amount=15 (other)", async function () {
+      const [owner, other] = [accounts[0], accounts[1]];
+      await moeMint(15);
+      await allowanceOf(15);
+      await nftApprove(owner, other);
+      await nftMint(15, 0, owner, other);
+    });
+    it("should *not* mint NFTs (other: not approved)", async function () {
+      const [owner, other] = [accounts[0], accounts[1]];
+      expect(
+        await nftMint(15, 0, owner, other).catch((ex) => {
+          const m = ex.message.match(/caller is not token owner or approved/);
+          if (m === null) console.debug(ex);
+          expect(m).to.not.eq(null);
+        }),
+      ).to.eq(undefined);
+    });
   });
   describe("mint-batch", async function () {
     it("should mint XPower for amount=15", async function () {
@@ -123,6 +137,23 @@ describe("XPowerNft", async function () {
         }),
       ).to.eq(undefined);
     });
+    it("should mint NFTs for level=UNIT & amount=15 (other)", async function () {
+      const [owner, other] = [accounts[0], accounts[1]];
+      await moeMint(15);
+      await allowanceOf(15);
+      await nftApprove(owner, other);
+      await nftMintBatch(15, 0, owner, other);
+    });
+    it("should *not* mint NFTs (other: not approved)", async function () {
+      const [owner, other] = [accounts[0], accounts[1]];
+      expect(
+        await nftMintBatch(15, 0, owner, other).catch((ex) => {
+          const m = ex.message.match(/caller is not token owner or approved/);
+          if (m === null) console.debug(ex);
+          expect(m).to.not.eq(null);
+        }),
+      ).to.eq(undefined);
+    });
   });
 });
 async function allowanceOf(n, a = accounts[0]) {
@@ -135,16 +166,23 @@ async function moeMint(n, a = accounts[0]) {
   expect(tx).to.be.an("object");
   return tx;
 }
-async function nftMint(n, l = 0, a = accounts[0]) {
+async function nftApprove(a = accounts[0], d = accounts[1]) {
+  expect(await nft.approvedMint(a, d)).to.eq(false);
+  const tx = await nft.approveMint(d, true);
+  expect(tx).to.be.an("object");
+  expect(await nft.approvedMint(a, d)).to.eq(true);
+  return tx;
+}
+async function nftMint(n, l = 0, a = accounts[0], d = accounts[0]) {
   const year = await nft.year();
   expect(year).to.be.greaterThan(0);
-  const old_balance = await moe.balanceOf(a.address);
-  const tx = await nft.connect(a).mint(a.address, l, n);
+  const old_balance = await moe.balanceOf(a);
+  const tx = await nft.connect(d).mint(a, l, n);
   const new_balance = await moe.balanceOf(a.address);
   expect(old_balance - new_balance).to.eq(BigInt(n * 10 ** l) * UNIT);
   const nft_id = await nft.idBy(year, l);
   expect(nft_id).to.be.greaterThan(0);
-  const nft_balance = await nft.balanceOf(a.address, nft_id);
+  const nft_balance = await nft.balanceOf(a, nft_id);
   expect(nft_balance).to.eq(n);
   const nft_supply = await nft.totalSupply(nft_id);
   expect(nft_supply).to.eq(n);
@@ -154,18 +192,18 @@ async function nftMint(n, l = 0, a = accounts[0]) {
   expect(nft_url).to.eq(NFT_XPOW_URL);
   return tx;
 }
-async function nftMintBatch(n, l = 0, a = accounts[0]) {
+async function nftMintBatch(n, l = 0, a = accounts[0], d = accounts[0]) {
   const year = await nft.year();
   expect(year).to.be.greaterThan(0);
-  const old_balance = await moe.balanceOf(a.address);
-  const tx = await nft.connect(a).mintBatch(a.address, [l], [n]);
-  const new_balance = await moe.balanceOf(a.address);
+  const old_balance = await moe.balanceOf(a);
+  const tx = await nft.connect(d).mintBatch(a, [l], [n]);
+  const new_balance = await moe.balanceOf(a);
   expect(old_balance - new_balance).to.eq(BigInt(n * 10 ** l) * UNIT);
   const nft_ids = await nft.idsBy(year, [l]);
   expect(nft_ids.length).to.be.greaterThan(0);
   const nft_id = nft_ids[0];
   expect(nft_id).to.be.greaterThan(0);
-  const nft_balance = await nft.balanceOf(a.address, nft_id);
+  const nft_balance = await nft.balanceOf(a, nft_id);
   expect(nft_balance).to.eq(n);
   const nft_supply = await nft.totalSupply(nft_id);
   expect(nft_supply).to.eq(n);
