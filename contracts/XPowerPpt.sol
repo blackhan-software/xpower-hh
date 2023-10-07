@@ -52,13 +52,21 @@ contract XPowerPpt is NftBase {
     }
 
     /** mint particular amount of staked NFTs */
-    function mint(address to, uint256 nftId, uint256 amount) external onlyOwner {
+    function mint(
+        address to,
+        uint256 nftId,
+        uint256 amount
+    ) external onlyOwner {
         _memoMint(to, nftId, amount);
         _mint(to, nftId, amount, "");
     }
 
     /** mint particular amounts of staked NFTs */
-    function mintBatch(address to, uint256[] memory nftIds, uint256[] memory amounts) external onlyOwner {
+    function mintBatch(
+        address to,
+        uint256[] memory nftIds,
+        uint256[] memory amounts
+    ) external onlyOwner {
         require(nftIds.length > 0, "empty ids");
         require(amounts.length > 0, "empty amounts");
         _memoMintBatch(to, nftIds, amounts);
@@ -66,13 +74,21 @@ contract XPowerPpt is NftBase {
     }
 
     /** burn particular amount of staked NFTs */
-    function burn(address from, uint256 nftId, uint256 amount) public override onlyOwner {
+    function burn(
+        address from,
+        uint256 nftId,
+        uint256 amount
+    ) public override onlyOwner {
         _memoBurn(from, nftId, amount);
         _burn(from, nftId, amount);
     }
 
     /** burn particular amounts of staked NFTs */
-    function burnBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) public override onlyOwner {
+    function burnBatch(
+        address from,
+        uint256[] memory nftIds,
+        uint256[] memory amounts
+    ) public override onlyOwner {
         require(nftIds.length > 0, "empty ids");
         require(amounts.length > 0, "empty amounts");
         _memoBurnBatch(from, nftIds, amounts);
@@ -80,7 +96,10 @@ contract XPowerPpt is NftBase {
     }
 
     /** @return age seconds over all stakes */
-    function ageOf(address account, uint256 nftId) external view returns (uint256) {
+    function ageOf(
+        address account,
+        uint256 nftId
+    ) external view returns (uint256) {
         int256 age = _age[account][nftId];
         if (age > 0) {
             uint256 balance = balanceOf(account, nftId);
@@ -100,9 +119,17 @@ contract XPowerPpt is NftBase {
     }
 
     /** remember mint actions */
-    function _pushMintBatch(address to, uint256[] memory nftIds, uint256[] memory amounts) private {
-        require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
-        for (uint256 i = 0; i < nftIds.length; i++) _pushMint(to, nftIds[i], amounts[i]);
+    function _pushMintBatch(
+        address to,
+        uint256[] memory nftIds,
+        uint256[] memory amounts
+    ) private {
+        require(
+            nftIds.length == amounts.length,
+            "ERC1155: ids and amounts length mismatch"
+        );
+        for (uint256 i = 0; i < nftIds.length; i++)
+            _pushMint(to, nftIds[i], amounts[i]);
     }
 
     /** remember burn action */
@@ -111,9 +138,17 @@ contract XPowerPpt is NftBase {
     }
 
     /** remember burn actions */
-    function _pushBurnBatch(address from, uint256[] memory nftIds, uint256[] memory amounts) private {
-        require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
-        for (uint256 i = 0; i < nftIds.length; i++) _pushBurn(from, nftIds[i], amounts[i]);
+    function _pushBurnBatch(
+        address from,
+        uint256[] memory nftIds,
+        uint256[] memory amounts
+    ) private {
+        require(
+            nftIds.length == amounts.length,
+            "ERC1155: ids and amounts length mismatch"
+        );
+        for (uint256 i = 0; i < nftIds.length; i++)
+            _pushBurn(from, nftIds[i], amounts[i]);
     }
 
     /** remember mint action (incl. accumulators) */
@@ -124,9 +159,18 @@ contract XPowerPpt is NftBase {
     }
 
     /** remember mint actions (incl. accumulators) */
-    function _memoMintBatch(address to, uint256[] memory nftIds, uint256[] memory amounts) private {
-        require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
-        for (uint256 i = 0; i < nftIds.length; i++) _memoMint(to, nftIds[i], amounts[i]);
+    function _memoMintBatch(
+        address to,
+        uint256[] memory nftIds,
+        uint256[] memory amounts
+    ) private {
+        require(
+            nftIds.length == amounts.length,
+            "ERC1155: ids and amounts length mismatch"
+        );
+        for (uint256 i = 0; i < nftIds.length; i++) {
+            _memoMint(to, nftIds[i], amounts[i]);
+        }
     }
 
     /** remember burn action (incl. accumulators) */
@@ -137,8 +181,17 @@ contract XPowerPpt is NftBase {
     }
 
     /** remember burn actions (incl. accumulators) */
-    function _memoBurnBatch(address form, uint256[] memory nftIds, uint256[] memory amounts) private {
-        require(nftIds.length == amounts.length, "ERC1155: ids and amounts length mismatch");
-        for (uint256 i = 0; i < nftIds.length; i++) _memoBurn(form, nftIds[i], amounts[i]);
+    function _memoBurnBatch(
+        address form,
+        uint256[] memory nftIds,
+        uint256[] memory amounts
+    ) private {
+        require(
+            nftIds.length == amounts.length,
+            "ERC1155: ids and amounts length mismatch"
+        );
+        for (uint256 i = 0; i < nftIds.length; i++) {
+            _memoBurn(form, nftIds[i], amounts[i]);
+        }
     }
 }
