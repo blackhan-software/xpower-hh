@@ -180,7 +180,7 @@ async function mintNft(level, amount) {
 }
 async function stakeNft(nft_id, amount) {
   const [account, address] = [addresses[0], nty.target];
-  const tx_approval = await await nft.setApprovalForAll(address, true);
+  const tx_approval = await nft.setApprovalForAll(address, true);
   expect(tx_approval).to.be.an("object");
   const tx_transfer = await ppt.transferOwnership(address);
   expect(tx_transfer).to.be.an("object");
