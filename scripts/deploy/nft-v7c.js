@@ -48,8 +48,8 @@ function nft_bases(
  * > await hre.run('compile');
  */
 async function main() {
-  const owner = process.env.FUND_ADDRESS;
-  assert(owner, "missing FUND_ADDRESS");
+  const owner = process.env.SAFE_ADDRESS;
+  assert(owner, "missing SAFE_ADDRESS");
   // addresses XPowerNft[Old]
   const nft_base = nft_bases("XPOW");
   assert(nft_base.length === 14);

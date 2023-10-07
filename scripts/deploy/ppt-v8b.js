@@ -45,8 +45,8 @@ function ppt_bases(
  * > await hre.run('compile');
  */
 async function main() {
-  const owner = process.env.FUND_ADDRESS;
-  assert(owner, "missing FUND_ADDRESS");
+  const owner = process.env.SAFE_ADDRESS;
+  assert(owner, "missing SAFE_ADDRESS");
   // addresses XPowerPpt[Old]
   const ppt_base = ppt_bases("XPOW");
   assert(ppt_base.length === 11);

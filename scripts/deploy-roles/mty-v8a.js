@@ -2,8 +2,8 @@ const assert = require("assert");
 const { transferMtyRoles } = require("../roles");
 
 async function main() {
-  const owner = process.env.FUND_ADDRESS;
-  assert(owner, "missing FUND_ADDRESS");
+  const owner = process.env.SAFE_ADDRESS;
+  assert(owner, "missing SAFE_ADDRESS");
   //
   // transfer roles:
   //

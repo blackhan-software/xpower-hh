@@ -19,8 +19,8 @@ const { ethers } = require("hardhat");
  * > await hre.run("compile");
  */
 async function main() {
-  const owner = process.env.FUND_ADDRESS;
-  assert(owner, "missing FUND_ADDRESS");
+  const owner = process.env.SAFE_ADDRESS;
+  assert(owner, "missing SAFE_ADDRESS");
   // addresses XPower[New]
   const moe_link = process.env.XPOW_MOE_V5a;
   assert(moe_link, "missing XPOW_MOE_V5a");

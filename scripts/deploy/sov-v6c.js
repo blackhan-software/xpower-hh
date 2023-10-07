@@ -30,8 +30,8 @@ function sov_bases(token, versions = ["V5a", "V5b", "V5c", "V6a", "V6b"]) {
  * > await hre.run("compile");
  */
 async function main() {
-  const owner = process.env.FUND_ADDRESS;
-  assert(owner, "missing FUND_ADDRESS");
+  const owner = process.env.SAFE_ADDRESS;
+  assert(owner, "missing SAFE_ADDRESS");
   // addresses APower[Old]
   const sov_base = sov_bases("XPOW");
   assert(sov_base.length === 5);

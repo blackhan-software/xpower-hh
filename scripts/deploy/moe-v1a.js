@@ -29,8 +29,8 @@ function moe_bases(token, versions = []) {
  * > await hre.run("compile");
  */
 async function main() {
-  const owner = process.env.FUND_ADDRESS;
-  assert(owner, "missing FUND_ADDRESS");
+  const owner = process.env.SAFE_ADDRESS;
+  assert(owner, "missing SAFE_ADDRESS");
   // addresses XPower[Old]
   const moe_base = moe_bases("XPOW");
   assert(moe_base.length === 0);
