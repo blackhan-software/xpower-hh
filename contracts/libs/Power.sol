@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 import {UD60x18, ud, pow} from "@prb/math/src/UD60x18.sol";
 

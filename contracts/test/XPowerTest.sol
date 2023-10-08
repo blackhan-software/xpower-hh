@@ -2,7 +2,7 @@
 // solhint-disable no-empty-blocks
 // solhint-disable not-rely-on-time
 // solhint-disable one-contract-per-file
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 import {XPower} from "../XPower.sol";
 

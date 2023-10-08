@@ -91,7 +91,7 @@ task("mine", "Mines for XPower tokens")
  */
 module.exports = {
   solidity: {
-    version: "0.8.19",
+    version: "0.8.20",
     settings: {
       optimizer: {
         enabled: Boolean(process.env.OPTIMIZER_FLAG || 1),
@@ -103,6 +103,7 @@ module.exports = {
     /* avalanche */ hardhat: {
       allowBlocksWithSameTimestamp: Boolean(process.env.NO_TIMETRAVEL),
       blockGasLimit: 15_000_000,
+      gasPrice: 25_000_000_000,
     },
     /* avalanche */ local: {
       url: "http://127.0.0.1:9650/ext/bc/C/rpc",
@@ -120,7 +121,7 @@ module.exports = {
         "0x86f78c5416151fe3546dece84fda4b4b1e36089f2dbc48496faf3a950f16157c",
         "0x750839e9dbbd2a0910efe40f50b2f3b2f2f59f5580bb4b83bd8c1201cf9a010a",
       ],
-      gasMultiplier: 1.0, // gasPrice: 100_000_000_000,
+      gasMultiplier: 1.0,
     },
     /* avalanche */ fuji: {
       url:
@@ -131,7 +132,7 @@ module.exports = {
         process.env.MINT_ADDRESS_PK ||
           "0x0000000000000000000000000000000000000000000000000000000000000000",
       ],
-      gasMultiplier: 1.0, // gasPrice: 100_000_000_000,
+      gasMultiplier: 1.0,
     },
     /* avalanche */ mainnet: {
       url:
@@ -141,7 +142,7 @@ module.exports = {
         process.env.MINT_ADDRESS_PK ||
           "0x0000000000000000000000000000000000000000000000000000000000000000",
       ],
-      gasMultiplier: 1.0, // gasPrice: 100_000_000_000,
+      gasMultiplier: 1.0,
     },
   },
   etherscan: {
