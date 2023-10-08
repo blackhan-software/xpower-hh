@@ -15,7 +15,10 @@ library Nft {
     }
 
     /** @return nft-ids composed of [(year, level) for level in levels] */
-    function idsBy(uint256 anno, uint256[] memory levels) internal pure returns (uint256[] memory) {
+    function idsBy(
+        uint256 anno,
+        uint256[] memory levels
+    ) internal pure returns (uint256[] memory) {
         uint256[] memory ids = new uint256[](levels.length);
         for (uint256 i = 0; i < levels.length; i++) {
             ids[i] = idBy(anno, levels[i]);

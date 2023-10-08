@@ -15,7 +15,15 @@ import {URIMalleable} from "./URIMalleable.sol";
 /**
  * Abstract base NFT class: publicly *not* minteable (nor burnable).
  */
-abstract contract NftBase is ERC1155, ERC1155Supply, ERC1155Burnable, URIMalleable, NftRoyalty, NftMigratable, Ownable {
+abstract contract NftBase is
+    ERC1155,
+    ERC1155Supply,
+    ERC1155Burnable,
+    URIMalleable,
+    NftRoyalty,
+    NftMigratable,
+    Ownable
+{
     /** contract name */
     string public name;
     /** contract symbol */
@@ -46,7 +54,10 @@ abstract contract NftBase is ERC1155, ERC1155Supply, ERC1155Burnable, URIMalleab
     }
 
     /** @return nft-ids composed of [(year, level) for level in levels] */
-    function idsBy(uint256 anno, uint256[] memory levels) public pure returns (uint256[] memory) {
+    function idsBy(
+        uint256 anno,
+        uint256[] memory levels
+    ) public pure returns (uint256[] memory) {
         return Nft.idsBy(anno, levels);
     }
 
@@ -79,13 +90,39 @@ abstract contract NftBase is ERC1155, ERC1155Supply, ERC1155Burnable, URIMalleab
         uint256[] memory amounts,
         bytes memory data
     ) internal override(ERC1155, ERC1155Supply) {
-        ERC1155Supply._beforeTokenTransfer(operator, from, to, nftIds, amounts, data);
+        ERC1155Supply._beforeTokenTransfer(
+            operator,
+            from,
+            to,
+            nftIds,
+            amounts,
+            data
+        );
+    }
+
+    /** @return URI of nft-id */
+    function uri(
+        uint256 nftId
+    )
+        public
+        view
+        virtual
+        override(ERC1155, URIMalleable)
+        returns (string memory)
+    {
+        return super.uri(nftId);
     }
 
     /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(ERC1155, URIMalleable, NftRoyalty, NftMigratable) returns (bool) {
+    )
+        public
+        view
+        virtual
+        override(ERC1155, URIMalleable, NftRoyalty, NftMigratable)
+        returns (bool)
+    {
         return super.supportsInterface(interfaceId);
     }
 }
