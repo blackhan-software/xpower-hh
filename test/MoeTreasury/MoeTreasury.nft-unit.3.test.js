@@ -85,15 +85,11 @@ describe("MoeTreasury", async function () {
     it("should stake UNIT NFTs", async function () {
       [account, nft_id] = await stakeNft(await mintNft(0, 1), 1);
     });
-    it("should return zero [APOW] in 0 year", async function () {
+    it("should return almost zero [APOW] in 0 year", async function () {
       await PrintRates(mty, nft_id);
-      expect(await mty.claimable(account, nft_id)).to.eq(0);
-      const claimed = await mty.claim(account, nft_id).catch((ex) => {
-        const m = ex.message.match(/nothing claimable/);
-        if (m === null) console.debug(ex);
-        expect(m).to.not.eq(null);
-      });
-      expect(claimed).to.eq(undefined);
+      expect((await mty.claimable(account, nft_id)) / UNIT).to.eq(0);
+      const tx = await mty.claim(account, nft_id);
+      expect(tx).to.be.an("object");
     });
     it("should grant reparametrization right", async function () {
       await mty.grantRole(mty.APR_ROLE(), addresses[0]);
@@ -106,15 +102,11 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_increaseTime", [YEAR]);
       await network.provider.send("evm_mine", []);
     });
-    it("should return zero [APOW] in 1 year", async function () {
+    it("should return almost zero [APOW] in 1 year", async function () {
       await PrintRates(mty, nft_id);
-      expect(await mty.claimable(account, nft_id)).to.eq(0);
-      const claimed = await mty.claim(account, nft_id).catch((ex) => {
-        const m = ex.message.match(/nothing claimable/);
-        if (m === null) console.debug(ex);
-        expect(m).to.not.eq(null);
-      });
-      expect(claimed).to.eq(undefined);
+      expect((await mty.claimable(account, nft_id)) / UNIT).to.eq(0);
+      const tx = await mty.claim(account, nft_id);
+      expect(tx).to.be.an("object");
     });
     it("should reparameterize (per nft.level)", async function () {
       const tx = await mty.setAPRBatch([202100], [3375e3, U256, 3375e3, 256]);
@@ -124,15 +116,11 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_increaseTime", [YEAR]);
       await network.provider.send("evm_mine", []);
     });
-    it("should return zero [APOW] in 2 years", async function () {
+    it("should return almost zero [APOW] in 2 years", async function () {
       await PrintRates(mty, nft_id);
-      expect(await mty.claimable(account, nft_id)).to.eq(0);
-      const claimed = await mty.claim(account, nft_id).catch((ex) => {
-        const m = ex.message.match(/nothing claimable/);
-        if (m === null) console.debug(ex);
-        expect(m).to.not.eq(null);
-      });
-      expect(claimed).to.eq(undefined);
+      expect((await mty.claimable(account, nft_id)) / UNIT).to.eq(0);
+      const tx = await mty.claim(account, nft_id);
+      expect(tx).to.be.an("object");
     });
     it("should reparameterize (per nft.level)", async function () {
       const tx = await mty.setAPRBatch([202100], [3375e3, U256, 3375e3, 256]);
@@ -142,15 +130,11 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_increaseTime", [YEAR]);
       await network.provider.send("evm_mine", []);
     });
-    it("should return zero [APOW] in 3 years", async function () {
+    it("should return almost zero [APOW] in 3 years", async function () {
       await PrintRates(mty, nft_id);
-      expect(await mty.claimable(account, nft_id)).to.eq(0);
-      const claimed = await mty.claim(account, nft_id).catch((ex) => {
-        const m = ex.message.match(/nothing claimable/);
-        if (m === null) console.debug(ex);
-        expect(m).to.not.eq(null);
-      });
-      expect(claimed).to.eq(undefined);
+      expect((await mty.claimable(account, nft_id)) / UNIT).to.eq(0);
+      const tx = await mty.claim(account, nft_id);
+      expect(tx).to.be.an("object");
     });
     it("should reparameterize (per nft.level)", async function () {
       const tx = await mty.setAPRBatch([202100], [3375e3, U256, 3375e3, 256]);
@@ -160,15 +144,11 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_increaseTime", [YEAR]);
       await network.provider.send("evm_mine", []);
     });
-    it("should return zero [APOW] in 4 years", async function () {
+    it("should return almost zero [APOW] in 4 years", async function () {
       await PrintRates(mty, nft_id);
-      expect(await mty.claimable(account, nft_id)).to.eq(0);
-      const claimed = await mty.claim(account, nft_id).catch((ex) => {
-        const m = ex.message.match(/nothing claimable/);
-        if (m === null) console.debug(ex);
-        expect(m).to.not.eq(null);
-      });
-      expect(claimed).to.eq(undefined);
+      expect((await mty.claimable(account, nft_id)) / UNIT).to.eq(0);
+      const tx = await mty.claim(account, nft_id);
+      expect(tx).to.be.an("object");
     });
   });
 });

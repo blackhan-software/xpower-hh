@@ -58,7 +58,7 @@ async function check_day(utc_date) {
   const nft_year = await nft.year();
   expect(nft_year).to.be.greaterThan(0);
   if (utc_date.dayOfYear() === 1 || utc_date.dayOfYear() === 365) {
-    expect(nft_year).to.approximately(utc_date.year(), 1);
+    expect(nft_year).to.closeTo(utc_date.year(), 1);
   } else {
     expect(nft_year).to.eq(utc_date.year());
   }

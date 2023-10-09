@@ -169,12 +169,10 @@ contract MoeTreasury is MoeTreasurySupervised {
         uint256 age = _ppt.ageOf(account, nftId);
         uint256 rate = aprOf(nftId) + apbOf(nftId);
         uint256 denomination = _ppt.denominationOf(_ppt.levelOf(nftId));
-        uint256 reward = Math.mulDiv(
-            rate * age,
-            denomination,
-            1e6 * Constants.CENTURY
+        return Math.mulDiv(
+            rate * age * 10 ** _moe.decimals(),
+            denomination, 1e6 * Constants.CENTURY
         );
-        return reward * 10 ** _moe.decimals();
     }
 
     /** @return reward amounts */

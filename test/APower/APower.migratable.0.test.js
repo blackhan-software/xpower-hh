@@ -111,10 +111,13 @@ describe("APower Migration", async function () {
     // wait for +12 months: 1st year
     await network.provider.send("evm_increaseTime", [YEAR]);
     expect(await mty.claim(account, nft_id)).to.be.an("object");
-    expect(await mty.rewardOf(account, nft_id)).to.eq(33n * UNIT_OLD);
-    expect(await mty.claimed(account, nft_id)).to.eq(33n * UNIT_OLD);
+    expect(await mty.rewardOf(account, nft_id)).to.gt(33n * UNIT_OLD);
+    expect(await mty.rewardOf(account, nft_id)).to.lt(34n * UNIT_OLD);
+    expect(await mty.claimed(account, nft_id)).to.gt(33n * UNIT_OLD);
+    expect(await mty.claimed(account, nft_id)).to.lt(34n * UNIT_OLD);
     expect(await mty.claimable(account, nft_id)).to.eq(0);
-    expect(await moe_old.balanceOf(mty.target)).to.eq(77n * UNIT_OLD);
+    expect(await moe_old.balanceOf(mty.target)).to.gt(76n * UNIT_OLD);
+    expect(await moe_old.balanceOf(mty.target)).to.lt(77n * UNIT_OLD);
   });
   beforeEach(async function () {
     const old_supply = await sov_old.totalSupply();
@@ -151,17 +154,13 @@ describe("APower Migration", async function () {
     await moe_old.increaseAllowance(moe_new.target, U256);
     await moe_new.increaseAllowance(sov_new.target, U256);
     await sov_old.increaseAllowance(sov_new.target, U256);
-    expect(await sov_old.balanceOf(A0)).to.closeTo(
-      525_960n * UNIT_OLD,
-      UNIT_OLD,
-    );
+    expect(await sov_old.balanceOf(A0)).to.gt(525_960n * UNIT_OLD);
+    expect(await sov_old.balanceOf(A0)).to.lt(525_961n * UNIT_OLD);
     expect(await sov_new.balanceOf(A0)).to.eq(0);
     await sov_new.migrate(sov_old.balanceOf(A0), [0, 0]);
     expect(await sov_old.balanceOf(A0)).to.eq(0);
-    expect(await sov_new.balanceOf(A0)).to.closeTo(
-      525_960n * UNIT_NEW,
-      UNIT_NEW,
-    );
+    expect(await sov_new.balanceOf(A0)).to.gt(525_960n * UNIT_NEW);
+    expect(await sov_new.balanceOf(A0)).to.lt(525_961n * UNIT_NEW);
   });
   it("should *not* migrate old (migration sealed)", async function () {
     await sov_new.grantRole(sov_new.SOV_SEAL_ROLE(), A0);

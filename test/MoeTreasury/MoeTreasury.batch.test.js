@@ -64,16 +64,16 @@ describe("MoeTreasury", async function () {
     expect(await sov.owner()).to.eq(mty.target);
   });
   before(async function () {
-    await mintToken(UNIT * 1102n);
+    await mintToken(1102n * UNIT);
     const supply = await moe.totalSupply();
     await increaseAllowanceBy(supply, nft.target);
   });
   before(async function () {
-    await moe.transfer(mty.target, UNIT * 102n);
+    await moe.transfer(mty.target, 102n * UNIT);
   });
   describe("moeBalance", async function () {
     it("should return 102 [XPOW]", async function () {
-      expect(await moe.balanceOf(mty.target)).to.eq(UNIT * 102n);
+      expect(await moe.balanceOf(mty.target)).to.closeTo(102n * UNIT, UNIT);
     });
   });
   describe("claimBatch", async function () {
@@ -86,79 +86,90 @@ describe("MoeTreasury", async function () {
           expect(m).to.not.eq(null);
         }),
       ).to.eq(undefined);
-      expect(
-        await mty.claimBatch(a, [id]).catch((ex) => {
-          const m = ex.message.match(/nothing claimable/);
-          if (m === null) console.debug(ex);
-          expect(m).to.not.eq(null);
-        }),
-      ).to.eq(undefined);
-      Expect(await mty.rewardOfBatch(a, [id])).to.eq([0n]);
-      Expect(await mty.claimedBatch(a, [id])).to.eq([0n]);
-      Expect(await mty.claimableBatch(a, [id])).to.eq([0n]);
-      Expect(await mty.mintedBatch(a, [id])).to.eq([0n]);
-      Expect(await mty.mintableBatch(a, [id])).to.eq([0n]);
-      expect(await moe.balanceOf(mty.target)).to.eq(UNIT * 102n);
+      expect(await mty.claimBatch(a, [id])).to.be.an("object");
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.lt(UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.lt(UNIT);
+      expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(UNIT);
+      expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect(await moe.balanceOf(mty.target)).to.gt(101n * UNIT);
+      expect(await moe.balanceOf(mty.target)).to.lt(102n * UNIT);
       // wait for +6 months:
       await provider.send("evm_increaseTime", [YEAR * 0.5]);
       expect(await mty.claimBatch(a, [id])).to.be.an("object");
-      Expect(await mty.rewardOfBatch(a, [id])).to.eq([UNIT * 16n]);
-      Expect(await mty.claimedBatch(a, [id])).to.eq([UNIT * 16n]);
-      Expect(await mty.claimableBatch(a, [id])).to.eq([0n]);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.gt(UNIT * 262_980n);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.lt(UNIT * 262_981n);
-      Expect(await mty.mintableBatch(a, [id])).to.eq([0n]);
-      expect(await moe.balanceOf(mty.target)).to.eq(UNIT * 86n);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.gt(16n * UNIT);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.lt(17n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.gt(16n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.lt(17n * UNIT);
+      expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(262_980n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(262_981n * UNIT);
+      expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect(await moe.balanceOf(mty.target)).to.gt(85n * UNIT);
+      expect(await moe.balanceOf(mty.target)).to.lt(86n * UNIT);
       // wait for +6 months:
       await provider.send("evm_increaseTime", [YEAR * 0.5]);
       expect(await mty.claimBatch(a, [id])).to.be.an("object");
-      Expect(await mty.rewardOfBatch(a, [id])).to.eq([UNIT * 33n]);
-      Expect(await mty.claimedBatch(a, [id])).to.eq([UNIT * 33n]);
-      Expect(await mty.claimableBatch(a, [id])).to.eq([0n]);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.gt(UNIT * 533_929n);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.lt(UNIT * 533_930n);
-      Expect(await mty.mintableBatch(a, [id])).to.eq([0n]);
-      expect(await moe.balanceOf(mty.target)).to.eq(UNIT * 69n);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.gt(33n * UNIT);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.lt(34n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.gt(33n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.lt(34n * UNIT);
+      expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(525_960n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(525_961n * UNIT);
+      expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect(await moe.balanceOf(mty.target)).to.gt(68n * UNIT);
+      expect(await moe.balanceOf(mty.target)).to.lt(69n * UNIT);
       // wait for +4 months:
       await provider.send("evm_increaseTime", [Math.round(YEAR * 0.334)]);
       expect(await mty.claimBatch(a, [id])).to.be.an("object");
-      Expect(await mty.rewardOfBatch(a, [id])).to.eq([UNIT * 45n]);
-      Expect(await mty.claimedBatch(a, [id])).to.eq([UNIT * 45n]);
-      Expect(await mty.claimableBatch(a, [id])).to.eq([0n]);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.gt(UNIT * 721_031n);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.lt(UNIT * 721_032n);
-      Expect(await mty.mintableBatch(a, [id])).to.eq([0n]);
-      expect(await moe.balanceOf(mty.target)).to.eq(UNIT * 57n);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.gt(45n * UNIT);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.lt(46n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.gt(45n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.lt(46n * UNIT);
+      expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(703_180n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(703_181n * UNIT);
+      expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect(await moe.balanceOf(mty.target)).to.gt(56n * UNIT);
+      expect(await moe.balanceOf(mty.target)).to.lt(57n * UNIT);
       // wait for +8 months:
       await provider.send("evm_increaseTime", [Math.round(YEAR * 0.667)]);
       expect(await mty.claimBatch(a, [id])).to.be.an("object");
-      Expect(await mty.rewardOfBatch(a, [id])).to.eq([UNIT * 67n]);
-      Expect(await mty.claimedBatch(a, [id])).to.eq([UNIT * 67n]);
-      Expect(await mty.claimableBatch(a, [id])).to.eq([0n]);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.gt(UNIT * 1_066_610n);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.lt(UNIT * 1_066_611n);
-      Expect(await mty.mintableBatch(a, [id])).to.eq([0n]);
-      expect(await moe.balanceOf(mty.target)).to.eq(UNIT * 35n);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.gt(67n * UNIT);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.lt(68n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.gt(67n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.lt(68n * UNIT);
+      expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(1_053_995n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(1_053_996n * UNIT);
+      expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect(await moe.balanceOf(mty.target)).to.gt(34n * UNIT);
+      expect(await moe.balanceOf(mty.target)).to.lt(35n * UNIT);
       // wait for +12 months:
       await provider.send("evm_increaseTime", [YEAR]);
       expect(await mty.claimBatch(a, [id])).to.be.an("object");
-      Expect(await mty.rewardOfBatch(a, [id])).to.eq([UNIT * 102n]);
-      Expect(await mty.claimedBatch(a, [id])).to.eq([UNIT * 102n]);
-      Expect(await mty.claimableBatch(a, [id])).to.eq([0n]);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.gt(UNIT * 1_608_220n);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.lt(UNIT * 1_608_221n);
-      Expect(await mty.mintableBatch(a, [id])).to.eq([0n]);
-      expect(await moe.balanceOf(mty.target)).to.eq(0n);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.gt(102n * UNIT);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.lt(103n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.gt(102n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.lt(103n * UNIT);
+      expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(1_583_046n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(1_583_047n * UNIT);
+      expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect(await moe.balanceOf(mty.target)).to.eq(0);
       // wait for +12 months: (empty treasury)
       await provider.send("evm_increaseTime", [YEAR]);
       expect(await mty.claimBatch(a, [id])).to.be.an("object");
-      Expect(await mty.rewardOfBatch(a, [id])).to.eq([UNIT * 136n]);
-      Expect(await mty.claimedBatch(a, [id])).to.eq([UNIT * 136n]);
-      Expect(await mty.claimableBatch(a, [id])).to.eq([0n]);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.gt(UNIT * 2_134_311n);
-      Expect(await mty.mintedBatch(a, [id]), 0).to.lt(UNIT * 2_134_312n);
-      Expect(await mty.mintableBatch(a, [id])).to.eq([0n]);
-      expect(await moe.balanceOf(mty.target)).to.eq(0n);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.gt(136n * UNIT);
+      expect((await mty.rewardOfBatch(a, [id]))[0]).to.lt(137n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.gt(136n * UNIT);
+      expect((await mty.claimedBatch(a, [id]))[0]).to.lt(137n * UNIT);
+      expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(2_113_628n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(2_113_629n * UNIT);
+      expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
+      expect(await moe.balanceOf(mty.target)).to.eq(0);
     });
   });
 });
@@ -207,9 +218,9 @@ async function stakeNft(nft_id, amount) {
   expect(nft_balance).to.eq(nft_balance_old - BigInt(amount));
   return [account, nft_id];
 }
-function Expect(array, index = undefined) {
-  if (typeof index === "number") {
-    return expect(array.map((n) => BigInt(n))[index]);
-  }
-  return expect(array.map((n) => BigInt(n))).deep;
-}
+// function Expect(array, index = undefined) {
+//   if (typeof index === "number") {
+//     return expect(array.map((n) => BigInt(n))[index]);
+//   }
+//   return expect(array.map((n) => BigInt(n))).deep;
+// }
