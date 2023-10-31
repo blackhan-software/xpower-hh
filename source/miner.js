@@ -1,5 +1,5 @@
+const { KeccakHasher } = require("wasm-miner");
 const { solidityPacked } = require("ethers");
-const { createKeccak } = require("hash-wasm");
 const { block } = require("./block");
 
 class Miner {
@@ -16,11 +16,11 @@ class Miner {
   }
 
   async init(contract, address, block_hash, nonce_length) {
-    const hasher = await createKeccak(256);
+    const hasher = await KeccakHasher();
     const array = this.abi_encode(contract, address, block_hash, nonce_length);
     return (nonce) => {
       array.set(nonce, 52);
-      return hasher.init().update(array).digest("binary");
+      return hasher.digest(array);
     };
   }
 
