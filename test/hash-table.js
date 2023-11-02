@@ -5,7 +5,7 @@ const fs = require("fs").promises;
 const { tmpdir } = require("os");
 const { join } = require("path");
 
-const { large_random, increment } = require("../source/cluster");
+const { large_random } = require("../source/cluster");
 const { Miner } = require("../source/miner");
 const { Token } = require("../source/token");
 
@@ -82,18 +82,13 @@ class HashTable {
       block_hash,
       nonce_length,
     );
-    const token = new Token(symbol);
-    const min_threshold = token.threshold(min_level);
-    const max_threshold = token.threshold(max_level);
+    const min_threshold = Token.amount(min_level);
+    const max_threshold = Token.amount(max_level);
     try {
-      for (
-        let [nonce] = large_random(nonce_length);
-        length > 0;
-        increment(nonce)
-      ) {
-        const x = hexlify(nonce);
-        const h = mine(nonce);
-        const a = token.amount_of(h);
+      for (let nonce = large_random(nonce_length); length > 0; nonce++) {
+        const x = "0x" + nonce.toString(16);
+        const h = mine({ range: [nonce, nonce + 1n] });
+        const a = Token.amount_of(h);
         if (a < min_threshold) {
           continue;
         }

@@ -28,15 +28,17 @@ class Token {
     return normalized(value);
   }
 
-  constructor(symbol) {
-    this.amount_of = (h) => 2 ** zeros(h) - 1;
-    this.symbol = symbol;
+  static amount(zeros) {
+    return amount(zeros);
   }
 
-  threshold(level) {
-    return threshold_of(this.symbol)(level);
+  static amount_of(hash) {
+    return amount(zeros(hash));
   }
 }
+const amount = (zeros) => {
+  return 2 ** zeros - 1;
+};
 const zeros = (hash, counter = 0) => {
   while (hash[counter] === 0) {
     counter++;
@@ -62,14 +64,6 @@ const normalized = (symbol) => {
   switch (symbol.toUpperCase()) {
     case "XPOW":
       return "XPOW";
-    default:
-      throw new Error(`unknown ${symbol}`);
-  }
-};
-const threshold_of = (symbol) => {
-  switch (symbol) {
-    case "XPOW":
-      return (level) => 2 ** level - 1;
     default:
       throw new Error(`unknown ${symbol}`);
   }

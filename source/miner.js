@@ -18,10 +18,7 @@ class Miner {
   async init(contract, address, block_hash, nonce_length) {
     const hasher = await KeccakHasher();
     const array = this.abi_encode(contract, address, block_hash, nonce_length);
-    return (nonce) => {
-      array.set(nonce, 52);
-      return hasher.digest(array);
-    };
+    return (options) => hasher.reduce(array, options);
   }
 
   abi_encode(contract, address, block_hash, nonce_length) {
