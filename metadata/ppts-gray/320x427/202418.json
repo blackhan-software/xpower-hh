@@ -1,0 +1,14 @@
+{
+  "name": "EXA XPOW",
+  "description": "Stakeable EXA XPOW NFT",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmW9GoRyN2oSqRQCFUVoPRGcLit7GV7sT8ZXcFnfZhGkQm/320x427/2024/7-Hela_EXA.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr-default", "value": "6%" },
+    { "trait_type": "apr-bonus", "value": "0‱" },
+    { "trait_type": "issue", "value": "2024" },
+    { "trait_type": "label", "value": "EXA" },
+    { "trait_type": "level", "max_value": 24, "value": 18 },
+    { "trait_type": "staked", "value": "true" },
+    { "trait_type": "token", "value": "XPOW" }
+  ]
+}

@@ -1,11 +1,11 @@
 {
   "name": "PETA XPOW",
-  "description": "Staked PETA XPOW NFT",
-  "external_url": "https://www.xpowermine.com/staking?token=XPOW",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmPTVP3wnaJsqAX7fFQjXW7gsexTh8hevar6g9EEJ29JKb/320x427/2021/Loki/6-Loki_PETA.png",
+  "description": "Stakeable PETA XPOW NFT",
+  "external_url": "https://www.xpowermine.com/nfts?token=XPOW",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmW9GoRyN2oSqRQCFUVoPRGcLit7GV7sT8ZXcFnfZhGkQm/320x427/2021/6-Thor_PETA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr-default", "value": "5%" },
-    { "trait_type": "apr-bonus", "value": "2‱" },
+    { "trait_type": "apr-bonus", "value": "3‱" },
     { "trait_type": "issue", "value": "2021" },
     { "trait_type": "label", "value": "PETA" },
     { "trait_type": "level", "max_value": 24, "value": 15 },

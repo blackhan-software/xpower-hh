@@ -1,0 +1,15 @@
+{
+  "name": "TERA XPOW",
+  "description": "Stakeable TERA XPOW NFT",
+  "external_url": "https://www.xpowermine.com/nfts?token=XPOW",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmUCCDw5VC2E4WDeAaAyeLhLuWYDpSaojaNx6NNERFkgue/1620x2160/2024/5-Hela_TERA.png",
+  "attributes": [
+    { "display_type": "string", "trait_type": "apr-default", "value": "4%" },
+    { "trait_type": "apr-bonus", "value": "0‱" },
+    { "trait_type": "issue", "value": "2024" },
+    { "trait_type": "label", "value": "TERA" },
+    { "trait_type": "level", "max_value": 24, "value": 12 },
+    { "trait_type": "staked", "value": "false" },
+    { "trait_type": "token", "value": "XPOW" }
+  ]
+}

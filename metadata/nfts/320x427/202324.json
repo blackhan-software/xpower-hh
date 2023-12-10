@@ -1,10 +1,10 @@
 {
   "name": "YOTTA XPOW",
   "description": "Stakeable YOTTA XPOW NFT",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmaxCcv7MiQ7xBab9HXqJQHtyCb9ZQCwGDEgjwHU3w2cXU/320x427/2023/Loki/9-Loki_YOTTA.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmXUKikAwre39yPM2jZrE699n3JuXYj6AUB9NyLoGZGATr/320x427/2023/9-Odin_YOTTA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr-default", "value": "8%" },
-    { "trait_type": "apr-bonus", "value": "0‱" },
+    { "trait_type": "apr-bonus", "value": "1‱" },
     { "trait_type": "issue", "value": "2023" },
     { "trait_type": "label", "value": "YOTTA" },
     { "trait_type": "level", "max_value": 24, "value": 24 },
