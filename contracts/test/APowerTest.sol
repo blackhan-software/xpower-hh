@@ -21,6 +21,18 @@ contract APowerOldTest is APowerTest {
     }
 }
 
+contract APowerNewTest is APowerTest {
+    constructor(
+        address moeLink,
+        address[] memory sovBase,
+        uint256 deadlineIn
+    ) APowerTest(moeLink, sovBase, deadlineIn) {}
+
+    function decimals() public pure override returns (uint8) {
+        return 18;
+    }
+}
+
 contract APowerOldTest36 is APowerTest {
     constructor(
         address moeLink,
