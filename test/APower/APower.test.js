@@ -73,6 +73,10 @@ describe("APower", async function () {
   beforeEach(async function () {
     await increaseAllowanceBy(1000n * UNIT, nft.target);
   });
+  it("should mint after 0th year", async function () {
+    expect(await sov.totalSupply()).to.eq(0);
+    expect(await sov.unwrappable(0)).to.eq(0);
+  });
   it("should mint after 1st year", async function () {
     const [account, nft_id] = await stakeNft(await mintNft(3, 1), 1);
     // wait for +12 months: 1st year
