@@ -1,4 +1,4 @@
-const { ethers } = require("hardhat");
+const { ethers, network } = require("hardhat");
 const { expect } = require("chai");
 
 let accounts; // all accounts
@@ -9,6 +9,7 @@ let UNIT; // decimals
 
 // 1 / 9th share of minted XPOW
 const PART = BigInt(1e18) / 8n;
+const HOUR = 3600; // [seconds]
 
 const { HashTable } = require("../hash-table");
 let table; // pre-hashed nonces
@@ -120,10 +121,10 @@ describe("XPower", async function () {
       expect(await moe.balanceOf(addresses[1])).to.eq(3n * PART);
     });
     it("should *not* mint for amount=3 (expired block-hash)", async function () {
-      const [nonce] = table.getNonce({ amount: 3 });
+      const [nonce, block_hash] = table.getNonce({ amount: 3 });
       expect(nonce).to.match(/^0x[a-f0-9]+$/);
-      const block_hash =
-        "0x0000000000000000000000000000000000000000000000000000000000000001";
+      await network.provider.send("evm_increaseTime", [HOUR]);
+      await network.provider.send("evm_mine", []);
       const tx = await moe.mint(addresses[0], block_hash, nonce).catch((ex) => {
         const m = ex.message.match(/expired block-hash/);
         if (m === null) console.debug(ex);

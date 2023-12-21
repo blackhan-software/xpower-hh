@@ -100,7 +100,7 @@ contract XPower is ERC20, ERC20Burnable, FeeTracker, MoeMigratable, Ownable {
 
     /** check whether block-hash has recently been cached */
     function _recent(bytes32 blockHash) private view returns (bool) {
-        return _timestamps[blockHash] > currentInterval();
+        return _timestamps[blockHash] >= currentInterval() * (1 hours);
     }
 
     /** @return hash of contract, to-beneficiary, block-hash & data (incl. nonce) */
