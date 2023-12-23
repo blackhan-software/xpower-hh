@@ -24,8 +24,10 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     /** flag to open emigration */
     uint256 private _migratable;
 
-    /** @param base addresses of old contracts */
-    /** @param deadlineIn seconds to end-of-migration */
+    /**
+     * @param base addresses of old contracts
+     * @param deadlineIn seconds to end-of-migration
+     */
     constructor(address[] memory base, uint256 deadlineIn) {
         _deadlineBy = block.timestamp + deadlineIn;
         _base = new ERC1155Burnable[](base.length);
@@ -36,17 +38,33 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         }
     }
 
-    /** @return index of base address */
+    /**
+     * @param base address of old contract
+     * @return index of base address
+     */
     function oldIndexOf(address base) external view returns (uint256) {
         return _index[base];
     }
 
-    /** migrate amount of ERC1155 */
+    /**
+     * migrate amount of ERC1155
+     *
+     * @param nftId matching (<prefix>2?)(<year>[0-9]{4,})(<level>[0-9]{2})
+     * @param amount of ERC1155s to migrate
+     * @param index pair of [nft_index, moe_index]
+     */
     function migrate(uint256 nftId, uint256 amount, uint256[] memory index) external {
         _migrateFrom(msg.sender, nftId, amount, index);
     }
 
-    /** migrate amount of ERC1155 */
+    /**
+     * migrate amount of ERC1155
+     *
+     * @param account to migrate from
+     * @param nftId matching (<prefix>2?)(<year>[0-9]{4,})(<level>[0-9]{2})
+     * @param amount of ERC1155s to migrate
+     * @param index pair of [nft_index, moe_index]
+     */
     function migrateFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) external {
         _migrateFrom(account, nftId, amount, index);
     }
@@ -66,12 +84,25 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         _base[index[0]].burn(account, tryBalance > 0 ? tryId : nftId, amount);
     }
 
-    /** batch-migrate amounts of ERC1155 */
+    /**
+     * batch-migrate amounts of ERC1155
+     *
+     * @param nftIds matching (<prefix>2?)(<year>[0-9]{4,})(<level>[0-9]{2})
+     * @param amounts of ERC1155s to migrate
+     * @param index pair of [nft_index, moe_index]
+     */
     function migrateBatch(uint256[] memory nftIds, uint256[] memory amounts, uint256[] memory index) external {
         _migrateFromBatch(msg.sender, nftIds, amounts, index);
     }
 
-    /** batch-migrate amounts of ERC1155 */
+    /**
+     * batch-migrate amounts of ERC1155
+     *
+     * @param account to migrate from
+     * @param nftIds matching (<prefix>2?)(<year>[0-9]{4,})(<level>[0-9]{2})
+     * @param amounts of ERC1155s to migrate
+     * @param index pair of [nft_index, moe_index]
+     */
     function migrateFromBatch(
         address account,
         uint256[] memory nftIds,
@@ -95,7 +126,11 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         _mintBatch(account, nftIds, amounts, "");
     }
 
-    /** seal immigration */
+    /**
+     * seal immigration
+     *
+     * @param index of base contract
+     */
     function seal(uint256 index) external onlyRole(NFT_SEAL_ROLE) {
         _sealed[index] = true;
     }
@@ -115,7 +150,10 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
     /** emitted on opening emigration */
     event Migratable(uint256 timestamp);
 
-    /** open emigration for *all* nft-years (deferred by a week) */
+    /**
+     * open emigration for *all* nft-years (deferred by a week)
+     * @param flag value to set to (only `true` has an effect)
+     */
     function migratable(bool flag) external onlyRole(NFT_OPEN_ROLE) {
         if (flag && _migratable == 0) {
             _migratable = block.timestamp + 7 days;

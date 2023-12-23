@@ -25,8 +25,10 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
     /** number of immigrated tokens */
     uint256 private _migrated;
 
-    /** @param base addresses of old contracts */
-    /** @param deadlineIn seconds to end-of-migration */
+    /**
+     * @param base addresses of old contracts
+     * @param deadlineIn seconds to end-of-migration
+     */
     constructor(address[] memory base, uint256 deadlineIn) {
         _deadlineBy = block.timestamp + deadlineIn;
         _base = new ERC20Burnable[](base.length);
@@ -37,12 +39,20 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         }
     }
 
-    /** @return index of base address */
+    /**
+     * @param base address of old contract
+     * @return index of base address
+     */
     function oldIndexOf(address base) external view returns (uint256) {
         return _index[base];
     }
 
-    /** migrate amount of ERC20 tokens */
+    /**
+     * migrate amount of ERC20 tokens
+     *
+     * @param amount of ERC20s to migrate
+     * @param index single of base contract
+     */
     function migrate(
         uint256 amount,
         uint256[] memory index
@@ -50,7 +60,13 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         return _migrateFrom(msg.sender, amount, index);
     }
 
-    /** migrate amount of ERC20 tokens */
+    /**
+     * migrate amount of ERC20 tokens
+     *
+     * @param account to migrate from
+     * @param amount of ERC20s to migrate
+     * @param index single of base contract
+     */
     function migrateFrom(
         address account,
         uint256 amount,
@@ -90,7 +106,11 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         return newAmount;
     }
 
-    /** @return forward converted new amount w.r.t. decimals */
+    /**
+     * @param oldAmount to convert from
+     * @param index of base contract
+     * @return forward converted new amount w.r.t. decimals
+     */
     function newUnits(
         uint256 oldAmount,
         uint256 index
@@ -102,7 +122,11 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         }
     }
 
-    /** @return backward converted old amount w.r.t. decimals */
+    /**
+     * @param newAmount to convert from
+     * @param index of base contract
+     * @return backward converted old amount w.r.t. decimals
+     */
     function oldUnits(
         uint256 newAmount,
         uint256 index
@@ -119,7 +143,11 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         return _migrated;
     }
 
-    /** seal immigration */
+    /**
+     * seal immigration
+     *
+     * @param index of base contract
+     */
     function _seal(uint256 index) internal {
         _sealed[index] = true;
     }
@@ -194,7 +222,13 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
         _moe = MoeMigratable(moe);
     }
 
-    /** migrate amount of SOV tokens */
+    /**
+     * migrate amount of SOV tokens
+     *
+     * @param account to migrate from
+     * @param amount of ERC20s to migrate
+     * @param index pair of [sov_index, moe_index]
+     */
     ///
     /// @dev assumes old (XPower:APower) == new (XPower:APower) w.r.t. decimals
     ///
@@ -220,7 +254,10 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
         return newAmountSov;
     }
 
-    /** @return cross-converted MOE amount w.r.t. decimals */
+    /**
+     * @param sovAmount to convert from
+     * @return cross-converted MOE amount w.r.t. decimals
+     */
     function moeUnits(uint256 sovAmount) public view returns (uint256) {
         if (decimals() >= _moe.decimals()) {
             return sovAmount / (10 ** (decimals() - _moe.decimals()));
@@ -229,7 +266,10 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
         }
     }
 
-    /** @return cross-converted SOV amount w.r.t. decimals */
+    /**
+     * @param moeAmount to convert from
+     * @return cross-converted SOV amount w.r.t. decimals
+     */
     function sovUnits(uint256 moeAmount) public view returns (uint256) {
         if (decimals() >= _moe.decimals()) {
             return moeAmount * (10 ** (decimals() - _moe.decimals()));
