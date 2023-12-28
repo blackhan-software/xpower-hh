@@ -5,6 +5,9 @@
 pragma solidity ^0.8.20;
 
 import {NftBase} from "./base/NftBase.sol";
+import {MoeTreasury} from "./MoeTreasury.sol";
+
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 /**
  * Abstract base class for staked XPowerNft(s): Only the contract owner
@@ -12,7 +15,7 @@ import {NftBase} from "./base/NftBase.sol";
  */
 contract XPowerPpt is NftBase {
     /** map of age: account => nft-id => accumulator [seconds] */
-    mapping(address => mapping(uint256 => int256)) private _age;
+    mapping(address => mapping(uint256 => uint256)) private _age;
     /** map of levels: nft-level => accumulator */
     int256[34] private _shares;
 
@@ -24,6 +27,15 @@ contract XPowerPpt is NftBase {
         address[] memory pptBase,
         uint256 deadlineIn
     ) NftBase("XPower PPTs", "XPOWPPT", pptUri, pptBase, deadlineIn) {}
+
+    /** MOE treasury */
+    MoeTreasury private _mty;
+
+    /** post-constructor init (only once) */
+    function initialize(address mty) public {
+        require(address(_mty) == address(0), "already initialized");
+        _mty = MoeTreasury(mty);
+    }
 
     /** transfer tokens (and reset age) */
     function safeTransferFrom(
@@ -100,10 +112,10 @@ contract XPowerPpt is NftBase {
         address account,
         uint256 nftId
     ) external view returns (uint256) {
-        int256 age = _age[account][nftId];
+        uint256 age = _age[account][nftId];
         if (age > 0) {
             uint256 balance = balanceOf(account, nftId);
-            return balance * block.timestamp - uint256(age);
+            return balance * block.timestamp - age;
         }
         return 0;
     }
@@ -115,7 +127,7 @@ contract XPowerPpt is NftBase {
 
     /** remember mint action */
     function _pushMint(address account, uint256 nftId, uint256 amount) private {
-        _age[account][nftId] += int256(amount * block.timestamp);
+        _age[account][nftId] += amount * block.timestamp;
     }
 
     /** remember mint actions */
@@ -133,9 +145,17 @@ contract XPowerPpt is NftBase {
         }
     }
 
-    /** remember burn action */
+    /** remember burn action (and refresh claimed) */
     function _pushBurn(address account, uint256 nftId, uint256 amount) private {
-        _age[account][nftId] -= int256(amount * block.timestamp);
+        uint256 balance = balanceOf(account, nftId);
+        require(
+            balance >= amount,
+            "ERC1155: insufficient balance for transfer"
+        );
+        _mty.refreshClaimed(account, nftId, balance, balance - amount);
+        _age[account][nftId] -= Math.mulDiv(
+            _age[account][nftId], amount, balance
+        );
     }
 
     /** remember burn actions */
