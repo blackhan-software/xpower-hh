@@ -3,10 +3,10 @@ const { expect } = require("chai");
 
 let accounts; // all accounts
 let addresses; // all addresses
-let Moe, Sov, Mty; // contract
-let moe, sov, mty; // instance
+let Moe, Sov, Ppt, Mty; // contract
+let moe, sov, ppt, mty; // instance
 
-const NONE_ADDRESS = "0x0000000000000000000000000000000000000000";
+const NFT_XPOW_URL = "https://xpowermine.com/nfts/xpow/{id}.json";
 
 describe("MoeTreasurySupervised", async function () {
   before(async function () {
@@ -20,6 +20,8 @@ describe("MoeTreasurySupervised", async function () {
     expect(Moe).to.be.an("object");
     Sov = await ethers.getContractFactory("APower");
     expect(Sov).to.be.an("object");
+    Ppt = await ethers.getContractFactory("XPowerPpt");
+    expect(Ppt).to.be.an("object");
     Mty = await ethers.getContractFactory("MoeTreasury");
     expect(Mty).to.be.an("object");
   });
@@ -29,7 +31,9 @@ describe("MoeTreasurySupervised", async function () {
     await moe.init();
     sov = await Sov.deploy(moe.target, [], 0);
     expect(sov).to.be.an("object");
-    mty = await Mty.deploy(moe.target, sov.target, NONE_ADDRESS);
+    ppt = await Ppt.deploy(NFT_XPOW_URL, [], 0);
+    expect(ppt).to.be.an("object");
+    mty = await Mty.deploy(moe.target, sov.target, ppt.target);
     expect(mty).to.be.an("object");
   });
   it("should grant & revoke APR_ROLE", async function () {

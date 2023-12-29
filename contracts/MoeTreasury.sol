@@ -16,11 +16,12 @@ import {Rpp} from "./libs/Rpp.sol";
 import {MoeTreasurySupervised} from "./base/Supervised.sol";
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * Treasury to mint (SoV) tokens for staked XPowerNft(s).
  */
-contract MoeTreasury is MoeTreasurySupervised {
+contract MoeTreasury is MoeTreasurySupervised, Ownable {
     using Integrator for Integrator.Item[];
     using Polynomials for Polynomial;
 
@@ -43,6 +44,20 @@ contract MoeTreasury is MoeTreasurySupervised {
         _moe = XPower(moeLink);
         _sov = APower(sovLink);
         _ppt = XPowerPpt(pptLink);
+        transferOwnership(pptLink);
+        _ppt.initialize(address(this));
+    }
+
+    /** refresh claimed (by rescaling) */
+    function refreshClaimed(
+        address account,
+        uint256 nftId,
+        uint256 balanceOld,
+        uint256 balanceNew
+    ) public onlyOwner {
+        _claimed[account][nftId] = Math.mulDiv(
+            _claimed[account][nftId], balanceNew, balanceOld
+        );
     }
 
     /** @return minted amount */
