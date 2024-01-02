@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 // solhint-disable not-rely-on-time
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import {IERC2981} from "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";

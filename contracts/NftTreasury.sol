@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 // solhint-disable reason-string
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import {ERC1155Holder} from "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 

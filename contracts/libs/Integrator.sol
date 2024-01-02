@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 /**
  * Allows to integrate over an array of (stamp, value) tuples, and to take

@@ -2,7 +2,7 @@
 // solhint-disable not-rely-on-time
 // solhint-disable no-empty-blocks
 // solhint-disable reason-string
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import {NftBase} from "./base/NftBase.sol";
 import {MoeTreasury} from "./MoeTreasury.sol";

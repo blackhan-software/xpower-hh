@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 // solhint-disable not-rely-on-time
 // solhint-disable one-contract-per-file
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import {ERC20, IERC20, IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Burnable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
