@@ -147,14 +147,20 @@ contract XPowerPpt is NftBase {
 
     /** remember burn action (and refresh claimed) */
     function _pushBurn(address account, uint256 nftId, uint256 amount) private {
-        uint256 balance = balanceOf(account, nftId);
         require(
-            balance >= amount,
-            "ERC1155: insufficient balance for transfer"
+            amount > 0 && balanceOf(account, nftId) >= amount,
+            "ERC1155: invalid amount or insufficient balance for transfer"
         );
-        _mty.refreshClaimed(account, nftId, balance, balance - amount);
+        _mty.refreshClaimed(
+            account,
+            nftId,
+            balanceOf(account, nftId),
+            balanceOf(account, nftId) - amount
+        );
         _age[account][nftId] -= Math.mulDiv(
-            _age[account][nftId], amount, balance
+            _age[account][nftId],
+            amount,
+            balanceOf(account, nftId)
         );
     }
 
