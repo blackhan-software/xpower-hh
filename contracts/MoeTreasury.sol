@@ -102,7 +102,7 @@ contract MoeTreasury is MoeTreasurySupervised, Ownable {
     /** claim APower tokens */
     function claim(address account, uint256 nftId) external {
         uint256 amount = claimable(account, nftId);
-        require(amount > 0, "nothing claimable");
+        require(amount > 0, "invalid claimable");
         _claimed[account][nftId] += amount;
         _minted[account][nftId] += _sov.mintable(amount);
         _moe.increaseAllowance(address(_sov), _sov.wrappable(amount));
@@ -118,7 +118,9 @@ contract MoeTreasury is MoeTreasurySupervised, Ownable {
         require(Array.unique(nftIds), "unsorted or duplicate ids");
         uint256[] memory amounts = claimableBatch(account, nftIds);
         for (uint256 i = 0; i < nftIds.length; i++) {
-            require(amounts[i] > 0, "nothing claimable");
+            require(amounts[i] > 0, "invalid claimables");
+        }
+        for (uint256 i = 0; i < nftIds.length; i++) {
             _claimed[account][nftIds[i]] += amounts[i];
             _minted[account][nftIds[i]] += _sov.mintable(amounts[i]);
             _moe.increaseAllowance(address(_sov), _sov.wrappable(amounts[i]));
