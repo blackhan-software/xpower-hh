@@ -37,6 +37,7 @@ contract NftTreasury is ERC1155Holder {
             account == msg.sender || approvedStake(account, msg.sender),
             "caller is not token owner or approved"
         );
+        require(amount > 0, "invalid amount");
         _nft.safeTransferFrom(account, address(this), nftId, amount, "");
         _ppt.mint(account, nftId, amount);
         emit Stake(account, nftId, amount);
@@ -56,6 +57,9 @@ contract NftTreasury is ERC1155Holder {
             account == msg.sender || approvedStake(account, msg.sender),
             "caller is not token owner or approved"
         );
+        for (uint256 i = 0; i < amounts.length; i++) {
+            require(amounts[i] > 0, "invalid amounts");
+        }
         _nft.safeBatchTransferFrom(account, address(this), nftIds, amounts, "");
         _ppt.mintBatch(account, nftIds, amounts);
         emit StakeBatch(account, nftIds, amounts);
