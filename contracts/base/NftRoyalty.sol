@@ -32,7 +32,10 @@ abstract contract NftRoyalty is IERC2981, NftRoyaltySupervised {
     /** set default royalty beneficiary */
     function setRoyal(address beneficiary) external onlyRole(NFT_ROYAL_ROLE) {
         _royal = beneficiary;
+        emit SetRoyal(beneficiary);
     }
+
+    event SetRoyal(address beneficiary);
 
     /** @return true if this contract implements the interface defined by interface-id */
     function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, Supervised) returns (bool) {
