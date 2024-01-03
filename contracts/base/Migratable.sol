@@ -183,14 +183,20 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
      */
     function _seal(uint256 index) internal {
         _sealed[index] = true;
+        emit Seal(index);
     }
+
+    event Seal(uint256 index);
 
     /** seal-all immigration */
     function _sealAll() internal {
         for (uint256 i = 0; i < _sealed.length; i++) {
             _sealed[i] = true;
         }
+        emit SealAll();
     }
+
+    event SealAll();
 
     /** @return seal flags (of all bases) */
     function seals() public view returns (bool[] memory) {
