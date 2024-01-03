@@ -45,7 +45,7 @@ contract MoeTreasury is MoeTreasurySupervised, Ownable {
         _sov = APower(sovLink);
         _ppt = XPowerPpt(pptLink);
         transferOwnership(pptLink);
-        _ppt.initialize(address(this));
+        _ppt.init(address(this));
     }
 
     /** refresh claimed (by rescaling) */

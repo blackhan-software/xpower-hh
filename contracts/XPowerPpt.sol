@@ -31,11 +31,14 @@ contract XPowerPpt is NftBase {
     /** MOE treasury */
     MoeTreasury private _mty;
 
-    /** post-constructor init (only once) */
-    function initialize(address mty) public {
+    /** post-constructor init (once) */
+    function init(address mty) external {
         require(address(_mty) == address(0), "already initialized");
         _mty = MoeTreasury(mty);
+        emit Init(mty);
     }
+
+    event Init(address mty);
 
     /** transfer tokens (and reset age) */
     function safeTransferFrom(
