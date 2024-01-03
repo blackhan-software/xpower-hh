@@ -48,12 +48,9 @@ contract XPower is ERC20, ERC20Burnable, FeeTracker, MoeMigratable, Ownable {
     /** cache most recent block-hash */
     function init() external {
         uint256 interval = currentInterval();
-        assert(interval > 0);
         if (uint256(_blockHashes[interval]) == 0) {
             bytes32 blockHash = blockhash(block.number - 1);
-            assert(blockHash > 0);
             uint256 timestamp = block.timestamp;
-            assert(timestamp > 0);
             _blockHashes[interval] = blockHash;
             _timestamps[blockHash] = timestamp;
             emit Init(blockHash, timestamp);
