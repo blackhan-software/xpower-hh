@@ -286,12 +286,16 @@ async function nftMigrate(n, l = 0) {
   await network.provider.send("evm_increaseTime", [7 * DAYS]);
   await network.provider.send("evm_mine", []);
   expect(await nft_old["migratable()"]()).to.eq(true);
-  const tx2 = await nft_new.migrate(nft_id, n, [nft_index, moe_index]);
+  const tx2 = await moe_new.approveMigrate(nft_new.target, true);
+  expect(tx2).to.be.an("object");
+  const approved = await moe_new.approvedMigrate(addresses[0], nft_new.target);
+  expect(approved).to.eq(true);
+  const tx3 = await nft_new.migrate(nft_id, n, [nft_index, moe_index]);
   const nft_balance_old = await nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance_old).to.eq(0);
   const nft_balance_new = await nft_new.balanceOf(addresses[0], nft_id);
   expect(nft_balance_new).to.eq(n);
-  return tx2;
+  return tx3;
 }
 async function nftMigrateFrom(n, l = 0) {
   const year = await nft_new.year();
@@ -306,7 +310,11 @@ async function nftMigrateFrom(n, l = 0) {
   await network.provider.send("evm_increaseTime", [7 * DAYS]);
   await network.provider.send("evm_mine", []);
   expect(await nft_old["migratable()"]()).to.eq(true);
-  const tx2 = await nft_new.migrateFrom(addresses[0], nft_id, n, [
+  const tx2 = await moe_new.approveMigrate(nft_new.target, true);
+  expect(tx2).to.be.an("object");
+  const approved = await moe_new.approvedMigrate(addresses[0], nft_new.target);
+  expect(approved).to.eq(true);
+  const tx3 = await nft_new.migrateFrom(addresses[0], nft_id, n, [
     nft_index,
     moe_index,
   ]);
@@ -314,7 +322,7 @@ async function nftMigrateFrom(n, l = 0) {
   expect(nft_balance_old).to.eq(0);
   const nft_balance_new = await nft_new.balanceOf(addresses[0], nft_id);
   expect(nft_balance_new).to.eq(n);
-  return tx2;
+  return tx3;
 }
 async function nftMigrateBatch(n, l = 0) {
   const year = await nft_new.year();
@@ -329,12 +337,16 @@ async function nftMigrateBatch(n, l = 0) {
   await network.provider.send("evm_increaseTime", [7 * DAYS]);
   await network.provider.send("evm_mine", []);
   expect(await nft_old["migratable()"]()).to.eq(true);
-  const tx2 = await nft_new.migrateBatch([nft_id], [n], [nft_index, moe_index]);
+  const tx2 = await moe_new.approveMigrate(nft_new.target, true);
+  expect(tx2).to.be.an("object");
+  const approved = await moe_new.approvedMigrate(addresses[0], nft_new.target);
+  expect(approved).to.eq(true);
+  const tx3 = await nft_new.migrateBatch([nft_id], [n], [nft_index, moe_index]);
   const nft_balance_old = await nft_old.balanceOf(addresses[0], nft_id);
   expect(nft_balance_old).to.eq(0);
   const nft_balance_new = await nft_new.balanceOf(addresses[0], nft_id);
   expect(nft_balance_new).to.eq(n);
-  return tx2;
+  return tx3;
 }
 async function nftMigrateFromBatch(n, l = 0) {
   const year = await nft_new.year();
@@ -349,7 +361,11 @@ async function nftMigrateFromBatch(n, l = 0) {
   await network.provider.send("evm_increaseTime", [7 * DAYS]);
   await network.provider.send("evm_mine", []);
   expect(await nft_old["migratable()"]()).to.eq(true);
-  const tx2 = await nft_new.migrateFromBatch(
+  const tx2 = await moe_new.approveMigrate(nft_new.target, true);
+  expect(tx2).to.be.an("object");
+  const approved = await moe_new.approvedMigrate(addresses[0], nft_new.target);
+  expect(approved).to.eq(true);
+  const tx3 = await nft_new.migrateFromBatch(
     addresses[0],
     [nft_id],
     [n],
@@ -359,7 +375,7 @@ async function nftMigrateFromBatch(n, l = 0) {
   expect(nft_balance_old).to.eq(0);
   const nft_balance_new = await nft_new.balanceOf(addresses[0], nft_id);
   expect(nft_balance_new).to.eq(n);
-  return tx2;
+  return tx3;
 }
 async function checkBalances([n_oo, n_on, n_no, n_nn]) {
   // check old balances

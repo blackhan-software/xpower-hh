@@ -150,6 +150,21 @@ describe("APower Migration", async function () {
     const new_migrated = await sov_new.migrated();
     expect(new_migrated).to.eq(0);
   });
+  it("should *not* migrate old (caller is not token owner or approved)", async function () {
+    await moe_old.increaseAllowance(moe_new.target, U256);
+    await moe_new.increaseAllowance(sov_new.target, U256);
+    await sov_old.increaseAllowance(sov_new.target, U256);
+    const tx = await sov_new
+      .migrate(sov_old.balanceOf(A0), [0, 0])
+      .catch((ex) => {
+        const m = ex.message.match(/caller is not token owner or approved/);
+        if (m === null) console.debug(ex);
+        expect(m).to.not.eq(null);
+      });
+    expect(tx).to.eq(undefined);
+    const new_migrated = await sov_new.migrated();
+    expect(new_migrated).to.eq(0);
+  });
   it("should migrate old", async function () {
     await moe_old.increaseAllowance(moe_new.target, U256);
     await moe_new.increaseAllowance(sov_new.target, U256);
@@ -157,6 +172,8 @@ describe("APower Migration", async function () {
     expect(await sov_old.balanceOf(A0)).to.gt(525_960n * UNIT_OLD);
     expect(await sov_old.balanceOf(A0)).to.lt(525_961n * UNIT_OLD);
     expect(await sov_new.balanceOf(A0)).to.eq(0);
+    await moe_new.approveMigrate(sov_new.target, true);
+    expect(await moe_new.approvedMigrate(A0, sov_new.target)).to.eq(true);
     await sov_new.migrate(sov_old.balanceOf(A0), [0, 0]);
     expect(await sov_old.balanceOf(A0)).to.eq(0);
     expect(await sov_new.balanceOf(A0)).to.gt(525_960n * UNIT_NEW);

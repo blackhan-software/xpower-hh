@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 // solhint-disable not-rely-on-time
 // solhint-disable one-contract-per-file
+// solhint-disable reason-string
 pragma solidity 0.8.20;
 
 import {ERC20, IERC20, IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -72,8 +73,40 @@ abstract contract Migratable is ERC20, ERC20Burnable, Supervised {
         uint256 amount,
         uint256[] memory index
     ) external returns (uint256) {
+        require(
+            account == msg.sender || approvedMigrate(account, msg.sender),
+            "caller is not token owner or approved"
+        );
         return _migrateFrom(account, amount, index);
     }
+
+    /** approve migrate by `operator` */
+    function approveMigrate(address operator, bool approved) external {
+        require(msg.sender != operator, "approving migrate for self");
+        _migrateApprovals[msg.sender][operator] = approved;
+        emit ApproveMigrate(msg.sender, operator, approved);
+    }
+
+    /** @return true if `account` approved migrate by `operator` */
+    function approvedMigrate(
+        address account,
+        address operator
+    ) public view returns (bool) {
+        return _migrateApprovals[account][operator];
+    }
+
+    /** migrate approvals: account => operator */
+    mapping(address => mapping(address => bool)) private _migrateApprovals;
+
+    /**
+     * emitted when `account` grants or revokes permission to
+     * `operator` to migrate their tokens according to `approved`
+     */
+    event ApproveMigrate(
+        address indexed account,
+        address indexed operator,
+        bool approved
+    );
 
     /** migrate amount of ERC20 tokens */
     function _migrateFrom(

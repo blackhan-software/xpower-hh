@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 // solhint-disable not-rely-on-time
+// solhint-disable reason-string
 pragma solidity 0.8.20;
 
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
@@ -66,8 +67,40 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
      * @param index pair of [nft_index, moe_index]
      */
     function migrateFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) external {
+        require(
+            account == msg.sender || approvedMigrate(account, msg.sender),
+            "caller is not token owner or approved"
+        );
         _migrateFrom(account, nftId, amount, index);
     }
+
+    /** approve migrate by `operator` */
+    function approveMigrate(address operator, bool approved) external {
+        require(msg.sender != operator, "approving migrate for self");
+        _migrateApprovals[msg.sender][operator] = approved;
+        emit ApproveMigrate(msg.sender, operator, approved);
+    }
+
+    /** @return true if `account` approved migrate by `operator` */
+    function approvedMigrate(
+        address account,
+        address operator
+    ) public view returns (bool) {
+        return _migrateApprovals[account][operator];
+    }
+
+    /** migrate approvals: account => operator */
+    mapping(address => mapping(address => bool)) private _migrateApprovals;
+
+    /**
+     * emitted when `account` grants or revokes permission to
+     * `operator` to migrate their tokens according to `approved`
+     */
+    event ApproveMigrate(
+        address indexed account,
+        address indexed operator,
+        bool approved
+    );
 
     /** migrate amount of ERC1155 */
     function _migrateFrom(address account, uint256 nftId, uint256 amount, uint256[] memory index) internal {
