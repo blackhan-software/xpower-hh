@@ -158,6 +158,9 @@ contract XPowerNft is NftBase {
         uint256[] memory ids,
         uint256[] memory amounts
     ) public override {
+        for (uint256 i = 0; i < ids.length; i++) {
+            require(_redeemable(ids[i]), "irredeemable issue");
+        }
         super.burnBatch(account, ids, amounts);
         _redeemToBatch(account, ids, amounts);
     }
@@ -167,11 +170,11 @@ contract XPowerNft is NftBase {
         uint256[] memory ids,
         uint256[] memory amounts
     ) private {
+        uint256 totalAmount = 0;
         for (uint256 i = 0; i < ids.length; i++) {
-            require(_redeemable(ids[i]), "irredeemable issue");
-            uint256 moeAmount = amounts[i] * denominationOf(levelOf(ids[i]));
-            _moe.transfer(account, moeAmount * 10 ** _moe.decimals());
+            totalAmount += amounts[i] * denominationOf(levelOf(ids[i]));
         }
+        _moe.transfer(account, totalAmount * 10 ** _moe.decimals());
     }
 
     /** upgrade NFTs */
