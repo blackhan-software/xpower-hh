@@ -34,7 +34,7 @@ contract NftTreasury is ERC1155Holder {
     /** stake NFT */
     function stake(address account, uint256 nftId, uint256 amount) external {
         require(
-            (account == msg.sender || approvedStake(account, msg.sender)) && !_nft.migratable(),
+            account == msg.sender || approvedStake(account, msg.sender),
             "caller is not token owner or approved"
         );
         _nft.safeTransferFrom(account, address(this), nftId, amount, "");
@@ -53,7 +53,7 @@ contract NftTreasury is ERC1155Holder {
         uint256[] memory amounts
     ) external {
         require(
-            (account == msg.sender || approvedStake(account, msg.sender)) && !_nft.migratable(),
+            account == msg.sender || approvedStake(account, msg.sender),
             "caller is not token owner or approved"
         );
         _nft.safeBatchTransferFrom(account, address(this), nftIds, amounts, "");
@@ -96,7 +96,7 @@ contract NftTreasury is ERC1155Holder {
     /** unstake NFT */
     function unstake(address account, uint256 nftId, uint256 amount) external {
         require(
-            (account == msg.sender || approvedUnstake(account, msg.sender)) || _nft.migratable(),
+            account == msg.sender || approvedUnstake(account, msg.sender),
             "caller is not token owner or approved"
         );
         _ppt.burn(account, nftId, amount);
@@ -115,7 +115,7 @@ contract NftTreasury is ERC1155Holder {
         uint256[] memory amounts
     ) external {
         require(
-            (account == msg.sender || approvedUnstake(account, msg.sender)) || _nft.migratable(),
+            account == msg.sender || approvedUnstake(account, msg.sender),
             "caller is not token owner or approved"
         );
         _ppt.burnBatch(account, nftIds, amounts);
