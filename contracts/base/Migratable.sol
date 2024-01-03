@@ -242,7 +242,7 @@ abstract contract MoeMigratable is Migratable, MoeMigratableSupervised {
  */
 abstract contract SovMigratable is Migratable, SovMigratableSupervised {
     /** migratable MOE tokens */
-    MoeMigratable private _moe;
+    MoeMigratable private _moeMigratable;
 
     /** @param moe address of MOE tokens */
     /** @param base addresses of old contracts */
@@ -252,7 +252,7 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
         address[] memory base,
         uint256 deadlineIn
     ) Migratable(base, deadlineIn) {
-        _moe = MoeMigratable(moe);
+        _moeMigratable = MoeMigratable(moe);
     }
 
     /**
@@ -276,13 +276,9 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
         uint256 migAmountSov = _premigrate(account, amount, index[0]);
         assert(migAmountSov == newAmountSov);
         uint256 newAmountMoe = moeUnits(newAmountSov);
-        uint256 oldAmountMoe = _moe.oldUnits(newAmountMoe, moeIndex[0]);
-        uint256 migAmountMoe = _moe.migrateFrom(
-            account,
-            oldAmountMoe,
-            moeIndex
-        );
-        assert(_moe.transferFrom(account, (address)(this), migAmountMoe));
+        uint256 oldAmountMoe = _moeMigratable.oldUnits(newAmountMoe, moeIndex[0]);
+        uint256 migAmountMoe = _moeMigratable.migrateFrom(account, oldAmountMoe, moeIndex);
+        assert(_moeMigratable.transferFrom(account, (address)(this), migAmountMoe));
         _mint(account, newAmountSov);
         return newAmountSov;
     }
@@ -292,10 +288,10 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
      * @return cross-converted MOE amount w.r.t. decimals
      */
     function moeUnits(uint256 sovAmount) public view returns (uint256) {
-        if (decimals() >= _moe.decimals()) {
-            return sovAmount / (10 ** (decimals() - _moe.decimals()));
+        if (decimals() >= _moeMigratable.decimals()) {
+            return sovAmount / (10 ** (decimals() - _moeMigratable.decimals()));
         } else {
-            return sovAmount * (10 ** (_moe.decimals() - decimals()));
+            return sovAmount * (10 ** (_moeMigratable.decimals() - decimals()));
         }
     }
 
@@ -304,10 +300,10 @@ abstract contract SovMigratable is Migratable, SovMigratableSupervised {
      * @return cross-converted SOV amount w.r.t. decimals
      */
     function sovUnits(uint256 moeAmount) public view returns (uint256) {
-        if (decimals() >= _moe.decimals()) {
-            return moeAmount * (10 ** (decimals() - _moe.decimals()));
+        if (decimals() >= _moeMigratable.decimals()) {
+            return moeAmount * (10 ** (decimals() - _moeMigratable.decimals()));
         } else {
-            return moeAmount / (10 ** (_moe.decimals() - decimals()));
+            return moeAmount / (10 ** (_moeMigratable.decimals() - decimals()));
         }
     }
 
