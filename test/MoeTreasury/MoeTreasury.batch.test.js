@@ -115,8 +115,8 @@ describe("MoeTreasury", async function () {
       expect((await mty.claimedBatch(a, [id]))[0]).to.gt(33n * UNIT);
       expect((await mty.claimedBatch(a, [id]))[0]).to.lt(34n * UNIT);
       expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
-      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(525_960n * UNIT);
-      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(525_961n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(526_737n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(526_738n * UNIT);
       expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
       expect(await moe.balanceOf(mty.target)).to.gt(68n * UNIT);
       expect(await moe.balanceOf(mty.target)).to.lt(69n * UNIT);
@@ -128,8 +128,8 @@ describe("MoeTreasury", async function () {
       expect((await mty.claimedBatch(a, [id]))[0]).to.gt(45n * UNIT);
       expect((await mty.claimedBatch(a, [id]))[0]).to.lt(46n * UNIT);
       expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
-      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(703_180n * UNIT);
-      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(703_181n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(702_408n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(702_409n * UNIT);
       expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
       expect(await moe.balanceOf(mty.target)).to.gt(56n * UNIT);
       expect(await moe.balanceOf(mty.target)).to.lt(57n * UNIT);
@@ -141,8 +141,8 @@ describe("MoeTreasury", async function () {
       expect((await mty.claimedBatch(a, [id]))[0]).to.gt(67n * UNIT);
       expect((await mty.claimedBatch(a, [id]))[0]).to.lt(68n * UNIT);
       expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
-      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(1_053_995n * UNIT);
-      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(1_053_996n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(1_055_290n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(1_055_291n * UNIT);
       expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
       expect(await moe.balanceOf(mty.target)).to.gt(34n * UNIT);
       expect(await moe.balanceOf(mty.target)).to.lt(35n * UNIT);
@@ -154,8 +154,8 @@ describe("MoeTreasury", async function () {
       expect((await mty.claimedBatch(a, [id]))[0]).to.gt(102n * UNIT);
       expect((await mty.claimedBatch(a, [id]))[0]).to.lt(103n * UNIT);
       expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
-      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(1_583_046n * UNIT);
-      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(1_583_047n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(1_584_341n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(1_584_342n * UNIT);
       expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
       expect(await moe.balanceOf(mty.target)).to.eq(0);
       // wait for +12 months: (empty treasury)
@@ -166,8 +166,8 @@ describe("MoeTreasury", async function () {
       expect((await mty.claimedBatch(a, [id]))[0]).to.gt(136n * UNIT);
       expect((await mty.claimedBatch(a, [id]))[0]).to.lt(137n * UNIT);
       expect((await mty.claimableBatch(a, [id]))[0]).to.lt(UNIT);
-      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(2_113_628n * UNIT);
-      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(2_113_629n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.gt(2_114_923n * UNIT);
+      expect((await mty.mintedBatch(a, [id]))[0]).to.lt(2_114_924n * UNIT);
       expect((await mty.mintableBatch(a, [id]))[0]).to.lt(UNIT);
       expect(await moe.balanceOf(mty.target)).to.eq(0);
     });

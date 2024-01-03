@@ -102,14 +102,14 @@ describe("MoeTreasury", async function () {
       expect(await mty.claimable(account, nft_id)).to.lt(UNIT);
       expect(await moe.balanceOf(mty.target)).to.closeTo(314n * UNIT, UNIT);
       // APOW balance:
-      expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
+      expect(await sov.balanceOf(account)).to.closeTo(526_737n * UNIT, UNIT);
       // check balances & burn[-from] aged tokens:
       expect(await moe.balanceOf(sov.target)).to.closeTo(33n * UNIT, UNIT);
-      expect(await sov.balanceOf(account)).to.closeTo(525_960n * UNIT, UNIT);
+      expect(await sov.balanceOf(account)).to.closeTo(526_737n * UNIT, UNIT);
       const old_xp = await moe.balanceOf(account);
-      await sov.increaseAllowance(account, (525_960n * UNIT) / 2n);
-      await sov.burnFrom(account, (525_960n * UNIT) / 2n);
-      await sov.burn((525_960n * UNIT) / 2n);
+      await sov.increaseAllowance(account, (526_737n * UNIT) / 2n);
+      await sov.burnFrom(account, (526_737n * UNIT) / 2n);
+      await sov.burn((526_737n * UNIT) / 2n);
       expect(await moe.balanceOf(account)).to.be.closeTo(
         old_xp + 33n * UNIT,
         UNIT,
@@ -250,7 +250,7 @@ describe("MoeTreasury", async function () {
       expect(await mty.claimable(account, nft_id)).to.lt(UNIT);
       expect(await moe.balanceOf(mty.target)).to.lt(UNIT);
       // APOW balance:
-      expect(await sov.balanceOf(account)).to.closeTo(5_343_332n * UNIT, UNIT);
+      expect(await sov.balanceOf(account)).to.closeTo(5_350_223n * UNIT, UNIT);
     });
   });
 });

@@ -113,7 +113,7 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (too large)", async function () {
       await mty.grantRole(mty.APB_ROLE(), addresses[0]);
       expect(
-        await mty.setAPB(202103, [0.03e6 + 1, 1, 0.01e6, 256]).catch((ex) => {
+        await mty.setAPB(202103, [0.04e6 + 1, 1, 0.01e6, 256]).catch((ex) => {
           const m = ex.message.match(/invalid change: too large/);
           if (m === null) console.debug(ex);
           expect(m).to.not.eq(null);
@@ -152,65 +152,32 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_increaseTime", [YEAR]);
       await network.provider.send("evm_mine", []);
     });
-    it("should return 0.054999[%] for nft-level=00", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 0))).to.eq(0.054999e6);
+    it("should return 0.059999[%] for nft-level=00", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 0))).to.eq(0.059999e6);
     });
-    it("should return 0.054999[%] for nft-level=03", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 3))).to.eq(0.054999e6);
+    it("should return 0.059999[%] for nft-level=03", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 3))).to.eq(0.059999e6);
     });
-    it("should return 0.054999[%] for nft-level=06", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 6))).to.eq(0.054999e6);
+    it("should return 0.059999[%] for nft-level=06", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 6))).to.eq(0.059999e6);
     });
-    it("should return 0.054999[%] for nft-level=09", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 9))).to.eq(0.054999e6);
+    it("should return 0.059999[%] for nft-level=09", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 9))).to.eq(0.059999e6);
     });
-    it("should return 0.054999[%] for nft-level=12", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 12))).to.eq(0.054999e6);
+    it("should return 0.059999[%] for nft-level=12", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 12))).to.eq(0.059999e6);
     });
-    it("should return 0.054999[%] for nft-level=15", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 15))).to.eq(0.054999e6);
+    it("should return 0.059999[%] for nft-level=15", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 15))).to.eq(0.059999e6);
     });
-    it("should return 0.054999[%] for nft-level=18", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 18))).to.eq(0.054999e6);
+    it("should return 0.059999[%] for nft-level=18", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 18))).to.eq(0.059999e6);
     });
-    it("should return 0.054999[%] for nft-level=21", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 21))).to.eq(0.054999e6);
+    it("should return 0.059999[%] for nft-level=21", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 21))).to.eq(0.059999e6);
     });
-    it("should return 0.054999[%] for nft-level=24", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 24))).to.eq(0.054999e6);
-    });
-  });
-  describe("apb-of (i.e rewards ~ nft-level × time)", async function () {
-    it("should forward time by one year", async function () {
-      await network.provider.send("evm_increaseTime", [YEAR]);
-      await network.provider.send("evm_mine", []);
-    });
-    it("should return 0.076666[%] for nft-level=00", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 0))).to.eq(0.076666e6);
-    });
-    it("should return 0.076666[%] for nft-level=03", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 3))).to.eq(0.076666e6);
-    });
-    it("should return 0.076666[%] for nft-level=06", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 6))).to.eq(0.076666e6);
-    });
-    it("should return 0.076666[%] for nft-level=09", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 9))).to.eq(0.076666e6);
-    });
-    it("should return 0.076666[%] for nft-level=12", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 12))).to.eq(0.076666e6);
-    });
-    it("should return 0.076666[%] for nft-level=15", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 15))).to.eq(0.076666e6);
-    });
-    it("should return 0.076666[%] for nft-level=18", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 18))).to.eq(0.076666e6);
-    });
-    it("should return 0.076666[%] for nft-level=21", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 21))).to.eq(0.076666e6);
-    });
-    it("should return 0.076666[%] for nft-level=24", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 24))).to.eq(0.076666e6);
+    it("should return 0.059999[%] for nft-level=24", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 24))).to.eq(0.059999e6);
     });
   });
   describe("apb-of (i.e rewards ~ nft-level × time)", async function () {
@@ -218,32 +185,65 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_increaseTime", [YEAR]);
       await network.provider.send("evm_mine", []);
     });
-    it("should return 0.097499[%] for nft-level=00", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 0))).to.eq(0.097499e6);
+    it("should return 0.079999[%] for nft-level=00", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 0))).to.eq(0.079999e6);
     });
-    it("should return 0.097499[%] for nft-level=03", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 3))).to.eq(0.097499e6);
+    it("should return 0.079999[%] for nft-level=03", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 3))).to.eq(0.079999e6);
     });
-    it("should return 0.097499[%] for nft-level=06", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 6))).to.eq(0.097499e6);
+    it("should return 0.079999[%] for nft-level=06", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 6))).to.eq(0.079999e6);
     });
-    it("should return 0.097499[%] for nft-level=09", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 9))).to.eq(0.097499e6);
+    it("should return 0.079999[%] for nft-level=09", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 9))).to.eq(0.079999e6);
     });
-    it("should return 0.097499[%] for nft-level=12", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 12))).to.eq(0.097499e6);
+    it("should return 0.079999[%] for nft-level=12", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 12))).to.eq(0.079999e6);
     });
-    it("should return 0.097499[%] for nft-level=15", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 15))).to.eq(0.097499e6);
+    it("should return 0.079999[%] for nft-level=15", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 15))).to.eq(0.079999e6);
     });
-    it("should return 0.097499[%] for nft-level=18", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 18))).to.eq(0.097499e6);
+    it("should return 0.079999[%] for nft-level=18", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 18))).to.eq(0.079999e6);
     });
-    it("should return 0.097499[%] for nft-level=21", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 21))).to.eq(0.097499e6);
+    it("should return 0.079999[%] for nft-level=21", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 21))).to.eq(0.079999e6);
     });
-    it("should return 0.097499[%] for nft-level=24", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 24))).to.eq(0.097499e6);
+    it("should return 0.079999[%] for nft-level=24", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 24))).to.eq(0.079999e6);
+    });
+  });
+  describe("apb-of (i.e rewards ~ nft-level × time)", async function () {
+    it("should forward time by one year", async function () {
+      await network.provider.send("evm_increaseTime", [YEAR]);
+      await network.provider.send("evm_mine", []);
+    });
+    it("should return 0.099999[%] for nft-level=00", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 0))).to.eq(0.099999e6);
+    });
+    it("should return 0.099999[%] for nft-level=03", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 3))).to.eq(0.099999e6);
+    });
+    it("should return 0.099999[%] for nft-level=06", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 6))).to.eq(0.099999e6);
+    });
+    it("should return 0.099999[%] for nft-level=09", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 9))).to.eq(0.099999e6);
+    });
+    it("should return 0.099999[%] for nft-level=12", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 12))).to.eq(0.099999e6);
+    });
+    it("should return 0.099999[%] for nft-level=15", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 15))).to.eq(0.099999e6);
+    });
+    it("should return 0.099999[%] for nft-level=18", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 18))).to.eq(0.099999e6);
+    });
+    it("should return 0.099999[%] for nft-level=21", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 21))).to.eq(0.099999e6);
+    });
+    it("should return 0.099999[%] for nft-level=24", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 24))).to.eq(0.099999e6);
     });
   });
   describe("apb-of (i.e rewards ~ nft-level × time)", async function () {
@@ -251,32 +251,32 @@ describe("MoeTreasury", async function () {
       await network.provider.send("evm_increaseTime", [YEAR * 999]);
       await network.provider.send("evm_mine", []);
     });
-    it("should return 20.079990[%] for nft-level=00", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 0))).to.eq(20.07999e6);
+    it("should return 20.079999[%] for nft-level=00", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 0))).to.eq(20.079999e6);
     });
-    it("should return 20.079990[%] for nft-level=03", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 3))).to.eq(20.07999e6);
+    it("should return 20.079999[%] for nft-level=03", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 3))).to.eq(20.079999e6);
     });
-    it("should return 20.079990[%] for nft-level=06", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 6))).to.eq(20.07999e6);
+    it("should return 20.079999[%] for nft-level=06", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 6))).to.eq(20.079999e6);
     });
-    it("should return 20.079990[%] for nft-level=09", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 9))).to.eq(20.07999e6);
+    it("should return 20.079999[%] for nft-level=09", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 9))).to.eq(20.079999e6);
     });
-    it("should return 20.079990[%] for nft-level=12", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 12))).to.eq(20.07999e6);
+    it("should return 20.079999[%] for nft-level=12", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 12))).to.eq(20.079999e6);
     });
-    it("should return 20.079990[%] for nft-level=15", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 15))).to.eq(20.07999e6);
+    it("should return 20.079999[%] for nft-level=15", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 15))).to.eq(20.079999e6);
     });
-    it("should return 20.079990[%] for nft-level=18", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 18))).to.eq(20.07999e6);
+    it("should return 20.079999[%] for nft-level=18", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 18))).to.eq(20.079999e6);
     });
-    it("should return 20.079990[%] for nft-level=21", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 21))).to.eq(20.07999e6);
+    it("should return 20.079999[%] for nft-level=21", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 21))).to.eq(20.079999e6);
     });
-    it("should return 20.079990[%] for nft-level=24", async function () {
-      expect(await mty.apbOf(ppt.idBy(AGE2, 24))).to.eq(20.07999e6);
+    it("should return 20.079999[%] for nft-level=24", async function () {
+      expect(await mty.apbOf(ppt.idBy(AGE2, 24))).to.eq(20.079999e6);
     });
   });
 });

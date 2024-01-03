@@ -112,7 +112,7 @@ describe("MoeTreasury", async function () {
     it("should *not* reparameterize (too large)", async function () {
       await mty.grantRole(mty.APB_ROLE(), addresses[0]);
       expect(
-        await mty.setAPB(202103, [30_001, 1, 0.01e6, 256]).catch((ex) => {
+        await mty.setAPB(202103, [0.04e6 + 1, 1, 0.01e6, 256]).catch((ex) => {
           const m = ex.message.match(/invalid change: too large/);
           if (m === null) console.debug(ex);
           expect(m).to.not.eq(null);
