@@ -281,7 +281,10 @@ contract MoeTreasury is MoeTreasurySupervised, Ownable {
         aprs[id].append(block.timestamp, currRate, "S");
         // all requirements satisfied: use array
         _apr[id] = array;
+        emit SetAPR(nftId, array);
     }
+
+    event SetAPR(uint256 nftId, uint256[] array);
 
     /** @return mean of annualized percentage rate */
     function _aprMeanOf(uint256[] memory array) private pure returns (uint256) {
@@ -476,7 +479,10 @@ contract MoeTreasury is MoeTreasurySupervised, Ownable {
         apbs[id].append(block.timestamp, currRate);
         // all requirements satisfied: use array
         _apb[id] = array;
+        emit SetAPB(nftId, array);
     }
+
+    event SetAPB(uint256 nftId, uint256[] array);
 
     /** batch-set APB parameters */
     function setAPBBatch(
