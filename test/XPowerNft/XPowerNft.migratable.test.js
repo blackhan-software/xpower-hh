@@ -13,7 +13,7 @@ const DEADLINE = 126_230_400; // [seconds] i.e. 4 years
 const DAYS = 86_400; // [seconds]
 
 describe("XPowerNft", async function () {
-  before(async function () {
+  after(async function () {
     await network.provider.send("hardhat_reset");
   });
   before(async function () {
@@ -70,7 +70,7 @@ describe("XPowerNft", async function () {
     it("should set XPower NFT approval for all", async function () {
       await nftApprove(nft_new.target);
     });
-    it("should migrate NFTs for level=UNIT & amount=1", async function () {
+    it("should migrate NFTs", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftMint(1);
@@ -79,7 +79,7 @@ describe("XPowerNft", async function () {
       await nftMigrate(1);
       await checkBalances([0, 0, 0, UNIT]);
     });
-    it("should migrate-from NFTs for level=UNIT & amount=1", async function () {
+    it("should migrate-from NFTs", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftMint(1);
@@ -88,7 +88,22 @@ describe("XPowerNft", async function () {
       await nftMigrateFrom(1);
       await checkBalances([0, 0, 0, UNIT]);
     });
-    it("should *not* migrate NFTs for level=UNIT & amount=1 (caller is not token owner or approved)", async function () {
+    it("should *not* migrate NFTs (deadline passed)", async function () {
+      await moeMint(1);
+      await allowanceOf(1);
+      await nftMint(1);
+      await checkBalances([UNIT, 0, 0, 0]);
+      await network.provider.send("evm_increaseTime", [DEADLINE]);
+      expect(
+        await nftMigrate(1).catch((ex) => {
+          const m = ex.message.match(/deadline passed/);
+          if (m === null) console.debug(ex);
+          expect(m).to.not.eq(null);
+        }),
+      ).to.eq(undefined);
+      await checkBalances([UNIT, 0, 0, 0]);
+    });
+    it("should *not* migrate NFTs (caller is not token owner or approved)", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftMint(1);
@@ -102,7 +117,7 @@ describe("XPowerNft", async function () {
       ).to.eq(undefined);
       await checkBalances([UNIT, 0, 0, 0]);
     });
-    it("should *not* migrate NFTs for level=UNIT & amount=1 (burn amount exceeds totalSupply)", async function () {
+    it("should *not* migrate NFTs (burn amount exceeds totalSupply)", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftApprove(nft_new.target);
@@ -116,7 +131,7 @@ describe("XPowerNft", async function () {
       ).to.eq(undefined);
       await checkBalances([0, 0, 0, 0]);
     });
-    it("should *not* migrate NFTs for level=UNIT & amount=1 (migration sealed)", async function () {
+    it("should *not* migrate NFTs (migration sealed)", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftMint(1);
@@ -137,7 +152,7 @@ describe("XPowerNft", async function () {
     });
   });
   describe("migrate-from", async function () {
-    it("should migrate NFTs for level=UNIT & amount=1", async function () {
+    it("should migrate NFTs", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftMint(1);
@@ -151,7 +166,7 @@ describe("XPowerNft", async function () {
     it("should set XPower NFT approval for all", async function () {
       await nftApprove(nft_new.target);
     });
-    it("should migrate-batch NFTs for level=UNIT & amount=1", async function () {
+    it("should migrate-batch NFTs", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftMintBatch(1);
@@ -160,7 +175,22 @@ describe("XPowerNft", async function () {
       await nftMigrateBatch(1);
       await checkBalances([0, 0, 0, UNIT]);
     });
-    it("should *not* migrate-batch NFTs for level=UNIT & amount=1 (caller is not token owner or approved)", async function () {
+    it("should *not* migrate-batch NFTs (deadline passed)", async function () {
+      await moeMint(1);
+      await allowanceOf(1);
+      await nftMint(1);
+      await checkBalances([UNIT, 0, 0, 0]);
+      await network.provider.send("evm_increaseTime", [DEADLINE]);
+      expect(
+        await nftMigrateBatch(1).catch((ex) => {
+          const m = ex.message.match(/deadline passed/);
+          if (m === null) console.debug(ex);
+          expect(m).to.not.eq(null);
+        }),
+      ).to.eq(undefined);
+      await checkBalances([UNIT, 0, 0, 0]);
+    });
+    it("should *not* migrate-batch NFTs (caller is not token owner or approved)", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftMint(1);
@@ -174,7 +204,7 @@ describe("XPowerNft", async function () {
       ).to.eq(undefined);
       await checkBalances([UNIT, 0, 0, 0]);
     });
-    it("should *not* migrate-batch NFTs for level=UNIT & amount=1 (burn amount exceeds totalSupply)", async function () {
+    it("should *not* migrate-batch NFTs (burn amount exceeds totalSupply)", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftApprove(nft_new.target);
@@ -188,7 +218,7 @@ describe("XPowerNft", async function () {
       ).to.eq(undefined);
       await checkBalances([0, 0, 0, 0]);
     });
-    it("should *not* migrate-batch NFTs for level=UNIT & amount=1 (migration sealed)", async function () {
+    it("should *not* migrate-batch NFTs (migration sealed)", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftMintBatch(1);
@@ -207,7 +237,7 @@ describe("XPowerNft", async function () {
     });
   });
   describe("migrate-from-batch", async function () {
-    it("should migrate-batch NFTs for level=UNIT & amount=1", async function () {
+    it("should migrate-batch NFTs", async function () {
       await moeMint(1);
       await allowanceOf(1);
       await nftMintBatch(1);

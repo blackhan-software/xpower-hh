@@ -192,6 +192,7 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
      * @param flag value to set to (only `true` has an effect)
      */
     function migratable(bool flag) external onlyRole(NFT_OPEN_ROLE) {
+        require(_deadlineBy >= block.timestamp, "deadline passed");
         if (flag && _migratable == 0) {
             _migratable = block.timestamp + 7 days;
             emit Migratable(_migratable);
