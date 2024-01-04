@@ -2,7 +2,7 @@
   "name": "GIGA XPOW",
   "description": "Stakeable GIGA XPOW NFT",
   "external_url": "https://www.xpowermine.com/nfts?token=XPOW",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmUCCDw5VC2E4WDeAaAyeLhLuWYDpSaojaNx6NNERFkgue/320x427/2023/4-Odin_GIGA.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmfAmGeLDdAS6AkPdnoHk6K1EJKtMrRRtdyBrpYg7EVcjv/320x427/2023/4-Odin_GIGA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr-default", "value": "3%" },
     { "trait_type": "apr-bonus", "value": "1‱" },

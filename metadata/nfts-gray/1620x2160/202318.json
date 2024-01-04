@@ -1,7 +1,7 @@
 {
   "name": "EXA XPOW",
   "description": "Stakeable EXA XPOW NFT",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmUCCDw5VC2E4WDeAaAyeLhLuWYDpSaojaNx6NNERFkgue/1620x2160/2023/7-Odin_EXA.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmfAmGeLDdAS6AkPdnoHk6K1EJKtMrRRtdyBrpYg7EVcjv/1620x2160/2023/7-Odin_EXA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr-default", "value": "6%" },
     { "trait_type": "apr-bonus", "value": "1‱" },

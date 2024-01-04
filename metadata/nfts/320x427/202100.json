@@ -2,7 +2,7 @@
   "name": "UNIT XPOW",
   "description": "Stakeable UNIT XPOW NFT",
   "external_url": "https://www.xpowermine.com/nfts?token=XPOW",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmXUKikAwre39yPM2jZrE699n3JuXYj6AUB9NyLoGZGATr/320x427/2021/1-Thor_UNIT.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmVifzFJPHFuEKq5dFzJbeM3nBRa95i5jxouPtdXoqnk1L/320x427/2021/1-Thor_UNIT.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr-default", "value": "0%" },
     { "trait_type": "apr-bonus", "value": "3‱" },

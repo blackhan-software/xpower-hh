@@ -2,7 +2,7 @@
   "name": "MEGA XPOW",
   "description": "Stakeable MEGA XPOW NFT",
   "external_url": "https://www.xpowermine.com/nfts?token=XPOW",
-  "image": "https://ipfs.xpowermine.com/ipfs/QmXUKikAwre39yPM2jZrE699n3JuXYj6AUB9NyLoGZGATr/320x427/2021/3-Thor_MEGA.png",
+  "image": "https://ipfs.xpowermine.com/ipfs/QmVifzFJPHFuEKq5dFzJbeM3nBRa95i5jxouPtdXoqnk1L/320x427/2021/3-Thor_MEGA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr-default", "value": "2%" },
     { "trait_type": "apr-bonus", "value": "3‱" },
