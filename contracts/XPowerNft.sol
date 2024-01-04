@@ -90,7 +90,7 @@ contract XPowerNft is NftBase {
     }
 
     function _redeemable(uint256 id) private view returns (bool) {
-        return yearOf(id) + levelOf(id) / 3 <= year() || migratable();
+        return yearOf(id) + 2 ** (levelOf(id) / 3) - 1 <= year() || migratable();
     }
 
     /** burn NFTs during migration */
