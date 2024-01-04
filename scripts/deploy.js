@@ -18,6 +18,7 @@ const { main: deploy_moe_v8b } = require("./deploy/moe-v8b");
 const { main: deploy_moe_v8c } = require("./deploy/moe-v8c");
 const { main: deploy_moe_v9a } = require("./deploy/moe-v9a");
 const { main: deploy_moe_v9b } = require("./deploy/moe-v9b");
+const { main: deploy_moe_v9c } = require("./deploy/moe-v9c");
 
 const { main: deploy_nft_v2a } = require("./deploy/nft-v2a");
 const { main: deploy_nft_v2b } = require("./deploy/nft-v2b");
@@ -39,6 +40,7 @@ const { main: deploy_nft_v8b } = require("./deploy/nft-v8b");
 const { main: deploy_nft_v8c } = require("./deploy/nft-v8c");
 const { main: deploy_nft_v9a } = require("./deploy/nft-v9a");
 const { main: deploy_nft_v9b } = require("./deploy/nft-v9b");
+const { main: deploy_nft_v9c } = require("./deploy/nft-v9c");
 
 const { main: deploy_ppt_v4a } = require("./deploy/ppt-v4a");
 const { main: deploy_ppt_v5a } = require("./deploy/ppt-v5a");
@@ -55,6 +57,7 @@ const { main: deploy_ppt_v8b } = require("./deploy/ppt-v8b");
 const { main: deploy_ppt_v8c } = require("./deploy/ppt-v8c");
 const { main: deploy_ppt_v9a } = require("./deploy/ppt-v9a");
 const { main: deploy_ppt_v9b } = require("./deploy/ppt-v9b");
+const { main: deploy_ppt_v9c } = require("./deploy/ppt-v9c");
 
 const { main: deploy_sov_v5a } = require("./deploy/sov-v5a");
 const { main: deploy_sov_v5b } = require("./deploy/sov-v5b");
@@ -70,6 +73,7 @@ const { main: deploy_sov_v8b } = require("./deploy/sov-v8b");
 const { main: deploy_sov_v8c } = require("./deploy/sov-v8c");
 const { main: deploy_sov_v9a } = require("./deploy/sov-v9a");
 const { main: deploy_sov_v9b } = require("./deploy/sov-v9b");
+const { main: deploy_sov_v9c } = require("./deploy/sov-v9c");
 
 const { main: deploy_mty_v4a } = require("./deploy/mty-v4a");
 const { main: deploy_mty_v5a } = require("./deploy/mty-v5a");
@@ -86,6 +90,7 @@ const { main: deploy_mty_v8b } = require("./deploy/mty-v8b");
 const { main: deploy_mty_v8c } = require("./deploy/mty-v8c");
 const { main: deploy_mty_v9a } = require("./deploy/mty-v9a");
 const { main: deploy_mty_v9b } = require("./deploy/mty-v9b");
+const { main: deploy_mty_v9c } = require("./deploy/mty-v9c");
 
 const { main: deploy_pty_v4a } = require("./deploy/pty-v4a");
 const { main: deploy_pty_v5a } = require("./deploy/pty-v5a");
@@ -102,6 +107,7 @@ const { main: deploy_pty_v8b } = require("./deploy/pty-v8b");
 const { main: deploy_pty_v8c } = require("./deploy/pty-v8c");
 const { main: deploy_pty_v9a } = require("./deploy/pty-v9a");
 const { main: deploy_pty_v9b } = require("./deploy/pty-v9b");
+const { main: deploy_pty_v9c } = require("./deploy/pty-v9c");
 
 async function main() {
   const owner = process.env.SAFE_ADDRESS;
@@ -257,6 +263,15 @@ async function main() {
   await deploy_sov_v9b();
   await deploy_mty_v9b();
   await deploy_pty_v9b();
+  //
+  // deploy v9c contract(s):
+  //
+  await deploy_moe_v9c();
+  await deploy_nft_v9c();
+  await deploy_ppt_v9c();
+  await deploy_sov_v9c();
+  await deploy_mty_v9c();
+  await deploy_pty_v9c();
   //
   // show ownership address:
   //
