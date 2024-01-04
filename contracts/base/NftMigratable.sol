@@ -142,6 +142,10 @@ abstract contract NftMigratable is ERC1155, ERC1155Burnable, NftMigratableSuperv
         uint256[] memory amounts,
         uint256[] memory index
     ) external {
+        require(
+            account == msg.sender || approvedMigrate(account, msg.sender),
+            "caller is not token owner or approved"
+        );
         _migrateFromBatch(account, nftIds, amounts, index);
     }
 
