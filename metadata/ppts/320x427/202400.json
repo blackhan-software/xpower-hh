@@ -1,7 +1,7 @@
 {
   "name": "UNIT XPOW",
-  "description": "Stakeable UNIT XPOW NFT",
-  "external_url": "https://www.xpowermine.com/nfts?token=XPOW",
+  "description": "Staked UNIT XPOW NFT",
+  "external_url": "https://www.xpowermine.com/staking?token=APOW",
   "image": "https://ipfs.xpowermine.com/ipfs/QmbcfgQTFrCGEoJQReK4UGNDUD7Ar1VmXqWhsYUewrTmmv/320x427/2024/1-Hela_UNIT.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr-default", "value": "0%" },

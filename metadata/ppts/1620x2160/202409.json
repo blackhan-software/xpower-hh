@@ -1,7 +1,7 @@
 {
   "name": "GIGA XPOW",
-  "description": "Stakeable GIGA XPOW NFT",
-  "external_url": "https://www.xpowermine.com/nfts?token=XPOW",
+  "description": "Staked GIGA XPOW NFT",
+  "external_url": "https://www.xpowermine.com/staking?token=APOW",
   "image": "https://ipfs.xpowermine.com/ipfs/QmbcfgQTFrCGEoJQReK4UGNDUD7Ar1VmXqWhsYUewrTmmv/1620x2160/2024/4-Hela_GIGA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr-default", "value": "3%" },

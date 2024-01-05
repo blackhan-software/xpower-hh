@@ -1,6 +1,6 @@
 {
   "name": "ZETTA XPOW",
-  "description": "Stakeable ZETTA XPOW NFT",
+  "description": "Staked ZETTA XPOW NFT",
   "image": "https://ipfs.xpowermine.com/ipfs/QmRrNik3iiipx3XpiP8zZ1htqzrroNEH7F1twUQe6s2FK4/1620x2160/2022/8-Loki_ZETTA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr-default", "value": "7%" },

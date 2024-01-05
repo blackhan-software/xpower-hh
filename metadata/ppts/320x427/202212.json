@@ -1,7 +1,7 @@
 {
   "name": "TERA XPOW",
-  "description": "Stakeable TERA XPOW NFT",
-  "external_url": "https://www.xpowermine.com/nfts?token=XPOW",
+  "description": "Staked TERA XPOW NFT",
+  "external_url": "https://www.xpowermine.com/staking?token=APOW",
   "image": "https://ipfs.xpowermine.com/ipfs/QmbcfgQTFrCGEoJQReK4UGNDUD7Ar1VmXqWhsYUewrTmmv/320x427/2022/5-Loki_TERA.png",
   "attributes": [
     { "display_type": "string", "trait_type": "apr-default", "value": "4%" },
