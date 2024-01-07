@@ -86,10 +86,14 @@ npx hardhat node
 
 ..where the configuration details of each network can be found in `hardhat.config.js`.
 
-### Deploy smart contract(s)
+### Deploy smart contracts & roles
 
 ```sh
 npx hardhat run 'scripts/deploy.js' [--no-compile] [--network $NETWORK]
+```
+
+```sh
+npx hardhat run 'scripts/deploy-roles.js' [--no-compile] [--network $NETWORK]
 ```
 
 ## Mining & Minting
