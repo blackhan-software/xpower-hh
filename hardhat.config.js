@@ -147,8 +147,8 @@ module.exports = {
   },
   etherscan: {
     apiKey: {
-      avalancheFujiTestnet: process.env.ETHERSCAN_API_KEY || "",
-      avalanche: process.env.ETHERSCAN_API_KEY || "",
+      avalancheFujiTestnet: process.env.ETHERSCAN_API_KEY || "avalanche",
+      avalanche: process.env.ETHERSCAN_API_KEY || "avalanche",
     },
     url: "https://api.snowtrace.io/api",
   },
