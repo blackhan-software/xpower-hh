@@ -1,6 +1,6 @@
 FROM node:lts-bullseye-slim
 
-ENV VERSION v9.1.0
+ENV VERSION v9.2.0
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get install -y \
@@ -15,7 +15,8 @@ RUN git clone --depth 1 --branch ${VERSION} \
 
 WORKDIR /opt/xpower-hh
 
-RUN npm install && \
+RUN npm install -g npm && \
+    npm install && \
     npm run build && \
     cp .env-avalanche-main .env
 
