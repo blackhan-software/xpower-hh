@@ -1,6 +1,6 @@
 FROM node:lts-bullseye-slim
 
-ENV VERSION v9.2.0
+ENV VERSION v9.2.1
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get install -y \
@@ -19,6 +19,7 @@ RUN npm install -g npm && \
     npm install && \
     npm run build && \
     cp .env-avalanche-main .env
+RUN npm config set update-notifier false
 
 COPY docker/start-miner.sh .
 COPY docker/restart-miner.cron /etc/cron.d/restart-miner
