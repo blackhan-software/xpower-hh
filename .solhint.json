@@ -2,8 +2,8 @@
   "extends": "solhint:recommended",
   "rules": {
     "compiler-version": ["error", "^0.8.0"],
-    "custom-errors": ["off"],
     "func-named-parameters": ["off"],
-    "func-visibility": ["warn", { "ignoreConstructors": true }]
+    "func-visibility": ["warn", { "ignoreConstructors": true }],
+    "gas-custom-errors": ["off"]
   }
 }

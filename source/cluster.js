@@ -213,10 +213,10 @@ async function loop(
           const result = ex.message?.match(/nonce has already been used/)
             ? "NAU"
             : ex.message?.match(/replacement fee too low/)
-            ? "FIL"
-            : ex.message?.match(/cannot estimate gas/)
-            ? "CEG"
-            : null;
+              ? "FIL"
+              : ex.message?.match(/cannot estimate gas/)
+                ? "CEG"
+                : null;
           if (result) {
             err_mint({
               worker: worker_id(),
