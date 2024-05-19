@@ -300,4 +300,4 @@ docker run --rm -ti \
 
 ## Copyright
 
-© 2023 [Blackhan Software Ltd](https://www.linkedin.com/company/blackhan)
+© 2024 [Moorhead LLC](#)
