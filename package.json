@@ -40,5 +40,5 @@
     "test": "NODE_OPTIONS='--max-old-space-size=4096' hardhat test",
     "test-gas": "REPORT_GAS=true npm test"
   },
-  "version": "9.2.2"
+  "version": "9.2.3"
 }
