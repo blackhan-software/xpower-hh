@@ -57,7 +57,7 @@ async function do_mint(
   const fee_data = await provider.getFeeData();
   const gas_price = fee_data.gasPrice ?? 25n;
   const gas_fee = (gas_price * BigInt((gas_multiplier ?? 1) * 1000)) / 1000n;
-  const gas_fee_priority = parseUnits("1.25", "gwei"); // nAVAX
+  const gas_fee_priority = parseUnits("1.125", "gwei"); // nAVAX
   return new Promise((resolve, reject) => {
     const tid = setTimeout(() => {
       reject(new Error("[MINT] transaction timeout"));
@@ -81,7 +81,7 @@ async function do_mint(
       xpower.mint(beneficiary, block_hash, "0x" + nonce.toString("16"), {
         maxFeePerGas: max(gas_fee_priority, gas_fee),
         maxPriorityFeePerGas: gas_fee_priority,
-        gasLimit: 250_000,
+        gasLimit: 100_000,
       }),
     );
   });
