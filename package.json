@@ -7,27 +7,19 @@
   "description": "XPower token",
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.3",
-    "@prb/math": "^4.0.2"
+    "@prb/math": "^4.1.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "dotenv": "^16.4.5",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-promise": "^6.1.1",
-    "hardhat": "^2.22.1",
+    "dotenv": "^16.4.7",
+    "hardhat": "^2.22.19",
     "moment": "^2.30.1",
-    "prettier": "^3.2.5",
-    "solhint": "^4.5.2",
+    "solhint": "^5.0.5",
     "wasm-miner": "npm:@blackhan-software/wasm-miner@^1.0.15",
-    "winston": "^3.12.0"
+    "winston": "^3.17.0"
   },
   "engines": {
-    "node": "^18.16.0"
+    "node": "^20.18.0"
   },
   "license": "GPL-3.0",
   "name": "xpower",
@@ -42,16 +34,7 @@
     "coverage": "hardhat coverage",
     "deploy": "hardhat run 'scripts/deploy.js'",
     "deploy-roles": "hardhat run 'scripts/deploy-roles.js'",
-    "eslint": "eslint '**/*.js'",
-    "eslint-fix": "eslint '**/*.js' --fix",
-    "lint": "npm run eslint && npm run solhint",
-    "lint-fix": "npm run eslint-fix && npm run solhint-fix",
-    "lint-md": "prettier '**/*.md' --check --print-width 120",
-    "lint-md-fix": "prettier '**/*.md' --write --print-width 120",
-    "lint-json": "prettier '**/*.json' --check --print-width 120",
-    "lint-json-fix": "prettier '**/*.json' --write --print-width 120",
     "node": "NO_TIMETRAVEL=1 hardhat node",
-    "prebuild": "npm run lint",
     "solhint": "solhint 'contracts/**/*.sol'",
     "solhint-fix": "solhint 'contracts/**/*.sol' --fix --noPrompt",
     "test": "NODE_OPTIONS='--max-old-space-size=4096' hardhat test",
