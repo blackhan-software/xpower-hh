@@ -1,6 +1,6 @@
 FROM node:lts-bullseye-slim
 
-ENV VERSION v9.2.1
+ENV VERSION v9.2.2
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get install -y \
